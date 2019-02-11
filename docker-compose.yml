@@ -1,14 +1,14 @@
 version: '2.1'
 
 services:
-  spring-boot-template:
+  sscs-dwp:
     build:
       context: .
       args:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: hmcts/spring-boot-template
+    image: hmcts/sscs-dwp
     environment:
       # these environment variables are used by java-logging library
       - ROOT_APPENDER
