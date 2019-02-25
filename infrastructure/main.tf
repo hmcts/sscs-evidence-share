@@ -4,7 +4,7 @@ locals {
   ase_name               = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 }
 
-module "sscs-dwp" {
+module "sscs-evidence-share" {
   source              = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product             = "${var.product}-${var.component}"
   location            = "${var.location_app}"

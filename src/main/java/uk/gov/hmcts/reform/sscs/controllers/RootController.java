@@ -23,6 +23,6 @@ public class RootController {
      */
     @GetMapping("/")
     public ResponseEntity<String> welcome() {
-        return ok("Welcome to sscs-dwp");
+        return ok("Welcome to sscs-evidence-share");
     }
 }

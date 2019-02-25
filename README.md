@@ -1,8 +1,8 @@
-# sscs-dwp
+# sscs-evidence-share
 
 Microservice to handle sending evidence via an SFTP server to DWP from SSCS
 
-[![Build Status](https://travis-ci.org/hmcts/sscs-dwp.svg?branch=master)](https://travis-ci.org/hmcts/sscs-dwp)
+[![Build Status](https://travis-ci.org/hmcts/sscs-evidence-share.svg?branch=master)](https://travis-ci.org/hmcts/sscs-evidence-share)
 
 ## Notes
 
@@ -37,7 +37,7 @@ Create docker image:
   docker-compose build
 ```
 
-Run the distribution (created in `build/install/sscs-dwp` directory)
+Run the distribution (created in `build/install/sscs-evidence-share` directory)
 by executing the following command:
 
 ```bash

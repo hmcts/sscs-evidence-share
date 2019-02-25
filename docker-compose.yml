@@ -1,14 +1,14 @@
 version: '2.1'
 
 services:
-  sscs-dwp:
+  sscs-evidence-share:
     build:
       context: .
       args:
         - http_proxy
         - https_proxy
         - no_proxy
-    image: hmcts/sscs-dwp
+    image: hmcts/sscs-evidence-share
     environment:
       # these environment variables are used by java-logging library
       - ROOT_APPENDER

@@ -95,8 +95,8 @@ project.tasks['sonarqube'].dependsOn test, integration
 
 sonarqube {
   properties {
-    property "sonar.projectName", "Reform :: sscs-dwp"
-    property "sonar.projectKey", "uk.gov.hmcts.reform:sscs-dwp"
+    property "sonar.projectName", "Reform :: sscs-evidence-share"
+    property "sonar.projectKey", "uk.gov.hmcts.reform:sscs-evidence-share"
     property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
     property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
 
@@ -172,7 +172,7 @@ test {
 mainClassName = 'uk.gov.hmcts.reform.sscs.Application'
 
 bootJar {
-  archiveName = 'sscs-dwp.jar'
+  archiveName = 'sscs-evidence-share.jar'
 
   manifest {
     attributes('Implementation-Version': project.version.toString())
