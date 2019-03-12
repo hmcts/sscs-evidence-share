@@ -49,12 +49,7 @@ public class MessagingConfig {
         return new CachingConnectionFactory(jmsConnectionFactory);
     }
 
-    /*
-     * DO NOT USE THIS IN PRODUCTION!
-     * This was only used for testing unverified ssl certs locally!
-     */
     @Bean
-    @Deprecated
     public SSLContext jmsSslContext(@Value("${amqp.trustAllCerts}") final boolean trustAllCerts)
         throws NoSuchAlgorithmException, KeyManagementException {
 
@@ -71,6 +66,11 @@ public class MessagingConfig {
         return null;
     }
 
+    /*
+     * DO NOT USE THIS IN PRODUCTION!
+     * This was only used for testing unverified ssl certs locally!
+     */
+    @Deprecated
     private TrustManager[] getTrustManagers() {
         return new TrustManager[]{
             new X509TrustManager() {
