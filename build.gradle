@@ -105,6 +105,9 @@ functional.shouldRunAfter(test)
 
 sonarqube {
   properties {
+    property "sonar.exclusions", 
+      "src/main/java/uk/gov/hmcts/reform/sscs/config/**," + 
+      "src/main/java/uk/gov/hmcts/reform/sscs/servicebus/messaging/**,"
     property "sonar.projectName", "Reform :: sscs-evidence-share"
     property "sonar.projectKey", "uk.gov.hmcts.reform:sscs-evidence-share"
     property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
@@ -169,7 +172,7 @@ dependencies {
   compile group: 'org.springframework', name: 'spring-jms'
   compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.40.0'
   compileOnly 'org.projectlombok:lombok:1.18.6'
-  
+
   apt "org.projectlombok:lombok:1.18.6"
 
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.144'
