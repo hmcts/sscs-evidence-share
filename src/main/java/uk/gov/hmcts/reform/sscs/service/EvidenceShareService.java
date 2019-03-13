@@ -6,26 +6,33 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.docmosis.factory.DocumentRequestFactory;
+import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.reform.sscs.domain.Pdf;
 
 @Component
 @Slf4j
 public class EvidenceShareService {
-    private final SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
+    @Autowired
+    private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
     @Autowired
-    public EvidenceShareService(SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer) {
-        this.sscsCaseCallbackDeserializer = sscsCaseCallbackDeserializer;
-    }
+    private DocumentManagementService documentManagementService;
+
+    @Autowired
+    private DocumentRequestFactory documentRequestFactory;
 
     public long processMessage(final String message) {
-        Callback<SscsCaseData> sscsCaseDataCallback = deserialise(message);
-        log.info("Callback for event {} with state {}", sscsCaseDataCallback.getEvent(),
-            sscsCaseDataCallback.getCaseDetails().getState());
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(message);
+
+        log.info("Processing callback event {} for case id {}", sscsCaseDataCallback.getEvent(),
+            sscsCaseDataCallback.getCaseDetails().getId());
+
+        DocumentHolder holder = documentRequestFactory.create(sscsCaseDataCallback.getCaseDetails().getCaseData());
+
+        Pdf pdf = documentManagementService.generateDocumentAndAddToCcd(holder, sscsCaseDataCallback.getCaseDetails().getCaseData());
 
         return sscsCaseDataCallback.getCaseDetails().getId();
-    }
-
-    private Callback<SscsCaseData> deserialise(final String message) {
-        return sscsCaseCallbackDeserializer.deserialize(message);
     }
 }

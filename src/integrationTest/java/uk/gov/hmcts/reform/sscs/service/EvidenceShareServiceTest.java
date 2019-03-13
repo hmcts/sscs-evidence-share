@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.junit.ClassRule;
@@ -13,14 +20,6 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest

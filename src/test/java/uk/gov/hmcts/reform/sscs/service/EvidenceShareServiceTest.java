@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -27,11 +29,12 @@ public class EvidenceShareServiceTest {
     @Mock
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
+    @InjectMocks
     private EvidenceShareService evidenceShareService;
 
     @Before
-    public void setUp() {
-        evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer);
+    public void setup() {
+        initMocks(this);
     }
 
     @Test
