@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.reform.sscs.domain.Pdf;
 
 @Component
 @Slf4j
@@ -31,7 +30,9 @@ public class EvidenceShareService {
 
         DocumentHolder holder = documentRequestFactory.create(sscsCaseDataCallback.getCaseDetails().getCaseData());
 
-        Pdf pdf = documentManagementService.generateDocumentAndAddToCcd(holder, sscsCaseDataCallback.getCaseDetails().getCaseData());
+        if (holder.getTemplate() != null) {
+            documentManagementService.generateDocumentAndAddToCcd(holder, sscsCaseDataCallback.getCaseDetails().getCaseData());
+        }
 
         return sscsCaseDataCallback.getCaseDetails().getId();
     }

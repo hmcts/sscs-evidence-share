@@ -16,7 +16,7 @@ public class TemplateService {
 
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
-            if (mrnDate.plusMonths(13L).isBefore(LocalDate.now())) {
+            if (mrnDate.plusMonths(13L).isAfter(LocalDate.now())) {
                 return DL6;
             }
         }

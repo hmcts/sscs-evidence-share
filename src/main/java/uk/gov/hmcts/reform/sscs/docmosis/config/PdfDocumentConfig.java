@@ -8,8 +8,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "document.pdf")
 public class PdfDocumentConfig {
-    private String familyCourtImgKey;
-    private String familyCourtImgVal;
 
     private String hmctsImgKey;
     private String hmctsImgVal;

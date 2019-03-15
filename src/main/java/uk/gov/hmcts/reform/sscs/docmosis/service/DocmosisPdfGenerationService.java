@@ -35,13 +35,19 @@ public class DocmosisPdfGenerationService implements PdfGenerationService {
     @Value("${service.pdf-service.accessKey}")
     private String pdfServiceAccessKey;
 
+    String templateEmptyMessage = "document generation template cannot be empty";
+    String placeholdersEmptyMessage = "placeholders map cannot be null";
+
+
     @Override
-    public byte[] generateDocFrom(DocumentHolder documentHolder) {
+    public byte[] generatePdf(DocumentHolder documentHolder) {
+
+        checkArgument(documentHolder.getTemplate() != null, templateEmptyMessage);
 
         String templateName = documentHolder.getTemplate().getName();
 
-        checkArgument(!isNullOrEmpty(templateName), "document generation template cannot be empty");
-        checkNotNull(documentHolder.getPlaceholders(), "placeholders map cannot be null");
+        checkArgument(!isNullOrEmpty(templateName), templateEmptyMessage);
+        checkNotNull(documentHolder.getPlaceholders(), placeholdersEmptyMessage);
 
         log.info("Making request to pdf service to generate pdf document with template {} "
             + "and placeholders of size [{}]", templateName, documentHolder.getPlaceholders().size());
@@ -65,11 +71,9 @@ public class DocmosisPdfGenerationService implements PdfGenerationService {
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> caseData(Map<String, Object> placeholders) {
-        Map<String, Object> data = (Map<String, Object>) ((Map) placeholders.get(CASE_DETAILS)).get(CASE_DATA);
-        data.put(pdfDocumentConfig.getDisplayTemplateKey(), pdfDocumentConfig.getDisplayTemplateVal());
-        data.put(pdfDocumentConfig.getFamilyCourtImgKey(), pdfDocumentConfig.getFamilyCourtImgVal());
-        data.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());
+        placeholders.put(pdfDocumentConfig.getDisplayTemplateKey(), pdfDocumentConfig.getDisplayTemplateVal());
+        placeholders.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());
 
-        return data;
+        return placeholders;
     }
 }

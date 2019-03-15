@@ -22,7 +22,7 @@ public class DocumentRequestFactory {
 
     public <E extends SscsCaseData> DocumentHolder create(E caseData) {
         Template template = templateService.findTemplate(caseData);
-        Map<String, Object> placeholders = documentPlaceholderService.generatePlaceholders();
+        Map<String, Object> placeholders = documentPlaceholderService.generatePlaceholders(caseData);
 
         return DocumentHolder.builder()
             .template(template)

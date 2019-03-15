@@ -6,10 +6,42 @@ management:
     web:
       base-path: /
 
-#If you use a database then uncomment below lines and update db properties accordingly
 spring:
   application:
     name: sscs evidence share
+
+http:
+  connect:
+    timeout: 5000
+    request:
+      timeout: 5000
+    read:
+      timeout: 5000
+
+service:
+  pdf-service:
+    uri: ${PDF_SERVICE_BASEURL:https://docmosis-development.platform.hmcts.net/rs/render}
+    accessKey: ${PDF_SERVICE_ACCESS_KEY:}
+    health:
+      uri: ${PDF_SERVICE_HEALTH_URL:https://docmosis-development.platform.hmcts.net/rs/status}
+
+amqp:
+  host: ${AMQP_HOST:localhost}
+  username: ${AMQP_USERNAME:guest}
+  password: ${AMQP_PASSWORD:guest}
+  topic: ${TOPIC_NAME:test.topic}
+  subscription: ${SUBSCRIPTION_NAME:test.queue}
+  # DO NOT SET THIS 'true' IN PRODUCTION!
+  trustAllCerts: ${TRUST_ALL_CERTS:true}
+
+document:
+  pdf:
+    hmctsImgKey: "hmcts"
+    hmctsImgVal: "[userImage:hmcts.png]"
+    displayTemplateKey: "displayTemplateOnly"
+    displayTemplateVal: "1"
+
+document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:4506}
 
 send-letter:
   url: ${SEND_LETTER_SERIVCE_BASEURL:http://localhost:4021}
@@ -29,12 +61,3 @@ idam:
       id: ${IDAM_OAUTH2_CLIENT_ID:sscs}
       secret: ${IDAM_OAUTH2_CLIENT_SECRET:QM5RQQ53LZFOSIXJ}
     redirectUrl: ${IDAM_OAUTH2_REDIRECT_URL:https://localhost:9000/poc}
-
-amqp:
-  host: ${AMQP_HOST:localhost}
-  username: ${AMQP_USERNAME:guest}
-  password: ${AMQP_PASSWORD:guest}
-  topic: ${TOPIC_NAME:test.topic}
-  subscription: ${SUBSCRIPTION_NAME:test.queue}
-  # DO NOT SET THIS 'true' IN PRODUCTION!
-  trustAllCerts: ${TRUST_ALL_CERTS:true}
