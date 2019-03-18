@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.docmosis.service;
+package uk.gov.hmcts.reform.sscs.service;
 
 import static uk.gov.hmcts.reform.sscs.docmosis.domain.Template.DL6;
 

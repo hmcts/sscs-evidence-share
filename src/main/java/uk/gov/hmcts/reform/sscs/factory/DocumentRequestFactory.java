@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.docmosis.factory;
+package uk.gov.hmcts.reform.sscs.factory;
 
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentPlaceholderService;
-import uk.gov.hmcts.reform.sscs.docmosis.service.TemplateService;
+import uk.gov.hmcts.reform.sscs.service.DocumentPlaceholderService;
+import uk.gov.hmcts.reform.sscs.service.TemplateService;
 
 @Component
 @Slf4j

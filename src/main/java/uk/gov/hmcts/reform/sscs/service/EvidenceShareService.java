@@ -7,8 +7,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.docmosis.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 
 @Component
 @Slf4j

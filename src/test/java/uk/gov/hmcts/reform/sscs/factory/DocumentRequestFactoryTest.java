@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.docmosis.factory;
+package uk.gov.hmcts.reform.sscs.factory;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
@@ -13,8 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentPlaceholderService;
-import uk.gov.hmcts.reform.sscs.docmosis.service.TemplateService;
+import uk.gov.hmcts.reform.sscs.service.DocumentPlaceholderService;
+import uk.gov.hmcts.reform.sscs.service.TemplateService;
 
 public class DocumentRequestFactoryTest {
 
