@@ -1,5 +1,13 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.lang.String.format;
+import static java.util.Base64.getEncoder;
+import static java.util.Collections.singletonList;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,15 +18,6 @@ import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
-import static java.lang.String.format;
-import static java.util.Base64.getEncoder;
-import static java.util.Collections.singletonList;
 
 @Service
 @Slf4j

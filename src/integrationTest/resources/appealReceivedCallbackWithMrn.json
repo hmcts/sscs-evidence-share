@@ -86,7 +86,12 @@
         "city": "BIRMINGHAM"
       },
       "appeal": {
-        "mrnDetails": {},
+        "mrnDetails": {
+          "mrnDate": "2019-01-01",
+          "mrnLateReason": "Lost my paperwork",
+          "dwpIssuingOffice": "1",
+          "mrnMissingReason": null
+        },
         "appellant": {
           "name": {
             "title": "Miss",
