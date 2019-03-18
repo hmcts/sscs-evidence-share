@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -80,7 +81,7 @@ public class EvidenceShareService {
             return Collections.emptyList();
         }
         return sscsDocument.stream().flatMap(f ->
-            f.getValue().getDocumentFileName().equalsIgnoreCase("pdf")
+            StringUtils.containsIgnoreCase(f.getValue().getDocumentFileName(), "pdf")
                 ? Stream.of(new Pdf(toBytes(f), f.getValue().getDocumentFileName()))
                 : Stream.empty()
         ).collect(Collectors.toList());
