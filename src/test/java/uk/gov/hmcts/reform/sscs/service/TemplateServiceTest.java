@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.docmosis.service;
+package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
+import uk.gov.hmcts.reform.sscs.service.TemplateService;
 
 public class TemplateServiceTest {
 
