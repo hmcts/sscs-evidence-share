@@ -1,17 +1,18 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.Before;
+import java.util.UUID;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -42,13 +43,11 @@ public class EvidenceShareServiceTest {
     @Mock
     private DocumentRequestFactory documentRequestFactory;
 
+    @Mock
+    private BulkPrintService bulkPrintService;
+
     @InjectMocks
     private EvidenceShareService evidenceShareService;
-
-    @Before
-    public void setup() {
-        initMocks(this);
-    }
 
     @Test
     public void givenAMessageWhichFindsToATemplate_thenConvertToSscsCaseDataAndAddPdfToCase() {
@@ -72,6 +71,7 @@ public class EvidenceShareServiceTest {
 
         when(documentRequestFactory.create(caseData)).thenReturn(holder);
         when(documentManagementService.generateDocumentAndAddToCcd(holder, caseData)).thenReturn(new Pdf(null, "test.pdf"));
+        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(Optional.of(UUID.randomUUID()));
 
         long id = evidenceShareService.processMessage(MY_JSON_DATA);
 

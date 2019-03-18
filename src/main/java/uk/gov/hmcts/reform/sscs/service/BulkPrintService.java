@@ -2,12 +2,9 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
-import static java.util.Collections.singletonList;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +13,7 @@ import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -40,23 +38,23 @@ public class BulkPrintService {
         this.sendLetterEnabled = sendLetterEnabled;
     }
 
-    public Optional<UUID> sendToBulkPrint(final String dataToPrint, final SscsCaseData sscsCaseData)
+    public Optional<UUID> sendToBulkPrint(final List<Pdf> pdfList, final SscsCaseData sscsCaseData)
         throws BulkPrintException {
         if (sendLetterEnabled) {
-            String encodedData = getEncoder().encodeToString(dataToPrint.getBytes());
+            String[] encodedData = pdfList.stream().map(f -> getEncoder().encodeToString(f.getContent())).toArray(String[]::new);
             final String authToken = idamService.generateServiceAuthorization();
-            return sendLetter(authToken, encodedData, sscsCaseData);
+            return sendLetter(authToken, sscsCaseData, encodedData);
         }
         return Optional.empty();
 
     }
 
-    private Optional<UUID> sendLetter(String authToken, String encodedData, SscsCaseData sscsCaseData) {
+    private Optional<UUID> sendLetter(String authToken, SscsCaseData sscsCaseData, String... encodedData) {
         try {
             SendLetterResponse sendLetterResponse = sendLetterApi.sendLetter(
                 authToken,
                 new LetterWithPdfsRequest(
-                    singletonList(encodedData),
+                    Arrays.asList(encodedData),
                     XEROX_TYPE_PARAMETER,
                     getAdditionalData(sscsCaseData)
                 )
