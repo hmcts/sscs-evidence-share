@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -18,10 +19,11 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.domain.Pdf;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
-public class BulkPrintServiceTest {
+public class BulkPrintServiceIt {
 
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
     @ClassRule
@@ -54,7 +56,8 @@ public class BulkPrintServiceTest {
     public void willSendFileToBulkPrint() {
         assertNotNull("bulkPrintService must be autowired", bulkPrintService);
 
-        Optional<UUID> uuidOptional = bulkPrintService.sendToBulkPrint("my data", SSCS_CASE_DATA);
-        assertTrue(uuidOptional.isPresent());
+        Optional<UUID> uuidOptional = bulkPrintService.sendToBulkPrint(
+            singletonList(new Pdf("my data".getBytes(), "file.pdf")), SSCS_CASE_DATA);
+        assertTrue("a uuid should exist", uuidOptional.isPresent());
     }
 }

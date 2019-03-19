@@ -56,7 +56,6 @@ public class DocumentManagementServiceTest {
 
         verify(ccdPdfService).mergeDocIntoCcd(docName, pdfBytes, 12345678L, caseData, tokens);
 
-        assertEquals(result.getContent(), pdfBytes);
-        assertEquals(result.getName(), docName);
+        assertEquals("Pdf should be as expected", new Pdf(pdfBytes, docName), result);
     }
 }

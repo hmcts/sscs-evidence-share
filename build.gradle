@@ -71,7 +71,7 @@ task smoke(type: Test) {
 
 checkstyle {
   maxWarnings = 0
-  toolVersion = '8.14'
+  toolVersion = '8.18'
   // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
   configDir = new File(rootDir, 'config/checkstyle')
 }
@@ -110,12 +110,14 @@ sonarqube {
       "src/main/java/uk/gov/hmcts/reform/sscs/servicebus/messaging/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
-      "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**,"
+      "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
+      "src/main/java/uk/gov/hmcts/reform/sscs/SscsEvidenceShareApplication.java,"
     property "sonar.projectName", "Reform :: sscs-evidence-share"
     property "sonar.projectKey", "uk.gov.hmcts.reform:sscs-evidence-share"
     property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
     property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
-
+    property "sonar.pitest.mode", "reuseReport"
+    property "sonar.pitest.reportsDirectory", "build/reports/pitest"
   }
 }
 

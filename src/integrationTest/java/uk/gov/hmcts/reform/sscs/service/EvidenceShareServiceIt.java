@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,8 +11,10 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,27 +54,22 @@ public class EvidenceShareServiceIt {
     private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
 
     @MockBean
-    @SuppressWarnings({"PMD.UnusedPrivateField"})
     private EvidenceManagementService evidenceManagementService;
 
     @MockBean
-    @SuppressWarnings({"PMD.UnusedPrivateField"})
     private CcdService ccdService;
 
     @MockBean
-    @SuppressWarnings({"PMD.UnusedPrivateField"})
     private RestTemplate restTemplate;
+
+    @MockBean
+    private BulkPrintService bulkPrintService;
 
     @Autowired
     @SuppressWarnings({"PMD.UnusedPrivateField"})
     private EvidenceShareService evidenceShareService;
 
-    public static final String FILE_CONTENT = "Welcome to PDF document service";
-
-    @Before
-    public void setup() {
-        initMocks(this);
-    }
+    private static final String FILE_CONTENT = "Welcome to PDF document service";
 
     @Test
     public void appealWithValidMrnDate_shouldGenerateDL6TemplateAgainstDocmosisAndUploadToEvidenceManagementServiceAndAddToCaseInCcd() throws IOException {
@@ -89,6 +85,7 @@ public class EvidenceShareServiceIt {
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(),  eq("sscs"))).thenReturn(uploadResponse);
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(Optional.of(UUID.randomUUID()));
 
         long id = evidenceShareService.processMessage(json);
 
@@ -97,6 +94,7 @@ public class EvidenceShareServiceIt {
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), any(), any());
+        verify(bulkPrintService).sendToBulkPrint(any(), any());
     }
 
     @Test

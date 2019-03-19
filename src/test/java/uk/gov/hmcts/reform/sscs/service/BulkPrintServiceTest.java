@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
@@ -17,13 +19,14 @@ import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BulkPrintServiceTest {
 
-    private static final String DATA = "myData";
+    private static final List<Pdf> PDF_LIST = singletonList(new Pdf("myData".getBytes(), "file.pdf"));
     private static final UUID LETTER_ID = UUID.randomUUID();
 
     private static final SscsCaseData SSCS_CASE_DATA = SscsCaseData.builder()
@@ -54,7 +57,7 @@ public class BulkPrintServiceTest {
     public void willSendToBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenReturn(new SendLetterResponse(LETTER_ID));
-        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(DATA, SSCS_CASE_DATA);
+        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
         assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
     }
 
@@ -62,14 +65,14 @@ public class BulkPrintServiceTest {
     public void willThrowAnyExceptionsToBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenThrow(new RuntimeException("error"));
-        bulkPrintService.sendToBulkPrint(DATA, SSCS_CASE_DATA);
+        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
     }
 
 
     @Test
     public void sendLetterNotEnabledWillNotSendToBulkPrint() {
         BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, false);
-        notEnabledBulkPrint.sendToBulkPrint(DATA, SSCS_CASE_DATA);
+        notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
         verifyZeroInteractions(idamService);
         verifyZeroInteractions(sendLetterApi);
     }
