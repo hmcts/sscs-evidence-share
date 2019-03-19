@@ -107,7 +107,8 @@
           "isAppointee": null
         },
         "benefitType": {
-          "code": "ESA"
+          "code": "ESA",
+          "description": "Employment Support Allowance"
         },
         "hearingOptions": {
           "wantsToAttend": "No",
