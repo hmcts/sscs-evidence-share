@@ -83,7 +83,12 @@ public class EvidenceShareService {
             return Collections.emptyList();
         }
         return sscsDocument.stream()
-            .filter(doc -> nonNull(doc) && nonNull(doc.getValue()) && nonNull(doc.getValue().getDocumentFileName()))
+            .filter(doc -> nonNull(doc)
+                && nonNull(doc.getValue())
+                && nonNull(doc.getValue().getDocumentFileName())
+                && nonNull(doc.getValue().getDocumentLink())
+                && nonNull(doc.getValue().getDocumentLink().getDocumentUrl())
+            )
             .flatMap(doc -> StringUtils.containsIgnoreCase(doc.getValue().getDocumentFileName(), "pdf")
                 ? Stream.of(new Pdf(toBytes(doc), doc.getValue().getDocumentFileName()))
                 : Stream.empty()
