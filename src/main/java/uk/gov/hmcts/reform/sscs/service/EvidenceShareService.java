@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Objects.nonNull;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,9 +82,10 @@ public class EvidenceShareService {
         if (sscsDocument == null) {
             return Collections.emptyList();
         }
-        return sscsDocument.stream().flatMap(f ->
-            StringUtils.containsIgnoreCase(f.getValue().getDocumentFileName(), "pdf")
-                ? Stream.of(new Pdf(toBytes(f), f.getValue().getDocumentFileName()))
+        return sscsDocument.stream()
+            .filter(doc -> nonNull(doc) && nonNull(doc.getValue()) && nonNull(doc.getValue().getDocumentFileName()))
+            .flatMap(doc -> StringUtils.containsIgnoreCase(doc.getValue().getDocumentFileName(), "pdf")
+                ? Stream.of(new Pdf(toBytes(doc), doc.getValue().getDocumentFileName()))
                 : Stream.empty()
         ).collect(Collectors.toList());
     }
