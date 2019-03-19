@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.domain;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -13,7 +14,7 @@ public class Pdf {
     }
 
     public byte[] getContent() {
-        return content;
+        return ArrayUtils.clone(content);
     }
 
     public String getName() {
