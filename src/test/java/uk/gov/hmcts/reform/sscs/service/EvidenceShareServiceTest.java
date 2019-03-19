@@ -54,14 +54,22 @@ public class EvidenceShareServiceTest {
     public void givenAMessageWhichFindsToATemplate_thenConvertToSscsCaseDataAndAddPdfToCase() {
 
         long expectedId = 123L;
-        String docUrl = "my/1/url";
+        String docUrl = "my/1/url.pdf";
         Pdf docPdf = new Pdf(docUrl.getBytes(), "evidence1.pdf");
         SscsCaseData caseData = SscsCaseData.builder().sscsDocument(
-            Collections.singletonList(
+            Arrays.asList(
                 SscsDocument.builder().value(SscsDocumentDetails.builder()
                     .documentFileName(docPdf.getName())
                     .documentLink(DocumentLink.builder().documentUrl(docUrl)
                         .documentFilename(docPdf.getName()).build())
+                    .build()).build(),
+                SscsDocument.builder().value(SscsDocumentDetails.builder()
+                    .documentFileName("filtered out word.doc")
+                    .documentLink(DocumentLink.builder().documentUrl("/my/1/doc.url")
+                        .documentFilename("filtered out word.doc").build())
+                    .build()).build(),
+                SscsDocument.builder().value(SscsDocumentDetails.builder()
+                    .documentFileName("filtered out as there is no documentLink object.pfd")
                     .build()).build()
             )
         ).build();
