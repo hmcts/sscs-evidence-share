@@ -40,14 +40,14 @@ public class EvidenceShareService {
 
     @Autowired
     public EvidenceShareService(
-        SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer,
+        SscsCaseCallbackDeserializer sscsDeserializer,
         DocumentManagementService documentManagementService,
         DocumentRequestFactory documentRequestFactory,
         EvidenceManagementService evidenceManagementService,
         BulkPrintService bulkPrintService
     ) {
 
-        this.sscsCaseCallbackDeserializer = sscsCaseCallbackDeserializer;
+        this.sscsCaseCallbackDeserializer = sscsDeserializer;
         this.documentManagementService = documentManagementService;
         this.documentRequestFactory = documentRequestFactory;
         this.evidenceManagementService = evidenceManagementService;
