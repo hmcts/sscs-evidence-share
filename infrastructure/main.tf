@@ -11,8 +11,8 @@ locals {
   shared_app_service_plan     = "${var.product}-${var.env}"
   non_shared_app_service_plan = "${var.product}-${var.component}-${var.env}"
   app_service_plan            = "${(var.env == "saat" || var.env == "sandbox") ?  local.shared_app_service_plan : local.non_shared_app_service_plan}"
-  docmosis_prod_vault         = "docmosisiaasdevkv"
-  docmosis_nonprod_vault      = "docmosisiaasprodkv"
+  docmosis_prod_vault         = "docmosisiaasprodkv"
+  docmosis_nonprod_vault      = "docmosisiaasdevkv"
 }
 
 resource "azurerm_resource_group" "rg" {
