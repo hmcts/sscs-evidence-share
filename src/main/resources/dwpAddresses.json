@@ -1,0 +1,205 @@
+{
+  "pip": [
+    {
+      "code": 1,
+      "address": {
+        "line1": "Mail Handling Site A",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV98 1AA"
+      }
+    },
+    {
+      "code": 2,
+      "address": {
+        "line1": "Mail Handling Site A",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV98 1AB"
+      }
+    },
+    {
+      "code": 3,
+      "address": {
+        "line1": "Mail Handling Site A",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV98 1AD"
+      }
+    },
+    {
+      "code": 4,
+      "address": {
+        "line1": "Mail Handling Site A",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV99 1AA"
+      }
+    },
+    {
+      "code": 5,
+      "address": {
+        "line1": "Post Handling Site B",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV99 1AB"
+      }
+    },
+    {
+      "code": 6,
+      "address": {
+        "line1": "Post Handling Site B",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV99 1AD"
+      }
+    },
+    {
+      "code": 7,
+      "address": {
+        "line1": "Post Handling Site B",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV99 1AE"
+      }
+    },
+    {
+      "code": 8,
+      "address": {
+        "line1": "Post Handling Site B",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV99 1AF"
+      }
+    },
+    {
+      "code": 9,
+      "address": {
+        "line1": "Post Handling Site B",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV99 1AG"
+      }
+    },
+    {
+      "code": 10,
+      "address": {
+        "line1": "Warbreck House",
+        "line2": "Blackpool",
+        "postCode": "FY2 0UZ"
+      }
+    }
+  ],
+  "esa" : [
+    {
+      "code": "Balham DRT",
+      "address": {
+        "line1": "Mail Handling Site A",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV98 1HJ"
+      }
+    },
+    {
+      "code": "Birkenhead LM DRT",
+      "address": {
+        "line1": "Birkenhead Benefit Centre",
+        "line2": "Post Handling Site B",
+        "line3": "WOLVERHAMPTON",
+        "postCode": "WV99 1FZ"
+      }
+    },
+    {
+      "code": "Lowestoft DRT",
+      "address": {
+        "line1": "Post Handling Site B",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV99 1NH"
+      }
+    },
+    {
+      "code": "Wellingborough DRT",
+      "address": {
+        "line1": "Post Handling Site B",
+        "line2": "WOLVERHAMPTON",
+        "postCode": "WV99 1DZ"
+      }
+    },
+    {
+      "code": "Chesterfield DRT",
+      "address": {
+        "line1": "Chesterfield Benefit Centre",
+        "line2": "Mail Handling Site A",
+        "line3": "WOLVERHAMPTON",
+        "postCode": "WV98 1GG"
+      }
+    },
+    {
+      "code": "Coatbridge Benefit Centre",
+      "address": {
+        "line1": "Coatbridge Benefit Centre",
+        "line2": "Mail Handling Site A",
+        "line3": "WOLVERHAMPTON",
+        "postCode": "WV98 1BX"
+      }
+    },
+    {
+      "code": "Inverness DRT",
+      "address": {
+        "line1": "Inverness Benefit Centre",
+        "line2": "Mail Handling Site A",
+        "line3": "Wolverhampton",
+        "postCode": "WV98 1PL"
+      }
+    },
+    {
+      "code": "Milton Keynes DRT",
+      "address": {
+        "line1": "Milton Keynes Benefit Centre",
+        "line2": "Post Handling Site B",
+        "line3": "WOLVERHAMPTON",
+        "postCode": "WV99 1RA"
+      }
+    },
+    {
+      "code": "Springburn DRT",
+      "address": {
+      }
+    },
+    {
+      "code": "Watford DRT",
+      "address": {
+        "line1": "Watford Service Centre",
+        "line2": "Post Handling Site B",
+        "line3": "WOLVERHAMPTON",
+        "postCode": "WV99 1RH"
+      }
+    },
+    {
+      "code": "Watford DRT",
+      "address": {
+        "line1": "Watford Service Centre",
+        "line2": "Post Handling Site B",
+        "line3": "WOLVERHAMPTON",
+        "postCode": "WV99 1RH"
+      }
+    },
+    {
+      "code": "Norwich DRT",
+      "address": {
+        "line1": "Norwich Benefit Centre",
+        "line2": "Post Handling Site B",
+        "line3": "WOLVERHAMPTON",
+        "postCode": "WV99 1NN"
+      }
+    },
+    {
+      "code": "Sheffield DRT",
+      "address": {
+        "line1": "Sheffield Benefit Centre",
+        "line2": "Mail Handling Site A",
+        "line3": "WOLVERHAMPTON",
+        "postCode": "WV98 1FZ"
+      }
+    }
+  ],
+  "excela" : {
+    "address": {
+      "line1": "PO BOX XXX",
+      "line2": "Exela BSP Services",
+      "line3": "Harlow",
+      "postCode": "CM19 5QS"
+    }
+  }
+
+}
