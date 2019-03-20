@@ -18,19 +18,19 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 sourceSets {
-  functionalTest {
+  e2e {
     java {
-      compileClasspath += main.output
-      runtimeClasspath += main.output
-      srcDir file('src/functionalTest/java')
+      compileClasspath += main.output + test.output
+      runtimeClasspath += main.output + test.output
+      srcDir file('src/e2e/java')
     }
-    resources.srcDir file('src/functionalTest/resources')
+    resources.srcDir file('src/e2e/resources')
   }
 
   integrationTest {
     java {
-      compileClasspath += main.output
-      runtimeClasspath += main.output
+      compileClasspath += main.output + test.output
+      runtimeClasspath += main.output + test.output
       srcDir file('src/integrationTest/java')
     }
     resources.srcDir file('src/integrationTest/resources')
@@ -50,9 +50,12 @@ tasks.withType(JavaCompile) {
   options.compilerArgs << "-Xlint:unchecked" << "-Werror"
 }
 
-task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
-  testClassesDirs = sourceSets.functionalTest.output.classesDirs
-  classpath = sourceSets.functionalTest.runtimeClasspath
+task functional(type: Test) {
+  group = 'verification'
+  description = 'Executes non-destructive functional tests in AAT against a running CCD and evidence share service'
+  setTestClassesDirs(sourceSets.e2e.output.classesDirs)
+  setClasspath(sourceSets.e2e.runtimeClasspath)
+  include "uk/gov/hmcts/reform/sscs/functional/**"
 }
 
 task integration(type: Test, description: 'Runs the integration tests.', group: 'Verification') {
@@ -69,6 +72,13 @@ task smoke(type: Test) {
   classpath = sourceSets.smokeTest.runtimeClasspath
 }
 
+configurations {
+  integrationTestCompile.extendsFrom(testCompile)
+  integrationTestRuntime.extendsFrom(testRuntime)
+  e2eCompile.extendsFrom(testCompile)
+  e2eRuntime.extendsFrom(testRuntime)
+}
+
 checkstyle {
   maxWarnings = 0
   toolVersion = '8.18'
@@ -79,7 +89,7 @@ checkstyle {
 pmd {
   toolVersion = "6.9.0"
   ignoreFailures = true
-  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest, sourceSets.smokeTest]
+  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.e2e, sourceSets.integrationTest, sourceSets.smokeTest]
   reportsDir = file("$project.buildDir/reports/pmd")
   ruleSetFiles = files("config/pmd/ruleset.xml")
 }
@@ -175,9 +185,11 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  compile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging-httpcomponents', version: versions.reformLogging
@@ -191,8 +203,8 @@ dependencies {
 
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '2.1.1'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '2.0.0'
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.149'
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.0.106'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.150'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.0.107'
 
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
@@ -207,7 +219,7 @@ dependencies {
   integrationTestCompile sourceSets.main.runtimeClasspath
   integrationTestCompile sourceSets.test.runtimeClasspath
 
-  functionalTestCompile sourceSets.main.runtimeClasspath
+  e2eCompile sourceSets.main.runtimeClasspath
 
   smokeTestCompile sourceSets.main.runtimeClasspath
 }

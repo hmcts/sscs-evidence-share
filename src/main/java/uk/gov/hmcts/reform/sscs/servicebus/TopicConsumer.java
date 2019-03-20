@@ -21,7 +21,6 @@ public class TopicConsumer {
         subscription = "${amqp.subscription}"
     )
     public void onMessage(String message) {
-        log.info("Received message from queue: {}", message);
         long caseId = evidenceShareService.processMessage(message);
         log.info("Processed message for caseId {}", caseId);
     }

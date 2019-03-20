@@ -11,7 +11,4 @@ public class PdfDocumentConfig {
 
     private String hmctsImgKey;
     private String hmctsImgVal;
-
-    private String displayTemplateKey;
-    private String displayTemplateVal;
 }

@@ -23,12 +23,12 @@ public class DocumentManagementService {
     private IdamService idamService;
 
     public Pdf generateDocumentAndAddToCcd(DocumentHolder holder, SscsCaseData caseData) {
-        log.info("Generating template {} for case id {}", holder.getTemplate().getName(), caseData.getCcdCaseId());
+        log.info("Generating template {} for case id {}", holder.getTemplate().getHmctsDocName(), caseData.getCcdCaseId());
 
         byte[] pdfBytes = pdfGenerationService.generatePdf(holder);
-        String pdfName = getPdfName(holder.getTemplate().getName(), caseData.getCcdCaseId());
+        String pdfName = getPdfName(holder.getTemplate().getHmctsDocName(), caseData.getCcdCaseId());
 
-        log.info("Adding document template {} to ccd for id {}", holder.getTemplate().getName(), caseData.getCcdCaseId());
+        log.info("Adding document template {} to ccd for id {}", holder.getTemplate().getHmctsDocName(), caseData.getCcdCaseId());
         ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, Long.valueOf(caseData.getCcdCaseId()), caseData, idamService.getIdamTokens());
 
         return new Pdf(pdfBytes, pdfName);

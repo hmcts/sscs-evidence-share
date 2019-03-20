@@ -9,6 +9,8 @@ management:
 spring:
   application:
     name: sscs evidence share
+  main:
+    allow-bean-definition-overriding: true
 
 http:
   connect:
@@ -36,16 +38,14 @@ amqp:
 
 document:
   pdf:
-    hmctsImgKey: "hmcts"
+    hmctsImgKey: "hmcts2"
     hmctsImgVal: "[userImage:hmcts.png]"
-    displayTemplateKey: "displayTemplateOnly"
-    displayTemplateVal: "1"
 
 document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:4506}
 
 send-letter:
   url: ${SEND_LETTER_SERIVCE_BASEURL:http://localhost:4021}
-  enabled: ${SEND_LETTER_SERIVCE_ENABLED:true}
+  enabled: ${SEND_LETTER_SERIVCE_ENABLED:false}
 
 idam:
   url: ${IDAM_URL:http://localhost:4501}
@@ -61,3 +61,8 @@ idam:
       id: ${IDAM_OAUTH2_CLIENT_ID:sscs}
       secret: ${IDAM_OAUTH2_CLIENT_SECRET:QM5RQQ53LZFOSIXJ}
     redirectUrl: ${IDAM_OAUTH2_REDIRECT_URL:https://localhost:9000/poc}
+core_case_data:
+  api:
+    url: ${CORE_CASE_DATA_URL:http://localhost:4452}
+  caseTypeId: Benefit
+  jurisdictionId: SSCS

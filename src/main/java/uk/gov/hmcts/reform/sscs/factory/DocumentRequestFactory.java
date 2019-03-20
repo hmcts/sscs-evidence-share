@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.factory;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,9 @@ public class DocumentRequestFactory {
     @Autowired
     private TemplateService templateService;
 
-    public <E extends SscsCaseData> DocumentHolder create(E caseData) {
+    public <E extends SscsCaseData> DocumentHolder create(E caseData, LocalDateTime caseCreatedDate) {
         Template template = templateService.findTemplate(caseData);
-        Map<String, Object> placeholders = documentPlaceholderService.generatePlaceholders(caseData);
+        Map<String, Object> placeholders = documentPlaceholderService.generatePlaceholders(caseData, caseCreatedDate);
 
         return DocumentHolder.builder()
             .template(template)
