@@ -74,7 +74,7 @@ data "azurerm_key_vault_secret" "pdf_service_access_key" {
   vault_uri = "${data.azurerm_key_vault.docmosis_key_vault.vault_uri}"
 }
 
-module "sscs-ccd-callback-orchestrator" {
+module "sscs-evidence-share" {
   source              = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product             = "${var.product}-${var.component}"
   location            = "${var.location_app}"
@@ -92,9 +92,9 @@ module "sscs-ccd-callback-orchestrator" {
     SEND_LETTER_SERIVCE_BASEURL = "${var.send_letter_service_base_url}"
     SEND_LETTER_SERIVCE_ENABLED = "${var.send_letter_service_enabled}"
 
-    PDF_SERVICE_BASEURL         = "${data.pdf_service_base_url}"
-    PDF_SERVICE_ACCESS_KEY      = "${data.pdf_service_access_key}"
-    PDF_SERVICE_HEALTH_URL      = "${replace(data.pdf_service_health_url, "render", "status")}"
+    PDF_SERVICE_BASEURL         = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}"
+    PDF_SERVICE_ACCESS_KEY      = "${data.azurerm_key_vault_secret.pdf_service_access_key.value}"
+    PDF_SERVICE_HEALTH_URL      = "${replace(data.azurerm_key_vault_secret.pdf_service_base_url.value, "render", "status")}"
 
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
 
