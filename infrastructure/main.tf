@@ -30,11 +30,6 @@ data "azurerm_key_vault" "sscs_key_vault" {
   resource_group_name = "${local.azureVaultName}"
 }
 
-data "azurerm_key_vault" "docmosis_key_vault" {
-  name                = "${local.azureVaultNameDocmosis}"
-  resource_group_name = "${local.azureVaultNameDocmosis}"
-}
-
 data "azurerm_key_vault_secret" "idam_api" {
   name      = "idam-api"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
