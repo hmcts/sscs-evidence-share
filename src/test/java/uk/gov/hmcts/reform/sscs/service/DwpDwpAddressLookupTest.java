@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -16,6 +17,8 @@ public class DwpDwpAddressLookupTest {
 
     private static final String PIP = "PIP";
     private static final String ESA = "ESA";
+    private static final String MUST_BE_TRUE = "must be true";
+    private static final String MUST_BE_FALSE = "must be false";
 
     private final DwpAddressLookup dwpAddressLookup = new DwpAddressLookup();
 
@@ -23,7 +26,7 @@ public class DwpDwpAddressLookupTest {
     @Parameters({"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"})
     public void pipAddressesExist(final String dwpIssuingOffice) {
         Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(PIP, dwpIssuingOffice);
-        assertTrue(optionalAddress.isPresent());
+        assertTrue(MUST_BE_TRUE, optionalAddress.isPresent());
     }
 
     @Test
@@ -33,7 +36,7 @@ public class DwpDwpAddressLookupTest {
     })
     public void benefitTypeIsCaseInsensitive(final String benefitType, String dwpIssuingOffice) {
         Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(benefitType, dwpIssuingOffice);
-        assertTrue(optionalAddress.isPresent());
+        assertTrue(MUST_BE_TRUE, optionalAddress.isPresent());
     }
 
     @Test
@@ -44,28 +47,33 @@ public class DwpDwpAddressLookupTest {
     })
     public void esaAddressesExist(final String dwpIssuingOffice) {
         Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(ESA, dwpIssuingOffice);
-        assertTrue(optionalAddress.isPresent());
+        assertTrue(MUST_BE_TRUE, optionalAddress.isPresent());
     }
 
     @Test
     @Parameters({"JOB", "UNK", "PLOP", "BIG", "FIG"})
     public void unknownBenefitTypeReturnsNone(final String benefitType) {
         Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(benefitType, "1");
-        assertFalse(optionalAddress.isPresent());
+        assertFalse(MUST_BE_FALSE, optionalAddress.isPresent());
     }
 
     @Test
     @Parameters({"11", "12", "13", "14", "JOB"})
     public void unknownPipDwpIssuingOfficeReturnsNone(final String dwpIssuingOffice) {
         Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(PIP, dwpIssuingOffice);
-        assertFalse(optionalAddress.isPresent());
+        assertFalse(MUST_BE_FALSE, optionalAddress.isPresent());
     }
 
     @Test
     @Parameters({"JOB", "UNK", "PLOP", "BIG", "11"})
     public void unknownEsaDwpIssuingOfficeReturnsNone(final String dwpIssuingOffice) {
         Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(ESA, dwpIssuingOffice);
-        assertFalse(optionalAddress.isPresent());
+        assertFalse(MUST_BE_FALSE, optionalAddress.isPresent());
     }
 
+    @Test
+    public void excelaAddressIsConfigured() {
+        String[] lines = DwpAddressLookup.EXCELA_DWP_ADDRESS.lines();
+        assertArrayEquals(new String[]{"PO BOX XXX", "Exela BSP Services", "Harlow", "CM19 5QS"}, lines);
+    }
 }

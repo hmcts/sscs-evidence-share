@@ -82,21 +82,23 @@ public class DocumentPlaceholderService {
                 caseData.getAppeal().getBenefitType().getCode(),
                 caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
 
-            if (optionalAddress.isPresent()) {
-                String[] lines = optionalAddress.get().lines();
-                if (lines.length >= 1) {
-                    placeholders.put(DWP_ADDRESS_LINE1_LITERAL, lines[0]);
-                }
-                if (lines.length >= 2) {
-                    placeholders.put(DWP_ADDRESS_LINE2_LITERAL, lines[1]);
-                }
-                if (lines.length >= 3) {
-                    placeholders.put(DWP_ADDRESS_LINE3_LITERAL, lines[2]);
-                }
-                if (lines.length >= 4) {
-                    placeholders.put(DWP_ADDRESS_LINE4_LITERAL, lines[3]);
-                }
-            }
+            optionalAddress.ifPresent(dwpAddress -> setDwpAddress(placeholders, dwpAddress));
+        }
+    }
+
+    private void setDwpAddress(Map<String, Object> placeholders, DwpAddress dwpAddress) {
+        String[] lines = dwpAddress.lines();
+        if (lines.length >= 1) {
+            placeholders.put(DWP_ADDRESS_LINE1_LITERAL, lines[0]);
+        }
+        if (lines.length >= 2) {
+            placeholders.put(DWP_ADDRESS_LINE2_LITERAL, lines[1]);
+        }
+        if (lines.length >= 3) {
+            placeholders.put(DWP_ADDRESS_LINE3_LITERAL, lines[2]);
+        }
+        if (lines.length >= 4) {
+            placeholders.put(DWP_ADDRESS_LINE4_LITERAL, lines[3]);
         }
     }
 
