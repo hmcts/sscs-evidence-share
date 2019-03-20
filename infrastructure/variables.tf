@@ -36,7 +36,7 @@ variable "idam_oauth2_client_id" {
 }
 
 variable "idam_redirect_url" {
-  default = "https://sscs-ccd-callback-orchestrator-sandbox.service.core-compute-sandbox.internal"
+  default = "https://sscs-evidence-share-sandbox.service.core-compute-sandbox.internal"
 }
 
 variable "trust_all_certs" {

@@ -2,13 +2,13 @@
 @Library("Infrastructure") _
 
 properties([
-        [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/sscs-ccd-callback-orchestrator'],
+        [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/sscs-evidence-share'],
         pipelineTriggers([[$class: 'GitHubPushTrigger']])
 ])
 
 def type = "java"
 def product = "sscs"
-def component = "ccd-callback-orchestrator"
+def component = "evidence-share"
 
 List<LinkedHashMap<String, Object>> secrets = [
   secret('idam-api', 'IDAM_API_URL'),

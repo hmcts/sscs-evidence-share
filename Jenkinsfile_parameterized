@@ -4,12 +4,12 @@
 properties([
   parameters([
     string(name: 'PRODUCT_NAME', defaultValue: 'sscs', description: ''),
-    string(name: 'APP', defaultValue: 'ccd-callback-orchestrator', description: ''),
+    string(name: 'APP', defaultValue: 'evidence-share', description: ''),
     string(name: 'TYPE', defaultValue: 'java', description: ''),
     string(name: 'ENVIRONMENT', defaultValue: 'saat', description: 'Environment where code should be build and deployed'),
     choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
   ]),
-  [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/sscs-ccd-callback-orchestrator'],
+  [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/sscs-evidence-share'],
   pipelineTriggers([[$class: 'GitHubPushTrigger']])
 ])
 
