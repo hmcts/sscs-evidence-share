@@ -14,6 +14,8 @@ locals {
   app_service_plan            = "${(var.env == "saat" || var.env == "sandbox") ?  local.shared_app_service_plan : local.non_shared_app_service_plan}"
   docmosis_prod_vault         = "docmosisiaasprodkv"
   docmosis_nonprod_vault      = "docmosisiaasdevkv"
+
+  documentStore = "http://dm-store-${var.env}.service.${local.ase_name}.internal"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -86,9 +88,9 @@ module "sscs-evidence-share" {
     SEND_LETTER_SERIVCE_BASEURL = "${var.send_letter_service_base_url}"
     SEND_LETTER_SERIVCE_ENABLED = "${var.send_letter_service_enabled}"
 
-    PDF_SERVICE_BASEURL         = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}/rs/render"
+    PDF_SERVICE_BASEURL         = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/render"
     PDF_SERVICE_ACCESS_KEY      = "${data.azurerm_key_vault_secret.pdf_service_access_key.value}"
-    PDF_SERVICE_HEALTH_URL      = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}/rs/health"
+    PDF_SERVICE_HEALTH_URL      = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/health"
 
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
 
@@ -111,5 +113,7 @@ module "sscs-evidence-share" {
     SUBSCRIPTION_NAME = "evidenceshare-subscription"
 
     TRUST_ALL_CERTS   = "${var.trust_all_certs}"
+
+    DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
   }
 }
