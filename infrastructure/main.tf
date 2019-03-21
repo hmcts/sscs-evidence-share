@@ -82,15 +82,13 @@ module "sscs-evidence-share" {
   common_tags         = "${var.common_tags}"
 
   app_settings = {
-    LOGBACK_REQUIRE_ALERT_LEVEL = "${var.logback_require_alert_level}"
-    LOGBACK_REQUIRE_ERROR_CODE  = "${var.logback_require_error_code}"
 
     SEND_LETTER_SERIVCE_BASEURL = "${var.send_letter_service_base_url}"
     SEND_LETTER_SERIVCE_ENABLED = "${var.send_letter_service_enabled}"
 
-    PDF_SERVICE_BASEURL         = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}"
+    PDF_SERVICE_BASEURL         = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}/rs/render"
     PDF_SERVICE_ACCESS_KEY      = "${data.azurerm_key_vault_secret.pdf_service_access_key.value}"
-    PDF_SERVICE_HEALTH_URL      = "${replace(data.azurerm_key_vault_secret.pdf_service_base_url.value, "render", "status")}"
+    PDF_SERVICE_HEALTH_URL      = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}/rs/health"
 
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
 
