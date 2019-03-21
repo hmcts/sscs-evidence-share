@@ -18,4 +18,18 @@
     <notes><![CDATA[ I can't upgrade qpid-jms-client-0.40.0.ja so I'm suppressing the vulnerability... ]]></notes>
     <cve>CVE-2016-4432</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: groovy-xml-2.4.15.jar
+   ]]></notes>
+    <gav regex="true">^org\.codehaus\.groovy:groovy-xml:.*$</gav>
+    <cve>CVE-2016-6497</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: groovy-json-2.4.15.jar
+   ]]></notes>
+    <gav regex="true">^org\.codehaus\.groovy:groovy-json:.*$</gav>
+    <cve>CVE-2016-6497</cve>
+  </suppress>
 </suppressions>

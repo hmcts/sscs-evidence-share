@@ -2,15 +2,21 @@ package uk.gov.hmcts.reform.sscs.docmosis.domain;
 
 public enum Template {
 
-    DL6("DL6");
+    DL6("TB-SCS-GNO-ENG-00010 v0.2.doc", "DL6");
 
-    private String name;
+    private String templateName;
+    private String hmctsDocName;
 
-    Template(String name) {
-        this.name = name;
+    Template(String templateName, String hmctsDocName) {
+        this.templateName = templateName;
+        this.hmctsDocName = hmctsDocName;
     }
 
-    public String getName() {
-        return name;
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public String getHmctsDocName() {
+        return hmctsDocName;
     }
 }

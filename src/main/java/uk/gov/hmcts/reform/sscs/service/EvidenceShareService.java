@@ -60,8 +60,11 @@ public class EvidenceShareService {
         log.info("Processing callback event {} for case id {}", sscsCaseDataCallback.getEvent(),
             sscsCaseDataCallback.getCaseDetails().getId());
 
+        DocumentHolder holder = documentRequestFactory.create(
+            sscsCaseDataCallback.getCaseDetails().getCaseData(),
+            sscsCaseDataCallback.getCaseDetails().getCreatedDate());
+
         final SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
-        DocumentHolder holder = documentRequestFactory.create(caseData);
 
         if (holder.getTemplate() != null) {
             Pdf newPdfAddedToTheCase = documentManagementService.generateDocumentAndAddToCcd(holder, caseData);

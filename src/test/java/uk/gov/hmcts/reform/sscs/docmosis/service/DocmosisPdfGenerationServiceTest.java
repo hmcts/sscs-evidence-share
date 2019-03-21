@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 
@@ -24,9 +23,6 @@ public class DocmosisPdfGenerationServiceTest {
 
     @Mock
     private RestTemplate restTemplate;
-
-    @Mock
-    private PdfDocumentConfig pdfDocumentConfig;
 
     @InjectMocks
     private DocmosisPdfGenerationService pdfGenerationService;

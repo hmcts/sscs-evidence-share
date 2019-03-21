@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.PdfDocumentRequest;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
@@ -20,14 +19,8 @@ import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 @Slf4j
 public class DocmosisPdfGenerationService implements PdfGenerationService {
 
-    private static final String CASE_DETAILS = "caseDetails";
-    private static final String CASE_DATA = "case_data";
-
     @Autowired
     private RestTemplate restTemplate;
-
-    @Autowired
-    private PdfDocumentConfig pdfDocumentConfig;
 
     @Value("${service.pdf-service.uri}")
     private String pdfServiceEndpoint;
@@ -44,7 +37,7 @@ public class DocmosisPdfGenerationService implements PdfGenerationService {
 
         checkArgument(documentHolder.getTemplate() != null, templateEmptyMessage);
 
-        String templateName = documentHolder.getTemplate().getName();
+        String templateName = documentHolder.getTemplate().getTemplateName();
 
         checkArgument(!isNullOrEmpty(templateName), templateEmptyMessage);
         checkNotNull(documentHolder.getPlaceholders(), placeholdersEmptyMessage);
@@ -63,17 +56,10 @@ public class DocmosisPdfGenerationService implements PdfGenerationService {
 
     private PdfDocumentRequest request(String templateName, Map<String, Object> placeholders) {
         return PdfDocumentRequest.builder()
-                .accessKey(pdfServiceAccessKey)
-                .templateName(templateName)
-                .outputName("result.pdf")
-                .data(caseData(placeholders)).build();
+            .accessKey(pdfServiceAccessKey)
+            .templateName(templateName)
+            .outputName("result.pdf")
+            .data(placeholders).build();
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> caseData(Map<String, Object> placeholders) {
-        placeholders.put(pdfDocumentConfig.getDisplayTemplateKey(), pdfDocumentConfig.getDisplayTemplateVal());
-        placeholders.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());
-
-        return placeholders;
-    }
 }
