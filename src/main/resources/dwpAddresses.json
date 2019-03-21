@@ -154,15 +154,10 @@
     {
       "code": "Springburn DRT",
       "address": {
-      }
-    },
-    {
-      "code": "Watford DRT",
-      "address": {
-        "line1": "Watford Service Centre",
+        "line1": "Springburn DRT",
         "line2": "Post Handling Site B",
         "line3": "WOLVERHAMPTON",
-        "postCode": "WV99 1RH"
+        "postCode": "WV99 1AB"
       }
     },
     {
