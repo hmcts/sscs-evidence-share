@@ -16,7 +16,7 @@ locals {
   docmosis_nonprod_vault      = "docmosisiaasdevkv"
 
   documentStore               = "http://dm-store-${var.env}.service.${local.ase_name}.internal"
-
+  ccdApi                      = "http://ccd-data-store-api-${var.env}.service.${local.ase_name}.internal"
   send_letter_service_baseurl = "http://rpe-send-letter-service-${var.env}.service.core-compute-${var.env}.internal"
 }
 
@@ -114,8 +114,10 @@ module "sscs-evidence-share" {
     TOPIC_NAME        = "evidenceshare-topic"
     SUBSCRIPTION_NAME = "evidenceshare-subscription"
 
-    TRUST_ALL_CERTS   = "${var.trust_all_certs}"
+    TRUST_ALL_CERTS         = "${var.trust_all_certs}"
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
+
+    CORE_CASE_DATA_URL  = "${local.ccdApi}"
   }
 }
