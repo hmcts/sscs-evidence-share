@@ -50,6 +50,8 @@ public class EvidenceShareServiceTest {
     @InjectMocks
     private EvidenceShareService evidenceShareService;
 
+    private LocalDateTime now = LocalDateTime.now();
+
     @Test
     public void givenAMessageWhichFindsToATemplate_thenConvertToSscsCaseDataAndAddPdfToCase() {
 
@@ -78,7 +80,7 @@ public class EvidenceShareServiceTest {
             "jurisdiction",
             APPEAL_CREATED,
             caseData,
-            LocalDateTime.now()
+            now
         );
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
@@ -90,7 +92,7 @@ public class EvidenceShareServiceTest {
 
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(Template.DL6).build();
 
-        when(documentRequestFactory.create(caseData)).thenReturn(holder);
+        when(documentRequestFactory.create(caseData, now)).thenReturn(holder);
         when(documentManagementService.generateDocumentAndAddToCcd(holder, caseData)).thenReturn(DL6_PDF);
 
         when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(DL6_PDF, docPdf)), any()))
@@ -108,12 +110,13 @@ public class EvidenceShareServiceTest {
 
         long expectedId = 123L;
         SscsCaseData caseData = SscsCaseData.builder().build();
+
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(
             expectedId,
             "jurisdiction",
             APPEAL_CREATED,
             caseData,
-            LocalDateTime.now()
+            now
         );
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
@@ -123,7 +126,7 @@ public class EvidenceShareServiceTest {
 
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(null).build();
 
-        when(documentRequestFactory.create(caseData)).thenReturn(holder);
+        when(documentRequestFactory.create(caseData, now)).thenReturn(holder);
         verifyNoMoreInteractions(documentManagementService);
 
         long id = evidenceShareService.processMessage(MY_JSON_DATA);

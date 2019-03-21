@@ -3,51 +3,46 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
-import org.joda.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
 
 @Service
 @Slf4j
 public class DocumentPlaceholderService {
 
-    private final DwpAddressLookup dwpAddressLookup;
+    @Autowired
+    private DwpAddressLookup dwpAddressLookup;
 
     @Autowired
-    public DocumentPlaceholderService(DwpAddressLookup dwpAddressLookup) {
-        this.dwpAddressLookup = dwpAddressLookup;
-    }
+    private PdfDocumentConfig pdfDocumentConfig;
 
-    public Map<String, Object> generatePlaceholders(SscsCaseData caseData) {
+    public Map<String, Object> generatePlaceholders(SscsCaseData caseData, LocalDateTime caseCreatedDate) {
         Map<String, Object> placeholders = new HashMap<>();
 
         Appeal appeal = caseData.getAppeal();
-        placeholders.put(CASE_CREATED_DATE_LITERAL, formatDate(caseData.getCaseCreated()));
+        placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate.toLocalDate().toString());
         placeholders.put(BENEFIT_TYPE_LITERAL, appeal.getBenefitType().getDescription().toUpperCase());
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
         placeholders.put(NINO_LITERAL, appeal.getAppellant().getIdentity().getNino());
         placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, generateNowDate());
+        placeholders.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());
 
         setRegionalProcessingOfficeAddress(placeholders, caseData);
         setDwpAddress(placeholders, caseData);
 
         return placeholders;
-    }
-
-    private String formatDate(String date) {
-        LocalDateTime dateTime = LocalDateTime.parse(date);
-        return dateTime.toLocalDate().toString();
     }
 
     private String generateNowDate() {
@@ -103,7 +98,8 @@ public class DocumentPlaceholderService {
     }
 
     private static boolean hasRegionalProcessingCenter(SscsCaseData ccdResponse) {
-        return null != ccdResponse.getRegionalProcessingCenter()
-            && null != ccdResponse.getRegionalProcessingCenter().getName();
+        return nonNull(ccdResponse.getRegionalProcessingCenter())
+            && nonNull(ccdResponse.getRegionalProcessingCenter().getName());
     }
+
 }
