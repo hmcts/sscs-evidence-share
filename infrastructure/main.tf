@@ -15,7 +15,9 @@ locals {
   docmosis_prod_vault         = "docmosisiaasprodkv"
   docmosis_nonprod_vault      = "docmosisiaasdevkv"
 
-  documentStore = "http://dm-store-${var.env}.service.${local.ase_name}.internal"
+  documentStore               = "http://dm-store-${var.env}.service.${local.ase_name}.internal"
+
+  send_letter_service_baseurl = "http://rpe-send-letter-service-${var.env}.service.core-compute-${var.env}.internal"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -85,8 +87,8 @@ module "sscs-evidence-share" {
 
   app_settings = {
 
-    SEND_LETTER_SERIVCE_BASEURL = "${var.send_letter_service_base_url}"
-    SEND_LETTER_SERIVCE_ENABLED = "${var.send_letter_service_enabled}"
+    SEND_LETTER_SERVICE_BASEURL = "${local.send_letter_service_baseurl}"
+    SEND_LETTER_SERVICE_ENABLED = "${var.send_letter_service_enabled}"
 
     PDF_SERVICE_BASEURL         = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/render"
     PDF_SERVICE_ACCESS_KEY      = "${data.azurerm_key_vault_secret.pdf_service_access_key.value}"

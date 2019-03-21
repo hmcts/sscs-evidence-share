@@ -44,8 +44,8 @@ document:
 document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:4506}
 
 send-letter:
-  url: ${SEND_LETTER_SERIVCE_BASEURL:http://localhost:4021}
-  enabled: ${SEND_LETTER_SERIVCE_ENABLED:false}
+  url: ${SEND_LETTER_SERVICE_BASEURL:http://localhost:4021}
+  enabled: ${SEND_LETTER_SERVICE_ENABLED:false}
 
 idam:
   url: ${IDAM_URL:http://localhost:4501}
