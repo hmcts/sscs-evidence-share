@@ -52,5 +52,5 @@ variable "logback_require_error_code" {
 }
 
 variable "send_letter_service_enabled" {
-  default = false
+  default = true
 }
