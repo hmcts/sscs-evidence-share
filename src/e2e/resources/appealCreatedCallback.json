@@ -110,8 +110,8 @@
           "isAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "PIP",
+          "description": "Personal Independence Payment"
         },
         "hearingOptions": {
           "wantsToAttend": "No",

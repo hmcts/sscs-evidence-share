@@ -36,7 +36,7 @@ public class DocmosisPdfGenerationIt {
     public static final Map<String, Object> PLACEHOLDERS = caseDataMap();
 
     public static final String PDF_SERVICE_URI = "https://docmosis-development.platform.hmcts.net/rs/render";
-    @Autowired
+
     private DocmosisPdfGenerationService pdfGenerationService;
 
     @Autowired
@@ -54,6 +54,7 @@ public class DocmosisPdfGenerationIt {
     @Before
     public void setUp() {
         mockServer = MockRestServiceServer.createServer(restTemplate);
+        pdfGenerationService = new DocmosisPdfGenerationService(PDF_SERVICE_URI, "bla2", restTemplate);
     }
 
     @Test
