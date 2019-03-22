@@ -19,7 +19,7 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
