@@ -118,6 +118,6 @@ module "sscs-evidence-share" {
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
 
-    CORE_CASE_DATA_URL  = "${local.ccdApi}"
+    CORE_CASE_DATA_API_URL  = "${local.ccdApi}"
   }
 }
