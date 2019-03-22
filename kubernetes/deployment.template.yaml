@@ -59,13 +59,12 @@ spec:
               value: "SendAndListenSharedAccessKey"
             - name: AMQP_PASSWORD
               value: ${AMQP_PASSWORD}
-            - name: PDF_SERVICE_BASE_URL:
+            - name: PDF_SERVICE_BASE_URL
               value: ${PDF_SERVICE_BASE_URL}/rs/render
-            - name: PDF_SERVICE_ACCESS_KEY:
+            - name: PDF_SERVICE_ACCESS_KEY
               value: ${PDF_SERVICE_ACCESS_KEY}
-            - name: PDF_SERVICE_HEALTH_URL:
+            - name: PDF_SERVICE_HEALTH_URL
               value: ${PDF_SERVICE_BASE_URL}/rs/health
-
           resources:
             requests:
               memory: "512Mi"
