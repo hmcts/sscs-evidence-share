@@ -44,11 +44,11 @@ spec:
             - name: SEND_LETTER_SERVICE_BASEURL
               value: "http://rpe-send-letter-service-${var.env}.service.core-compute-aat.internal"
             - name: SEND_LETTER_SERVICE_ENABLED
-              value: true
+              value: "true"
             - name: DOCUMENT_MANAGEMENT_URL
               value: "http://dm-store-aat.service.core-compute.internal"
             - name: TRUST_ALL_CERTS
-              value: true
+              value: "true"
             - name: SUBSCRIPTION_NAME
               value: "evidenceshare-subscription"
             - name: TOPIC_NAME
