@@ -29,7 +29,7 @@ List<LinkedHashMap<String, Object>> secrets = [
     'docmosisiaasdevkv'      : [
             // Used by Kubernetes
             secret('docmosis-endpoint', 'PDF_SERVICE_BASE_URL'),
-            secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
+            secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY')
         ]
 ]
 
