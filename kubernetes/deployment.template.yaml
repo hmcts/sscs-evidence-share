@@ -42,7 +42,7 @@ spec:
             - name: DOCUMENT_MANAGEMENT_URL
               value: "http://dm-store-aat.service.core-compute-aat.internal"
             - name: SEND_LETTER_SERVICE_BASEURL
-              value: "http://rpe-send-letter-service-${var.env}.service.core-compute-aat.internal"
+              value: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
             - name: SEND_LETTER_SERVICE_ENABLED
               value: "true"
             - name: DOCUMENT_MANAGEMENT_URL
