@@ -10,6 +10,7 @@ def type = "java"
 def product = "sscs"
 def component = "evidence-share"
 
+
 List<LinkedHashMap<String, Object>> secrets = [
   secret('idam-api', 'IDAM_API_URL'),
   secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
