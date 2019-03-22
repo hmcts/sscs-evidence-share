@@ -60,13 +60,11 @@ spec:
             - name: AMQP_PASSWORD
               value: ${AMQP_PASSWORD}
             - name: PDF_SERVICE_BASE_URL:
-              value:
+              value: ${PDF_SERVICE_BASE_URL}/rs/render
             - name: PDF_SERVICE_ACCESS_KEY:
-              value:
-            - name: PDF_SERVICE_HEALTH_UR:
-              value:
-
-
+              value: ${PDF_SERVICE_ACCESS_KEY}
+            - name: PDF_SERVICE_HEALTH_URL:
+              value: ${PDF_SERVICE_BASE_URL}/rs/health
 
           resources:
             requests:
