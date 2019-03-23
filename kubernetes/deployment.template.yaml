@@ -44,7 +44,7 @@ spec:
             - name: SEND_LETTER_SERVICE_ENABLED
               value: "true"
             - name: DOCUMENT_MANAGEMENT_URL
-              value: "http://dm-store-aat.service.core-compute.aat.internal"
+              value: "http://dm-store-aat.service.core-compute-aat.internal"
             - name: TRUST_ALL_CERTS
               value: "true"
             - name: SUBSCRIPTION_NAME
