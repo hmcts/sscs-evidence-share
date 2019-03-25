@@ -119,5 +119,7 @@ module "sscs-evidence-share" {
     DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
 
     CORE_CASE_DATA_API_URL  = "${local.ccdApi}"
+    CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
+    CORE_CASE_DATA_CASE_TYPE_ID    = "${var.core_case_data_case_type_id}"
   }
 }

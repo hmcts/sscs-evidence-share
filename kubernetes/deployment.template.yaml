@@ -23,6 +23,10 @@ spec:
               value: ${IDAM_API_URL}
             - name: CORE_CASE_DATA_API_URL
               value: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+            - name: CORE_CASE_DATA_JURISDICTION_ID
+              value: SSCS
+            - name: CORE_CASE_DATA_CASE_TYPE_ID
+              value: Benefit
             - name: IDAM.S2S-AUTH.TOTP_SECRET
               value: ${IDAM_S2S_AUTH_TOTP_SECRET}
             - name: IDAM.S2S-AUTH

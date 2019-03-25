@@ -54,3 +54,11 @@ variable "logback_require_error_code" {
 variable "send_letter_service_enabled" {
   default = false
 }
+
+variable "core_case_data_jurisdiction_id" {
+  default = "SSCS"
+}
+
+variable "core_case_data_case_type_id" {
+  default = "Benefit"
+}
