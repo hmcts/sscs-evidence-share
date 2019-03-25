@@ -27,11 +27,11 @@ spec:
               value: SSCS
             - name: CORE_CASE_DATA_CASE_TYPE_ID
               value: Benefit
-            - name: IDAM_S2S-AUTH.TOTP_SECRET
+            - name: IDAM_S2S-AUTH_TOTP_SECRET
               value: ${IDAM_S2S_AUTH_TOTP_SECRET}
             - name: IDAM_S2S-AUTH
               value: ${IDAM_S2S_AUTH}
-            - name: IDAM_S2S-AUTH.MICROSERVICE
+            - name: IDAM_S2S-AUTH_MICROSERVICE
               value: ${IDAM_S2S_AUTH_MICROSERVICE}
             - name: IDAM_SSCS_SYSTEMUPDATE_USER
               value: ${IDAM_SSCS_SYSTEMUPDATE_USER}
