@@ -11,11 +11,15 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 @Slf4j
 public class TemplateService {
 
-    @Value("${docmosis.template.dl6.templateName}")
     private String dl6TemplateName;
 
-    @Value("${docmosis.template.dl16.templateName}")
     private String dl16TemplateName;
+
+    public TemplateService(@Value("${docmosis.template.dl6.templateName}") String dl6TemplateName,
+                           @Value("${docmosis.template.dl16.templateName") String dl16TemplateName) {
+        this.dl6TemplateName = dl6TemplateName;
+        this.dl16TemplateName = dl16TemplateName;
+    }
 
     public Template findTemplate(SscsCaseData caseData) {
 
