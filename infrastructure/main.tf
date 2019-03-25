@@ -96,9 +96,9 @@ module "sscs-evidence-share" {
 
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
 
-    IDAM_S2S-AUTH_TOTP_SECRET  = "${data.azurerm_key_vault_secret.sscs_s2s_secret.value}"
-    IDAM_S2S-AUTH              = "${local.s2sCnpUrl}"
-    IDAM_S2S-AUTH_MICROSERVICE = "${var.ccd_idam_s2s_auth_microservice}"
+    IDAM_S2S_AUTH_TOTP_SECRET  = "${data.azurerm_key_vault_secret.sscs_s2s_secret.value}"
+    IDAM_S2S_AUTH              = "${local.s2sCnpUrl}"
+    IDAM_S2S_AUTH_MICROSERVICE = "${var.ccd_idam_s2s_auth_microservice}"
 
     IDAM_SSCS_SYSTEMUPDATE_USER     = "${data.azurerm_key_vault_secret.idam_sscs_systemupdate_user.value}"
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD = "${data.azurerm_key_vault_secret.idam_sscs_systemupdate_password.value}"
