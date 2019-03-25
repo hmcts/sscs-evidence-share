@@ -87,7 +87,9 @@ public class EvidenceShareServiceTest {
         Map<String, Object> placeholders = new HashMap<>();
         placeholders.put("Test", "Value");
 
-        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(Template.DL6).build();
+        Template template = new Template("bla", "bla2");
+
+        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
 
         when(documentRequestFactory.create(caseData, now)).thenReturn(holder);
         when(documentManagementService.generateDocumentAndAddToCcd(holder, caseData)).thenReturn(DL6_PDF);

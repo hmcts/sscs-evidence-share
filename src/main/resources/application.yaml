@@ -66,3 +66,10 @@ core_case_data:
     url: ${CORE_CASE_DATA_API_URL:http://localhost:4452}
   caseTypeId: Benefit
   jurisdictionId: SSCS
+
+docmosis:
+  template:
+    dl6:
+      templateName: TB-SCS-GNO-ENG-00010 v0.2.doc
+    dl16:
+      templateName: TB-SCS-GNO-ENG-00011 v0.1.doc

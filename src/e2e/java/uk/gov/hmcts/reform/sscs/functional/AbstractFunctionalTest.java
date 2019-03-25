@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
-import static helper.EnvironmentProfileValueSource.getEnvOrEmpty;
+import static io.restassured.RestAssured.baseURI;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import helper.EnvironmentProfileValueSource;
@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -57,12 +58,13 @@ public abstract class AbstractFunctionalTest {
 
     protected String ccdCaseId;
 
+    private final String tcaInstance = System.getenv("TEST_URL");
+    private final String localInstance = "http://localhost:8091";
 
     @Before
     public void setup() {
-
+        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
         idamTokens = idamService.getIdamTokens();
-
     }
 
     protected void createCase() {
@@ -83,7 +85,7 @@ public abstract class AbstractFunctionalTest {
     }
 
     public void simulateCcdCallback(String json) throws IOException {
-        final String callbackUrl = getEnvOrEmpty("TEST_URL") + "/send";
+        final String callbackUrl = baseURI + "/send";
 
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured
