@@ -1,18 +1,16 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.domain.BenefitLookup;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
@@ -31,11 +29,8 @@ public class DwpAddressLookup {
     static {
         JSONParser parser = new JSONParser();
         try {
-
-            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-            File file = resolver.getResource("classpath:dwpAddresses.json").getFile();
-
-            configObject = (JSONObject) parser.parse(FileUtils.readFileToString(file, "UTF-8"));
+            configObject = (JSONObject) parser.parse(IOUtils.resourceToString("dwpAddresses.json",
+                Charset.forName("UTF-8"), Thread.currentThread().getContextClassLoader()));
 
         } catch (Exception exception) {
             log.error("Cannot parse dwp addresses. " + exception.getMessage(), exception);
