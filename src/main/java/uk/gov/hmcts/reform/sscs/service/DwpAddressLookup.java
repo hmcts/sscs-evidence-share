@@ -14,6 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.domain.BenefitLookup;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
@@ -32,7 +35,11 @@ public class DwpAddressLookup {
     static {
         JSONParser parser = new JSONParser();
         try {
-            URL url = Thread.currentThread().getContextClassLoader().getResource("dwpAddresses.json");
+
+            ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+            Resource[] resources = resolver.getResources("classpath*:dwpAddresses.json");
+
+            URL url = resources[0].getURL();
 
             configObject = (JSONObject) parser.parse(FileUtils.readFileToString(
                 new File(requireNonNull(url.getPath())), "UTF-8"));
