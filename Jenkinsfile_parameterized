@@ -14,7 +14,9 @@ properties([
 ])
 
 List<LinkedHashMap<String, Object>> secrets = [
-
+  secret('ccdApi', 'CORE_CASE_DATA_API_URL'),
+  secret('ccdJid', 'CORE_CASE_DATA_JURISDICTION_ID'),
+  secret('ccdCtid', 'CORE_CASE_DATA_CASE_TYPE_ID'),
   secret('idam-api', 'IDAM_API_URL'),
   secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
   secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),

@@ -15,7 +15,7 @@ locals {
   docmosis_prod_vault         = "docmosisiaasprodkv"
   docmosis_nonprod_vault      = "docmosisiaasdevkv"
 
-  documentStore               = "http://dm-store-${var.env}.service.${local.ase_name}.internal"
+  documentStore               = "http://dm-store-${var.env}.service.${local.ase_name}-${var.env}.internal"
   ccdApi                      = "http://ccd-data-store-api-${var.env}.service.${local.ase_name}.internal"
   send_letter_service_baseurl = "http://rpe-send-letter-service-${var.env}.service.core-compute-${var.env}.internal"
 }
@@ -91,7 +91,7 @@ module "sscs-evidence-share" {
     SEND_LETTER_SERVICE_ENABLED = "${var.send_letter_service_enabled}"
 
     PDF_SERVICE_BASE_URL        = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/render"
-    PDF_SERVICE_ACCESS_KEY      = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/render"
+    PDF_SERVICE_ACCESS_KEY      = "${data.azurerm_key_vault_secret.pdf_service_access_key.value}"
     PDF_SERVICE_HEALTH_URL      = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/health"
 
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
@@ -119,5 +119,7 @@ module "sscs-evidence-share" {
     DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
 
     CORE_CASE_DATA_API_URL  = "${local.ccdApi}"
+    CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
+    CORE_CASE_DATA_CASE_TYPE_ID    = "${var.core_case_data_case_type_id}"
   }
 }
