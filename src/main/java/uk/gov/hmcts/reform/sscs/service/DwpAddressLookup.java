@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static java.util.Objects.requireNonNull;
-
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
@@ -37,12 +33,9 @@ public class DwpAddressLookup {
         try {
 
             ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-            Resource[] resources = resolver.getResources("classpath*:dwpAddresses.json");
+            File file = resolver.getResource("classpath:dwpAddresses.json").getFile();
 
-            URL url = resources[0].getURL();
-
-            configObject = (JSONObject) parser.parse(FileUtils.readFileToString(
-                new File(requireNonNull(url.getPath())), "UTF-8"));
+            configObject = (JSONObject) parser.parse(FileUtils.readFileToString(file, "UTF-8"));
 
         } catch (Exception exception) {
             log.error("Cannot parse dwp addresses. " + exception.getMessage(), exception);
