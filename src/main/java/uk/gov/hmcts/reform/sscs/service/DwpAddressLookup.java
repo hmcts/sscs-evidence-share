@@ -1,13 +1,15 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import static java.util.Objects.requireNonNull;
+
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.simple.JSONObject;
@@ -30,13 +32,13 @@ public class DwpAddressLookup {
     static {
         JSONParser parser = new JSONParser();
         try {
-            configObject = (JSONObject) parser.parse(
-                Files.newBufferedReader(Paths.get(
-                    Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("dwpAddresses.json")).toURI())
-                )
-            );
+            URL url = Thread.currentThread().getContextClassLoader().getResource("dwpAddresses.json");
+
+            configObject = (JSONObject) parser.parse(FileUtils.readFileToString(
+                new File(requireNonNull(url.getPath())), "UTF-8"));
+
         } catch (Exception exception) {
-            log.error("Cannot parse dwp addresses.", exception);
+            log.error("Cannot parse dwp addresses. " + exception.getMessage(), exception);
             throw new RuntimeException("cannot parse dwp addresses", exception);
         }
     }
