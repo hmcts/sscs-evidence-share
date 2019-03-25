@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -21,7 +20,7 @@ public class TemplateServiceTest {
 
     @Before
     public void setup() {
-        service = new TemplateService();
+        service = new TemplateService("dl6TemplateName", "dl16TemplateName");
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
@@ -29,7 +28,6 @@ public class TemplateServiceTest {
     public void givenACaseDataWithMrnWithin30Days_thenGenerateThePlaceholderMappingsForDl6() {
         LocalDate date = LocalDate.now();
         String dateAsString = date.format(formatter);
-        ReflectionTestUtils.setField(service, "dl6TemplateName", "dl6-template.doc");
 
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -45,7 +43,6 @@ public class TemplateServiceTest {
     public void givenACaseDataWithMrnEqualTo30Days_thenGenerateThePlaceholderMappings() {
         LocalDate date = LocalDate.now().minusDays(30);
         String dateAsString = date.format(formatter);
-        ReflectionTestUtils.setField(service, "dl6TemplateName", "dl6-template.doc");
 
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -62,7 +59,6 @@ public class TemplateServiceTest {
     public void givenACaseDataWithMrnGreaterThan30Days_thenGenerateThePlaceholderMappingsForDl16() {
         LocalDate date = LocalDate.now().minusDays(31);
         String dateAsString = date.format(formatter);
-        ReflectionTestUtils.setField(service, "dl16TemplateName", "dl16-template.doc");
 
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
