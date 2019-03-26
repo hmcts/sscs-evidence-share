@@ -192,7 +192,7 @@ dependencies {
   compile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
   compile group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
-  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.1.0.RELEASE'
+  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.1.1.RELEASE'
 
   compile group: 'org.springframework', name: 'spring-jms'
   compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.40.0'
