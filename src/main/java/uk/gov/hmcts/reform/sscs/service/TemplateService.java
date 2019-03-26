@@ -16,7 +16,7 @@ public class TemplateService {
     private String dl16TemplateName;
 
     public TemplateService(@Value("${docmosis.template.dl6.templateName}") String dl6TemplateName,
-                           @Value("${docmosis.template.dl16.templateName") String dl16TemplateName) {
+                           @Value("${docmosis.template.dl16.templateName}") String dl16TemplateName) {
         this.dl6TemplateName = dl6TemplateName;
         this.dl16TemplateName = dl16TemplateName;
     }
@@ -26,9 +26,9 @@ public class TemplateService {
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
             if (mrnDate.plusDays(30).isBefore(LocalDate.now())) {
-                return new Template(dl6TemplateName, "DL16");
+                return new Template(dl16TemplateName, "DL16");
             } else {
-                return new Template(dl16TemplateName, "DL6");
+                return new Template(dl6TemplateName, "DL6");
             }
         }
         return null;
