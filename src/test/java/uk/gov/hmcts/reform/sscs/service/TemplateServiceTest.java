@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static uk.gov.hmcts.reform.sscs.docmosis.domain.Template.DL6;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,12 +20,12 @@ public class TemplateServiceTest {
 
     @Before
     public void setup() {
-        service = new TemplateService();
+        service = new TemplateService("dl6TemplateName", "dl16TemplateName");
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
     @Test
-    public void givenACaseDataWithMrnWithin13Months_thenGenerateThePlaceholderMappings() {
+    public void givenACaseDataWithMrnWithin30Days_thenGenerateThePlaceholderMappingsForDl6() {
         LocalDate date = LocalDate.now();
         String dateAsString = date.format(formatter);
 
@@ -37,12 +36,12 @@ public class TemplateServiceTest {
 
         Template result = service.findTemplate(caseData);
 
-        assertEquals(result, DL6);
+        assertEquals("DL6", result.getHmctsDocName());
     }
 
     @Test
-    public void givenACaseDataWithMrnGreaterThan13Months_thenGenerateThePlaceholderMappings() {
-        LocalDate date = LocalDate.now().minusMonths(13).minusDays(1);
+    public void givenACaseDataWithMrnEqualTo30Days_thenGenerateThePlaceholderMappings() {
+        LocalDate date = LocalDate.now().minusDays(30);
         String dateAsString = date.format(formatter);
 
         SscsCaseData caseData = SscsCaseData.builder()
@@ -53,7 +52,23 @@ public class TemplateServiceTest {
 
         Template result = service.findTemplate(caseData);
 
-        assertNull(result);
+        assertEquals("DL6", result.getHmctsDocName());
+    }
+
+    @Test
+    public void givenACaseDataWithMrnGreaterThan30Days_thenGenerateThePlaceholderMappingsForDl16() {
+        LocalDate date = LocalDate.now().minusDays(31);
+        String dateAsString = date.format(formatter);
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .mrnDetails(MrnDetails.builder().mrnDate(dateAsString).build())
+                .build())
+            .build();
+
+        Template result = service.findTemplate(caseData);
+
+        assertEquals("DL16", result.getHmctsDocName());
     }
 
     @Test

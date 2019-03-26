@@ -36,7 +36,7 @@ public class DocmosisPdfGenerationIt {
     public static final Map<String, Object> PLACEHOLDERS = caseDataMap();
 
     public static final String PDF_SERVICE_URI = "https://docmosis-development.platform.hmcts.net/rs/render";
-    @Autowired
+
     private DocmosisPdfGenerationService pdfGenerationService;
 
     @Autowired
@@ -54,6 +54,7 @@ public class DocmosisPdfGenerationIt {
     @Before
     public void setUp() {
         mockServer = MockRestServiceServer.createServer(restTemplate);
+        pdfGenerationService = new DocmosisPdfGenerationService(PDF_SERVICE_URI, "bla2", restTemplate);
     }
 
     @Test
@@ -62,7 +63,7 @@ public class DocmosisPdfGenerationIt {
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess(FILE_CONTENT, MediaType.APPLICATION_JSON));
 
-        byte[] result = pdfGenerationService.generatePdf(DocumentHolder.builder().template(Template.DL6).placeholders(PLACEHOLDERS).build());
+        byte[] result = pdfGenerationService.generatePdf(DocumentHolder.builder().template(new Template("dl6-template.doc", "DL6")).placeholders(PLACEHOLDERS).build());
         assertThat(result, is(notNullValue()));
         assertThat(result, is(equalTo(FILE_CONTENT.getBytes())));
     }
@@ -74,7 +75,7 @@ public class DocmosisPdfGenerationIt {
             .andRespond(withBadRequest());
 
         try {
-            pdfGenerationService.generatePdf(DocumentHolder.builder().template(Template.DL6).placeholders(PLACEHOLDERS).build());
+            pdfGenerationService.generatePdf(DocumentHolder.builder().template(new Template("dl6-template.doc", "DL6")).placeholders(PLACEHOLDERS).build());
             fail("should have thrown bad-request exception");
         } catch (PdfGenerationException e) {
             HttpStatus httpStatus = ((HttpClientErrorException) e.getCause()).getStatusCode();

@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,12 +71,13 @@ public class EvidenceShareServiceIt {
     private static final String FILE_CONTENT = "Welcome to PDF document service";
 
     @Test
-    public void appealWithValidMrnDate_shouldGenerateDL6TemplateAgainstDocmosisAndUploadToEvidenceManagementServiceAndAddToCaseInCcd() throws IOException {
+    public void appealWithMrnDateWithin30Days_shouldGenerateDL6TemplateAgainstDocmosisAndUploadToEvidenceManagementServiceAndAddToCaseInCcd() throws IOException {
         assertNotNull("evidenceShareService must be autowired", evidenceShareService);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("appealReceivedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = updateMrnDate(json, LocalDate.now().toString());
+        json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
@@ -93,24 +93,34 @@ public class EvidenceShareServiceIt {
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
-        verify(ccdService).updateCase(any(), any(), any(), any(), any(), any());
+        verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded DL6-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
     }
 
     @Test
-    public void appealWithNoMrnDateOlderThan13Months_shouldNotGenerateTemplateOrAddToCcd() throws IOException {
+    public void appealWithNoMrnDateOlderThan30Days_shouldNotGenerateTemplateOrAddToCcd() throws IOException {
         assertNotNull("evidenceShareService must be autowired", evidenceShareService);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("appealReceivedCallback.json")).getFile();
+            .getResource("appealReceivedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
+
+        doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
+            .when(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
+
+        UploadResponse uploadResponse = createUploadResponse();
+        when(evidenceManagementService.upload(any(),  eq("sscs"))).thenReturn(uploadResponse);
+        when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(Optional.of(UUID.randomUUID()));
 
         long id = evidenceShareService.processMessage(json);
 
         assertEquals("id should be 12345656789L", 12345656789L, id);
 
-        verifyNoMoreInteractions(restTemplate);
-        verifyNoMoreInteractions(evidenceManagementService);
-        verifyNoMoreInteractions(ccdService);
+        verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
+        verify(evidenceManagementService).upload(any(),  eq("sscs"));
+        verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded DL16-12345656789.pdf into SSCS"), any());
+        verify(bulkPrintService).sendToBulkPrint(any(), any());
     }
 
     @Test
