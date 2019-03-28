@@ -3,15 +3,12 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.*;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -21,9 +18,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
-import uk.gov.hmcts.reform.sscs.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -90,7 +87,9 @@ public class EvidenceShareServiceTest {
         Map<String, Object> placeholders = new HashMap<>();
         placeholders.put("Test", "Value");
 
-        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(Template.DL6).build();
+        Template template = new Template("bla", "bla2");
+
+        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
 
         when(documentRequestFactory.create(caseData, now)).thenReturn(holder);
         when(documentManagementService.generateDocumentAndAddToCcd(holder, caseData)).thenReturn(DL6_PDF);

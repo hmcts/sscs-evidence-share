@@ -88,7 +88,7 @@
       "appeal": {
         "mrnDetails": {
           "dwpIssuingOffice": "1",
-          "mrnDate": "2019-03-01"
+          "mrnDate": "MRN_DATE_TO_BE_REPLACED"
         },
         "appellant": {
           "name": {
@@ -110,8 +110,8 @@
           "isAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "PIP",
+          "description": "Personal Independence Payment"
         },
         "hearingOptions": {
           "wantsToAttend": "No",
