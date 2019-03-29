@@ -68,7 +68,7 @@ spec:
             - name: PDF_SERVICE_HEALTH_URL
               value: ${PDF_SERVICE_BASE_URL}rs/health
             - name: WEBSITE_DNS_SERVER
-              value: ${WEBSITE_DNS_SERVER}
+              value: "10.96.139.254"
           resources:
             requests:
               memory: "512Mi"
