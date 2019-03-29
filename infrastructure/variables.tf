@@ -62,3 +62,7 @@ variable "core_case_data_jurisdiction_id" {
 variable "core_case_data_case_type_id" {
   default = "Benefit"
 }
+
+variable "consul_dns_resource_group_name" {
+  type = "string"
+}
