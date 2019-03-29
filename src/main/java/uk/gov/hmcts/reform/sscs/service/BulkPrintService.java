@@ -42,7 +42,13 @@ public class BulkPrintService {
         if (sendLetterEnabled) {
             String[] encodedData = pdfList.stream().map(f -> getEncoder().encodeToString(f.getContent())).toArray(String[]::new);
             final String authToken = idamService.generateServiceAuthorization();
-            return sendLetter(authToken, sscsCaseData, encodedData);
+            Optional<UUID> optionalUuid = sendLetter(authToken, sscsCaseData, encodedData);
+            if (!optionalUuid.isPresent()) {
+                log.warn("send letter service did not return a value for case id {}", sscsCaseData.getCcdCaseId());
+            }
+            optionalUuid.ifPresent(uuid ->
+                log.info("send letter service returned with uuid {} for case id {}", uuid, sscsCaseData.getCcdCaseId()));
+            return optionalUuid;
         }
         return Optional.empty();
 
