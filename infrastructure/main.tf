@@ -111,8 +111,8 @@ module "sscs-evidence-share" {
     // In Azure Service bus, rulename/key is used as username/password
     AMQP_USERNAME     = "SendAndListenSharedAccessKey"
     AMQP_PASSWORD     = "${data.azurerm_key_vault_secret.sscs_asb_primary_send_and_listen_shared_access_key.value}"
-    TOPIC_NAME        = "sscs-evidenceshare-topic"
-    SUBSCRIPTION_NAME = "sscs-evidenceshare-subscription"
+    TOPIC_NAME        = "sscs-evidenceshare-topic-${var.env}"
+    SUBSCRIPTION_NAME = "sscs-evidenceshare-subscription-${var.env}"
 
     TRUST_ALL_CERTS         = "${var.trust_all_certs}"
 
