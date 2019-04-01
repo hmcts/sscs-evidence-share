@@ -76,6 +76,8 @@ public class EvidenceShareService {
                 List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
                 return bulkPrintService.sendToBulkPrint(getAllCasePdfs(newPdfAddedToTheCase, existingCasePdfs), caseData);
             }
+        } else {
+            log.warn("case id {} is not ready to send to dwp", sscsCaseDataCallback.getCaseDetails().getId());
         }
         return Optional.empty();
     }
