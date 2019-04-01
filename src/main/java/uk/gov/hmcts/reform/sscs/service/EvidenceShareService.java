@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Objects.nonNull;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
@@ -26,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 public class EvidenceShareService {
 
     private static final String DM_STORE_USER_ID = "sscs";
+    public static final String PAPER = "Paper";
 
     private final SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
@@ -37,13 +37,16 @@ public class EvidenceShareService {
 
     private final BulkPrintService bulkPrintService;
 
+    private final EvidenceShareConfig evidenceShareConfig;
+
     @Autowired
     public EvidenceShareService(
         SscsCaseCallbackDeserializer sscsDeserializer,
         DocumentManagementService documentManagementService,
         DocumentRequestFactory documentRequestFactory,
         EvidenceManagementService evidenceManagementService,
-        BulkPrintService bulkPrintService
+        BulkPrintService bulkPrintService,
+        EvidenceShareConfig evidenceShareConfig
     ) {
 
         this.sscsCaseCallbackDeserializer = sscsDeserializer;
@@ -51,27 +54,42 @@ public class EvidenceShareService {
         this.documentRequestFactory = documentRequestFactory;
         this.evidenceManagementService = evidenceManagementService;
         this.bulkPrintService = bulkPrintService;
+        this.evidenceShareConfig = evidenceShareConfig;
     }
 
-    public long processMessage(final String message) {
+    public Optional<UUID> processMessage(final String message) {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(message);
 
-        log.info("Processing callback event {} for case id {}", sscsCaseDataCallback.getEvent(),
-            sscsCaseDataCallback.getCaseDetails().getId());
+        if (readyToSendToDwp(sscsCaseDataCallback.getCaseDetails().getCaseData())) {
 
-        DocumentHolder holder = documentRequestFactory.create(
-            sscsCaseDataCallback.getCaseDetails().getCaseData(),
-            sscsCaseDataCallback.getCaseDetails().getCreatedDate());
+            log.info("Processing callback event {} for case id {}", sscsCaseDataCallback.getEvent(),
+                sscsCaseDataCallback.getCaseDetails().getId());
 
-        final SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
+            DocumentHolder holder = documentRequestFactory.create(
+                sscsCaseDataCallback.getCaseDetails().getCaseData(),
+                sscsCaseDataCallback.getCaseDetails().getCreatedDate());
 
-        if (holder.getTemplate() != null) {
-            Pdf newPdfAddedToTheCase = documentManagementService.generateDocumentAndAddToCcd(holder, caseData);
-            List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
-            bulkPrintService.sendToBulkPrint(getAllCasePdfs(newPdfAddedToTheCase, existingCasePdfs), caseData);
+            final SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
+
+            if (holder.getTemplate() != null) {
+                Pdf newPdfAddedToTheCase = documentManagementService.generateDocumentAndAddToCcd(holder, caseData);
+                List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
+                return bulkPrintService.sendToBulkPrint(getAllCasePdfs(newPdfAddedToTheCase, existingCasePdfs), caseData);
+            }
         }
+        return Optional.empty();
+    }
 
-        return sscsCaseDataCallback.getCaseDetails().getId();
+    private boolean readyToSendToDwp(SscsCaseData caseData) {
+        return nonNull(caseData)
+            && nonNull(caseData.getAppeal())
+            && nonNull(caseData.getAppeal().getBenefitType())
+            && nonNull(caseData.getAppeal().getBenefitType().getCode())
+            && nonNull(caseData.getAppeal().getReceivedVia())
+            && evidenceShareConfig.getSubmitTypes().stream()
+                .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase)
+            && evidenceShareConfig.getAllowedBenefitTypes().stream()
+                .anyMatch(caseData.getAppeal().getBenefitType().getCode()::equalsIgnoreCase);
     }
 
     private List<Pdf> getAllCasePdfs(Pdf newPdfAddedToTheCase, List<Pdf> existingCasePdfs) {

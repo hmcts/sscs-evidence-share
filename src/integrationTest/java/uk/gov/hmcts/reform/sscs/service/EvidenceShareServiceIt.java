@@ -85,11 +85,12 @@ public class EvidenceShareServiceIt {
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(),  eq("sscs"))).thenReturn(uploadResponse);
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
-        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(Optional.of(UUID.randomUUID()));
+        Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
+        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
 
-        long id = evidenceShareService.processMessage(json);
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
-        assertEquals("id should be 12345656789L", 12345656789L, id);
+        assertEquals(expectedOptionalUuid, optionalUuid);
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
@@ -111,11 +112,12 @@ public class EvidenceShareServiceIt {
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(),  eq("sscs"))).thenReturn(uploadResponse);
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
-        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(Optional.of(UUID.randomUUID()));
+        Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
+        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
 
-        long id = evidenceShareService.processMessage(json);
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
-        assertEquals("id should be 12345656789L", 12345656789L, id);
+        assertEquals(expectedOptionalUuid, optionalUuid);
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
@@ -130,9 +132,9 @@ public class EvidenceShareServiceIt {
             .getResource("appealReceivedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        long id = evidenceShareService.processMessage(json);
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
-        assertEquals("id should be 12345656789L", 12345656789L, id);
+        assertEquals(Optional.empty(), optionalUuid);
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
