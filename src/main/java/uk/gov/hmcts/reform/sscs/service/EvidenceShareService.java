@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 public class EvidenceShareService {
 
     private static final String DM_STORE_USER_ID = "sscs";
-    public static final String PAPER = "Paper";
 
     private final SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
