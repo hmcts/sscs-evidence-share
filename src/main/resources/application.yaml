@@ -76,6 +76,6 @@ docmosis:
 
 evidence-share:
   allowed-benefit-types:
-  - "PIP"
+  - PIP
   submit-types:
-  - "PAPER"
+  - PAPER
