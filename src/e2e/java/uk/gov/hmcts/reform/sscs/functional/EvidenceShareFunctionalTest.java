@@ -6,6 +6,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -17,6 +19,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
+    @Ignore
     public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcd() throws IOException {
 
         createCase();
@@ -34,6 +37,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
+    @Ignore
     public void processAnAppealWithValidMrn_shouldGenerateADl16AndAddToCcd() throws IOException {
 
         createCase();
