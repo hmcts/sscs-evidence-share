@@ -15,7 +15,7 @@ locals {
   docmosis_prod_vault         = "docmosisiaasprodkv"
   docmosis_nonprod_vault      = "docmosisiaasdevkv"
 
-  documentStore               = "http://dm-store-${var.env}.service.${local.ase_name}-${var.env}.internal"
+  documentStore               = "http://dm-store-${var.env}.service.${local.ase_name}.internal"
   ccdApi                      = "http://ccd-data-store-api-${var.env}.service.${local.ase_name}.internal"
   send_letter_service_baseurl = "http://rpe-send-letter-service-${var.env}.service.core-compute-${var.env}.internal"
 }
