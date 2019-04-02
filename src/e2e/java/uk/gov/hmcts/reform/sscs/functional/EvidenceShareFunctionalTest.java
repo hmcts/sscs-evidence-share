@@ -19,6 +19,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
+    @Ignore
     public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcd() throws IOException {
 
         createCase();
@@ -36,6 +37,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
+    @Ignore
     public void processAnAppealWithValidMrn_shouldGenerateADl16AndAddToCcd() throws IOException {
 
         createCase();

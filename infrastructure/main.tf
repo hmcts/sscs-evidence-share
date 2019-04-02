@@ -85,6 +85,8 @@ module "sscs-evidence-share" {
   capacity            = "${var.capacity}"
   common_tags         = "${var.common_tags}"
 
+  appinsights_instrumentation_key = "${var.appinsights_instrumentation_key}"
+
   app_settings = {
 
     SEND_LETTER_SERVICE_BASEURL = "${local.send_letter_service_baseurl}"
