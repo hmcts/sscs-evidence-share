@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
