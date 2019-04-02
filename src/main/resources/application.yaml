@@ -73,3 +73,9 @@ docmosis:
       templateName: TB-SCS-GNO-ENG-00010 v0.2.doc
     dl16:
       templateName: TB-SCS-GNO-ENG-00011 v0.1.doc
+
+evidence-share:
+  allowed-benefit-types:
+  - PIP
+  submit-types:
+  - PAPER

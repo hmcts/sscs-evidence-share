@@ -13,7 +13,12 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +26,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -32,9 +38,17 @@ import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
-@RunWith(SpringRunner.class)
+@RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 public class EvidenceShareServiceIt {
+
+    // Below rules are needed to use the junitParamsRunner together with SpringRunner
+    @ClassRule
+    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
+
+    @Rule
+    public final SpringMethodRule springMethodRule = new SpringMethodRule();
+    //end of rules needed for junitParamsRunner
 
     @MockBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
@@ -65,7 +79,6 @@ public class EvidenceShareServiceIt {
     private BulkPrintService bulkPrintService;
 
     @Autowired
-    @SuppressWarnings({"PMD.UnusedPrivateField"})
     private EvidenceShareService evidenceShareService;
 
     private static final String FILE_CONTENT = "Welcome to PDF document service";
@@ -85,11 +98,12 @@ public class EvidenceShareServiceIt {
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(),  eq("sscs"))).thenReturn(uploadResponse);
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
-        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(Optional.of(UUID.randomUUID()));
+        Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
+        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
 
-        long id = evidenceShareService.processMessage(json);
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
-        assertEquals("id should be 12345656789L", 12345656789L, id);
+        assertEquals(expectedOptionalUuid, optionalUuid);
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
@@ -111,11 +125,12 @@ public class EvidenceShareServiceIt {
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(),  eq("sscs"))).thenReturn(uploadResponse);
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
-        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(Optional.of(UUID.randomUUID()));
+        Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
+        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
 
-        long id = evidenceShareService.processMessage(json);
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
-        assertEquals("id should be 12345656789L", 12345656789L, id);
+        assertEquals(expectedOptionalUuid, optionalUuid);
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
@@ -130,9 +145,43 @@ public class EvidenceShareServiceIt {
             .getResource("appealReceivedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        long id = evidenceShareService.processMessage(json);
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
-        assertEquals("id should be 12345656789L", 12345656789L, id);
+        assertEquals(Optional.empty(), optionalUuid);
+
+        verifyNoMoreInteractions(restTemplate);
+        verifyNoMoreInteractions(evidenceManagementService);
+        verifyNoMoreInteractions(ccdService);
+    }
+
+    @Test
+    @Parameters({"ONLINE", "COR"})
+    public void nonReceivedViaPaper_shouldNotBeProcessed(String receivedVia) throws IOException {
+        assertNotNull("evidenceShareService must be autowired", evidenceShareService);
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource("appealReceivedCallback.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replace("PAPER", receivedVia);
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
+
+        assertEquals(Optional.empty(), optionalUuid);
+
+        verifyNoMoreInteractions(restTemplate);
+        verifyNoMoreInteractions(evidenceManagementService);
+        verifyNoMoreInteractions(ccdService);
+    }
+
+    @Test
+    @Parameters({"ESA", "UC"})
+    public void nonPipBenefitTypes_shouldNotBeProcessed(String benefitCode) throws IOException {
+        assertNotNull("evidenceShareService must be autowired", evidenceShareService);
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource("appealReceivedCallback.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replace("PIP", benefitCode);
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
+
+        assertEquals(Optional.empty(), optionalUuid);
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
