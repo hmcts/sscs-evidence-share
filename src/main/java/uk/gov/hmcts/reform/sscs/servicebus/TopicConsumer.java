@@ -1,12 +1,17 @@
 package uk.gov.hmcts.reform.sscs.servicebus;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.service.EvidenceShareService;
 
 @Slf4j
 @Component
+@Lazy(false)
 public class TopicConsumer {
 
     private final EvidenceShareService evidenceShareService;
@@ -21,7 +26,7 @@ public class TopicConsumer {
         subscription = "${amqp.subscription}"
     )
     public void onMessage(String message) {
-        long caseId = evidenceShareService.processMessage(message);
-        log.info("Processed message for caseId {}", caseId);
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(message);
+        log.info("Processed message for with returned value {}", optionalUuid);
     }
 }

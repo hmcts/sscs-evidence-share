@@ -23,6 +23,7 @@ import org.springframework.test.annotation.ProfileValueSourceConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -68,7 +69,11 @@ public abstract class AbstractFunctionalTest {
     }
 
     protected void createCase() {
-        SscsCaseData caseData = CaseDataUtils.buildMinimalCaseData();
+        SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
+        SscsCaseData caseData = minimalCaseData.toBuilder().appeal(minimalCaseData.getAppeal().toBuilder()
+            .benefitType(BenefitType.builder().code("PIP").build())
+            .receivedVia("Paper")
+            .build()).build();
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, "appealCreated",
             "Evidence share service appeal created", "Evidence share service appeal created in test", idamTokens);
         ccdCaseId = String.valueOf(caseDetails.getId());

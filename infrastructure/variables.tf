@@ -62,3 +62,8 @@ variable "core_case_data_jurisdiction_id" {
 variable "core_case_data_case_type_id" {
   default = "Benefit"
 }
+
+variable "appinsights_instrumentation_key" {
+  description = "Instrumentation key of the App Insights instance this webapp should use. Module will create own App Insights resource if this is not provided"
+  default     = ""
+}
