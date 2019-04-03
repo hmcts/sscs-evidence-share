@@ -52,9 +52,9 @@ spec:
             - name: TRUST_ALL_CERTS
               value: "true"
             - name: SUBSCRIPTION_NAME
-              value: "evidenceshare-subscription"
+              value: "sscs-evidenceshare-subscription-aat"
             - name: TOPIC_NAME
-              value: "evidenceshare-topic"
+              value: "sscs-evidenceshare-topic-aat"
             - name: AMQP_HOST
               value: "sscs-servicebus-aat.servicebus.windows.net"
             - name: AMQP_USERNAME
