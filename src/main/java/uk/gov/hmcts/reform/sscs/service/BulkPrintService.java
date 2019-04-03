@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @Slf4j
 public class BulkPrintService {
 
-    private static final String XEROX_TYPE_PARAMETER = "DIV001";
+    private static final String XEROX_TYPE_PARAMETER = "SSC001";
     private static final String CCD_ID = "ccdId";
     private static final String LETTER_TYPE_KEY = "letterType";
     private static final String APPELLANT_NAME = "appellantName";
@@ -63,7 +63,8 @@ public class BulkPrintService {
 
             return Optional.of(sendLetterResponse.letterId);
         } catch (Exception e) {
-            String message = format("Failed to send to bulk print for case %s", sscsCaseData.getCcdCaseId());
+            String message = format("Failed to send to bulk print for case %s with error %s.",
+                sscsCaseData.getCcdCaseId(), e.getMessage());
             log.error(message, e);
             throw new BulkPrintException(message, e);
         }
