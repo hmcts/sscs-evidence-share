@@ -113,7 +113,7 @@
           "code": "PIP",
           "description": "Personal Independence Payment"
         },
-        "receivedVia": "PAPER",
+        "receivedVia": "Paper",
         "hearingOptions": {
           "wantsToAttend": "No",
           "other": "No"
