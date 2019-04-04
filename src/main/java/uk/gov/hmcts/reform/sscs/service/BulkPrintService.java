@@ -63,7 +63,8 @@ public class BulkPrintService {
 
             return Optional.of(sendLetterResponse.letterId);
         } catch (Exception e) {
-            String message = format("Failed to send to bulk print for case %s with error '%s'.",
+            String message = format("Failed to send to bulk print for case %s with error %s.",
+
                 sscsCaseData.getCcdCaseId(), e.getMessage());
             log.error(message, e);
             throw new BulkPrintException(message, e);
