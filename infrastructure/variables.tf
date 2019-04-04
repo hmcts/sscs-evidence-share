@@ -66,3 +66,8 @@ variable "core_case_data_case_type_id" {
 variable "consul_dns_resource_group_name" {
   type = "string"
 }
+
+variable "appinsights_instrumentation_key" {
+  description = "Instrumentation key of the App Insights instance this webapp should use. Module will create own App Insights resource if this is not provided"
+  default     = ""
+}
