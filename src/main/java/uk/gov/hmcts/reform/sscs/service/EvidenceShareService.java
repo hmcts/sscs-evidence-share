@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sscs.bundling.SscsBundlingAndStitchingService;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -38,6 +39,8 @@ public class EvidenceShareService {
 
     private final EvidenceShareConfig evidenceShareConfig;
 
+    private final SscsBundlingAndStitchingService sscsAddCaseBundleService;
+
     @Autowired
     public EvidenceShareService(
         SscsCaseCallbackDeserializer sscsDeserializer,
@@ -45,7 +48,8 @@ public class EvidenceShareService {
         DocumentRequestFactory documentRequestFactory,
         EvidenceManagementService evidenceManagementService,
         BulkPrintService bulkPrintService,
-        EvidenceShareConfig evidenceShareConfig
+        EvidenceShareConfig evidenceShareConfig,
+        SscsBundlingAndStitchingService sscsAddCaseBundleService
     ) {
 
         this.sscsCaseCallbackDeserializer = sscsDeserializer;
@@ -54,6 +58,7 @@ public class EvidenceShareService {
         this.evidenceManagementService = evidenceManagementService;
         this.bulkPrintService = bulkPrintService;
         this.evidenceShareConfig = evidenceShareConfig;
+        this.sscsAddCaseBundleService = sscsAddCaseBundleService;
     }
 
     public Optional<UUID> processMessage(final String message) {
@@ -73,6 +78,9 @@ public class EvidenceShareService {
             if (holder.getTemplate() != null) {
                 Pdf newPdfAddedToTheCase = documentManagementService.generateDocumentAndAddToCcd(holder, caseData);
                 List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
+
+                sscsAddCaseBundleService.bundleAndStitch(caseData);
+
                 return bulkPrintService.sendToBulkPrint(getAllCasePdfs(newPdfAddedToTheCase, existingCasePdfs), caseData);
             }
         } else {
