@@ -1,5 +1,5 @@
 provider "azurerm" {
-  version = "1.19.0"
+  version = "1.21.0"
 }
 
 locals {
@@ -74,6 +74,11 @@ data "azurerm_key_vault_secret" "pdf_service_access_key" {
   vault_uri = "${local.azureVaultUrlDocmosis}"
 }
 
+data "azurerm_lb" "consul_dns" {
+  name                = "consul-server_dns"
+  resource_group_name = "${var.consul_dns_resource_group_name}"
+}
+
 module "sscs-evidence-share" {
   source              = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product             = "${var.product}-${var.component}"
@@ -123,5 +128,7 @@ module "sscs-evidence-share" {
     CORE_CASE_DATA_API_URL  = "${local.ccdApi}"
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
     CORE_CASE_DATA_CASE_TYPE_ID    = "${var.core_case_data_case_type_id}"
+
+    WEBSITE_DNS_SERVER = "${data.azurerm_lb.consul_dns.private_ip_address}"
   }
 }
