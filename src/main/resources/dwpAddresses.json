@@ -195,6 +195,14 @@
       "line3": "Harlow",
       "postCode": "CM19 5QS"
     }
+  },
+  "test-hmcts-address" : {
+    "address": {
+      "line1": "Josh Greencroft",
+      "line2": "3rd Floor, Aldgate Tower",
+      "line3": "2 Leman Street, London",
+      "postCode": "E1 8FA"
+    }
   }
 
 }

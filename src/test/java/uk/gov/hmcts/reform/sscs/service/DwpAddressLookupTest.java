@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Optional;
 
@@ -82,5 +80,14 @@ public class DwpAddressLookupTest {
         assertTrue(optionalAddress.isPresent());
         DwpAddress address = optionalAddress.get();
         assertArrayEquals(new String[]{"Mail Handling Site A", "WOLVERHAMPTON", "WV98 1AA"}, address.lines());
+    }
+
+    @Test
+    @Parameters({"PIP", "ESA", "JOB", "UNK", "PLOP", "BIG", "11"})
+    public void willAlwaysReturnTestAddressForATestDwpIssuingOffice(final String benefitType) {
+        Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(benefitType, "test-hmcts-address");
+        assertTrue(optionalAddress.isPresent());
+        DwpAddress address = optionalAddress.get();
+        assertEquals("E1 8FA", address.lines()[3]);
     }
 }
