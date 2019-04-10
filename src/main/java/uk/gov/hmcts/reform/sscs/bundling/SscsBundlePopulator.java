@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.bundling;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,7 @@ public class SscsBundlePopulator {
             .title("SSCS DWP Bundle")
             .documents(bundledDocs)
             .eligibleForStitching("yes")
+            .dateGenerated(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
             .build())
         .build();
     }

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.bundling;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -54,50 +56,21 @@ public class SscsBundlingAndStitchingServiceTest {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        SscsCaseData result = sscsBundlingAndStitchingService.bundleAndStitch(caseData);
+        when(updateCcdCaseService.updateCase(eq(caseData), eq(1L), any(), any(), any(), eq(idamTokens))).thenReturn(
+            SscsCaseDetails.builder().data(SscsCaseData.builder().ccdCaseId("1").sscsDocument(docs).caseBundles(
+                singletonList(Bundle.builder().value(BundleDetails.builder().title("My new bundle").build()).build())).build()).build());
 
-        verify(updateCcdCaseService, times(2)).updateCase(eq(caseData), eq(1L), any(), any(), any(), eq(idamTokens));
+        List<Bundle> result = sscsBundlingAndStitchingService.bundleAndStitch(caseData);
 
-        assertEquals(result.getCaseBundles().get(0), bundle);
+        verify(updateCcdCaseService).updateCase(eq(caseData), eq(1L), any(), any(), any(), eq(idamTokens));
+
+        assertEquals("My new bundle", result.get(0).getValue().getTitle());
     }
 
     @Test
-    public void givenAnSscsCaseWithExistingBundle_thenCreateAnotherBundleAndStitchToCase() {
-        List<SscsDocument> docs = new ArrayList<>();
-
-        SscsDocument sscsDocument1 = SscsDocument.builder().value(
-            SscsDocumentDetails.builder().documentFileName("TestFileName1")
-                .documentLink(
-                    DocumentLink.builder().documentUrl("test1.com").documentBinaryUrl("test1.com/binary").documentFilename("MyFile1.jpg").build()).build())
-            .build();
-
-        docs.add(sscsDocument1);
-
-        Bundle existingBundle = Bundle.builder().value(BundleDetails.builder().title("New bundle").build()).build();
-
-        List<Bundle> bundles = new ArrayList<>();
-        bundles.add(existingBundle);
-
-        SscsCaseData caseData = SscsCaseData.builder().ccdCaseId("1").caseBundles(bundles).sscsDocument(docs).build();
-
-        Bundle bundle = Bundle.builder().value(BundleDetails.builder().title("New bundle").build()).build();
-        when(sscsBundlePopulator.populateNewBundle(caseData)).thenReturn(bundle);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        SscsCaseData result = sscsBundlingAndStitchingService.bundleAndStitch(caseData);
-
-        verify(updateCcdCaseService, times(2)).updateCase(eq(caseData), eq(1L), any(), any(), any(), eq(idamTokens));
-
-        assertEquals(result.getCaseBundles().get(0), existingBundle);
-        assertEquals(result.getCaseBundles().get(1), bundle);
-    }
-
-    @Test
-    public void givenACaseWithNoDocuments_thenReturnOriginalCaseData() {
+    public void givenACaseWithNoDocuments_thenReturnNull() {
         SscsCaseData caseData = SscsCaseData.builder().build();
 
-        assertEquals(caseData, sscsBundlingAndStitchingService.bundleAndStitch(caseData));
+        assertNull(sscsBundlingAndStitchingService.bundleAndStitch(caseData));
     }
 }

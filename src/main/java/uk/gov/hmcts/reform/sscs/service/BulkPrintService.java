@@ -37,10 +37,10 @@ public class BulkPrintService {
         this.sendLetterEnabled = sendLetterEnabled;
     }
 
-    public Optional<UUID> sendToBulkPrint(final List<Pdf> pdfList, final SscsCaseData sscsCaseData)
+    public Optional<UUID> sendToBulkPrint(Pdf pdf, final SscsCaseData sscsCaseData)
         throws BulkPrintException {
         if (sendLetterEnabled) {
-            String[] encodedData = pdfList.stream().map(f -> getEncoder().encodeToString(f.getContent())).toArray(String[]::new);
+            String encodedData = getEncoder().encodeToString(pdf.getContent());
             final String authToken = idamService.generateServiceAuthorization();
             return sendLetter(authToken, sscsCaseData, encodedData);
         }

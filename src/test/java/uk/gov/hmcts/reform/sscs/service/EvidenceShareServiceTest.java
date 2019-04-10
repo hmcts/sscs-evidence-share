@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -9,16 +10,17 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.*;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import uk.gov.hmcts.reform.sscs.bundling.SscsBundlingAndStitchingService;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -56,6 +58,10 @@ public class EvidenceShareServiceTest {
     @Mock
     private EvidenceShareConfig evidenceShareConfig;
 
+    @Mock
+    private SscsBundlingAndStitchingService sscsAddCaseBundleService;
+
+    @InjectMocks
     private EvidenceShareService evidenceShareService;
 
     private LocalDateTime now = LocalDateTime.now();
@@ -63,29 +69,24 @@ public class EvidenceShareServiceTest {
     @Before
     public void setUp() {
         evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer, documentManagementService,
-            documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig);
+            documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig, sscsAddCaseBundleService);
         when(evidenceShareConfig.getAllowedBenefitTypes()).thenReturn(Collections.singletonList("pip"));
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(Collections.singletonList("paper"));
     }
 
     @Test
-    public void givenAMessageWhichFindsToATemplate_thenConvertToSscsCaseDataAndAddPdfToCase() {
+    public void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint() {
 
         String docUrl = "my/1/url.pdf";
-        Pdf docPdf = new Pdf(docUrl.getBytes(), "evidence1.pdf");
+        String stitchedFileName = "stitched.pdf";
+
+        Pdf docPdf = new Pdf(docUrl.getBytes(), stitchedFileName);
+
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(docPdf.getName())
                 .documentLink(DocumentLink.builder().documentUrl(docUrl)
                     .documentFilename(docPdf.getName()).build())
-                .build()).build(),
-            SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName("filtered out word.doc")
-                .documentLink(DocumentLink.builder().documentUrl("/my/1/doc.url")
-                    .documentFilename("filtered out word.doc").build())
-                .build()).build(),
-            SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName("filtered out as there is no documentLink object.pfd")
                 .build()).build()));
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
@@ -103,14 +104,19 @@ public class EvidenceShareServiceTest {
         when(documentManagementService.generateDocumentAndAddToCcd(holder, caseDetails.getCaseData())).thenReturn(DL6_PDF);
 
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
-        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(DL6_PDF, docPdf)), any()))
+        when(sscsAddCaseBundleService.bundleAndStitch(caseDetails.getCaseData())).thenReturn(
+            singletonList(Bundle.builder().value(BundleDetails.builder().stitchedDocument(
+                DocumentLink.builder().documentUrl(docUrl).documentFilename(stitchedFileName).build()).build()).build()));
+
+        when(bulkPrintService.sendToBulkPrint(eq(docPdf), any()))
             .thenReturn(expectedOptionalUuid);
 
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
 
         assertEquals(expectedOptionalUuid, optionalUuid);
         verify(evidenceManagementService).download(eq(URI.create(docUrl)), any());
-        verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(DL6_PDF, docPdf)), any());
+        verify(bulkPrintService).sendToBulkPrint(eq(docPdf), any());
+        verify(sscsAddCaseBundleService).bundleAndStitch(eq(caseDetails.getCaseData()));
     }
 
     @Test

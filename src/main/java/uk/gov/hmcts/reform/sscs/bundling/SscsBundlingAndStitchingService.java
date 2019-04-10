@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Bundle;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -28,7 +29,7 @@ public class SscsBundlingAndStitchingService implements CcdCaseUpdater {
     }
 
     @Override
-    public SscsCaseData bundleAndStitch(SscsCaseData sscsCaseData) {
+    public List<Bundle> bundleAndStitch(SscsCaseData sscsCaseData) {
 
         if (sscsCaseData != null && sscsCaseData.getSscsDocument() != null) {
 
@@ -36,15 +37,12 @@ public class SscsBundlingAndStitchingService implements CcdCaseUpdater {
 
             addBundleToCase(sscsCaseData, newBundle);
 
-//            updateCcdCaseService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), "createBundle", "Create bundle", "Create bundle of documents ready for stitching", idamService.getIdamTokens());
-            updateCcdCaseService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), "stitchBundle", "Stitch bundle", "Stitch bundle before sending to DWP", idamService.getIdamTokens());
+            SscsCaseDetails caseDetails = updateCcdCaseService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), "stitchBundle", "Stitch bundle", "Stitch bundle before sending to DWP", idamService.getIdamTokens());
 
-            //call stitch endpoint direct?
-
-
+            return caseDetails.getData().getCaseBundles();
         }
 
-        return sscsCaseData;
+        return null;
     }
 
     private void addBundleToCase(SscsCaseData sscsCaseData, Bundle newBundle) {
