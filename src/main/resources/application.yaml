@@ -74,6 +74,10 @@ docmosis:
     dl16:
       templateName: TB-SCS-GNO-ENG-00011 v0.1.doc
 
+dwp-address-lookup:
+  # DO NOT SET THIS 'true' IN PRODUCTION
+  use-test-address: ${USE_DWP_TEST_ADDRESS:false}
+
 evidence-share:
   allowed-benefit-types:
   - PIP

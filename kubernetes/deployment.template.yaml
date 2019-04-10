@@ -47,6 +47,8 @@ spec:
               value: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
             - name: SEND_LETTER_SERVICE_ENABLED
               value: "true"
+            - name: USE_DWP_TEST_ADDRESS
+              value: "false"
             - name: DOCUMENT_MANAGEMENT_URL
               value: "http://dm-store-aat.service.core-compute-aat.internal"
             - name: TRUST_ALL_CERTS

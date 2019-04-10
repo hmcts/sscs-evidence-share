@@ -18,6 +18,7 @@ locals {
   documentStore               = "http://dm-store-${var.env}.service.${local.ase_name}.internal"
   ccdApi                      = "http://ccd-data-store-api-${var.env}.service.${local.ase_name}.internal"
   send_letter_service_baseurl = "http://rpe-send-letter-service-${var.env}.service.core-compute-${var.env}.internal"
+  use_dwp_test_address        = "${(var.env == "aat" || var.env == "demo")? "true" : var.use_dwp_test_address}"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -122,6 +123,7 @@ module "sscs-evidence-share" {
     SUBSCRIPTION_NAME = "sscs-evidenceshare-subscription-${var.env}"
 
     TRUST_ALL_CERTS         = "${var.trust_all_certs}"
+    USE_DWP_TEST_ADDRESS    = "${local.use_dwp_test_address}"
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
 

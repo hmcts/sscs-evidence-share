@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.domain.BenefitLookup;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
@@ -22,9 +23,18 @@ public class DwpAddressLookup {
     private static final String PIP = "PIP";
     private static final String ESA = "ESA";
     private static final String EXCELA = "excela";
+    private static final String TEST_ADDRESS = "test-address";
     private static final String ADDRESS = "address";
 
     private static JSONObject configObject;
+    private final boolean useTestAddress;
+
+    public DwpAddressLookup(@Value("${dwp-address-lookup.use-test-address}") boolean useTestAddress) {
+        if (useTestAddress) {
+            log.warn("****WARNING*** Using test dwp address, ensure you know what your doing.");
+        }
+        this.useTestAddress = useTestAddress;
+    }
 
     static {
         JSONParser parser = new JSONParser();
@@ -42,6 +52,8 @@ public class DwpAddressLookup {
     private static final BenefitLookup<String> ESA_LOOKUP = new BenefitLookup<>(getJsonArray(ESA));
     private static final JSONObject EXCELA_CONFIG = (JSONObject) configObject.get(EXCELA);
     public static final DwpAddress EXCELA_DWP_ADDRESS = BenefitLookup.getAddress((JSONObject) EXCELA_CONFIG.get(ADDRESS));
+    private static final JSONObject TEST_ADDRESS_CONFIG = (JSONObject) configObject.get(TEST_ADDRESS);
+    private static final DwpAddress TEST_DWP_ADDRESS = BenefitLookup.getAddress((JSONObject) TEST_ADDRESS_CONFIG.get(ADDRESS));
 
     public Optional<DwpAddress> lookup(String benefitType, String dwpIssuingOffice) {
         log.info("looking up address for benefitType {} and dwpIssuingOffice {}", benefitType, dwpIssuingOffice);
@@ -55,6 +67,10 @@ public class DwpAddressLookup {
     }
 
     private Optional<DwpAddress> getDwpAddress(String benefitType, String dwpIssuingOffice) {
+        if (useTestAddress) {
+            log.warn("****WARNING*** Returning test dwp address, ensure you know what your doing.");
+            return Optional.of(TEST_DWP_ADDRESS);
+        }
         if (StringUtils.equalsIgnoreCase(PIP, benefitType) && NumberUtils.isCreatable(dwpIssuingOffice)) {
             return Optional.ofNullable(PIP_LOOKUP.get(NumberUtils.toLong(dwpIssuingOffice, 0)));
         } else if (StringUtils.equalsIgnoreCase(ESA, benefitType)) {
