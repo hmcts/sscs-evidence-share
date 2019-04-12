@@ -12,7 +12,7 @@ public class SscsBundlePopulator {
 
     public Bundle populateNewBundle(SscsCaseData caseData) {
 
-        List<SscsDocument> sscsDocuments = caseData.getSscsDocument();
+        List<SscsDocument> sscsDocuments = sortBundledDocuments(caseData.getSscsDocument());
 
         List<BundleDocument> bundledDocs = new ArrayList<>();
         for (int i = 0; i < sscsDocuments.size(); i++) {
@@ -38,6 +38,19 @@ public class SscsBundlePopulator {
             .dateGenerated(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
             .build())
         .build();
+    }
+
+    private List<SscsDocument> sortBundledDocuments(List<SscsDocument> sscsDocuments) {
+        List<SscsDocument> sortedDocuments = new ArrayList<>();
+
+        for (SscsDocument doc : sscsDocuments) {
+            if (null != doc.getValue().getDocumentType() && (doc.getValue().getDocumentType().equals("dl6") || doc.getValue().getDocumentType().equals("dl16"))) {
+                sortedDocuments.add(0, doc);
+            } else {
+                sortedDocuments.add(doc);
+            }
+        }
+        return sortedDocuments;
     }
 
 }
