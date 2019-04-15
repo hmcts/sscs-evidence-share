@@ -63,7 +63,7 @@ public class DocmosisPdfGenerationIt {
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess(FILE_CONTENT, MediaType.APPLICATION_JSON));
 
-        byte[] result = pdfGenerationService.generatePdf(DocumentHolder.builder().template(new Template("dl6-template.doc", "DL6")).placeholders(PLACEHOLDERS).build());
+        byte[] result = pdfGenerationService.generatePdf(DocumentHolder.builder().template(new Template("dl6-template.doc", "dl6")).placeholders(PLACEHOLDERS).build());
         assertThat(result, is(notNullValue()));
         assertThat(result, is(equalTo(FILE_CONTENT.getBytes())));
     }
@@ -75,7 +75,7 @@ public class DocmosisPdfGenerationIt {
             .andRespond(withBadRequest());
 
         try {
-            pdfGenerationService.generatePdf(DocumentHolder.builder().template(new Template("dl6-template.doc", "DL6")).placeholders(PLACEHOLDERS).build());
+            pdfGenerationService.generatePdf(DocumentHolder.builder().template(new Template("dl6-template.doc", "dl6")).placeholders(PLACEHOLDERS).build());
             fail("should have thrown bad-request exception");
         } catch (PdfGenerationException e) {
             HttpStatus httpStatus = ((HttpClientErrorException) e.getCause()).getStatusCode();

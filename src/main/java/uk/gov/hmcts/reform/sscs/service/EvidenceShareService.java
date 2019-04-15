@@ -82,8 +82,8 @@ public class EvidenceShareService {
 
                 List<Bundle> bundles = sscsAddCaseBundleService.bundleAndStitch(caseData);
 
-                if (null != bundles && bundles.size() > 0 && null != bundles.get(0).getValue().getStitchedDocument()) {
-                    return bulkPrintService.sendToBulkPrint(stitchedPdf(bundles.get(0).getValue().getStitchedDocument()), caseData);
+                if (null != bundles && bundles.size() > 0 && null != bundles.get(bundles.size() - 1).getValue().getStitchedDocument()) {
+                    return bulkPrintService.sendToBulkPrint(stitchedPdf(bundles.get(bundles.size() - 1).getValue().getStitchedDocument()), caseData);
                 }
             }
         } else {

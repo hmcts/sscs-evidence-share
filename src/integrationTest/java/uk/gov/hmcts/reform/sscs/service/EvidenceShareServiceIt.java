@@ -9,13 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
@@ -108,10 +102,10 @@ public class EvidenceShareServiceIt {
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
         when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
-        when(ccdService.updateCase(any(), any(), eq("uploadDocument"), any(), eq("Uploaded DL6-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(ccdService.updateCase(any(), any(), eq("uploadDocument"), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
         List<Bundle> bundles = new ArrayList<>();
-        bundles.add(Bundle.builder().value(BundleDetails.builder().dateGenerated(LocalDateTime.now().toString()).stitchedDocument(
+        bundles.add(Bundle.builder().value(BundleDetails.builder().stitchedDocument(
             DocumentLink.builder().documentUrl("test.com").documentFilename("myfile.pdf").build()).build()).build());
 
         SscsCaseDetails stitchedCase = SscsCaseDetails.builder().data(SscsCaseData.builder().caseBundles(bundles).build()).build();
@@ -123,7 +117,7 @@ public class EvidenceShareServiceIt {
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
-        verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded DL6-12345656789.pdf into SSCS"), any());
+        verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
     }
 
@@ -141,10 +135,10 @@ public class EvidenceShareServiceIt {
 
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(),  eq("sscs"))).thenReturn(uploadResponse);
-        when(ccdService.updateCase(any(), any(), eq("uploadDocument"), any(), eq("Uploaded DL6-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(ccdService.updateCase(any(), any(), eq("uploadDocument"), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
         List<Bundle> bundles = new ArrayList<>();
-        bundles.add(Bundle.builder().value(BundleDetails.builder().dateGenerated(LocalDateTime.now().toString()).stitchedDocument(
+        bundles.add(Bundle.builder().value(BundleDetails.builder().stitchedDocument(
             DocumentLink.builder().documentUrl("test.com").documentFilename("mynewfile.pdf").build()).build()).build());
 
         SscsCaseDetails stitchedCase = SscsCaseDetails.builder().data(SscsCaseData.builder().caseBundles(bundles).build()).build();
@@ -161,7 +155,7 @@ public class EvidenceShareServiceIt {
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
-        verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded DL6-12345656789.pdf into SSCS"), any());
+        verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
     }
 
@@ -181,10 +175,10 @@ public class EvidenceShareServiceIt {
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
         when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
-        when(ccdService.updateCase(any(), any(), any(), any(), eq("Uploaded DL16-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(ccdService.updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
         List<Bundle> bundles = new ArrayList<>();
-        bundles.add(Bundle.builder().value(BundleDetails.builder().dateGenerated(LocalDateTime.now().toString()).stitchedDocument(
+        bundles.add(Bundle.builder().value(BundleDetails.builder().stitchedDocument(
             DocumentLink.builder().documentUrl("test.com").documentFilename("myfile.pdf").build()).build()).build());
 
         SscsCaseDetails stitchedCase = SscsCaseDetails.builder().data(SscsCaseData.builder().caseBundles(bundles).build()).build();
@@ -196,7 +190,7 @@ public class EvidenceShareServiceIt {
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
-        verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded DL16-12345656789.pdf into SSCS"), any());
+        verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
     }
 

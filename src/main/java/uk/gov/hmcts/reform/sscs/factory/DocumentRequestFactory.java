@@ -28,6 +28,7 @@ public class DocumentRequestFactory {
         return DocumentHolder.builder()
             .template(template)
             .placeholders(placeholders)
+            .pdfArchiveMode(true)
             .build();
     }
 }
