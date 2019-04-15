@@ -37,6 +37,6 @@
    file name: spring-security-crypto-5.1.3.RELEASE.jar
    ]]></notes>
     <gav regex="true">^org\.springframework\.security:spring-security-crypto:5\.1\.3\.RELEASE$</gav>
-    <cve>CVE-2018-1258</cve>
+    <cpe>cpe:/a:pivotal_software:spring_security</cpe>
   </suppress>
 </suppressions>
