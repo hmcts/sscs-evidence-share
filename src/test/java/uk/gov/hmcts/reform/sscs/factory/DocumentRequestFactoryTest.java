@@ -48,5 +48,6 @@ public class DocumentRequestFactoryTest {
 
         assertEquals(holder.getTemplate(), template);
         assertEquals(holder.getPlaceholders(), placeholders);
+        assertEquals(holder.isPdfArchiveMode(), true);
     }
 }

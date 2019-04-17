@@ -26,9 +26,9 @@ public class TemplateService {
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
             if (mrnDate.plusDays(30).isBefore(LocalDate.now())) {
-                return new Template(dl16TemplateName, "DL16");
+                return new Template(dl16TemplateName, "dl16");
             } else {
-                return new Template(dl6TemplateName, "DL6");
+                return new Template(dl6TemplateName, "dl6");
             }
         }
         return null;

@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
 
 @RunWith(JUnitParamsRunner.class)
-public class DwpDwpAddressLookupTest {
+public class DwpAddressLookupTest {
 
     private static final String PIP = "PIP";
     private static final String ESA = "ESA";

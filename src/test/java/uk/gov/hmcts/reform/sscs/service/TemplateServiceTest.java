@@ -36,7 +36,7 @@ public class TemplateServiceTest {
 
         Template result = service.findTemplate(caseData);
 
-        assertEquals("DL6", result.getHmctsDocName());
+        assertEquals("dl6", result.getHmctsDocName());
     }
 
     @Test
@@ -52,7 +52,7 @@ public class TemplateServiceTest {
 
         Template result = service.findTemplate(caseData);
 
-        assertEquals("DL6", result.getHmctsDocName());
+        assertEquals("dl6", result.getHmctsDocName());
     }
 
     @Test
@@ -68,7 +68,7 @@ public class TemplateServiceTest {
 
         Template result = service.findTemplate(caseData);
 
-        assertEquals("DL16", result.getHmctsDocName());
+        assertEquals("dl16", result.getHmctsDocName());
     }
 
     @Test

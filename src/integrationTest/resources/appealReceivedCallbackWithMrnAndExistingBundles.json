@@ -72,6 +72,46 @@
         "documents": [
         ]
       },
+      "caseBundles": [
+        {
+          "value": {
+            "id": "1234",
+            "title": "bundle1",
+            "description": "This is a bundle of docs",
+            "eligibleForStitching": "yes",
+            "documents": [
+              {
+                "id": "0a07cce4-4963-4f29-94b3-ffb93a0a7f56",
+                "value": {
+                  "name": "Test.doc",
+                  "description": "My test doc"
+                }
+              }
+            ],
+            "stitchStatus": "",
+            "dateGenerated": "2019-04-05T14:38:26.443"
+          }
+        },
+        {
+          "value": {
+            "id": "1234",
+            "title": "bundle2",
+            "description": "This is another bundle of docs",
+            "eligibleForStitching": "yes",
+            "documents": [
+              {
+                "id": "0a07cce4-4963-4f29-94b3-ffb93a0a7f55",
+                "value": {
+                  "name": "Test2.doc",
+                  "description": "My test doc2"
+                }
+              }
+            ],
+            "stitchStatus": "",
+            "dateGenerated": "2019-04-06T14:38:26.443"
+          }
+        }
+      ],
       "caseReference": "SC022/14/12423",
       "generatedSurname": "Test",
       "regionalProcessingCenter": {
@@ -86,7 +126,12 @@
         "city": "BIRMINGHAM"
       },
       "appeal": {
-        "mrnDetails": {},
+        "mrnDetails": {
+          "mrnDate": "MRN_DATE_TO_BE_REPLACED",
+          "mrnLateReason": "Lost my paperwork",
+          "dwpIssuingOffice": "1",
+          "mrnMissingReason": null
+        },
         "appellant": {
           "name": {
             "title": "Miss",
@@ -107,8 +152,8 @@
           "isAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "PIP",
+          "description": "Personal Independence Payment"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {
