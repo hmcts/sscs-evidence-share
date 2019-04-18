@@ -40,4 +40,10 @@
     <cve>CVE-2018-1258</cve>
     <cve>CVE-2019-3795</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[Shadowed dependency from AppInsights]]></notes>
+    <gav regex="true">^io\.netty:netty-tcnative-boringssl-static:2\.0\.17\.Final$</gav>
+    <cve>CVE-2014-3488</cve>
+    <cve>CVE-2015-2156</cve>
+  </suppress>
 </suppressions>
