@@ -3,18 +3,17 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Objects.nonNull;
 
 import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.bundling.SscsBundlingAndStitchingService;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Bundle;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
@@ -39,8 +38,6 @@ public class EvidenceShareService {
 
     private final EvidenceShareConfig evidenceShareConfig;
 
-    private final SscsBundlingAndStitchingService sscsAddCaseBundleService;
-
     @Autowired
     public EvidenceShareService(
         SscsCaseCallbackDeserializer sscsDeserializer,
@@ -48,8 +45,7 @@ public class EvidenceShareService {
         DocumentRequestFactory documentRequestFactory,
         EvidenceManagementService evidenceManagementService,
         BulkPrintService bulkPrintService,
-        EvidenceShareConfig evidenceShareConfig,
-        SscsBundlingAndStitchingService sscsAddCaseBundleService
+        EvidenceShareConfig evidenceShareConfig
     ) {
 
         this.sscsCaseCallbackDeserializer = sscsDeserializer;
@@ -58,7 +54,6 @@ public class EvidenceShareService {
         this.evidenceManagementService = evidenceManagementService;
         this.bulkPrintService = bulkPrintService;
         this.evidenceShareConfig = evidenceShareConfig;
-        this.sscsAddCaseBundleService = sscsAddCaseBundleService;
     }
 
     public Optional<UUID> processMessage(final String message) {
@@ -78,13 +73,10 @@ public class EvidenceShareService {
             if (holder.getTemplate() != null) {
                 log.info("Generating document for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
 
-                documentManagementService.generateDocumentAndAddToCcd(holder, caseData);
+                Pdf newPdfAddedToTheCase = documentManagementService.generateDocumentAndAddToCcd(holder, caseData);
+                List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
 
-                List<Bundle> bundles = sscsAddCaseBundleService.bundleAndStitch(caseData);
-
-                if (null != bundles && bundles.size() > 0 && null != bundles.get(bundles.size() - 1).getValue().getStitchedDocument()) {
-                    return bulkPrintService.sendToBulkPrint(stitchedPdf(bundles.get(bundles.size() - 1).getValue().getStitchedDocument()), caseData);
-                }
+                return bulkPrintService.sendToBulkPrint(getAllCasePdfs(newPdfAddedToTheCase, existingCasePdfs), caseData);
             }
         } else {
             log.warn("case id {} is not ready to send to dwp", sscsCaseDataCallback.getCaseDetails().getId());
@@ -104,7 +96,33 @@ public class EvidenceShareService {
                 .anyMatch(caseData.getAppeal().getBenefitType().getCode()::equalsIgnoreCase);
     }
 
-    private Pdf stitchedPdf(DocumentLink doc) {
-        return (new Pdf(evidenceManagementService.download(URI.create(doc.getDocumentUrl()), DM_STORE_USER_ID), doc.getDocumentFilename()));
+    private List<Pdf> getAllCasePdfs(Pdf newPdfAddedToTheCase, List<Pdf> existingCasePdfs) {
+        List<Pdf> allPdfs = new ArrayList<>(existingCasePdfs);
+        allPdfs.add(0, newPdfAddedToTheCase);
+        return allPdfs;
+    }
+
+    private List<Pdf> toPdf(List<SscsDocument> sscsDocument) {
+        if (sscsDocument == null) {
+            return Collections.emptyList();
+        }
+        return sscsDocument.stream()
+            .filter(doc -> nonNull(doc)
+                && nonNull(doc.getValue())
+                && nonNull(doc.getValue().getDocumentFileName())
+                && nonNull(doc.getValue().getDocumentLink())
+                && nonNull(doc.getValue().getDocumentLink().getDocumentUrl())
+            )
+            .flatMap(doc -> StringUtils.containsIgnoreCase(doc.getValue().getDocumentFileName(), "pdf")
+                ? Stream.of(new Pdf(toBytes(doc), doc.getValue().getDocumentFileName()))
+                : Stream.empty()
+            ).collect(Collectors.toList());
+    }
+
+    private byte[] toBytes(SscsDocument sscsDocument) {
+        return evidenceManagementService.download(
+            URI.create(sscsDocument.getValue().getDocumentLink().getDocumentUrl()),
+            DM_STORE_USER_ID
+        );
     }
 }
