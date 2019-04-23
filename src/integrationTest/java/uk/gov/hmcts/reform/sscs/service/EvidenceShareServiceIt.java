@@ -17,7 +17,6 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
-import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -104,53 +102,8 @@ public class EvidenceShareServiceIt {
         when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
         when(ccdService.updateCase(any(), any(), eq("uploadDocument"), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
-        List<Bundle> bundles = new ArrayList<>();
-        bundles.add(Bundle.builder().value(BundleDetails.builder().stitchedDocument(
-            DocumentLink.builder().documentUrl("test.com").documentFilename("myfile.pdf").build()).build()).build());
-
-        SscsCaseDetails stitchedCase = SscsCaseDetails.builder().data(SscsCaseData.builder().caseBundles(bundles).build()).build();
-        when(updateCcdCaseService.updateCase(any(), any(), eq("stitchBundle"), eq("Stitch bundle"), any(), any())).thenReturn(stitchedCase);
-
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
-        assertEquals(expectedOptionalUuid, optionalUuid);
-
-        verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
-        verify(evidenceManagementService).upload(any(),  eq("sscs"));
-        verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any());
-        verify(bulkPrintService).sendToBulkPrint(any(), any());
-    }
-
-    @Test
-    public void appealWithMultipleBundles_shouldSelectTheLatestBundleToSendToStitchingService() throws IOException {
-        assertNotNull("evidenceShareService must be autowired", evidenceShareService);
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("appealReceivedCallbackWithMrnAndExistingBundles.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-        json = updateMrnDate(json, LocalDate.now().toString());
-        json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
-
-        doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
-
-        UploadResponse uploadResponse = createUploadResponse();
-        when(evidenceManagementService.upload(any(),  eq("sscs"))).thenReturn(uploadResponse);
-        when(ccdService.updateCase(any(), any(), eq("uploadDocument"), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
-
-        List<Bundle> bundles = new ArrayList<>();
-        bundles.add(Bundle.builder().value(BundleDetails.builder().stitchedDocument(
-            DocumentLink.builder().documentUrl("test.com").documentFilename("mynewfile.pdf").build()).build()).build());
-
-        SscsCaseDetails stitchedCase = SscsCaseDetails.builder().data(SscsCaseData.builder().caseBundles(bundles).build()).build();
-        when(updateCcdCaseService.updateCase(any(), any(), eq("stitchBundle"), eq("Stitch bundle"), any(), any())).thenReturn(stitchedCase);
-
-        Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
-        ArgumentCaptor<Pdf> pdfCaptor = ArgumentCaptor.forClass(Pdf.class);
-        when(bulkPrintService.sendToBulkPrint(pdfCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
-
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
-
-        assertEquals("mynewfile.pdf", pdfCaptor.getValue().getName());
         assertEquals(expectedOptionalUuid, optionalUuid);
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
@@ -176,13 +129,6 @@ public class EvidenceShareServiceIt {
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
         when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
         when(ccdService.updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
-
-        List<Bundle> bundles = new ArrayList<>();
-        bundles.add(Bundle.builder().value(BundleDetails.builder().stitchedDocument(
-            DocumentLink.builder().documentUrl("test.com").documentFilename("myfile.pdf").build()).build()).build());
-
-        SscsCaseDetails stitchedCase = SscsCaseDetails.builder().data(SscsCaseData.builder().caseBundles(bundles).build()).build();
-        when(updateCcdCaseService.updateCase(any(), any(), eq("stitchBundle"), eq("Stitch bundle"), any(), any())).thenReturn(stitchedCase);
 
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
@@ -263,7 +209,7 @@ public class EvidenceShareServiceIt {
         Document document = new Document();
         Document.Links links = new Document.Links();
         Document.Link link = new Document.Link();
-        link.href = "some link";
+        link.href = "http://link.com";
         links.self = link;
         document.links = links;
         return document;

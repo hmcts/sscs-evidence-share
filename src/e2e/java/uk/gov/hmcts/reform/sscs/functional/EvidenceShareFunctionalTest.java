@@ -31,8 +31,6 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         List<SscsDocument> docs = caseData.getSscsDocument();
         assertEquals(1, docs.size());
         assertEquals("dl6-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
-        assertEquals(1, caseData.getCaseBundles().size());
-        assertEquals("stitched.pdf", caseData.getCaseBundles().get(0).getValue().getStitchedDocument().getDocumentFilename());
     }
 
     @Test
@@ -49,8 +47,6 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
         List<SscsDocument> docs = caseData.getSscsDocument();
         assertEquals(1, docs.size());
-        assertEquals("DL16-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
-        assertEquals(1, caseData.getCaseBundles().size());
-        assertEquals("stitched.pdf", caseData.getCaseBundles().get(0).getValue().getStitchedDocument().getDocumentFilename());
+        assertEquals("dl16-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
     }
 }
