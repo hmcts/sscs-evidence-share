@@ -66,7 +66,7 @@ spec:
             - name: PDF_SERVICE_ACCESS_KEY
               value: ${PDF_SERVICE_ACCESS_KEY}
             - name: PDF_SERVICE_HEALTH_URL
-              value: ${PDF_SERVICE_BASE_URL}rs/health
+              value: ${PDF_SERVICE_BASE_URL}rs/status
           resources:
             requests:
               memory: "512Mi"
