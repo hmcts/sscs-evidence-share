@@ -45,6 +45,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
+env.TF_LOG = 'DEBUG'
+
 withPipeline(type, product, component) {
     if (env.CHANGE_TITLE && !env.CHANGE_TITLE.startsWith('Bump')) {
         enableDockerBuild()
