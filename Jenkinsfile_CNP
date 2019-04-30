@@ -10,10 +10,6 @@ def type = "java"
 def product = "sscs"
 def component = "evidence-share"
 
-def docmosisVaultName = '${env.ENVIRONMENT_NAME}' == 'prod' ? 'docmosisiaasprodkv' : 'docmosisiaasdevkv'
-
-def testPrint = echo "I AM PRINTING vault name ${docmosisVaultName} for env ${env.ENVIRONMENT_NAME}"
-
 def secrets = [
     'sscs-${env}'      : [
             secret('idam-api', 'IDAM_API_URL'),
