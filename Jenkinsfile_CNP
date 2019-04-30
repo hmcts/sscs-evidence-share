@@ -12,7 +12,7 @@ def component = "evidence-share"
 
 def docmosisVaultName = '${env}' == 'prod' ? 'docmosisiaasprodkv' : 'docmosisiaasdevkv'
 
-def testPrint = echo "I AM PRINTING vault name ${docmosisVaultName} for env ${env.NAME}"
+def testPrint = echo "I AM PRINTING vault name ${docmosisVaultName} for env ${env.ENVIRONMENT_NAME}"
 
 def secrets = [
     'sscs-${env}'      : [
