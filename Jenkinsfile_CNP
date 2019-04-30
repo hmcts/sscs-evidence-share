@@ -10,7 +10,7 @@ def type = "java"
 def product = "sscs"
 def component = "evidence-share"
 
-def docmosisVaultName = '${env.name}' == 'prod' ? 'docmosisiaasprodkv' : 'docmosisiaasdevkv'
+def docmosisVaultName = '${env}' == 'prod' ? 'docmosisiaasprodkv' : 'docmosisiaasdevkv'
 
 def testPrint = echo "I AM PRINTING vault name ${docmosisVaultName}"
 
