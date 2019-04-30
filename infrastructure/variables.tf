@@ -15,10 +15,6 @@ variable "env" {
   type = "string"
 }
 
-variable "docmosis_env" {
-  type = "string"
-}
-
 variable "ilbIp" {}
 
 variable "subscription" {}

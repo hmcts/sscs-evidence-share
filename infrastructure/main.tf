@@ -8,7 +8,6 @@ locals {
   azureVaultNameDocmosis = "${var.env == "prod" ? local.docmosis_prod_vault : local.docmosis_nonprod_vault}"
   azureVaultUrlDocmosis  = "https://${local.azureVaultNameDocmosis}.vault.azure.net/"
   s2sCnpUrl              = "http://rpe-service-auth-provider-${var.env}.service.${local.ase_name}.internal"
-  docmosis_env           = "${var.env == "prod" ? "prod" : "dev"}"
 
   shared_app_service_plan     = "${var.product}-${var.env}"
   non_shared_app_service_plan = "${var.product}-${var.component}-${var.env}"
@@ -85,7 +84,6 @@ module "sscs-evidence-share" {
   product             = "${var.product}-${var.component}"
   location            = "${var.location_app}"
   env                 = "${var.env}"
-  docmosis_env        = "${var.docmosis_env}"
   ilbIp               = "${var.ilbIp}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   subscription        = "${var.subscription}"
