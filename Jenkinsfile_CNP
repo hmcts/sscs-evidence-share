@@ -10,8 +10,6 @@ def type = "java"
 def product = "sscs"
 def component = "evidence-share"
 
-def docmosisVaultName = '${env}' == 'prod' ? 'docmosisiaasprodkv' : 'docmosisiaasdevkv'
-
 def secrets = [
     'sscs-${env}'      : [
             secret('idam-api', 'IDAM_API_URL'),
@@ -28,11 +26,6 @@ def secrets = [
             secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
             secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
             secret('sscs-asb-primary-send-and-listen-shared-access-key', 'AMQP_PASSWORD')
-        ],
-    (docmosisVaultName)      : [
-            // Used by Kubernetes
-            secret('docmosis-endpoint', 'PDF_SERVICE_BASE_URL'),
-            secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY')
         ]
 ]
 
@@ -46,6 +39,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 env.TF_LOG = 'DEBUG'
+
 
 withPipeline(type, product, component) {
     if (env.CHANGE_TITLE && !env.CHANGE_TITLE.startsWith('Bump')) {
