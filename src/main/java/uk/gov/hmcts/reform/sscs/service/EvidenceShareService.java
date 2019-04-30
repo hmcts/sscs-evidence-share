@@ -84,6 +84,7 @@ public class EvidenceShareService {
         return Optional.empty();
     }
 
+
     private boolean readyToSendToDwp(SscsCaseData caseData) {
         return nonNull(caseData)
             && nonNull(caseData.getAppeal())
