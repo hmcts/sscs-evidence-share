@@ -31,7 +31,7 @@ def secrets = [
             secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
             secret('sscs-asb-primary-send-and-listen-shared-access-key', 'AMQP_PASSWORD')
         ],
-    ((docmosisVaultName))      : [
+     ('${env}' == 'prod' ? 'docmosisiaasprodkv' : 'docmosisiaasdevkv')     : [
             // Used by Kubernetes
             secret('docmosis-endpoint', 'PDF_SERVICE_BASE_URL'),
             secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY')
@@ -57,7 +57,5 @@ withPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')
     loadVaultSecrets(secrets)
 
-    before('buildinfra:prod') {
-    }
 }
 
