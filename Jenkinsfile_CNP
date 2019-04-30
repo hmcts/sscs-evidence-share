@@ -12,7 +12,7 @@ def component = "evidence-share"
 
 def docmosisVaultName = '${env}' == 'prod' ? 'docmosisiaasprodkv' : 'docmosisiaasdevkv'
 
-def testPrint = echo "I AM PRINTING vault name ${docmosisVaultName}"
+def testPrint = echo "I AM PRINTING vault name ${docmosisVaultName} for env ${env}"
 
 def secrets = [
     'sscs-${env}'      : [
@@ -31,7 +31,7 @@ def secrets = [
             secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
             secret('sscs-asb-primary-send-and-listen-shared-access-key', 'AMQP_PASSWORD')
         ],
-    "docmosisiaas${env.name}kv"      : [
+    "docmosisiaas${env}kv"      : [
             // Used by Kubernetes
             secret('docmosis-endpoint', 'PDF_SERVICE_BASE_URL'),
             secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY')
@@ -58,7 +58,6 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
 
     before('buildinfra:prod') {
-       docmosisVaultName = 'docmosisiaasprodkv'
     }
 }
 
