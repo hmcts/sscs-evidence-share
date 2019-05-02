@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
     })
 @EnableRetry
 @ComponentScan(
-    excludeFilters =
     basePackages = "uk.gov.hmcts.reform.sscs",
     basePackageClasses = SscsEvidenceShareApplication.class,
     lazyInit = true
