@@ -46,4 +46,13 @@
     <cve>CVE-2014-3488</cve>
     <cve>CVE-2015-2156</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[No fix is available]]></notes>
+    <gav regex="true">^org\.springframework\.security:spring-security-rsa:1\.0\.7\.RELEASE$</gav>
+    <cve>CVE-2011-2731</cve>
+    <cve>CVE-2011-2732</cve>
+    <cve>CVE-2012-5055</cve>
+    <cve>CVE-2018-1258</cve>
+    <cve>CVE-2018-1260</cve>
+  </suppress>
 </suppressions>
