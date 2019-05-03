@@ -20,6 +20,7 @@ java:
         - s2s-micro
         - sscs-asb-primary-send-and-listen-shared-access-key
     docmosisiaasdevkv:
+      excludeEnvironmentSuffix: true
       resourceGroup: docmosisiaasdevkv
       secrets:
         - docmosis-endpoint

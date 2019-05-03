@@ -1,10 +1,4 @@
 java:
-  keyVaults:
-    docmosisiaasdevkv:
-      resourceGroup: docmosisiaasdevkv
-      secrets:
-      - docmosis-endpoint
-      - docmosis-api-key
   environment:
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
     CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
