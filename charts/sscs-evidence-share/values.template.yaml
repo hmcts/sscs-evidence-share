@@ -26,7 +26,7 @@ java:
         - docmosis-api-key
   environment:
     REFORM_TEAM: sscs
-    REFORM_SERVICE_NAME: sscs-tribunals-api
+    REFORM_SERVICE_NAME: sscs-evidence-share
     REFORM_SERVICE_TYPE: java
     REFORM_ENVIRONMENT: preview
     ROOT_LOGGING_LEVEL: INFO
