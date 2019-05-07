@@ -23,6 +23,7 @@ public class DwpAddressLookup {
     private static final String ESA = "ESA";
     private static final String EXCELA = "excela";
     private static final String ADDRESS = "address";
+    private static final String TEST_HMCTS_ADDRESS = "test-hmcts-address";
 
     private static JSONObject configObject;
 
@@ -40,6 +41,8 @@ public class DwpAddressLookup {
 
     private static final BenefitLookup<Long> PIP_LOOKUP = new BenefitLookup<>(getJsonArray(PIP));
     private static final BenefitLookup<String> ESA_LOOKUP = new BenefitLookup<>(getJsonArray(ESA));
+    private static final JSONObject TEST_ADDRESS_CONFIG = (JSONObject) configObject.get(TEST_HMCTS_ADDRESS);
+    private static final DwpAddress TEST_ADDRESS = BenefitLookup.getAddress((JSONObject) TEST_ADDRESS_CONFIG.get(ADDRESS));
     private static final JSONObject EXCELA_CONFIG = (JSONObject) configObject.get(EXCELA);
     public static final DwpAddress EXCELA_DWP_ADDRESS = BenefitLookup.getAddress((JSONObject) EXCELA_CONFIG.get(ADDRESS));
 
@@ -55,6 +58,9 @@ public class DwpAddressLookup {
     }
 
     private Optional<DwpAddress> getDwpAddress(String benefitType, String dwpIssuingOffice) {
+        if (StringUtils.equalsIgnoreCase(dwpIssuingOffice, TEST_HMCTS_ADDRESS)) {
+            return Optional.of(TEST_ADDRESS);
+        }
         if (StringUtils.equalsIgnoreCase(PIP, benefitType) && NumberUtils.isCreatable(dwpIssuingOffice)) {
             return Optional.ofNullable(PIP_LOOKUP.get(NumberUtils.toLong(dwpIssuingOffice, 0)));
         } else if (StringUtils.equalsIgnoreCase(ESA, benefitType)) {

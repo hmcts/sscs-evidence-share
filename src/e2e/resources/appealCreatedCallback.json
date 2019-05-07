@@ -87,7 +87,7 @@
       },
       "appeal": {
         "mrnDetails": {
-          "dwpIssuingOffice": "1",
+          "dwpIssuingOffice": "test-hmcts-address",
           "mrnDate": "MRN_DATE_TO_BE_REPLACED"
         },
         "appellant": {
