@@ -13,8 +13,6 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class EvidenceShareConfig {
 
-    private final List<String> allowedBenefitTypes = new ArrayList<>();
-
     private final List<String> submitTypes = new ArrayList<>();
 
 }

@@ -4,12 +4,7 @@ import static io.restassured.RestAssured.baseURI;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import helper.EnvironmentProfileValueSource;
-import io.restassured.RestAssured;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import junitparams.JUnitParamsRunner;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -18,13 +13,12 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -68,39 +62,25 @@ public abstract class AbstractFunctionalTest {
         idamTokens = idamService.getIdamTokens();
     }
 
-    protected void createCase() {
+    protected SscsCaseData createCase(String mrnDate) {
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
         SscsCaseData caseData = minimalCaseData.toBuilder().appeal(minimalCaseData.getAppeal().toBuilder()
-            .benefitType(BenefitType.builder().code("PIP").build())
+            .benefitType(BenefitType.builder().code("PIP").description("Personal Independence Payment").build())
+            .mrnDetails(MrnDetails.builder().mrnDate(mrnDate).build())
             .receivedVia("Paper")
             .build()).build();
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, "appealCreated",
             "Evidence share service appeal created", "Evidence share service appeal created in test", idamTokens);
         ccdCaseId = String.valueOf(caseDetails.getId());
+        return caseData;
+    }
+
+    protected void sendToDwpEvent(SscsCaseData caseData) {
+        ccdService.updateCase(caseData, Long.valueOf(ccdCaseId), "sendToDwp",
+            "Test send to DWP", "Testing sending to DWP", idamTokens);
     }
 
     protected SscsCaseDetails findCaseById(String ccdCaseId) {
         return ccdService.getByCaseId(Long.valueOf(ccdCaseId), idamTokens);
-    }
-
-    protected String getJson(EventType eventType) throws IOException {
-        String resource = eventType.getCcdType()  + "Callback.json";
-        String file = getClass().getClassLoader().getResource(resource).getFile();
-        return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
-    }
-
-    public void simulateCcdCallback(String json) throws IOException {
-        final String callbackUrl = baseURI + "/send";
-
-        RestAssured.useRelaxedHTTPSValidation();
-        RestAssured
-                .given()
-                .header("ServiceAuthorization", "" + idamTokens.getServiceAuthorization())
-                .contentType("application/json")
-                .body(json)
-                .when()
-                .post(callbackUrl)
-                .then()
-                .statusCode(HttpStatus.OK.value());
     }
 }
