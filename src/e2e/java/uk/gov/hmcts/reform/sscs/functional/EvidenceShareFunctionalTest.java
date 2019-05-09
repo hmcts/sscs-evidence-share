@@ -1,10 +1,11 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
 import static org.junit.Assert.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.function.Supplier;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -17,12 +18,15 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
-    public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws InterruptedException {
+    public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws IOException {
 
-        SscsCaseData sscsCaseData = createCase(LocalDate.now().toString());
-        sendToDwpEvent(sscsCaseData);
+        createCaseInSendingToDwpState();
 
-        waitUntil(stateUpdated(), 60L);
+        String json = getJson(SYA_APPEAL_CREATED);
+        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
+        json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
+
+        simulateCcdCallback(json);
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
@@ -35,13 +39,15 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
-    public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws InterruptedException {
+    public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws IOException {
 
-        SscsCaseData sscsCaseData = createCase(LocalDate.now().minusDays(31).toString());
-        sendToDwpEvent(sscsCaseData);
+        createCaseInSendingToDwpState();
 
-        waitUntil(stateUpdated(), 60L);
+        String json = getJson(SYA_APPEAL_CREATED);
+        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
+        json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
 
+        simulateCcdCallback(json);
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
 
@@ -50,26 +56,5 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         assertEquals("dl16-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
         assertEquals("withDwp", caseDetails.getState());
         assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
-    }
-
-    private Supplier<Boolean> stateUpdated() {
-        return () -> {
-            SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-            return "withDwp".equals(caseDetails.getState());
-        };
-    }
-
-    private static void waitUntil(Supplier<Boolean> condition, long timeoutInSeconds) throws InterruptedException {
-        long timeout = timeoutInSeconds * 1000L * 1000000L;
-        long startTime = System.nanoTime();
-        while (true) {
-            if (condition.get()) {
-                System.out.println("Evidence share event completed after [" + ((System.nanoTime() - startTime) / (1000L * 1000000L)) + "] seconds");
-                break;
-            } else if (System.nanoTime() - startTime >= timeout) {
-                throw new RuntimeException("Evidence share event has not been completed in [" + timeoutInSeconds + "] seconds.");
-            }
-            Thread.sleep(5000L);
-        }
     }
 }
