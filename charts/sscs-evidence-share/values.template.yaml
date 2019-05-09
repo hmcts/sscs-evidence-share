@@ -19,12 +19,8 @@ java:
         - sscs-s2s-secret
         - s2s-micro
         - sscs-asb-primary-send-and-listen-shared-access-key
-#    docmosisiaasdevkv:
-#      excludeEnvironmentSuffix: true
-#      resourceGroup: docmosisiaasdevkv
-#      secrets:
-#        - docmosis-endpoint
-#        - docmosis-api-key
+        - docmosis-endpoint
+        - docmosis-api-key
   environment:
     REFORM_TEAM: sscs
     REFORM_SERVICE_NAME: sscs-evidence-share
