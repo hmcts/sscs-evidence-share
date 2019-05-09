@@ -2,7 +2,8 @@ spring:
   cloud:
     propertiesvolume:
       paths: /mnt/secrets/sscs, /mnt/secrets/docmosisiaasdevkv
-      prefixed: false
+      prefixed: true
+      enabled: true
       aliases:
         sscs.idam-api: IDAM_API_URL
         sscs.idam-oauth-user: IDAM_OAUTH2_CLIENT_ID
