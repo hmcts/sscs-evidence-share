@@ -11,7 +11,6 @@ java:
     TOPIC_NAME: "sscs-evidenceshare-topic-aat"
     AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
-    TRUST_ALL_CERTS: "false"
     PDF_SERVICE_BASE_URL: ${PDF_SERVICE_BASE_URL}rs/render
     PDF_SERVICE_ACCESS_KEY: ${PDF_SERVICE_ACCESS_KEY}
     PDF_SERVICE_HEALTH_URL: ${PDF_SERVICE_BASE_URL}rs/status
