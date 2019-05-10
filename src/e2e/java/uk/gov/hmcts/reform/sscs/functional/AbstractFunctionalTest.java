@@ -79,6 +79,7 @@ public abstract class AbstractFunctionalTest {
         ccdCaseId = String.valueOf(caseDetails.getId());
     }
 
+
     protected SscsCaseDetails findCaseById(String ccdCaseId) {
         return ccdService.getByCaseId(Long.valueOf(ccdCaseId), idamTokens);
     }

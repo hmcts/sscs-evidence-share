@@ -5,15 +5,11 @@ provider "azurerm" {
 locals {
   ase_name               = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
   azureVaultName         = "sscs-${var.env}"
-  azureVaultNameDocmosis = "${var.env == "prod" ? local.docmosis_prod_vault : local.docmosis_nonprod_vault}"
-  azureVaultUrlDocmosis  = "https://${local.azureVaultNameDocmosis}.vault.azure.net/"
   s2sCnpUrl              = "http://rpe-service-auth-provider-${var.env}.service.${local.ase_name}.internal"
 
   shared_app_service_plan     = "${var.product}-${var.env}"
   non_shared_app_service_plan = "${var.product}-${var.component}-${var.env}"
   app_service_plan            = "${(var.env == "saat" || var.env == "sandbox") ?  local.shared_app_service_plan : local.non_shared_app_service_plan}"
-  docmosis_prod_vault         = "docmosisiaasprodkv"
-  docmosis_nonprod_vault      = "docmosisiaasdevkv"
 
   documentStore               = "http://dm-store-${var.env}.service.${local.ase_name}.internal"
   ccdApi                      = "http://ccd-data-store-api-${var.env}.service.${local.ase_name}.internal"
@@ -66,12 +62,12 @@ data "azurerm_key_vault_secret" "sscs_asb_primary_send_and_listen_shared_access_
 
 data "azurerm_key_vault_secret" "pdf_service_base_url" {
   name      = "docmosis-endpoint"
-  vault_uri = "${local.azureVaultUrlDocmosis}"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "pdf_service_access_key" {
   name      = "docmosis-api-key"
-  vault_uri = "${local.azureVaultUrlDocmosis}"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_lb" "consul_dns" {
