@@ -32,7 +32,6 @@ public class EvidenceShareConfigTest {
     public void submitTypeContainsPaperAndAllowedBenefitTypesContainsPip() {
         assertNotNull("evidenceShareConfig must be autowired", evidenceShareConfig);
         assertThat(evidenceShareConfig.getSubmitTypes(), contains("PAPER"));
-        assertThat(evidenceShareConfig.getAllowedBenefitTypes(), contains("PIP"));
     }
 
 }

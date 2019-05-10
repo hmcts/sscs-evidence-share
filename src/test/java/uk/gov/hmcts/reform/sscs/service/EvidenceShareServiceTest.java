@@ -21,12 +21,14 @@ import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(JUnitParamsRunner.class)
 public class EvidenceShareServiceTest {
@@ -55,15 +57,20 @@ public class EvidenceShareServiceTest {
     @Mock
     private EvidenceShareConfig evidenceShareConfig;
 
+    @Mock
+    private CcdService ccdCaseService;
+
+    @Mock
+    private IdamService idamService;
+
     private EvidenceShareService evidenceShareService;
 
     private LocalDateTime now = LocalDateTime.now();
 
     @Before
     public void setUp() {
-        evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer, documentManagementService,
-            documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig);
-        when(evidenceShareConfig.getAllowedBenefitTypes()).thenReturn(Collections.singletonList("pip"));
+        evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer, documentManagementService, documentRequestFactory,
+            evidenceManagementService, bulkPrintService, evidenceShareConfig, ccdCaseService, idamService);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(Collections.singletonList("paper"));
     }
 
@@ -111,6 +118,7 @@ public class EvidenceShareServiceTest {
         assertEquals(expectedOptionalUuid, optionalUuid);
         verify(evidenceManagementService).download(eq(URI.create(docUrl)), any());
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(DL6_PDF, docPdf)), any());
+        verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case has been sent to the DWP"), any());
     }
 
     @Test
@@ -136,6 +144,7 @@ public class EvidenceShareServiceTest {
 
     private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments) {
         SscsCaseData caseData = SscsCaseData.builder()
+            .ccdCaseId("123")
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code(benefitType).build())
                 .receivedVia(receivedVia)
@@ -160,25 +169,9 @@ public class EvidenceShareServiceTest {
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
 
-
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
 
         verifyNoMoreInteractions(documentManagementService);
         assertEquals(Optional.empty(), optionalUuid);
     }
-
-    @Test
-    @Parameters({"ESA", "UC"})
-    public void nonPipBenefitTypes_doesNotGetSentToDwp(String benefitCode) {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(benefitCode, "Online", null);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
-        when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
-
-        verifyNoMoreInteractions(documentManagementService);
-
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
-
-        assertEquals(Optional.empty(), optionalUuid);
-    }
-
 }

@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
@@ -99,8 +100,11 @@ public class EvidenceShareServiceIt {
         when(evidenceManagementService.upload(any(),  eq("sscs"))).thenReturn(uploadResponse);
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
-        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
         when(ccdService.updateCase(any(), any(), eq("uploadDocument"), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
+        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any())).thenReturn(SscsCaseDetails.builder().build());
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
@@ -110,6 +114,7 @@ public class EvidenceShareServiceIt {
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any());
     }
 
     @Test
@@ -127,8 +132,11 @@ public class EvidenceShareServiceIt {
         when(evidenceManagementService.upload(any(),  eq("sscs"))).thenReturn(uploadResponse);
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
-        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
         when(ccdService.updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
+        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any())).thenReturn(SscsCaseDetails.builder().build());
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
@@ -138,6 +146,7 @@ public class EvidenceShareServiceIt {
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any());
     }
 
     @Test
@@ -164,23 +173,6 @@ public class EvidenceShareServiceIt {
             .getResource("appealReceivedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("PAPER", receivedVia);
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
-
-        assertEquals(Optional.empty(), optionalUuid);
-
-        verifyNoMoreInteractions(restTemplate);
-        verifyNoMoreInteractions(evidenceManagementService);
-        verifyNoMoreInteractions(ccdService);
-    }
-
-    @Test
-    @Parameters({"ESA", "UC"})
-    public void nonPipBenefitTypes_shouldNotBeProcessed(String benefitCode) throws IOException {
-        assertNotNull("evidenceShareService must be autowired", evidenceShareService);
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("appealReceivedCallback.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-        json = json.replace("PIP", benefitCode);
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
         assertEquals(Optional.empty(), optionalUuid);

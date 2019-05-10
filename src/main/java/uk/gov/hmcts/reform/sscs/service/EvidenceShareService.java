@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Objects.nonNull;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,13 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Component
 @Slf4j
@@ -38,6 +42,10 @@ public class EvidenceShareService {
 
     private final EvidenceShareConfig evidenceShareConfig;
 
+    private final CcdService ccdService;
+
+    private final IdamService idamService;
+
     @Autowired
     public EvidenceShareService(
         SscsCaseCallbackDeserializer sscsDeserializer,
@@ -45,7 +53,9 @@ public class EvidenceShareService {
         DocumentRequestFactory documentRequestFactory,
         EvidenceManagementService evidenceManagementService,
         BulkPrintService bulkPrintService,
-        EvidenceShareConfig evidenceShareConfig
+        EvidenceShareConfig evidenceShareConfig,
+        CcdService ccdService,
+        IdamService idamService
     ) {
 
         this.sscsCaseCallbackDeserializer = sscsDeserializer;
@@ -54,6 +64,8 @@ public class EvidenceShareService {
         this.evidenceManagementService = evidenceManagementService;
         this.bulkPrintService = bulkPrintService;
         this.evidenceShareConfig = evidenceShareConfig;
+        this.ccdService = ccdService;
+        this.idamService = idamService;
     }
 
     public Optional<UUID> processMessage(final String message) {
@@ -76,7 +88,12 @@ public class EvidenceShareService {
                 Pdf newPdfAddedToTheCase = documentManagementService.generateDocumentAndAddToCcd(holder, caseData);
                 List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
 
-                return bulkPrintService.sendToBulkPrint(getAllCasePdfs(newPdfAddedToTheCase, existingCasePdfs), caseData);
+                Optional<UUID> uuid = bulkPrintService.sendToBulkPrint(getAllCasePdfs(newPdfAddedToTheCase, existingCasePdfs), caseData);
+
+                caseData.setDateSentToDwp(LocalDate.now().toString());
+                ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP", idamService.getIdamTokens());
+
+                return uuid;
             }
         } else {
             log.warn("case id {} is not ready to send to dwp", sscsCaseDataCallback.getCaseDetails().getId());
@@ -87,13 +104,9 @@ public class EvidenceShareService {
     private boolean readyToSendToDwp(SscsCaseData caseData) {
         return nonNull(caseData)
             && nonNull(caseData.getAppeal())
-            && nonNull(caseData.getAppeal().getBenefitType())
-            && nonNull(caseData.getAppeal().getBenefitType().getCode())
             && nonNull(caseData.getAppeal().getReceivedVia())
             && evidenceShareConfig.getSubmitTypes().stream()
-                .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase)
-            && evidenceShareConfig.getAllowedBenefitTypes().stream()
-                .anyMatch(caseData.getAppeal().getBenefitType().getCode()::equalsIgnoreCase);
+                .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
     }
 
     private List<Pdf> getAllCasePdfs(Pdf newPdfAddedToTheCase, List<Pdf> existingCasePdfs) {

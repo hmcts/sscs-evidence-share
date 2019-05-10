@@ -28,7 +28,7 @@ public class FunctionalTestController {
 
     @PostMapping(value = "/send", produces = APPLICATION_JSON_VALUE)
     public void send(@RequestHeader(AuthorisationService.SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
-                        @RequestBody String message) {
+                     @RequestBody String message) {
         log.info("authorising service auth header.");
         authorisationService.authorise(serviceAuthHeader);
         log.info("consuming message.");
