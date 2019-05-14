@@ -17,6 +17,8 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,6 +33,7 @@ import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -82,10 +85,13 @@ public class EvidenceShareServiceIt {
     @Autowired
     private EvidenceShareService evidenceShareService;
 
+    @Captor
+    ArgumentCaptor<ArrayList<Pdf>> documentCaptor;
+
     private static final String FILE_CONTENT = "Welcome to PDF document service";
 
     @Test
-    public void appealWithMrnDateWithin30Days_shouldGenerateDL6TemplateAndAndAddToCaseInCcdAndSendToBulkPrint() throws IOException {
+    public void appealWithMrnDateWithin30Days_shouldGenerateDL6TemplateAndAndAddToCaseInCcdAndSendToBulkPrintInCorrectOrder() throws IOException {
         assertNotNull("evidenceShareService must be autowired", evidenceShareService);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("appealReceivedCallbackWithMrn.json")).getFile();
@@ -101,7 +107,8 @@ public class EvidenceShareServiceIt {
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
         when(ccdService.updateCase(any(), any(), eq("uploadDocument"), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
-        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
+
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
         when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any())).thenReturn(SscsCaseDetails.builder().build());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -109,6 +116,11 @@ public class EvidenceShareServiceIt {
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
         assertEquals(expectedOptionalUuid, optionalUuid);
+
+        assertEquals(3, documentCaptor.getValue().size());
+        assertEquals("dl6-12345656789.pdf", documentCaptor.getValue().get(0).getName());
+        assertEquals("sscs1.pdf", documentCaptor.getValue().get(1).getName());
+        assertEquals("filename1.pdf", documentCaptor.getValue().get(2).getName());
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
@@ -133,7 +145,8 @@ public class EvidenceShareServiceIt {
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
         when(ccdService.updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
-        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
+
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
         when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any())).thenReturn(SscsCaseDetails.builder().build());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -141,6 +154,11 @@ public class EvidenceShareServiceIt {
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
 
         assertEquals(expectedOptionalUuid, optionalUuid);
+
+        assertEquals(3, documentCaptor.getValue().size());
+        assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
+        assertEquals("sscs1.pdf", documentCaptor.getValue().get(1).getName());
+        assertEquals("filename1.pdf", documentCaptor.getValue().get(2).getName());
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
