@@ -37,7 +37,6 @@ public class EvidenceShareServiceTest {
     public MockitoRule rule = MockitoJUnit.rule();
 
     private static final String MY_JSON_DATA = "{myJson: true}";
-    private static final Pdf DL6_PDF = new Pdf("null".getBytes(), "dl6.pdf");
 
     @Mock
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
@@ -82,11 +81,13 @@ public class EvidenceShareServiceTest {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(docPdf.getName())
+                .documentType("sscs1")
                 .documentLink(DocumentLink.builder().documentUrl(docUrl)
                     .documentFilename(docPdf.getName()).build())
                 .build()).build(),
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("filtered out word.doc")
+                .documentType("appellantEvidence")
                 .documentLink(DocumentLink.builder().documentUrl("/my/1/doc.url")
                     .documentFilename("filtered out word.doc").build())
                 .build()).build(),
@@ -106,18 +107,17 @@ public class EvidenceShareServiceTest {
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
 
         when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
-        when(documentManagementService.generateDocumentAndAddToCcd(holder, caseDetails.getCaseData())).thenReturn(DL6_PDF);
 
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
 
-        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(DL6_PDF, docPdf)), any()))
+        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf)), any()))
             .thenReturn(expectedOptionalUuid);
 
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
 
         assertEquals(expectedOptionalUuid, optionalUuid);
         verify(evidenceManagementService).download(eq(URI.create(docUrl)), any());
-        verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(DL6_PDF, docPdf)), any());
+        verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf)), any());
         verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case has been sent to the DWP"), any());
     }
 

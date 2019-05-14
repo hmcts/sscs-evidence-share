@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -85,10 +86,10 @@ public class EvidenceShareService {
             if (holder.getTemplate() != null) {
                 log.info("Generating document for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
 
-                Pdf newPdfAddedToTheCase = documentManagementService.generateDocumentAndAddToCcd(holder, caseData);
+                documentManagementService.generateDocumentAndAddToCcd(holder, caseData);
                 List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
 
-                Optional<UUID> uuid = bulkPrintService.sendToBulkPrint(getAllCasePdfs(newPdfAddedToTheCase, existingCasePdfs), caseData);
+                Optional<UUID> uuid = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
 
                 caseData.setDateSentToDwp(LocalDate.now().toString());
                 ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP", idamService.getIdamTokens());
@@ -109,27 +110,38 @@ public class EvidenceShareService {
                 .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
     }
 
-    private List<Pdf> getAllCasePdfs(Pdf newPdfAddedToTheCase, List<Pdf> existingCasePdfs) {
-        List<Pdf> allPdfs = new ArrayList<>(existingCasePdfs);
-        allPdfs.add(0, newPdfAddedToTheCase);
-        return allPdfs;
-    }
-
     private List<Pdf> toPdf(List<SscsDocument> sscsDocument) {
         if (sscsDocument == null) {
             return Collections.emptyList();
         }
-        return sscsDocument.stream()
+
+        Supplier<Stream<SscsDocument>> sscsDocumentStream = () -> sscsDocument.stream()
             .filter(doc -> nonNull(doc)
                 && nonNull(doc.getValue())
                 && nonNull(doc.getValue().getDocumentFileName())
+                && nonNull(doc.getValue().getDocumentType())
                 && nonNull(doc.getValue().getDocumentLink())
                 && nonNull(doc.getValue().getDocumentLink().getDocumentUrl())
-            )
-            .flatMap(doc -> StringUtils.containsIgnoreCase(doc.getValue().getDocumentFileName(), "pdf")
-                ? Stream.of(new Pdf(toBytes(doc), doc.getValue().getDocumentFileName()))
-                : Stream.empty()
-            ).collect(Collectors.toList());
+            );
+
+        Stream<SscsDocument> allDocs = buildStreamOfDocuments(sscsDocumentStream);
+
+        return allDocs.flatMap(doc -> StringUtils.containsIgnoreCase(doc.getValue().getDocumentFileName(), "pdf")
+            ? Stream.of(new Pdf(toBytes(doc), doc.getValue().getDocumentFileName()))
+            : Stream.empty()
+        ).collect(Collectors.toList());
+    }
+
+    private Stream<SscsDocument> buildStreamOfDocuments(Supplier<Stream<SscsDocument>> sscsDocumentStream) {
+        Stream<SscsDocument> dlDocs = sscsDocumentStream.get().filter(doc -> doc.getValue().getDocumentType().equals("dl6") || doc.getValue().getDocumentType().equals("dl16"));
+
+        Stream<SscsDocument> appealDocs = sscsDocumentStream.get().filter(doc -> doc.getValue().getDocumentType().equals("sscs1"));
+
+        Stream<SscsDocument> allOtherDocs = sscsDocumentStream.get().filter(doc -> !doc.getValue().getDocumentType().equals("dl6")
+            && !doc.getValue().getDocumentType().equals("dl16")
+            && !doc.getValue().getDocumentType().equals("sscs1"));
+
+        return Stream.concat(Stream.concat(dlDocs, appealDocs), allOtherDocs);
     }
 
     private byte[] toBytes(SscsDocument sscsDocument) {

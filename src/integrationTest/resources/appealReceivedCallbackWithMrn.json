@@ -68,6 +68,38 @@
           "tya": ""
         }
       },
+      "sscsDocument" : [
+        {
+          "value" : {
+            "documentLink" : {
+              "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
+            },
+            "documentDateAdded" : "2019-05-01",
+            "documentFileName" : "filename1.pdf",
+            "documentType" : "appellantEvidence"
+          }
+        },
+        {
+          "value" : {
+            "documentLink" : {
+              "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
+            },
+            "documentDateAdded" : "2019-05-01",
+            "documentFileName" : "filename2.doc",
+            "documentType" : "appellantEvidence"
+          }
+        },
+        {
+          "value" : {
+            "documentLink" : {
+              "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
+            },
+            "documentDateAdded" : "2019-05-01",
+            "documentFileName" : "sscs1.pdf",
+            "documentType" : "sscs1"
+          }
+        }
+      ],
       "evidence": {
         "documents": [
         ]
