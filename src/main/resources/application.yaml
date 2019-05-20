@@ -73,9 +73,9 @@ core_case_data:
 docmosis:
   template:
     dl6:
-      templateName: TB-SCS-GNO-ENG-00010 v0.2.doc
+      templateName: TB-SCS-GNO-ENG-00010.doc
     dl16:
-      templateName: TB-SCS-GNO-ENG-00011 v0.1.doc
+      templateName: TB-SCS-GNO-ENG-00011.doc
 
 evidence-share:
   submit-types:
