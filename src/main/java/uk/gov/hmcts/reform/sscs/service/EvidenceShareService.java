@@ -4,7 +4,10 @@ import static java.util.Objects.nonNull;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -47,6 +50,8 @@ public class EvidenceShareService {
 
     private final IdamService idamService;
 
+    private final RoboticsHandler roboticsHandler;
+
     @Autowired
     public EvidenceShareService(
         SscsCaseCallbackDeserializer sscsDeserializer,
@@ -56,9 +61,9 @@ public class EvidenceShareService {
         BulkPrintService bulkPrintService,
         EvidenceShareConfig evidenceShareConfig,
         CcdService ccdService,
-        IdamService idamService
+        IdamService idamService,
+        RoboticsHandler roboticsHandler
     ) {
-
         this.sscsCaseCallbackDeserializer = sscsDeserializer;
         this.documentManagementService = documentManagementService;
         this.documentRequestFactory = documentRequestFactory;
@@ -67,10 +72,13 @@ public class EvidenceShareService {
         this.evidenceShareConfig = evidenceShareConfig;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.roboticsHandler = roboticsHandler;
     }
 
     public Optional<UUID> processMessage(final String message) {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(message);
+
+        roboticsHandler.sendCaseToRobotics(sscsCaseDataCallback.getCaseDetails().getCaseData());
 
         if (readyToSendToDwp(sscsCaseDataCallback.getCaseDetails().getCaseData())) {
 
