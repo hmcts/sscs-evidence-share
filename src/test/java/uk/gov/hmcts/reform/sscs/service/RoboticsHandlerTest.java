@@ -73,6 +73,14 @@ public class RoboticsHandlerTest {
     @Test
     public void givenACaseWithCaseCreatedEventAndEvidenceToDownload_thenCreateRoboticsFileWithDownloadedEvidence() {
 
+        given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
+
+        byte[] expectedBytes = {1, 2, 3};
+        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
+
+        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
+        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
+
         Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
             .appellant(Appellant.builder().address(
                 Address.builder().postcode("CM120HN").build())
@@ -89,13 +97,6 @@ public class RoboticsHandlerTest {
 
         SscsCaseData caseData = SscsCaseData.builder().appeal(appeal).sscsDocument(documents).ccdCaseId("123").build();
 
-        given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
-
-        byte[] expectedBytes = {1, 2, 3};
-        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
-
-        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
-        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
         when(roboticsService
             .sendCaseToRobotics(caseData, 123L, "CM12", null, expectedAdditionalEvidence))
             .thenReturn(null);
