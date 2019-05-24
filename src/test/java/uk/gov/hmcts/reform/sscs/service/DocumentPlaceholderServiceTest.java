@@ -2,13 +2,11 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Optional;
 
 import org.joda.time.DateTimeUtils;
 import org.junit.Before;
@@ -20,6 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
+import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentPlaceholderServiceTest {
@@ -46,6 +45,8 @@ public class DocumentPlaceholderServiceTest {
     @Before
     public void setup() {
         DateTimeUtils.setCurrentMillisFixed(1550000000000L);
+        when(pdfDocumentConfig.getHmctsImgKey()).thenReturn("HmctsImgKey");
+        when(pdfDocumentConfig.getHmctsImgVal()).thenReturn("HmctsImgVal");
         now = LocalDateTime.now();
     }
 
@@ -58,7 +59,7 @@ public class DocumentPlaceholderServiceTest {
 
         buildCaseData(rpc);
         DwpAddress dwpAddress = new DwpAddress(RPC_ADDRESS1, RPC_ADDRESS2, RPC_CITY, POSTCODE);
-        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(Optional.of(dwpAddress));
+        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
 
         Map<String, Object> result = service.generatePlaceholders(caseData, now);
 
@@ -85,7 +86,7 @@ public class DocumentPlaceholderServiceTest {
     public void givenACaseDataWithNoRpc_thenGenerateThePlaceholderMappingsWithoutRpc() {
         buildCaseData(null);
         when(dwpAddressLookup.lookup("PIP", "1"))
-            .thenReturn(Optional.of(new DwpAddress(RPC_ADDRESS1, RPC_ADDRESS2, RPC_CITY, POSTCODE)));
+            .thenReturn(new DwpAddress(RPC_ADDRESS1, RPC_ADDRESS2, RPC_CITY, POSTCODE));
 
         Map<String, Object> result = service.generatePlaceholders(caseData, now);
 
@@ -102,7 +103,7 @@ public class DocumentPlaceholderServiceTest {
     public void anAddressWithTwoLinesAndPostCodeWillNotHaveRow4() {
         buildCaseData(null);
         DwpAddress dwpAddress = new DwpAddress(RPC_ADDRESS1, RPC_ADDRESS2, POSTCODE);
-        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(Optional.of(dwpAddress));
+        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
         Map<String, Object> result = service.generatePlaceholders(caseData, now);
         assertEquals(dwpAddress.lines()[0], result.get(DWP_ADDRESS_LINE1_LITERAL));
         assertEquals(dwpAddress.lines()[1], result.get(DWP_ADDRESS_LINE2_LITERAL));
@@ -114,7 +115,7 @@ public class DocumentPlaceholderServiceTest {
     public void anAddressWithOneLineAndPostCodeWillNotHaveRow3AndRow4() {
         buildCaseData(null);
         DwpAddress dwpAddress = new DwpAddress(RPC_ADDRESS1, "", POSTCODE);
-        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(Optional.of(dwpAddress));
+        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
         Map<String, Object> result = service.generatePlaceholders(caseData, now);
         assertEquals(dwpAddress.lines()[0], result.get(DWP_ADDRESS_LINE1_LITERAL));
         assertEquals(dwpAddress.lines()[1], result.get(DWP_ADDRESS_LINE2_LITERAL));
@@ -126,7 +127,7 @@ public class DocumentPlaceholderServiceTest {
     public void addressWithOneLineWillNotHaveRow2AndRow3AndRow4() {
         buildCaseData(null);
         DwpAddress dwpAddress = new DwpAddress("", "", POSTCODE);
-        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(Optional.of(dwpAddress));
+        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
         Map<String, Object> result = service.generatePlaceholders(caseData, now);
         assertEquals(dwpAddress.lines()[0], result.get(DWP_ADDRESS_LINE1_LITERAL));
         assertNull(result.get(DWP_ADDRESS_LINE2_LITERAL));
@@ -138,7 +139,7 @@ public class DocumentPlaceholderServiceTest {
     public void addressWithNoLinesWillNotHaveADwpAddress() {
         buildCaseData(null);
         DwpAddress dwpAddress = new DwpAddress("", "", "");
-        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(Optional.of(dwpAddress));
+        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
         Map<String, Object> result = service.generatePlaceholders(caseData, now);
         assertNull(result.get(DWP_ADDRESS_LINE1_LITERAL));
         assertNull(result.get(DWP_ADDRESS_LINE2_LITERAL));
@@ -146,29 +147,19 @@ public class DocumentPlaceholderServiceTest {
         assertNull(result.get(DWP_ADDRESS_LINE4_LITERAL));
     }
 
-    @Test
+    @Test(expected = NoMrnDetailsException.class)
     public void asAppealWithNoMrnDetailsWillNotHaveADwpAddress() {
         buildCaseData(null);
         caseData = caseData.toBuilder().appeal(caseData.getAppeal().toBuilder().mrnDetails(null).build()).build();
-        Map<String, Object> result = service.generatePlaceholders(caseData, now);
-        verifyZeroInteractions(dwpAddressLookup);
-        assertNull(result.get(DWP_ADDRESS_LINE1_LITERAL));
-        assertNull(result.get(DWP_ADDRESS_LINE2_LITERAL));
-        assertNull(result.get(DWP_ADDRESS_LINE3_LITERAL));
-        assertNull(result.get(DWP_ADDRESS_LINE4_LITERAL));
+        service.generatePlaceholders(caseData, now);
     }
 
-    @Test
+    @Test(expected = NoMrnDetailsException.class)
     public void anAppealWithNoDwpIssuingOfficeWillNotHaveADwpAddress() {
         buildCaseData(null);
         caseData = caseData.toBuilder().appeal(caseData.getAppeal().toBuilder().mrnDetails(
             MrnDetails.builder().mrnLateReason("soz").build()).build()).build();
-        Map<String, Object> result = service.generatePlaceholders(caseData, now);
-        verifyZeroInteractions(dwpAddressLookup);
-        assertNull(result.get(DWP_ADDRESS_LINE1_LITERAL));
-        assertNull(result.get(DWP_ADDRESS_LINE2_LITERAL));
-        assertNull(result.get(DWP_ADDRESS_LINE3_LITERAL));
-        assertNull(result.get(DWP_ADDRESS_LINE4_LITERAL));
+        service.generatePlaceholders(caseData, now);
     }
 
     private void buildCaseData(RegionalProcessingCenter rpc) {
