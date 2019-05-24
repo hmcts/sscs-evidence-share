@@ -41,15 +41,15 @@ public class TopicConsumerTest {
         topicConsumer.onMessage(MESSAGE);
     }
 
-    @Test(expected = NullPointerException.class)
-    public void nullPointerExceptionWillNotBeCaught() {
+    @Test
+    public void nullPointerExceptionWillBeCaught() {
         NullPointerException exception = new NullPointerException();
         when(evidenceShareService.processMessage(any())).thenThrow(exception);
         topicConsumer.onMessage(MESSAGE);
     }
 
-    @Test(expected = ClientAuthorisationException.class)
-    public void clientAuthorisationExceptionWillNotBeCaught() {
+    @Test
+    public void clientAuthorisationExceptionWillBeCaught() {
         ClientAuthorisationException exception = new ClientAuthorisationException(EXCEPTION);
         when(evidenceShareService.processMessage(any())).thenThrow(exception);
         topicConsumer.onMessage(MESSAGE);

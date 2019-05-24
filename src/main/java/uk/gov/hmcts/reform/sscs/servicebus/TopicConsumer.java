@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.sscs.servicebus;
 
+import static java.lang.String.format;
+
 import java.util.Optional;
 import java.util.UUID;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jms.annotation.JmsListener;
@@ -30,12 +31,20 @@ public class TopicConsumer {
     )
     public void onMessage(String message) {
         try {
+            processMessage(message);
+        } catch (Exception e) {
+            log.error(format("Caught error %s", e.getMessage()), e);
+        }
+
+    }
+
+    private void processMessage(String message) {
+        try {
             Optional<UUID> optionalUuid = evidenceShareService.processMessage(message);
             log.info("Processed message for with returned value {}", optionalUuid);
         } catch (PdfStoreException | BulkPrintException | DwpAddressLookupException exception) {
             // unrecoverable. Catch to remove it from the queue.
-            log.error(exception.getMessage(), exception);
+            log.error(format("Caught unrecoverable error: %s", exception.getMessage()), exception);
         }
-
     }
 }
