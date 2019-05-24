@@ -69,6 +69,7 @@ public abstract class AbstractFunctionalTest {
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
         SscsCaseData caseData = minimalCaseData.toBuilder().appeal(minimalCaseData.getAppeal().toBuilder()
             .benefitType(BenefitType.builder().code("PIP").description("Personal Independence Payment").build())
+
             .receivedVia("Paper")
             .build()).build();
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, "dummySendToDwp",

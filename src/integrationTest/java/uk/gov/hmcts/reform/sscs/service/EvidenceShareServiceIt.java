@@ -10,9 +10,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,6 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.web.client.RestTemplate;
@@ -89,6 +93,19 @@ public class EvidenceShareServiceIt {
     ArgumentCaptor<ArrayList<Pdf>> documentCaptor;
 
     private static final String FILE_CONTENT = "Welcome to PDF document service";
+
+    protected Session session = Session.getInstance(new Properties());
+
+    protected MimeMessage message;
+
+    @MockBean
+    protected JavaMailSender mailSender;
+
+    @Before
+    public void setup() {
+        message = new MimeMessage(session);
+        when(mailSender.createMimeMessage()).thenReturn(message);
+    }
 
     @Test
     public void appealWithMrnDateWithin30Days_shouldGenerateDL6TemplateAndAndAddToCaseInCcdAndSendToBulkPrintInCorrectOrder() throws IOException {

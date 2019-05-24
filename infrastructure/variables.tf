@@ -71,3 +71,24 @@ variable "appinsights_instrumentation_key" {
   description = "Instrumentation key of the App Insights instance this webapp should use. Module will create own App Insights resource if this is not provided"
   default     = ""
 }
+
+
+variable "robotics_email_subject" {
+  type    = "string"
+  default = "Robotics Data"
+}
+
+variable "robotics_email_message" {
+  type    = "string"
+  default = "Please find attached the robotics json file \nPlease do not respond to this email"
+}
+
+variable "appeal_email_smtp_tls_enabled" {
+  type    = "string"
+  default = "true"
+}
+
+variable "appeal_email_smtp_ssl_trust" {
+  type    = "string"
+  default = "*"
+}

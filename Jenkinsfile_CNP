@@ -27,7 +27,10 @@ def secrets = [
     secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
     secret('sscs-asb-primary-send-and-listen-shared-access-key', 'AMQP_PASSWORD'),
     secret('docmosis-endpoint', 'PDF_SERVICE_BASE_URL'),
-    secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY')
+    secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
+    secret('robotics-email-from', 'ROBOTICS_EMAIL_FROM'),
+    secret('robotics-email-to', 'ROBOTICS_EMAIL_TO'),
+
   ]
 ]
 
