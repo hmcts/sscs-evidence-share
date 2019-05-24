@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
-import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
+import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 
 @Service
 @Slf4j
@@ -81,7 +81,7 @@ public class DocumentPlaceholderService {
 
             setDwpAddress(placeholders, dwpAddress);
         } else {
-            throw new DwpAddressLookupException("There is no Appeal Mrn details.");
+            throw new NoMrnDetailsException(caseData);
         }
     }
 

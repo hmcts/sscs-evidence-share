@@ -36,7 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
-import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
+import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -168,7 +168,7 @@ public class EvidenceShareServiceIt {
         verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any());
     }
 
-    @Test(expected = DwpAddressLookupException.class)
+    @Test(expected = NoMrnDetailsException.class)
     public void appealWithNoMrnDate_shouldNotGenerateTemplateOrAddToCcd() throws IOException {
         assertNotNull("evidenceShareService must be autowired", evidenceShareService);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
@@ -177,7 +177,7 @@ public class EvidenceShareServiceIt {
 
         try {
             evidenceShareService.processMessage(json);
-        } catch (DwpAddressLookupException e) {
+        } catch (NoMrnDetailsException e) {
             verifyNoMoreInteractions(restTemplate);
             verifyNoMoreInteractions(evidenceManagementService);
             verifyNoMoreInteractions(ccdService);

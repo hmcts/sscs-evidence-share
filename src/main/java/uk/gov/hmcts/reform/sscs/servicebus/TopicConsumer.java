@@ -10,6 +10,7 @@ import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
+import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
 import uk.gov.hmcts.reform.sscs.service.EvidenceShareService;
 
@@ -33,7 +34,7 @@ public class TopicConsumer {
         try {
             processMessage(message);
         } catch (Exception e) {
-            log.error(format("Caught error %s", e.getMessage()), e);
+            log.error(format("Caught unknown unrecoverable error %s", e.getMessage()), e);
         }
 
     }
@@ -42,7 +43,7 @@ public class TopicConsumer {
         try {
             Optional<UUID> optionalUuid = evidenceShareService.processMessage(message);
             log.info("Processed message for with returned value {}", optionalUuid);
-        } catch (PdfStoreException | BulkPrintException | DwpAddressLookupException exception) {
+        } catch (PdfStoreException | BulkPrintException | DwpAddressLookupException | NoMrnDetailsException exception) {
             // unrecoverable. Catch to remove it from the queue.
             log.error(format("Caught unrecoverable error: %s", exception.getMessage()), exception);
         }

@@ -5,10 +5,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
-import uk.gov.hmcts.reform.sscs.exception.ClientAuthorisationException;
-import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
-import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.exception.*;
 import uk.gov.hmcts.reform.sscs.service.EvidenceShareService;
 
 public class TopicConsumerTest {
@@ -37,6 +35,13 @@ public class TopicConsumerTest {
     @Test
     public void dwpAddressLookupExceptionWillBeCaught() {
         DwpAddressLookupException exception = new DwpAddressLookupException(MESSAGE);
+        when(evidenceShareService.processMessage(any())).thenThrow(exception);
+        topicConsumer.onMessage(MESSAGE);
+    }
+
+    @Test
+    public void noMrnDetailsExceptionWillBeCaught() {
+        NoMrnDetailsException exception = new NoMrnDetailsException(SscsCaseData.builder().ccdCaseId("123").build());
         when(evidenceShareService.processMessage(any())).thenThrow(exception);
         topicConsumer.onMessage(MESSAGE);
     }

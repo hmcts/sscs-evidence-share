@@ -18,7 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
-import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
+import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DocumentPlaceholderServiceTest {
@@ -147,14 +147,14 @@ public class DocumentPlaceholderServiceTest {
         assertNull(result.get(DWP_ADDRESS_LINE4_LITERAL));
     }
 
-    @Test(expected = DwpAddressLookupException.class)
+    @Test(expected = NoMrnDetailsException.class)
     public void asAppealWithNoMrnDetailsWillNotHaveADwpAddress() {
         buildCaseData(null);
         caseData = caseData.toBuilder().appeal(caseData.getAppeal().toBuilder().mrnDetails(null).build()).build();
         service.generatePlaceholders(caseData, now);
     }
 
-    @Test(expected = DwpAddressLookupException.class)
+    @Test(expected = NoMrnDetailsException.class)
     public void anAppealWithNoDwpIssuingOfficeWillNotHaveADwpAddress() {
         buildCaseData(null);
         caseData = caseData.toBuilder().appeal(caseData.getAppeal().toBuilder().mrnDetails(
