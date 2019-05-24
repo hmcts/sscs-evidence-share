@@ -7,6 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
+import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
 import uk.gov.hmcts.reform.sscs.service.EvidenceShareService;
 
 @Slf4j
@@ -26,7 +29,13 @@ public class TopicConsumer {
         subscription = "${amqp.subscription}"
     )
     public void onMessage(String message) {
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(message);
-        log.info("Processed message for with returned value {}", optionalUuid);
+        try {
+            Optional<UUID> optionalUuid = evidenceShareService.processMessage(message);
+            log.info("Processed message for with returned value {}", optionalUuid);
+        } catch (PdfStoreException | BulkPrintException | DwpAddressLookupException exception) {
+            // unrecoverable. Catch to remove it from the queue.
+            log.error(exception.getMessage(), exception);
+        }
+
     }
 }

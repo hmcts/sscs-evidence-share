@@ -28,13 +28,17 @@ public class BulkPrintService {
     private final SendLetterApi sendLetterApi;
     private final IdamService idamService;
     private final boolean sendLetterEnabled;
+    private final Integer maxRetryAttempts;
 
     @Autowired
-    public BulkPrintService(SendLetterApi sendLetterApi, IdamService idamService,
-                            @Value("${send-letter.enabled}") boolean sendLetterEnabled) {
+    public BulkPrintService(SendLetterApi sendLetterApi,
+                            IdamService idamService,
+                            @Value("${send-letter.enabled}") boolean sendLetterEnabled,
+                            @Value("${send-letter.maxRetryAttempts}")Integer maxRetryAttempts) {
         this.idamService = idamService;
         this.sendLetterApi = sendLetterApi;
         this.sendLetterEnabled = sendLetterEnabled;
+        this.maxRetryAttempts = maxRetryAttempts;
     }
 
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData)
@@ -45,31 +49,39 @@ public class BulkPrintService {
                 encodedData.add(getEncoder().encodeToString(pdf.getContent()));
             }
             final String authToken = idamService.generateServiceAuthorization();
-            return sendLetter(authToken, sscsCaseData, encodedData);
+            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, 1);
         }
         return Optional.empty();
     }
 
-    private Optional<UUID> sendLetter(String authToken, SscsCaseData sscsCaseData, List<String> encodedData) {
+    private Optional<UUID> sendLetterWithRetry(String authToken, SscsCaseData sscsCaseData, List<String> encodedData,
+                                               Integer reTryNumber) {
         try {
-            SendLetterResponse sendLetterResponse = sendLetterApi.sendLetter(
-                authToken,
-                new LetterWithPdfsRequest(
-                    encodedData,
-                    XEROX_TYPE_PARAMETER,
-                    getAdditionalData(sscsCaseData)
-                )
-            );
-            log.info("Letter service produced the following letter Id {} for case {}",
-                sendLetterResponse.letterId, sscsCaseData.getCcdCaseId());
-
-            return Optional.of(sendLetterResponse.letterId);
+            return sendLetter(authToken, sscsCaseData, encodedData);
         } catch (Exception e) {
-            String message = format("Failed to send to bulk print for case %s with error %s.",
-                sscsCaseData.getCcdCaseId(), e.getMessage());
-            log.error(message, e);
-            throw new BulkPrintException(message, e);
+            if (reTryNumber > maxRetryAttempts) {
+                String message = format("Failed to send to bulk print for case %s with error %s.",
+                    sscsCaseData.getCcdCaseId(), e.getMessage());
+                log.error(message, e);
+                throw new BulkPrintException(message, e);
+            }
+            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, reTryNumber + 1);
         }
+    }
+
+    private Optional<UUID> sendLetter(String authToken, SscsCaseData sscsCaseData, List<String> encodedData) {
+        SendLetterResponse sendLetterResponse = sendLetterApi.sendLetter(
+            authToken,
+            new LetterWithPdfsRequest(
+                encodedData,
+                XEROX_TYPE_PARAMETER,
+                getAdditionalData(sscsCaseData)
+            )
+        );
+        log.info("Letter service produced the following letter Id {} for case {}",
+            sendLetterResponse.letterId, sscsCaseData.getCcdCaseId());
+
+        return Optional.of(sendLetterResponse.letterId);
     }
 
     private static Map<String, Object> getAdditionalData(final SscsCaseData sscsCaseData) {
