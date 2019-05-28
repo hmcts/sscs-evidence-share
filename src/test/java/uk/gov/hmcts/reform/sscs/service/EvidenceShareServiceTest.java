@@ -120,7 +120,9 @@ public class EvidenceShareServiceTest {
         assertEquals(expectedOptionalUuid, optionalUuid);
         verify(evidenceManagementService).download(eq(URI.create(docUrl)), any());
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf)), any());
-        verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case has been sent to the DWP"), any());
+
+        String documentList =  "Case has been sent to the DWP with documents: \n - evidence1.pdf";
+        verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq(documentList), any());
     }
 
     @Test

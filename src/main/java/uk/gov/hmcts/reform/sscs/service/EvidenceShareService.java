@@ -99,7 +99,8 @@ public class EvidenceShareService {
                 Optional<UUID> uuid = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
 
                 caseData.setDateSentToDwp(LocalDate.now().toString());
-                ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP", idamService.getIdamTokens());
+                String description = buildEventDescription(existingCasePdfs);
+                ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.SENT_TO_DWP.getCcdType(), "Sent to DWP", description, idamService.getIdamTokens());
 
                 return uuid;
             }
@@ -107,6 +108,16 @@ public class EvidenceShareService {
             log.warn("case id {} is not ready to send to dwp", sscsCaseDataCallback.getCaseDetails().getId());
         }
         return Optional.empty();
+    }
+
+    private String buildEventDescription(List<Pdf> pdfs) {
+        StringBuilder builder = new StringBuilder("Case has been sent to the DWP with documents: ");
+
+        for (Pdf pdf : pdfs) {
+            builder.append("\n - " + pdf.getName());
+        }
+
+        return builder.toString();
     }
 
     private boolean readyToSendToDwp(SscsCaseData caseData) {
