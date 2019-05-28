@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -73,6 +74,8 @@ public class EvidenceShareServiceTest {
         evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer, documentManagementServiceWrapper, documentRequestFactory,
             evidenceManagementService, bulkPrintService, evidenceShareConfig, ccdCaseService, idamService, roboticsHandler);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(Collections.singletonList("paper"));
+
+        ReflectionTestUtils.setField(evidenceShareService, "sendToDwpFeature", true);
     }
 
     @Test
@@ -120,7 +123,7 @@ public class EvidenceShareServiceTest {
         assertEquals(expectedOptionalUuid, optionalUuid);
         verify(evidenceManagementService).download(eq(URI.create(docUrl)), any());
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf)), any());
-        verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case has been sent to the DWP"), any());
+        verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case has been sent to the DWP via Bulk Print"), any());
     }
 
     @Test

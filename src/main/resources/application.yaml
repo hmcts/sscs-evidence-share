@@ -94,6 +94,9 @@ docmosis:
     dl16:
       templateName: TB-SCS-GNO-ENG-00011.doc
 
+feature:
+  send_to_dwp: ${SEND_TO_DWP_ENABLED:false}
+
 evidence-share:
   submit-types:
   - PAPER
