@@ -40,6 +40,7 @@ java:
     TOPIC_NAME: "sscs-evidenceshare-topic-demo"
     AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
+    MAX_RETRY_ATTEMPTS: 3
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
     ROBOTICS_EMAIL_SUBJECT: "Robotics Data"

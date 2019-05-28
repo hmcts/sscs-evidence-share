@@ -2,13 +2,12 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.*;
 
-import java.util.Optional;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
+import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpAddressLookupTest {
@@ -21,8 +20,8 @@ public class DwpAddressLookupTest {
     @Test
     @Parameters({"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"})
     public void pipAddressesExist(final String dwpIssuingOffice) {
-        Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(PIP, dwpIssuingOffice);
-        assertTrue(optionalAddress.isPresent());
+        DwpAddress address = dwpAddressLookup.lookup(PIP, dwpIssuingOffice);
+        assertNotNull(address);
     }
 
     @Test
@@ -31,8 +30,8 @@ public class DwpAddressLookupTest {
         "ESA, Balham DRT", "EsA, Balham DRT", "esa, Balham DRT"
     })
     public void benefitTypeIsCaseInsensitive(final String benefitType, String dwpIssuingOffice) {
-        Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(benefitType, dwpIssuingOffice);
-        assertTrue(optionalAddress.isPresent());
+        DwpAddress address = dwpAddressLookup.lookup(benefitType, dwpIssuingOffice);
+        assertNotNull(address);
     }
 
     @Test
@@ -42,29 +41,26 @@ public class DwpAddressLookupTest {
         "Norwich DRT", "Sheffield DRT"
     })
     public void esaAddressesExist(final String dwpIssuingOffice) {
-        Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(ESA, dwpIssuingOffice);
-        assertTrue(optionalAddress.isPresent());
+        DwpAddress address = dwpAddressLookup.lookup(ESA, dwpIssuingOffice);
+        assertNotNull(address);
     }
 
-    @Test
+    @Test(expected = DwpAddressLookupException.class)
     @Parameters({"JOB", "UNK", "PLOP", "BIG", "FIG"})
     public void unknownBenefitTypeReturnsNone(final String benefitType) {
-        Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(benefitType, "1");
-        assertFalse(optionalAddress.isPresent());
+        dwpAddressLookup.lookup(benefitType, "1");
     }
 
-    @Test
+    @Test(expected = DwpAddressLookupException.class)
     @Parameters({"11", "12", "13", "14", "JOB"})
     public void unknownPipDwpIssuingOfficeReturnsNone(final String dwpIssuingOffice) {
-        Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(PIP, dwpIssuingOffice);
-        assertFalse(optionalAddress.isPresent());
+        dwpAddressLookup.lookup(PIP, dwpIssuingOffice);
     }
 
-    @Test
+    @Test(expected = DwpAddressLookupException.class)
     @Parameters({"JOB", "UNK", "PLOP", "BIG", "11"})
     public void unknownEsaDwpIssuingOfficeReturnsNone(final String dwpIssuingOffice) {
-        Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(ESA, dwpIssuingOffice);
-        assertFalse(optionalAddress.isPresent());
+        dwpAddressLookup.lookup(ESA, dwpIssuingOffice);
     }
 
     @Test
@@ -76,18 +72,16 @@ public class DwpAddressLookupTest {
 
     @Test
     public void pip_1_isConfiguredCorrectly() {
-        Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(PIP, "1");
-        assertTrue(optionalAddress.isPresent());
-        DwpAddress address = optionalAddress.get();
+        DwpAddress address = dwpAddressLookup.lookup(PIP, "1");
+        assertNotNull(address);
         assertArrayEquals(new String[]{"Mail Handling Site A", "WOLVERHAMPTON", "WV98 1AA"}, address.lines());
     }
 
     @Test
     @Parameters({"PIP", "ESA", "JOB", "UNK", "PLOP", "BIG", "11"})
     public void willAlwaysReturnTestAddressForATestDwpIssuingOffice(final String benefitType) {
-        Optional<DwpAddress> optionalAddress = dwpAddressLookup.lookup(benefitType, "test-hmcts-address");
-        assertTrue(optionalAddress.isPresent());
-        DwpAddress address = optionalAddress.get();
+        DwpAddress address = dwpAddressLookup.lookup(benefitType, "test-hmcts-address");
+        assertNotNull(address);
         assertEquals("E1 8FA", address.lines()[3]);
     }
 }

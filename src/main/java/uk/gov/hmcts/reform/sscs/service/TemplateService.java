@@ -11,9 +11,9 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 @Slf4j
 public class TemplateService {
 
-    private String dl6TemplateName;
+    private final String dl6TemplateName;
 
-    private String dl16TemplateName;
+    private final String dl16TemplateName;
 
     public TemplateService(@Value("${docmosis.template.dl6.templateName}") String dl6TemplateName,
                            @Value("${docmosis.template.dl16.templateName}") String dl16TemplateName) {

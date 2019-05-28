@@ -48,9 +48,8 @@ public class BulkPrintServiceTest {
 
     @Before
     public void setUp() {
-        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, true);
+        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, true, 1);
         when(idamService.generateServiceAuthorization()).thenReturn(AUTH_TOKEN);
-
     }
 
     @Test
@@ -71,7 +70,7 @@ public class BulkPrintServiceTest {
 
     @Test
     public void sendLetterNotEnabledWillNotSendToBulkPrint() {
-        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, false);
+        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, false, 1);
         notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
         verifyZeroInteractions(idamService);
         verifyZeroInteractions(sendLetterApi);

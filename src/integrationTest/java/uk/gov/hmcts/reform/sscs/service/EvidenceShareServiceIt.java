@@ -40,6 +40,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
+import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -184,20 +185,21 @@ public class EvidenceShareServiceIt {
         verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any());
     }
 
-    @Test
+    @Test(expected = NoMrnDetailsException.class)
     public void appealWithNoMrnDate_shouldNotGenerateTemplateOrAddToCcd() throws IOException {
         assertNotNull("evidenceShareService must be autowired", evidenceShareService);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("appealReceivedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
-
-        assertEquals(Optional.empty(), optionalUuid);
-
-        verifyNoMoreInteractions(restTemplate);
-        verifyNoMoreInteractions(evidenceManagementService);
-        verifyNoMoreInteractions(ccdService);
+        try {
+            evidenceShareService.processMessage(json);
+        } catch (NoMrnDetailsException e) {
+            verifyNoMoreInteractions(restTemplate);
+            verifyNoMoreInteractions(evidenceManagementService);
+            verifyNoMoreInteractions(ccdService);
+            throw e;
+        }
     }
 
     @Test

@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -42,7 +41,7 @@ public class EvidenceShareServiceTest {
     private SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
     @Mock
-    private DocumentManagementService documentManagementService;
+    private DocumentManagementServiceWrapper documentManagementServiceWrapper;
 
     @Mock
     private DocumentRequestFactory documentRequestFactory;
@@ -71,7 +70,7 @@ public class EvidenceShareServiceTest {
 
     @Before
     public void setUp() {
-        evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer, documentManagementService, documentRequestFactory,
+        evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer, documentManagementServiceWrapper, documentRequestFactory,
             evidenceManagementService, bulkPrintService, evidenceShareConfig, ccdCaseService, idamService, roboticsHandler);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(Collections.singletonList("paper"));
     }
@@ -137,7 +136,7 @@ public class EvidenceShareServiceTest {
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(null).build();
 
         when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
-        verifyNoMoreInteractions(documentManagementService);
+        verifyNoMoreInteractions(documentManagementServiceWrapper);
 
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
 
@@ -174,7 +173,7 @@ public class EvidenceShareServiceTest {
 
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
 
-        verifyNoMoreInteractions(documentManagementService);
+        verifyNoMoreInteractions(documentManagementServiceWrapper);
         assertEquals(Optional.empty(), optionalUuid);
     }
 }

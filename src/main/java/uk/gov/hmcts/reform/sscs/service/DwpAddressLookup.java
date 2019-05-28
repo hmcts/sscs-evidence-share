@@ -14,6 +14,7 @@ import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.domain.BenefitLookup;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
+import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 
 @Service
 @Slf4j
@@ -46,15 +47,16 @@ public class DwpAddressLookup {
     private static final JSONObject EXCELA_CONFIG = (JSONObject) configObject.get(EXCELA);
     public static final DwpAddress EXCELA_DWP_ADDRESS = BenefitLookup.getAddress((JSONObject) EXCELA_CONFIG.get(ADDRESS));
 
-    public Optional<DwpAddress> lookup(String benefitType, String dwpIssuingOffice) {
+    public DwpAddress lookup(String benefitType, String dwpIssuingOffice) {
         log.info("looking up address for benefitType {} and dwpIssuingOffice {}", benefitType, dwpIssuingOffice);
         Optional<DwpAddress> dwpAddressOptional =
             getDwpAddress(StringUtils.stripToNull(benefitType), StringUtils.stripToNull(dwpIssuingOffice));
         if (!dwpAddressOptional.isPresent()) {
-            log.warn("could not find dwp address for benefitType {} and dwpIssuingOffice {}",
-                benefitType, dwpIssuingOffice);
+            throw new DwpAddressLookupException(String.format("could not find dwp address for benefitType %s and dwpIssuingOffice %s",
+                benefitType, dwpIssuingOffice));
+
         }
-        return dwpAddressOptional;
+        return dwpAddressOptional.get();
     }
 
     private Optional<DwpAddress> getDwpAddress(String benefitType, String dwpIssuingOffice) {

@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -36,7 +35,7 @@ public class EvidenceShareService {
 
     private final SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
-    private final DocumentManagementService documentManagementService;
+    private final DocumentManagementServiceWrapper documentManagementServiceWrapper;
 
     private final DocumentRequestFactory documentRequestFactory;
 
@@ -55,7 +54,7 @@ public class EvidenceShareService {
     @Autowired
     public EvidenceShareService(
         SscsCaseCallbackDeserializer sscsDeserializer,
-        DocumentManagementService documentManagementService,
+        DocumentManagementServiceWrapper documentManagementServiceWrapper,
         DocumentRequestFactory documentRequestFactory,
         EvidenceManagementService evidenceManagementService,
         BulkPrintService bulkPrintService,
@@ -65,7 +64,7 @@ public class EvidenceShareService {
         RoboticsHandler roboticsHandler
     ) {
         this.sscsCaseCallbackDeserializer = sscsDeserializer;
-        this.documentManagementService = documentManagementService;
+        this.documentManagementServiceWrapper = documentManagementServiceWrapper;
         this.documentRequestFactory = documentRequestFactory;
         this.evidenceManagementService = evidenceManagementService;
         this.bulkPrintService = bulkPrintService;
@@ -94,7 +93,7 @@ public class EvidenceShareService {
             if (holder.getTemplate() != null) {
                 log.info("Generating document for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
 
-                documentManagementService.generateDocumentAndAddToCcd(holder, caseData);
+                documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData);
                 List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
 
                 Optional<UUID> uuid = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
