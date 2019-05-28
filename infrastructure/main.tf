@@ -75,6 +75,26 @@ data "azurerm_lb" "consul_dns" {
   resource_group_name = "${var.consul_dns_resource_group_name}"
 }
 
+data "azurerm_key_vault_secret" "robotics_email_from" {
+  name      = "robotics-email-from"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "robotics_email_to" {
+  name      = "robotics-email-to"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "smtp_host" {
+  name      = "smtp-host"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "smtp_port" {
+  name      = "smtp-port"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
 module "sscs-evidence-share" {
   source              = "git@github.com:hmcts/moj-module-webapp?ref=master"
   product             = "${var.product}-${var.component}"
@@ -126,5 +146,15 @@ module "sscs-evidence-share" {
     CORE_CASE_DATA_CASE_TYPE_ID    = "${var.core_case_data_case_type_id}"
 
     WEBSITE_DNS_SERVER = "${data.azurerm_lb.consul_dns.private_ip_address}"
+
+    ROBOTICS_EMAIL_FROM    = "${data.azurerm_key_vault_secret.robotics_email_from.value}"
+    ROBOTICS_EMAIL_TO      = "${data.azurerm_key_vault_secret.robotics_email_to.value}"
+    ROBOTICS_EMAIL_SUBJECT = "${var.robotics_email_subject}"
+    ROBOTICS_EMAIL_MESSAGE = "${var.robotics_email_message}"
+
+    EMAIL_SERVER_HOST      = "${data.azurerm_key_vault_secret.smtp_host.value}"
+    EMAIL_SERVER_PORT      = "${data.azurerm_key_vault_secret.smtp_port.value}"
+    EMAIL_SMTP_TLS_ENABLED = "${var.appeal_email_smtp_tls_enabled}"
+    EMAIL_SMTP_SSL_TRUST   = "${var.appeal_email_smtp_ssl_trust}"
   }
 }

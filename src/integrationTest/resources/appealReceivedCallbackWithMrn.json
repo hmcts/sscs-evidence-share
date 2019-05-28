@@ -131,6 +131,11 @@
             "lastName": "Test"
           },
           "address": {
+            "line1": "2 Drake Close",
+            "line2": "Hutton",
+            "town": "Brentwood",
+            "county": "Essex",
+            "postcode": "CM13 1AQ"
           },
           "contact": {
             "email": null,
@@ -179,6 +184,7 @@
       },
       "region": "BIRMINGHAM",
       "generatedDOB": "1900-01-01",
+      "evidencePresent" : "No",
       "events": [
         {
           "value": {

@@ -61,6 +61,9 @@ public class EvidenceShareServiceTest {
     @Mock
     private IdamService idamService;
 
+    @Mock
+    private RoboticsHandler roboticsHandler;
+
     private EvidenceShareService evidenceShareService;
 
     private LocalDateTime now = LocalDateTime.now();
@@ -68,7 +71,7 @@ public class EvidenceShareServiceTest {
     @Before
     public void setUp() {
         evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer, documentManagementServiceWrapper, documentRequestFactory,
-            evidenceManagementService, bulkPrintService, evidenceShareConfig, ccdCaseService, idamService);
+            evidenceManagementService, bulkPrintService, evidenceShareConfig, ccdCaseService, idamService, roboticsHandler);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(Collections.singletonList("paper"));
     }
 

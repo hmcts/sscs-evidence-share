@@ -205,6 +205,12 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '2.0.0'
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '2.0.11'
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.0.4'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version:  '1.0.3'
+  compile group: 'com.github.everit-org.json-schema', name: 'org.everit.json.schema', version: '1.9.2'
+
+  //Remove when our dependencies pull in this version or later
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
+  integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
 
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
   testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
