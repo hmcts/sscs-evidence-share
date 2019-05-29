@@ -204,7 +204,7 @@ public class EvidenceShareServiceIt {
 
     @Test
     @Parameters({"ONLINE", "COR"})
-    public void nonReceivedViaPaper_shouldNotBeProcessed(String receivedVia) throws IOException {
+    public void nonReceivedViaPaper_shouldNotBeBulkPrintedAndStateShouldBeUpdated(String receivedVia) throws IOException {
         assertNotNull("evidenceShareService must be autowired", evidenceShareService);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("appealReceivedCallback.json")).getFile();
@@ -216,7 +216,7 @@ public class EvidenceShareServiceIt {
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
-        verifyNoMoreInteractions(ccdService);
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any());
     }
 
     private String updateMrnDate(String json, String updatedDate) {

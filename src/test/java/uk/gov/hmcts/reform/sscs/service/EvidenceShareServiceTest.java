@@ -121,6 +121,7 @@ public class EvidenceShareServiceTest {
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
 
         assertEquals(expectedOptionalUuid, optionalUuid);
+        verify(roboticsHandler).sendCaseToRobotics(any());
         verify(evidenceManagementService).download(eq(URI.create(docUrl)), any());
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf)), any());
         verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case has been sent to the DWP via Bulk Print"), any());
@@ -139,12 +140,42 @@ public class EvidenceShareServiceTest {
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(null).build();
 
         when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
-        verifyNoMoreInteractions(documentManagementServiceWrapper);
 
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
 
-        assertEquals(Optional.empty(), optionalUuid);
+        verifyNoMoreInteractions(documentManagementServiceWrapper);
+        verify(roboticsHandler).sendCaseToRobotics(any());
 
+        assertEquals(Optional.empty(), optionalUuid);
+    }
+
+    @Test
+    @Parameters({"Online", "COR"})
+    public void nonReceivedViaPaperCases_doesNotGetSentToBulkPrint(String receivedVia) {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", receivedVia, null);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
+
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
+
+        verify(roboticsHandler).sendCaseToRobotics(any());
+        verifyNoMoreInteractions(documentManagementServiceWrapper);
+        assertEquals(Optional.empty(), optionalUuid);
+    }
+
+    @Test
+    public void givenSendToDwpFeatureFlagIsOff_doNotProcess() {
+        ReflectionTestUtils.setField(evidenceShareService, "sendToDwpFeature", false);
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
+
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
+
+        verifyNoMoreInteractions(roboticsHandler);
+        verifyNoMoreInteractions(documentManagementServiceWrapper);
+        assertEquals(Optional.empty(), optionalUuid);
     }
 
     private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments) {
@@ -164,19 +195,5 @@ public class EvidenceShareServiceTest {
             caseData,
             now
         );
-
-    }
-
-    @Test
-    @Parameters({"Online", "COR"})
-    public void nonReceivedViaPaperCases_doesNotGetSentToBulkPrint(String reveivedVia) {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", reveivedVia, null);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
-        when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
-
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
-
-        verifyNoMoreInteractions(documentManagementServiceWrapper);
-        assertEquals(Optional.empty(), optionalUuid);
     }
 }
