@@ -128,7 +128,7 @@ public class EvidenceShareServiceIt {
 
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
-        String documentList =  "Case has been sent to the DWP with documents: \n - dl6-12345656789.pdf\n - sscs1.pdf\n - filename1.pdf";
+        String documentList =  "Case has been sent to the DWP with documents: dl6-12345656789.pdf, sscs1.pdf, filename1.pdf";
         when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -169,7 +169,7 @@ public class EvidenceShareServiceIt {
 
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
-        String documentList =  "Case has been sent to the DWP with documents: \n - dl16-12345656789.pdf\n - sscs1.pdf\n - filename1.pdf";
+        String documentList =  "Case has been sent to the DWP with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
         when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);

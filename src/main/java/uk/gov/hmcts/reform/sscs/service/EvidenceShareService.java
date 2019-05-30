@@ -4,10 +4,7 @@ import static java.util.Objects.nonNull;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -111,13 +108,13 @@ public class EvidenceShareService {
     }
 
     private String buildEventDescription(List<Pdf> pdfs) {
-        StringBuilder builder = new StringBuilder("Case has been sent to the DWP with documents: ");
+        List<String> arr = new ArrayList<>();
 
         for (Pdf pdf : pdfs) {
-            builder.append("\n - " + pdf.getName());
+            arr.add(pdf.getName());
         }
 
-        return builder.toString();
+        return "Case has been sent to the DWP with documents: " + String.join(", ", arr);
     }
 
     private boolean readyToSendToDwp(SscsCaseData caseData) {
@@ -125,7 +122,7 @@ public class EvidenceShareService {
             && nonNull(caseData.getAppeal())
             && nonNull(caseData.getAppeal().getReceivedVia())
             && evidenceShareConfig.getSubmitTypes().stream()
-                .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
+            .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
     }
 
     private List<Pdf> toPdf(List<SscsDocument> sscsDocument) {
