@@ -145,6 +145,8 @@ module "sscs-evidence-share" {
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
     CORE_CASE_DATA_CASE_TYPE_ID    = "${var.core_case_data_case_type_id}"
 
+    SEND_TO_DWP_ENABLED    = "${var.send_to_dwp_enabled}"
+
     WEBSITE_DNS_SERVER = "${data.azurerm_lb.consul_dns.private_ip_address}"
 
     ROBOTICS_EMAIL_FROM    = "${data.azurerm_key_vault_secret.robotics_email_from.value}"

@@ -127,7 +127,7 @@ public class EvidenceShareServiceIt {
         when(ccdService.updateCase(any(), any(), eq("uploadDocument"), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP via Bulk Print"), any())).thenReturn(SscsCaseDetails.builder().build());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
@@ -144,7 +144,7 @@ public class EvidenceShareServiceIt {
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any());
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP via Bulk Print"), any());
     }
 
     @Test
@@ -165,7 +165,7 @@ public class EvidenceShareServiceIt {
         when(ccdService.updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP via Bulk Print"), any())).thenReturn(SscsCaseDetails.builder().build());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
@@ -182,7 +182,7 @@ public class EvidenceShareServiceIt {
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any());
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP via Bulk Print"), any());
     }
 
     @Test(expected = NoMrnDetailsException.class)
@@ -204,7 +204,7 @@ public class EvidenceShareServiceIt {
 
     @Test
     @Parameters({"ONLINE", "COR"})
-    public void nonReceivedViaPaper_shouldNotBeProcessed(String receivedVia) throws IOException {
+    public void nonReceivedViaPaper_shouldNotBeBulkPrintedAndStateShouldBeUpdated(String receivedVia) throws IOException {
         assertNotNull("evidenceShareService must be autowired", evidenceShareService);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("appealReceivedCallback.json")).getFile();
@@ -216,7 +216,7 @@ public class EvidenceShareServiceIt {
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
-        verifyNoMoreInteractions(ccdService);
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP"), any());
     }
 
     private String updateMrnDate(String json, String updatedDate) {
