@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Component
 @Slf4j
@@ -97,7 +98,8 @@ public class EvidenceShareService {
                 if (holder.getTemplate() != null) {
                     log.info("Generating document for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
 
-                    documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData);
+                    IdamTokens idamTokens = idamService.getIdamTokens();
+                    documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
                     List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
 
                     Optional<UUID> uuid = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
@@ -110,7 +112,7 @@ public class EvidenceShareService {
                 }
             } else {
                 log.info("Skipping bulk print. Sending straight to {} state for case id {}", EventType.SENT_TO_DWP.getCcdType(), sscsCaseDataCallback.getCaseDetails().getId());
-                ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP", idamService.getIdamTokens());
+                ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP via Bulk Print", idamService.getIdamTokens());
                 return Optional.empty();
             }
         }
