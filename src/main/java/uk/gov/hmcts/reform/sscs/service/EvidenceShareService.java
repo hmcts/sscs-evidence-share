@@ -4,10 +4,7 @@ import static java.util.Objects.nonNull;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -106,7 +103,8 @@ public class EvidenceShareService {
                     Optional<UUID> uuid = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
 
                     caseData.setDateSentToDwp(LocalDate.now().toString());
-                    ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP via Bulk Print", idamService.getIdamTokens());
+                    String description = buildEventDescription(existingCasePdfs);
+                    ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.SENT_TO_DWP.getCcdType(), "Sent to DWP", description, idamService.getIdamTokens());
 
                     return uuid;
                 }
@@ -120,12 +118,22 @@ public class EvidenceShareService {
         return Optional.empty();
     }
 
+    private String buildEventDescription(List<Pdf> pdfs) {
+        List<String> arr = new ArrayList<>();
+
+        for (Pdf pdf : pdfs) {
+            arr.add(pdf.getName());
+        }
+
+        return "Case has been sent to the DWP via Bulk Print with documents: " + String.join(", ", arr);
+    }
+
     private boolean isAllowedReceivedTypeForBulkPrint(SscsCaseData caseData) {
         return nonNull(caseData)
             && nonNull(caseData.getAppeal())
             && nonNull(caseData.getAppeal().getReceivedVia())
             && evidenceShareConfig.getSubmitTypes().stream()
-                .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
+            .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
     }
 
     private List<Pdf> toPdf(List<SscsDocument> sscsDocument) {

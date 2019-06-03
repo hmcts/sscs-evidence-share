@@ -127,7 +127,9 @@ public class EvidenceShareServiceIt {
         when(ccdService.updateCase(any(), any(), eq("uploadDocument"), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP via Bulk Print"), any())).thenReturn(SscsCaseDetails.builder().build());
+
+        String documentList =  "Case has been sent to the DWP via Bulk Print with documents: dl6-12345656789.pdf, sscs1.pdf, filename1.pdf";
+        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
@@ -144,7 +146,8 @@ public class EvidenceShareServiceIt {
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP via Bulk Print"), any());
+
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
     }
 
     @Test
@@ -165,7 +168,9 @@ public class EvidenceShareServiceIt {
         when(ccdService.updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP via Bulk Print"), any())).thenReturn(SscsCaseDetails.builder().build());
+
+        String documentList =  "Case has been sent to the DWP via Bulk Print with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
+        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
@@ -182,7 +187,8 @@ public class EvidenceShareServiceIt {
         verify(evidenceManagementService).upload(any(),  eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP via Bulk Print"), any());
+
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
     }
 
     @Test(expected = NoMrnDetailsException.class)

@@ -83,12 +83,19 @@ public class EvidenceShareServiceTest {
 
         String docUrl = "my/1/url.pdf";
         Pdf docPdf = new Pdf(docUrl.getBytes(), "evidence1.pdf");
+        Pdf docPdf2 = new Pdf(docUrl.getBytes(), "evidence2.pdf");
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(docPdf.getName())
                 .documentType("sscs1")
                 .documentLink(DocumentLink.builder().documentUrl(docUrl)
                     .documentFilename(docPdf.getName()).build())
+                .build()).build(),
+            SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName(docPdf2.getName())
+                .documentType("appellantEvidence")
+                .documentLink(DocumentLink.builder().documentUrl(docUrl)
+                    .documentFilename(docPdf2.getName()).build())
                 .build()).build(),
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("filtered out word.doc")
@@ -115,16 +122,19 @@ public class EvidenceShareServiceTest {
 
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
 
-        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf)), any()))
+        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
             .thenReturn(expectedOptionalUuid);
 
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
 
         assertEquals(expectedOptionalUuid, optionalUuid);
+
         verify(roboticsHandler).sendCaseToRobotics(any());
-        verify(evidenceManagementService).download(eq(URI.create(docUrl)), any());
-        verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf)), any());
-        verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case has been sent to the DWP via Bulk Print"), any());
+        verify(evidenceManagementService, times(2)).download(eq(URI.create(docUrl)), any());
+        verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any());
+
+        String documentList =  "Case has been sent to the DWP via Bulk Print with documents: evidence1.pdf, evidence2.pdf";
+        verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq(documentList), any());
     }
 
     @Test
