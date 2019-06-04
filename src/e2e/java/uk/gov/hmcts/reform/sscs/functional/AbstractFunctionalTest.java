@@ -75,7 +75,7 @@ public abstract class AbstractFunctionalTest {
 
             .receivedVia("Paper")
             .build()).build();
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData, "dummySendToDwp",
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, "validAppealCreated",
             "Evidence share service send to DWP test", "Evidence share service send to DWP case created", idamTokens);
         ccdCaseId = String.valueOf(caseDetails.getId());
     }
