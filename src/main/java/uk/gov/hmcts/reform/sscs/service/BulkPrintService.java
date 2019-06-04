@@ -62,9 +62,10 @@ public class BulkPrintService {
             if (reTryNumber > maxRetryAttempts) {
                 String message = format("Failed to send to bulk print for case %s with error %s.",
                     sscsCaseData.getCcdCaseId(), e.getMessage());
-                log.error(message, e);
                 throw new BulkPrintException(message, e);
             }
+            log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
+                e.getMessage(), reTryNumber, maxRetryAttempts));
             return sendLetterWithRetry(authToken, sscsCaseData, encodedData, reTryNumber + 1);
         }
     }

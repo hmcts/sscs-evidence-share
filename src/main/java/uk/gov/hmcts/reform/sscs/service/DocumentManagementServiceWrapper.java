@@ -50,6 +50,8 @@ public class DocumentManagementServiceWrapper {
             if (reTryNumber > maxRetryAttempts) {
                 throw new PdfStoreException(e.getMessage(), e);
             }
+            log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
+                e.getMessage(), reTryNumber, maxRetryAttempts));
             generateDocumentAndAddToCcdWithRetry(holder, caseData, reTryNumber + 1, idamTokens);
         }
     }
