@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 
 import java.net.URI;
 import java.time.LocalDateTime;
@@ -105,7 +106,7 @@ public class EvidenceShareServiceTest {
                 .build()).build(),
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("filtered out as there is no documentLink object.pfd")
-                .build()).build()));
+                .build()).build()), APPEAL_CREATED);
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
@@ -140,7 +141,7 @@ public class EvidenceShareServiceTest {
     @Test
     public void givenAMessageWhichCannotFindATemplate_thenConvertToSscsCaseDataAndDoNotAddPdfToCase() {
 
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null);
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null, APPEAL_CREATED);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
 
@@ -162,7 +163,7 @@ public class EvidenceShareServiceTest {
     @Test
     @Parameters({"Online", "COR"})
     public void nonReceivedViaPaperCases_doesNotGetSentToBulkPrint(String receivedVia) {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", receivedVia, null);
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", receivedVia, null, APPEAL_CREATED);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
 
@@ -174,11 +175,11 @@ public class EvidenceShareServiceTest {
     }
 
     @Test
-    public void givenSendToDwpFeatureFlagIsOff_doNotProcess() {
+    public void givenSendToDwpFeatureFlagIsOffAndEventNotValidAppealCreated_doNotProcess() {
         ReflectionTestUtils.setField(evidenceShareService, "sendToDwpFeature", false);
 
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null, APPEAL_CREATED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SYA_APPEAL_CREATED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
 
         Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
@@ -188,7 +189,23 @@ public class EvidenceShareServiceTest {
         assertEquals(Optional.empty(), optionalUuid);
     }
 
-    private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments) {
+    @Test
+    public void givenSendToDwpFeatureFlagIsOffAndEventIsValidAppealCreated_doNotProcess() {
+        ReflectionTestUtils.setField(evidenceShareService, "sendToDwpFeature", false);
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null, VALID_APPEAL);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED);
+        when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
+
+        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
+
+        assertEquals(Optional.empty(), optionalUuid);
+        verifyNoMoreInteractions(roboticsHandler);
+        verifyNoMoreInteractions(documentManagementServiceWrapper);
+        verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.MOVE_TO_APPEAL_CREATED.getCcdType()), eq("Case created"), eq("Sending back to appealCreated state"), any());
+    }
+
+    private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments, State state) {
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("123")
             .appeal(Appeal.builder()
@@ -201,7 +218,7 @@ public class EvidenceShareServiceTest {
         return new CaseDetails<>(
             123L,
             "jurisdiction",
-            APPEAL_CREATED,
+            state,
             caseData,
             now
         );
