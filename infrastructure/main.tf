@@ -57,7 +57,6 @@ data "azurerm_key_vault_secret" "idam_oauth2_client_secret" {
 
 data "azurerm_key_vault_secret" "sscs_asb_primary_send_and_listen_shared_access_key" {
   name      = "sscs-asb-primary-send-and-listen-shared-access-key"
-  version   = "${var.asb_key_version}"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
