@@ -5,5 +5,5 @@ idam_redirect_url = "https://sscs-case-loader-prod.service.core-compute-prod.int
 send_to_dwp_enabled = "false"
 
 variable "asb_key_version" {
-  type = "be0108ee496f4f0ea4a5e6fb94050ef5"
+  default = "be0108ee496f4f0ea4a5e6fb94050ef5"
 }
