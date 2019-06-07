@@ -147,6 +147,8 @@ module "sscs-evidence-share" {
 
     SEND_TO_DWP_ENABLED    = "${var.send_to_dwp_enabled}"
 
+    TEST_VALUE    = "bla"
+
     WEBSITE_DNS_SERVER = "${data.azurerm_lb.consul_dns.private_ip_address}"
 
     ROBOTICS_EMAIL_FROM    = "${data.azurerm_key_vault_secret.robotics_email_from.value}"
