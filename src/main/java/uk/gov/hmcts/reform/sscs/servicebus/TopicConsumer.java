@@ -5,6 +5,7 @@ import static java.lang.String.format;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
@@ -20,9 +21,12 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceShareService;
 public class TopicConsumer {
 
     private final EvidenceShareService evidenceShareService;
+    private final Integer maxRetryAttempts;
 
-    public TopicConsumer(final EvidenceShareService evidenceShareService) {
+    public TopicConsumer(final EvidenceShareService evidenceShareService,
+                         @Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts) {
         this.evidenceShareService = evidenceShareService;
+        this.maxRetryAttempts = maxRetryAttempts;
     }
 
     @JmsListener(
@@ -31,12 +35,22 @@ public class TopicConsumer {
         subscription = "${amqp.subscription}"
     )
     public void onMessage(String message) {
+        processMessageWithRetry(message, 1);
+    }
+
+    private void processMessageWithRetry(String message, int retry) {
         try {
             processMessage(message);
         } catch (Exception e) {
-            log.error(format("Caught unknown unrecoverable error %s", e.getMessage()), e);
+            if (retry > maxRetryAttempts) {
+                // retried and now unrecoverable. Catch to remove it from the queue.
+                log.error(format("Caught unknown unrecoverable error %s", e.getMessage()), e);
+            } else {
+                log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
+                    e.getMessage(), retry, maxRetryAttempts));
+                processMessageWithRetry(message, retry + 1);
+            }
         }
-
     }
 
     private void processMessage(String message) {
