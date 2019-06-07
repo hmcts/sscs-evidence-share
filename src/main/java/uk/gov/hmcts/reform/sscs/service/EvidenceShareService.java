@@ -87,8 +87,14 @@ public class EvidenceShareService {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(message);
         SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
         if (sendToDwpFeature) {
-            roboticsHandler.sendCaseToRobotics(caseData);
-            BulkPrintInfo bulkPrintInfo = bulkPrintCase(sscsCaseDataCallback);
+            BulkPrintInfo bulkPrintInfo = null;
+            try {
+                roboticsHandler.sendCaseToRobotics(caseData);
+                bulkPrintInfo = bulkPrintCase(sscsCaseDataCallback);
+            } catch (Exception e) {
+                log.info("Error when bulk-printing caseId: {}", sscsCaseDataCallback.getCaseDetails().getId(), e);
+                updateCaseToFlagError(caseData);
+            }
             if (updateCaseToSentToDwp(sscsCaseDataCallback, caseData, bulkPrintInfo)) {
                 return bulkPrintInfo.getUuid();
             }
@@ -106,6 +112,16 @@ public class EvidenceShareService {
                 idamService.getIdamTokens());
         }
         return Optional.empty();
+    }
+
+    private void updateCaseToFlagError(SscsCaseData caseData) {
+        caseData.setHmctsDwpSecondaryState("failedSending");
+        ccdService.updateCase(caseData,
+            Long.valueOf(caseData.getCcdCaseId()),
+            EventType.SEND_TO_DWP.getCcdType(),
+            "Send to DWP",
+            "Send to DWP event has been triggered from Evidence Share service",
+            idamService.getIdamTokens());
     }
 
     private boolean updateCaseToSentToDwp(Callback<SscsCaseData> sscsCaseDataCallback, SscsCaseData caseData,
