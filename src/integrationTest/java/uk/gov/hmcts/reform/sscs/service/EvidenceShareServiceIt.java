@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -48,6 +50,7 @@ import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
@@ -205,18 +208,26 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void appealWithNoMrnDate_shouldNotGenerateTemplateOrAddToCcd() throws IOException {
+    public void appealWithNoMrnDate_shouldNotGenerateTemplateOrAddToCcdAndShouldUpdateCaseWithSecondaryState()
+        throws IOException {
         assertNotNull("evidenceShareService must be autowired", evidenceShareService);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("appealReceivedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        evidenceShareService.processMessage(json);
-        verifyNoMoreInteractions(restTemplate);
-        verifyNoMoreInteractions(evidenceManagementService);
+        ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        Optional<UUID> result = evidenceShareService.processMessage(json);
+
+        assertFalse(result.isPresent());
         then(ccdService)
             .should(times(1))
-            .updateCase(any(), any(), eq("sendToDwp"), any(), any(), any());
+            .updateCase(caseDataCaptor.capture(), any(), eq("sendToDwp"), any(), any(), any());
+        assertNull(caseDataCaptor.getValue().getAppeal().getMrnDetails().getMrnDate());
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpSecondaryState());
+
+        verifyNoMoreInteractions(restTemplate);
+        verifyNoMoreInteractions(evidenceManagementService);
     }
 
     @Test

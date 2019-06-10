@@ -98,18 +98,18 @@ public class EvidenceShareService {
             if (updateCaseToSentToDwp(sscsCaseDataCallback, caseData, bulkPrintInfo)) {
                 return bulkPrintInfo.getUuid();
             }
-        }
-
-        log.info("Feature flag turned off for sending to DWP. Skipping evidence share for case id {}",
-            sscsCaseDataCallback.getCaseDetails().getId());
-        if (sscsCaseDataCallback.getCaseDetails().getState().toString().equals(State.VALID_APPEAL.toString())) {
-            log.info("Sending case back to appeal created so it is in correct state for old workflow for case id {}",
+        } else {
+            log.info("Feature flag turned off for sending to DWP. Skipping evidence share for case id {}",
                 sscsCaseDataCallback.getCaseDetails().getId());
-            ccdService.updateCase(caseData,
-                Long.valueOf(caseData.getCcdCaseId()),
-                EventType.MOVE_TO_APPEAL_CREATED.getCcdType(),
-                "Case created", "Sending back to appealCreated state",
-                idamService.getIdamTokens());
+            if (sscsCaseDataCallback.getCaseDetails().getState().toString().equals(State.VALID_APPEAL.toString())) {
+                log.info("Sending case back to appeal created so it is in correct state for old workflow for case id {}",
+                    sscsCaseDataCallback.getCaseDetails().getId());
+                ccdService.updateCase(caseData,
+                    Long.valueOf(caseData.getCcdCaseId()),
+                    EventType.MOVE_TO_APPEAL_CREATED.getCcdType(),
+                    "Case created", "Sending back to appealCreated state",
+                    idamService.getIdamTokens());
+            }
         }
         return Optional.empty();
     }
