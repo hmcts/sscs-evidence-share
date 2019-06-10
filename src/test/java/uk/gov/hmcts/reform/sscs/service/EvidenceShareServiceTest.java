@@ -1,28 +1,49 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
@@ -72,8 +93,9 @@ public class EvidenceShareServiceTest {
 
     @Before
     public void setUp() {
-        evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer, documentManagementServiceWrapper, documentRequestFactory,
-            evidenceManagementService, bulkPrintService, evidenceShareConfig, ccdCaseService, idamService, roboticsHandler);
+        evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer, documentManagementServiceWrapper,
+            documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig,
+            ccdCaseService, idamService, roboticsHandler);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(Collections.singletonList("paper"));
 
         ReflectionTestUtils.setField(evidenceShareService, "sendToDwpFeature", true);
@@ -134,8 +156,26 @@ public class EvidenceShareServiceTest {
         verify(evidenceManagementService, times(2)).download(eq(URI.create(docUrl)), any());
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any());
 
-        String documentList =  "Case has been sent to the DWP via Bulk Print with documents: evidence1.pdf, evidence2.pdf";
+        String documentList = "Case has been sent to the DWP via Bulk Print with documents: evidence1.pdf, evidence2.pdf";
         verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq(documentList), any());
+    }
+
+    @Test
+    public void givenAnErrorWhenSendToBulkPrint_shouldUpdateCaseInCcdToFlagError() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper",
+            null, APPEAL_CREATED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
+
+        ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        Optional<UUID> result = evidenceShareService.processMessage(MY_JSON_DATA);
+
+        assertFalse(result.isPresent());
+        then(ccdCaseService)
+            .should(times(1))
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwp"), any(), any(), any());
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpSecondaryState());
     }
 
     @Test
