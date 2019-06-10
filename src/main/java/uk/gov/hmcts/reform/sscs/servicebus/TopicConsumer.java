@@ -6,9 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Profile;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
@@ -20,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceShareService;
 @Slf4j
 @Component
 @Lazy(false)
-@ConditionalOnProperty(value = "topic.consumer.enable", matchIfMissing = true)
 public class TopicConsumer {
 
     private final EvidenceShareService evidenceShareService;
