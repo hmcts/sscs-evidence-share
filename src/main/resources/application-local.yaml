@@ -1,2 +1,0 @@
-topic.consumer.enable: false
-test.url: ${TEST_URL:http://localhost:8091}
