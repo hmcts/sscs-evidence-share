@@ -178,6 +178,30 @@ public class EvidenceShareServiceTest {
     }
 
     @Test
+    public void givenNoTemplates_shouldThrowAnExceptionAndFlagError() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper",
+            null, APPEAL_CREATED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
+
+        ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+        when(documentRequestFactory.create(caseDetails.getCaseData(), now))
+            .thenReturn(DocumentHolder.builder()
+                .template(null)
+                .build());
+
+        Optional<UUID> result = evidenceShareService.processMessage(MY_JSON_DATA);
+
+        assertFalse(result.isPresent());
+        then(ccdCaseService)
+            .should(times(1))
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwp"), any(), any(), any());
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpSecondaryState());
+
+
+    }
+
+    @Test
     public void givenAMessageWhichCannotFindATemplate_thenConvertToSscsCaseDataAndDoNotAddPdfToCase() {
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null, APPEAL_CREATED);

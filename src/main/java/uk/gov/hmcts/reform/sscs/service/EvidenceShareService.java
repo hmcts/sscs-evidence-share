@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 
 import java.net.URI;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -150,8 +152,7 @@ public class EvidenceShareService {
             log.info("Processing callback event {} for case id {}", sscsCaseDataCallback.getEvent(),
                 sscsCaseDataCallback.getCaseDetails().getId());
 
-            DocumentHolder holder = documentRequestFactory.create(
-                sscsCaseDataCallback.getCaseDetails().getCaseData(),
+            DocumentHolder holder = documentRequestFactory.create(sscsCaseDataCallback.getCaseDetails().getCaseData(),
                 sscsCaseDataCallback.getCaseDetails().getCreatedDate());
 
             if (holder.getTemplate() != null) {
@@ -169,7 +170,9 @@ public class EvidenceShareService {
                     .desc(buildEventDescription(existingCasePdfs))
                     .build();
             }
-            return null;
+            throw new BulkPrintException(
+                format("Failed to send to bulk print for case %s because no template was found",
+                    caseData.getCcdCaseId()));
         } else {
             return BulkPrintInfo.builder()
                 .uuid(null)
