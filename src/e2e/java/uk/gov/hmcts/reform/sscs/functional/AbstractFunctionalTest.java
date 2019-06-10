@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
-@ActiveProfiles("functional")
 @ProfileValueSourceConfiguration(EnvironmentProfileValueSource.class)
 public abstract class AbstractFunctionalTest {
 
