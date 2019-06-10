@@ -117,6 +117,7 @@ sonarqube {
       "src/main/java/uk/gov/hmcts/reform/sscs/config/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/servicebus/messaging/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
+      "src/main/java/uk/gov/hmcts/reform/sscs/model/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/SscsEvidenceShareApplication.java,"
