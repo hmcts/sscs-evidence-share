@@ -20,7 +20,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws IOException {
 
-        createCaseInSendingToDwpState();
+        createCaseWithValidAppealState();
 
         String json = getJson(SYA_APPEAL_CREATED);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -39,9 +39,24 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
+    public void processAnAppealWithNoValidMrnDate_shouldNoTBeSentToDwpAndShouldBeUpdatedToFlagError() throws IOException {
+        createCaseWithValidAppealState();
+
+        String json = getJson(SYA_APPEAL_CREATED);
+        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
+        json = json.replace("MRN_DATE_TO_BE_REPLACED", "");
+
+        simulateCcdCallback(json);
+        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+
+        assertNull(caseDetails.getData().getSscsDocument());
+        assertEquals("validAppeal", caseDetails.getState());
+    }
+
+    @Test
     public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws IOException {
 
-        createCaseInSendingToDwpState();
+        createCaseWithValidAppealState();
 
         String json = getJson(SYA_APPEAL_CREATED);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
