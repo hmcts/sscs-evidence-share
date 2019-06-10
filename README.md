@@ -57,14 +57,6 @@ You should get a response similar to this:
 
 ```
   {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
-```
-
-### Running the application locally without docker
-The below is an elegant way to easily turn off the topic consumer mechanism when running the service locally
-if we don't need this topic consume locally. We just need to inject an environment variable. The below is just
-one way of doing it: 
-```bash
-spring_profiles_active=local ./gradlew bootRun 
 ``` 
 
 ### Alternative script to run application
