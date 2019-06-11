@@ -117,7 +117,7 @@ public class EvidenceShareService {
     }
 
     private void updateCaseToFlagError(SscsCaseData caseData) {
-        caseData.setHmctsDwpSecondaryState("failedSending");
+        caseData.setHmctsDwpState("failedSending");
         ccdService.updateCase(caseData,
             Long.valueOf(caseData.getCcdCaseId()),
             EventType.SEND_TO_DWP.getCcdType(),

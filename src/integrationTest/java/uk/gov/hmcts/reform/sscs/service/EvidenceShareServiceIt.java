@@ -224,7 +224,7 @@ public class EvidenceShareServiceIt {
             .should(times(1))
             .updateCase(caseDataCaptor.capture(), any(), eq("sendToDwp"), any(), any(), any());
         assertNull(caseDataCaptor.getValue().getAppeal().getMrnDetails().getMrnDate());
-        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpSecondaryState());
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
