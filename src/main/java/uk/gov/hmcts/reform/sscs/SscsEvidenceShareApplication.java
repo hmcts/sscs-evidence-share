@@ -11,6 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import uk.gov.hmcts.reform.authorisation.healthcheck.ServiceAuthHealthIndicator;
 import uk.gov.hmcts.reform.sendletter.SendLetterAutoConfiguration;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
@@ -32,6 +33,7 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
     basePackageClasses = SscsEvidenceShareApplication.class,
     lazyInit = true
 )
+@EnableScheduling
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
 public class SscsEvidenceShareApplication {
 
