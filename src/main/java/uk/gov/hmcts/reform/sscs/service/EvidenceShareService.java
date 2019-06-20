@@ -109,8 +109,7 @@ public class EvidenceShareService {
 
                     String description = buildEventDescription(existingCasePdfs);
                     ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.SENT_TO_DWP.getCcdType(), "Sent to DWP", description, idamService.getIdamTokens());
-                    log.info("Case sent to dwp for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
-
+                    log.info("Case sent to dwp for case id {} with returned value {}", sscsCaseDataCallback.getCaseDetails().getId(), uuid);
                     return uuid;
                 }
             } else {
