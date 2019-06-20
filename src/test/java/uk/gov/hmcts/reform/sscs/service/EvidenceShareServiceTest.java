@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
@@ -147,9 +146,7 @@ public class EvidenceShareServiceTest {
         when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
             .thenReturn(expectedOptionalUuid);
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
-
-        assertEquals(expectedOptionalUuid, optionalUuid);
+        evidenceShareService.processMessage(MY_JSON_DATA);
 
         verify(roboticsHandler).sendCaseToRobotics(any());
         verify(evidenceManagementService, times(2)).download(eq(URI.create(docUrl)), any());
@@ -168,9 +165,8 @@ public class EvidenceShareServiceTest {
 
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
-        Optional<UUID> result = evidenceShareService.processMessage(MY_JSON_DATA);
+        evidenceShareService.processMessage(MY_JSON_DATA);
 
-        assertFalse(result.isPresent());
         then(ccdCaseService)
             .should(times(1))
             .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwp"), any(), any(), any());
@@ -190,9 +186,8 @@ public class EvidenceShareServiceTest {
                 .template(null)
                 .build());
 
-        Optional<UUID> result = evidenceShareService.processMessage(MY_JSON_DATA);
+        evidenceShareService.processMessage(MY_JSON_DATA);
 
-        assertFalse(result.isPresent());
         then(ccdCaseService)
             .should(times(1))
             .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwp"), any(), any(), any());
@@ -215,12 +210,10 @@ public class EvidenceShareServiceTest {
 
         when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
+        evidenceShareService.processMessage(MY_JSON_DATA);
 
         verifyNoMoreInteractions(documentManagementServiceWrapper);
         verify(roboticsHandler).sendCaseToRobotics(any());
-
-        assertEquals(Optional.empty(), optionalUuid);
     }
 
     @Test
@@ -230,11 +223,10 @@ public class EvidenceShareServiceTest {
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
+        evidenceShareService.processMessage(MY_JSON_DATA);
 
         verify(roboticsHandler).sendCaseToRobotics(any());
         verifyNoMoreInteractions(documentManagementServiceWrapper);
-        assertEquals(Optional.empty(), optionalUuid);
     }
 
     @Test
@@ -245,11 +237,11 @@ public class EvidenceShareServiceTest {
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SYA_APPEAL_CREATED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
+
+        evidenceShareService.processMessage(MY_JSON_DATA);
 
         verifyNoMoreInteractions(roboticsHandler);
         verifyNoMoreInteractions(documentManagementServiceWrapper);
-        assertEquals(Optional.empty(), optionalUuid);
     }
 
     @Test
@@ -260,9 +252,8 @@ public class EvidenceShareServiceTest {
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
+        evidenceShareService.processMessage(MY_JSON_DATA);
 
-        assertEquals(Optional.empty(), optionalUuid);
         verifyNoMoreInteractions(roboticsHandler);
         verifyNoMoreInteractions(documentManagementServiceWrapper);
         verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.MOVE_TO_APPEAL_CREATED.getCcdType()), eq("Case created"), eq("Sending back to appealCreated state"), any());

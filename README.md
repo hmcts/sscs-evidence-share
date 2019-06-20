@@ -57,7 +57,7 @@ You should get a response similar to this:
 
 ```
   {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
-``` 
+```
 
 ### Alternative script to run application
 

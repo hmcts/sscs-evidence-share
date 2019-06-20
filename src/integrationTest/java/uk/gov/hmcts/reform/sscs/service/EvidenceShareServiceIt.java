@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,6 +44,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -149,9 +149,7 @@ public class EvidenceShareServiceIt {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
-
-        assertEquals(expectedOptionalUuid, optionalUuid);
+        evidenceShareService.processMessage(json);
 
         assertEquals(3, documentCaptor.getValue().size());
         assertEquals("dl6-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -190,9 +188,7 @@ public class EvidenceShareServiceIt {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
-
-        assertEquals(expectedOptionalUuid, optionalUuid);
+        evidenceShareService.processMessage(json);
 
         assertEquals(3, documentCaptor.getValue().size());
         assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -211,15 +207,15 @@ public class EvidenceShareServiceIt {
     public void appealWithNoMrnDate_shouldNotGenerateTemplateOrAddToCcdAndShouldUpdateCaseWithSecondaryState()
         throws IOException {
         assertNotNull("evidenceShareService must be autowired", evidenceShareService);
+        ReflectionTestUtils.setField(evidenceShareService, "sendToDwpFeature", true);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("appealReceivedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
-        Optional<UUID> result = evidenceShareService.processMessage(json);
+        evidenceShareService.processMessage(json);
 
-        assertFalse(result.isPresent());
         then(ccdService)
             .should(times(1))
             .updateCase(caseDataCaptor.capture(), any(), eq("sendToDwp"), any(), any(), any());
@@ -238,9 +234,8 @@ public class EvidenceShareServiceIt {
             .getResource("appealReceivedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("PAPER", receivedVia);
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(json);
+        evidenceShareService.processMessage(json);
 
-        assertEquals(Optional.empty(), optionalUuid);
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
