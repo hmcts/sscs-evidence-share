@@ -37,8 +37,8 @@ sourceSets {
 
   smokeTest {
     java {
-      compileClasspath += main.output
-      runtimeClasspath += main.output
+      compileClasspath += main.output + test.output
+      runtimeClasspath += main.output + test.output
       srcDir file('src/smokeTest/java')
     }
     resources.srcDir file('src/smokeTest/resources')
@@ -74,6 +74,8 @@ configurations {
   integrationTestRuntime.extendsFrom(testRuntime)
   e2eCompile.extendsFrom(testCompile)
   e2eRuntime.extendsFrom(testRuntime)
+  smokeTestCompile.extendsFrom(testCompile)
+  smokeTestRuntime.extendsFrom(testRuntime)
   
   testCompile.exclude module: "android-json" 
   testRuntime.exclude module: "android-json" 
@@ -186,7 +188,6 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
-  compile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -223,14 +224,17 @@ dependencies {
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testCompile group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
 
+  compile 'org.projectlombok:lombok:1.18.8'
+  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+  testCompileOnly 'org.projectlombok:lombok:1.18.8'
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  integrationTestCompile sourceSets.main.runtimeClasspath
-  integrationTestCompile sourceSets.test.runtimeClasspath
+  e2eCompileOnly 'org.projectlombok:lombok:1.18.8'
+  e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  e2eCompile sourceSets.main.runtimeClasspath
-
-  smokeTestCompile sourceSets.main.runtimeClasspath
+  integrationTestCompileOnly 'org.projectlombok:lombok:1.18.8'
+  integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
 }
 
