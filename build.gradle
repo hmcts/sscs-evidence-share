@@ -204,7 +204,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '2.2.0'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '2.0.0'
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.12'
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.0.6'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.0.8'
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version:  '1.0.3'
   compile group: 'com.github.everit-org.json-schema', name: 'org.everit.json.schema', version: '1.11.1'
 
