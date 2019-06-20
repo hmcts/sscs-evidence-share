@@ -8,8 +8,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -85,7 +83,7 @@ public class EvidenceShareService {
         this.roboticsHandler = roboticsHandler;
     }
 
-    public Optional<UUID> processMessage(final String message) {
+    public void processMessage(final String message) {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(message);
         SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
         if (sendToDwpFeature) {
@@ -97,9 +95,8 @@ public class EvidenceShareService {
                 log.info("Error when bulk-printing caseId: {}", sscsCaseDataCallback.getCaseDetails().getId(), e);
                 updateCaseToFlagError(caseData);
             }
-            if (updateCaseToSentToDwp(sscsCaseDataCallback, caseData, bulkPrintInfo)) {
-                return bulkPrintInfo.getUuid();
-            }
+            updateCaseToSentToDwp(sscsCaseDataCallback, caseData, bulkPrintInfo);
+
         } else {
             log.info("Feature flag turned off for sending to DWP. Skipping evidence share for case id {}",
                 sscsCaseDataCallback.getCaseDetails().getId());
@@ -113,7 +110,6 @@ public class EvidenceShareService {
                     idamService.getIdamTokens());
             }
         }
-        return Optional.empty();
     }
 
     private void updateCaseToFlagError(SscsCaseData caseData) {
@@ -126,14 +122,15 @@ public class EvidenceShareService {
             idamService.getIdamTokens());
     }
 
-    private boolean updateCaseToSentToDwp(Callback<SscsCaseData> sscsCaseDataCallback, SscsCaseData caseData,
-                                          BulkPrintInfo bulkPrintInfo) {
+    private void updateCaseToSentToDwp(Callback<SscsCaseData> sscsCaseDataCallback, SscsCaseData caseData,
+                                       BulkPrintInfo bulkPrintInfo) {
         if (bulkPrintInfo != null) {
             if (bulkPrintInfo.isAllowedTypeForBulkPrint()) {
                 ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                     EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
                     idamService.getIdamTokens());
-                log.info("Case sent to dwp for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
+                log.info("Case sent to dwp for case id {} with returned value {}",
+                    sscsCaseDataCallback.getCaseDetails().getId(), bulkPrintInfo.getUuid());
             } else {
                 log.info("Skipping bulk print. Sending straight to {} state for case id {}",
                     EventType.SENT_TO_DWP.getCcdType(), sscsCaseDataCallback.getCaseDetails().getId());
@@ -141,9 +138,7 @@ public class EvidenceShareService {
                     EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
                     idamService.getIdamTokens());
             }
-            return true;
         }
-        return false;
     }
 
     private BulkPrintInfo bulkPrintCase(Callback<SscsCaseData> sscsCaseDataCallback) {
