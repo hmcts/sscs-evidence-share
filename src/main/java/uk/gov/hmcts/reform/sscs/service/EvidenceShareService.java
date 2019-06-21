@@ -87,29 +87,36 @@ public class EvidenceShareService {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(message);
         SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
         if (sendToDwpFeature) {
-            BulkPrintInfo bulkPrintInfo = null;
-            try {
-                roboticsHandler.sendCaseToRobotics(caseData);
-                bulkPrintInfo = bulkPrintCase(sscsCaseDataCallback);
-            } catch (Exception e) {
-                log.info("Error when bulk-printing caseId: {}", sscsCaseDataCallback.getCaseDetails().getId(), e);
-                updateCaseToFlagError(caseData);
-            }
-            updateCaseToSentToDwp(sscsCaseDataCallback, caseData, bulkPrintInfo);
-
+            sendToDwpPath(sscsCaseDataCallback, caseData);
         } else {
-            log.info("Feature flag turned off for sending to DWP. Skipping evidence share for case id {}",
-                sscsCaseDataCallback.getCaseDetails().getId());
-            if (sscsCaseDataCallback.getCaseDetails().getState().toString().equals(State.VALID_APPEAL.toString())) {
-                log.info("Sending case back to appeal created so it is in correct state for old workflow for case id {}",
-                    sscsCaseDataCallback.getCaseDetails().getId());
-                ccdService.updateCase(caseData,
-                    Long.valueOf(caseData.getCcdCaseId()),
-                    EventType.MOVE_TO_APPEAL_CREATED.getCcdType(),
-                    "Case created", "Sending back to appealCreated state",
-                    idamService.getIdamTokens());
-            }
+            noSendToDwpPath(sscsCaseDataCallback, caseData);
         }
+    }
+
+    private void noSendToDwpPath(Callback<SscsCaseData> sscsCaseDataCallback, SscsCaseData caseData) {
+        log.info("Feature flag turned off for sending to DWP. Skipping evidence share for case id {}",
+            sscsCaseDataCallback.getCaseDetails().getId());
+        if (sscsCaseDataCallback.getCaseDetails().getState().toString().equals(State.VALID_APPEAL.toString())) {
+            log.info("Sending case back to appeal created so it is in correct state for old workflow for case id {}",
+                sscsCaseDataCallback.getCaseDetails().getId());
+            ccdService.updateCase(caseData,
+                Long.valueOf(caseData.getCcdCaseId()),
+                EventType.MOVE_TO_APPEAL_CREATED.getCcdType(),
+                "Case created", "Sending back to appealCreated state",
+                idamService.getIdamTokens());
+        }
+    }
+
+    private void sendToDwpPath(Callback<SscsCaseData> sscsCaseDataCallback, SscsCaseData caseData) {
+        BulkPrintInfo bulkPrintInfo = null;
+        try {
+            roboticsHandler.sendCaseToRobotics(caseData);
+            bulkPrintInfo = bulkPrintCase(sscsCaseDataCallback);
+        } catch (Exception e) {
+            log.info("Error when bulk-printing caseId: {}", sscsCaseDataCallback.getCaseDetails().getId(), e);
+            updateCaseToFlagError(caseData);
+        }
+        updateCaseToSentToDwp(sscsCaseDataCallback, caseData, bulkPrintInfo);
     }
 
     private void updateCaseToFlagError(SscsCaseData caseData) {
