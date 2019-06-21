@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
 import static io.restassured.RestAssured.baseURI;
-import static org.slf4j.LoggerFactory.getLogger;
 
 import helper.EnvironmentProfileValueSource;
 import io.restassured.RestAssured;
@@ -10,13 +9,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
@@ -30,14 +28,11 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @ProfileValueSourceConfiguration(EnvironmentProfileValueSource.class)
 public abstract class AbstractFunctionalTest {
-
-    private static final Logger log = getLogger(AuthorisationService.class);
 
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
     @ClassRule
@@ -57,12 +52,12 @@ public abstract class AbstractFunctionalTest {
 
     String ccdCaseId;
 
-    private final String tcaInstance = System.getenv("TEST_URL");
-    private final String localInstance = "http://localhost:8091";
+    @Value("${test-url}")
+    private String testUrl;
 
     @Before
     public void setup() {
-        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
+        baseURI = testUrl;
         idamTokens = idamService.getIdamTokens();
     }
 
