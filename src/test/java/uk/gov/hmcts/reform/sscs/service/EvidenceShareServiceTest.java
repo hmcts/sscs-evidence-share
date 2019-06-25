@@ -169,7 +169,7 @@ public class EvidenceShareServiceTest {
 
         then(ccdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwp"), any(), any(), any());
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
@@ -190,7 +190,7 @@ public class EvidenceShareServiceTest {
 
         then(ccdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwp"), any(), any(), any());
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
 
 

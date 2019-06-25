@@ -218,7 +218,7 @@ public class EvidenceShareServiceIt {
 
         then(ccdService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), any(), eq("sendToDwp"), any(), any(), any());
+            .updateCase(caseDataCaptor.capture(), any(), eq("sendToDwpError"), any(), any(), any());
         assertNull(caseDataCaptor.getValue().getAppeal().getMrnDetails().getMrnDate());
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
 
