@@ -116,9 +116,9 @@ public class EvidenceShareService {
         caseData.setHmctsDwpState("failedSending");
         ccdService.updateCase(caseData,
             Long.valueOf(caseData.getCcdCaseId()),
-            EventType.SEND_TO_DWP.getCcdType(),
-            "Send to DWP",
-            "Send to DWP event has been triggered from Evidence Share service",
+            EventType.SENT_TO_DWP_ERROR.getCcdType(),
+            "Send to DWP Error",
+            "Send to DWP Error event has been triggered from Evidence Share service",
             idamService.getIdamTokens());
     }
 
