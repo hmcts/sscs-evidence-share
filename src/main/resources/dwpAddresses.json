@@ -81,13 +81,22 @@
       }
     }
   ],
-  "esa" : [
+  "esa": [
     {
       "code": "Balham DRT",
       "address": {
         "line1": "Mail Handling Site A",
         "line2": "WOLVERHAMPTON",
         "postCode": "WV98 1HJ"
+      }
+    },
+    {
+      "code": "Worthing DRT",
+      "address": {
+        "line1": "Worthing Benefit Centre",
+        "line2": "Post Handling Site B",
+        "line3": "WOLVERHAMPTON",
+        "postCode": "WV99 1QJ"
       }
     },
     {
@@ -188,7 +197,7 @@
       }
     }
   ],
-  "excela" : {
+  "excela": {
     "address": {
       "line1": "PO BOX XXX",
       "line2": "Exela BSP Services",
@@ -196,7 +205,7 @@
       "postCode": "CM19 5QS"
     }
   },
-  "test-hmcts-address" : {
+  "test-hmcts-address": {
     "address": {
       "line1": "Josh Greencroft",
       "line2": "3rd Floor, Aldgate Tower",
@@ -204,5 +213,4 @@
       "postCode": "E1 8FA"
     }
   }
-
 }
