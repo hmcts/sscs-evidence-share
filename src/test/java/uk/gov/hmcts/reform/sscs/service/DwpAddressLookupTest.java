@@ -38,7 +38,7 @@ public class DwpAddressLookupTest {
     @Parameters({
         "Balham DRT", "Birkenhead LM DRT", "Lowestoft DRT", "Wellingborough DRT", "Chesterfield DRT",
         "Coatbridge Benefit Centre", "Inverness DRT", "Milton Keynes DRT", "Springburn DRT", "Watford DRT",
-        "Norwich DRT", "Sheffield DRT"
+        "Norwich DRT", "Sheffield DRT", "Worthing DRT"
     })
     public void esaAddressesExist(final String dwpIssuingOffice) {
         DwpAddress address = dwpAddressLookup.lookup(ESA, dwpIssuingOffice);
