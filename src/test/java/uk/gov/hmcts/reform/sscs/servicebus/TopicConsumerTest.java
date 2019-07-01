@@ -1,11 +1,19 @@
 package uk.gov.hmcts.reform.sscs.servicebus;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.exception.*;
+import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.exception.ClientAuthorisationException;
+import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
+import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
+import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
 import uk.gov.hmcts.reform.sscs.service.EvidenceShareService;
 
 public class TopicConsumerTest {
@@ -17,51 +25,52 @@ public class TopicConsumerTest {
     private final EvidenceShareService evidenceShareService = mock(EvidenceShareService.class);
 
     private final TopicConsumer topicConsumer = new TopicConsumer(evidenceShareService, RETRY_THREE_TIMES);
+    private Exception exception;
 
     @Test
     public void bulkPrintExceptionWillBeCaught() {
-        BulkPrintException exception = new BulkPrintException(MESSAGE, EXCEPTION);
-        when(evidenceShareService.processMessage(any())).thenThrow(exception);
+        exception = new BulkPrintException(MESSAGE, EXCEPTION);
+        doThrow(exception).when(evidenceShareService).processMessage(any());
         topicConsumer.onMessage(MESSAGE);
         verify(evidenceShareService, atLeastOnce()).processMessage(any());
     }
 
     @Test
     public void pdfStoreExceptionWillBeCaught() {
-        PdfStoreException exception = new PdfStoreException(MESSAGE, EXCEPTION);
-        when(evidenceShareService.processMessage(any())).thenThrow(exception);
+        exception = new PdfStoreException(MESSAGE, EXCEPTION);
+        doThrow(exception).when(evidenceShareService).processMessage(any());
         topicConsumer.onMessage(MESSAGE);
         verify(evidenceShareService, atLeastOnce()).processMessage(any());
     }
 
     @Test
     public void dwpAddressLookupExceptionWillBeCaught() {
-        DwpAddressLookupException exception = new DwpAddressLookupException(MESSAGE);
-        when(evidenceShareService.processMessage(any())).thenThrow(exception);
+        exception = new DwpAddressLookupException(MESSAGE);
+        doThrow(exception).when(evidenceShareService).processMessage(any());
         topicConsumer.onMessage(MESSAGE);
         verify(evidenceShareService, atLeastOnce()).processMessage(any());
     }
 
     @Test
     public void noMrnDetailsExceptionWillBeCaught() {
-        NoMrnDetailsException exception = new NoMrnDetailsException(SscsCaseData.builder().ccdCaseId("123").build());
-        when(evidenceShareService.processMessage(any())).thenThrow(exception);
+        exception = new NoMrnDetailsException(SscsCaseData.builder().ccdCaseId("123").build());
+        doThrow(exception).when(evidenceShareService).processMessage(any());
         topicConsumer.onMessage(MESSAGE);
         verify(evidenceShareService, atLeastOnce()).processMessage(any());
     }
 
     @Test
     public void nullPointerExceptionWillBeCaught() {
-        NullPointerException exception = new NullPointerException();
-        when(evidenceShareService.processMessage(any())).thenThrow(exception);
+        exception = new NullPointerException();
+        doThrow(exception).when(evidenceShareService).processMessage(any());
         topicConsumer.onMessage(MESSAGE);
         verify(evidenceShareService, atLeast(RETRY_THREE_TIMES)).processMessage(any());
     }
 
     @Test
     public void clientAuthorisationExceptionWillBeCaught() {
-        ClientAuthorisationException exception = new ClientAuthorisationException(EXCEPTION);
-        when(evidenceShareService.processMessage(any())).thenThrow(exception);
+        exception = new ClientAuthorisationException(EXCEPTION);
+        doThrow(exception).when(evidenceShareService).processMessage(any());
         topicConsumer.onMessage(MESSAGE);
         verify(evidenceShareService, atLeast(RETRY_THREE_TIMES)).processMessage(any());
     }

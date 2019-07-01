@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,15 +26,18 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.model.BulkPrintInfo;
 
 @Component
 @Slf4j
 public class EvidenceShareService {
 
     private static final String DM_STORE_USER_ID = "sscs";
+    private static final String SENT_TO_DWP = "Sent to DWP";
 
     private final SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
@@ -77,54 +83,98 @@ public class EvidenceShareService {
         this.roboticsHandler = roboticsHandler;
     }
 
-    public Optional<UUID> processMessage(final String message) {
-
+    public void processMessage(final String message) {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(message);
-        final SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
-
+        SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
         if (sendToDwpFeature) {
+            BulkPrintInfo bulkPrintInfo = null;
+            try {
+                roboticsHandler.sendCaseToRobotics(caseData);
+                bulkPrintInfo = bulkPrintCase(sscsCaseDataCallback);
+            } catch (Exception e) {
+                log.info("Error when bulk-printing caseId: {}", sscsCaseDataCallback.getCaseDetails().getId(), e);
+                updateCaseToFlagError(caseData);
+            }
+            updateCaseToSentToDwp(sscsCaseDataCallback, caseData, bulkPrintInfo);
 
-            roboticsHandler.sendCaseToRobotics(sscsCaseDataCallback.getCaseDetails().getCaseData());
-
-            if (isAllowedReceivedTypeForBulkPrint(sscsCaseDataCallback.getCaseDetails().getCaseData())) {
-
-                log.info("Processing callback event {} for case id {}", sscsCaseDataCallback.getEvent(),
+        } else {
+            log.info("Feature flag turned off for sending to DWP. Skipping evidence share for case id {}",
+                sscsCaseDataCallback.getCaseDetails().getId());
+            if (sscsCaseDataCallback.getCaseDetails().getState().toString().equals(State.VALID_APPEAL.toString())) {
+                log.info("Sending case back to appeal created so it is in correct state for old workflow for case id {}",
                     sscsCaseDataCallback.getCaseDetails().getId());
-
-                DocumentHolder holder = documentRequestFactory.create(
-                    sscsCaseDataCallback.getCaseDetails().getCaseData(),
-                    sscsCaseDataCallback.getCaseDetails().getCreatedDate());
-
-                if (holder.getTemplate() != null) {
-                    log.info("Generating DL document for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
-
-                    IdamTokens idamTokens = idamService.getIdamTokens();
-                    documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
-                    List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
-
-                    log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
-                    caseData.setDateSentToDwp(LocalDate.now().toString());
-
-                    Optional<UUID> uuid = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
-
-                    String description = buildEventDescription(existingCasePdfs);
-                    ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.SENT_TO_DWP.getCcdType(), "Sent to DWP", description, idamService.getIdamTokens());
-                    log.info("Case sent to dwp for case id {} with returned value {}", sscsCaseDataCallback.getCaseDetails().getId(), uuid);
-                    return uuid;
-                }
-            } else {
-                log.info("Skipping bulk print. Sending straight to {} state for case id {}", EventType.SENT_TO_DWP.getCcdType(), sscsCaseDataCallback.getCaseDetails().getId());
-                ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP via Bulk Print", idamService.getIdamTokens());
-                return Optional.empty();
+                ccdService.updateCase(caseData,
+                    Long.valueOf(caseData.getCcdCaseId()),
+                    EventType.MOVE_TO_APPEAL_CREATED.getCcdType(),
+                    "Case created", "Sending back to appealCreated state",
+                    idamService.getIdamTokens());
             }
         }
-        log.info("Feature flag turned off for sending to DWP. Skipping evidence share for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
-        if (sscsCaseDataCallback.getCaseDetails().getState().toString().equals(State.VALID_APPEAL.toString())) {
-            log.info("Sending case back to appeal created so it is in correct state for old workflow for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
-            ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.MOVE_TO_APPEAL_CREATED.getCcdType(), "Case created", "Sending back to appealCreated state", idamService.getIdamTokens());
-        }
+    }
 
-        return Optional.empty();
+    private void updateCaseToFlagError(SscsCaseData caseData) {
+        caseData.setHmctsDwpState("failedSending");
+        ccdService.updateCase(caseData,
+            Long.valueOf(caseData.getCcdCaseId()),
+            EventType.SENT_TO_DWP_ERROR.getCcdType(),
+            "Send to DWP Error",
+            "Send to DWP Error event has been triggered from Evidence Share service",
+            idamService.getIdamTokens());
+    }
+
+    private void updateCaseToSentToDwp(Callback<SscsCaseData> sscsCaseDataCallback, SscsCaseData caseData,
+                                       BulkPrintInfo bulkPrintInfo) {
+        if (bulkPrintInfo != null) {
+            if (bulkPrintInfo.isAllowedTypeForBulkPrint()) {
+                ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
+                    EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
+                    idamService.getIdamTokens());
+                log.info("Case sent to dwp for case id {} with returned value {}",
+                    sscsCaseDataCallback.getCaseDetails().getId(), bulkPrintInfo.getUuid());
+            } else {
+                log.info("Skipping bulk print. Sending straight to {} state for case id {}",
+                    EventType.SENT_TO_DWP.getCcdType(), sscsCaseDataCallback.getCaseDetails().getId());
+                ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
+                    EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
+                    idamService.getIdamTokens());
+            }
+        }
+    }
+
+    private BulkPrintInfo bulkPrintCase(Callback<SscsCaseData> sscsCaseDataCallback) {
+        SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
+        if (isAllowedReceivedTypeForBulkPrint(sscsCaseDataCallback.getCaseDetails().getCaseData())) {
+            log.info("Processing callback event {} for case id {}", sscsCaseDataCallback.getEvent(),
+                sscsCaseDataCallback.getCaseDetails().getId());
+
+            DocumentHolder holder = documentRequestFactory.create(sscsCaseDataCallback.getCaseDetails().getCaseData(),
+                sscsCaseDataCallback.getCaseDetails().getCreatedDate());
+
+            if (holder.getTemplate() != null) {
+                log.info("Generating DL document for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
+
+                IdamTokens idamTokens = idamService.getIdamTokens();
+                documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
+                List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
+
+                log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
+                caseData.setDateSentToDwp(LocalDate.now().toString());
+                return BulkPrintInfo.builder()
+                    .uuid(bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData).orElse(null))
+                    .allowedTypeForBulkPrint(true)
+                    .desc(buildEventDescription(existingCasePdfs))
+                    .build();
+            }
+            throw new BulkPrintException(
+                format("Failed to send to bulk print for case %s because no template was found",
+                    caseData.getCcdCaseId()));
+        } else {
+            return BulkPrintInfo.builder()
+                .uuid(null)
+                .allowedTypeForBulkPrint(false)
+                .desc("Case has been sent to the DWP via Bulk Print")
+                .build();
+        }
     }
 
     private String buildEventDescription(List<Pdf> pdfs) {

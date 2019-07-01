@@ -37,8 +37,8 @@ sourceSets {
 
   smokeTest {
     java {
-      compileClasspath += main.output
-      runtimeClasspath += main.output
+      compileClasspath += main.output + test.output
+      runtimeClasspath += main.output + test.output
       srcDir file('src/smokeTest/java')
     }
     resources.srcDir file('src/smokeTest/resources')
@@ -61,8 +61,6 @@ task integration(type: Test, description: 'Runs the integration tests.', group: 
   testClassesDirs = sourceSets.integrationTest.output.classesDirs
   classpath = sourceSets.integrationTest.runtimeClasspath
 
-  // set your environment variables here
-  // environment("APPINSIGHTS_INSTRUMENTATIONKEY", "test-key")
 }
 
 task smoke(type: Test) {
@@ -76,6 +74,13 @@ configurations {
   integrationTestRuntime.extendsFrom(testRuntime)
   e2eCompile.extendsFrom(testCompile)
   e2eRuntime.extendsFrom(testRuntime)
+  smokeTestCompile.extendsFrom(testCompile)
+  smokeTestRuntime.extendsFrom(testRuntime)
+  
+  testCompile.exclude module: "android-json" 
+  testRuntime.exclude module: "android-json" 
+  integrationTestCompile.exclude module: "android-json"
+  integrationTestRuntime.exclude module: "android-json" 
 }
 
 checkstyle {
@@ -117,6 +122,7 @@ sonarqube {
       "src/main/java/uk/gov/hmcts/reform/sscs/config/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/servicebus/messaging/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
+      "src/main/java/uk/gov/hmcts/reform/sscs/model/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
       "src/main/java/uk/gov/hmcts/reform/sscs/SscsEvidenceShareApplication.java,"
@@ -182,8 +188,6 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
-  compile group: 'org.springframework.boot', name: 'spring-boot-starter-json'
-  compile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: versions.springBoot
 
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -203,13 +207,13 @@ dependencies {
 
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '2.2.0'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '2.0.0'
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.12'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.20'
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.0.11'
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version:  '1.0.5'
-  compile group: 'com.github.everit-org.json-schema', name: 'org.everit.json.schema', version: '1.11.1'
 
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
+  
   integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
 
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
@@ -220,14 +224,18 @@ dependencies {
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testCompile group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
 
+  compile 'org.projectlombok:lombok:1.18.8'
+  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+  testCompileOnly 'org.projectlombok:lombok:1.18.8'
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  integrationTestCompile sourceSets.main.runtimeClasspath
-  integrationTestCompile sourceSets.test.runtimeClasspath
+  e2eCompileOnly 'org.projectlombok:lombok:1.18.8'
+  e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  e2eCompile sourceSets.main.runtimeClasspath
+  integrationTestCompileOnly 'org.projectlombok:lombok:1.18.8'
+  integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  smokeTestCompile sourceSets.main.runtimeClasspath
 }
 
 dependencyManagement {
