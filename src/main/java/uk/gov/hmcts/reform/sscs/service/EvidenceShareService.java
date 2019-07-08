@@ -21,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
@@ -57,8 +56,8 @@ public class EvidenceShareService {
 
     private final RoboticsHandler roboticsHandler;
 
-    @Value("${feature.send_to_dwp}")
-    private Boolean sendToDwpFeature;
+    @Value("${send-letter.enabled}")
+    private Boolean bulkPrintFeature;
 
     @Autowired
     public EvidenceShareService(
@@ -86,30 +85,20 @@ public class EvidenceShareService {
     public void processMessage(final String message) {
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(message);
         SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
-        if (sendToDwpFeature) {
-            BulkPrintInfo bulkPrintInfo = null;
-            try {
-                roboticsHandler.sendCaseToRobotics(caseData);
-                bulkPrintInfo = bulkPrintCase(sscsCaseDataCallback);
-            } catch (Exception e) {
-                log.info("Error when bulk-printing caseId: {}", sscsCaseDataCallback.getCaseDetails().getId(), e);
-                updateCaseToFlagError(caseData);
-            }
-            updateCaseToSentToDwp(sscsCaseDataCallback, caseData, bulkPrintInfo);
+        BulkPrintInfo bulkPrintInfo = null;
 
-        } else {
-            log.info("Feature flag turned off for sending to DWP. Skipping evidence share for case id {}",
-                sscsCaseDataCallback.getCaseDetails().getId());
-            if (sscsCaseDataCallback.getCaseDetails().getState().toString().equals(State.VALID_APPEAL.toString())) {
-                log.info("Sending case back to appeal created so it is in correct state for old workflow for case id {}",
-                    sscsCaseDataCallback.getCaseDetails().getId());
-                ccdService.updateCase(caseData,
-                    Long.valueOf(caseData.getCcdCaseId()),
-                    EventType.MOVE_TO_APPEAL_CREATED.getCcdType(),
-                    "Case created", "Sending back to appealCreated state",
-                    idamService.getIdamTokens());
-            }
+        log.info("Processing event {} for case id {} in evidence share service", sscsCaseDataCallback.getEvent(),
+            sscsCaseDataCallback.getCaseDetails().getId());
+
+        try {
+            roboticsHandler.sendCaseToRobotics(caseData);
+            bulkPrintInfo = bulkPrintCase(sscsCaseDataCallback);
+        } catch (Exception e) {
+            log.info("Error when bulk-printing caseId: {}", sscsCaseDataCallback.getCaseDetails().getId(), e);
+            updateCaseToFlagError(caseData);
         }
+        updateCaseToSentToDwp(sscsCaseDataCallback, caseData, bulkPrintInfo);
+
     }
 
     private void updateCaseToFlagError(SscsCaseData caseData) {
@@ -144,8 +133,8 @@ public class EvidenceShareService {
     private BulkPrintInfo bulkPrintCase(Callback<SscsCaseData> sscsCaseDataCallback) {
         SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
         if (isAllowedReceivedTypeForBulkPrint(sscsCaseDataCallback.getCaseDetails().getCaseData())) {
-            log.info("Processing callback event {} for case id {}", sscsCaseDataCallback.getEvent(),
-                sscsCaseDataCallback.getCaseDetails().getId());
+
+            log.info("Processing bulk print tasks for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
 
             DocumentHolder holder = documentRequestFactory.create(sscsCaseDataCallback.getCaseDetails().getCaseData(),
                 sscsCaseDataCallback.getCaseDetails().getCreatedDate());
@@ -169,10 +158,12 @@ public class EvidenceShareService {
                 format("Failed to send to bulk print for case %s because no template was found",
                     caseData.getCcdCaseId()));
         } else {
+            log.info("Case not valid to send to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
+
             return BulkPrintInfo.builder()
                 .uuid(null)
                 .allowedTypeForBulkPrint(false)
-                .desc("Case has been sent to the DWP via Bulk Print")
+                .desc("Case state is now sent to DWP")
                 .build();
         }
     }
@@ -191,6 +182,7 @@ public class EvidenceShareService {
         return nonNull(caseData)
             && nonNull(caseData.getAppeal())
             && nonNull(caseData.getAppeal().getReceivedVia())
+            && bulkPrintFeature
             && evidenceShareConfig.getSubmitTypes().stream()
             .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
     }

@@ -93,11 +93,6 @@ variable "appeal_email_smtp_ssl_trust" {
   default = "*"
 }
 
-variable "send_to_dwp_enabled" {
-  type    = "string"
-  default = "false"
-}
-
 variable "feature_rpc_email_robotics" {
   default = "true"
 }

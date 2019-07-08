@@ -122,6 +122,7 @@ public class EvidenceShareServiceIt {
     public void setup() {
         message = new MimeMessage(session);
         when(mailSender.createMimeMessage()).thenReturn(message);
+        ReflectionTestUtils.setField(evidenceShareService, "bulkPrintFeature", true);
     }
 
     @Test
@@ -207,7 +208,6 @@ public class EvidenceShareServiceIt {
     public void appealWithNoMrnDate_shouldNotGenerateTemplateOrAddToCcdAndShouldUpdateCaseWithSecondaryState()
         throws IOException {
         assertNotNull("evidenceShareService must be autowired", evidenceShareService);
-        ReflectionTestUtils.setField(evidenceShareService, "sendToDwpFeature", true);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("appealReceivedCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -239,7 +239,7 @@ public class EvidenceShareServiceIt {
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case has been sent to the DWP via Bulk Print"), any());
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to DWP"), any());
     }
 
     private String updateMrnDate(String json, String updatedDate) {
