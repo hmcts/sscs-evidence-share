@@ -200,7 +200,7 @@ dependencies {
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.1.1.RELEASE'
 
   compile group: 'org.springframework', name: 'spring-jms'
-  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.43.0'
+  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.44.0'
   compileOnly 'org.projectlombok:lombok:1.18.8'
 
   annotationProcessor "org.projectlombok:lombok:1.18.6"
