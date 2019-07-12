@@ -38,6 +38,7 @@ public class TopicConsumer {
 
     private void processMessageWithRetry(String message, int retry) {
         try {
+            log.info("Message received from the service bus by evidence share service");
             processMessage(message);
         } catch (Exception e) {
             if (retry > maxRetryAttempts) {

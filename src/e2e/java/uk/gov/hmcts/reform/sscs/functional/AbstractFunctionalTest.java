@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
@@ -35,7 +34,6 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
-@ActiveProfiles("functional")
 @ProfileValueSourceConfiguration(EnvironmentProfileValueSource.class)
 public abstract class AbstractFunctionalTest {
 
@@ -55,9 +53,9 @@ public abstract class AbstractFunctionalTest {
     private IdamTokens idamTokens;
 
     @Autowired
-    protected CcdService ccdService;
+    private CcdService ccdService;
 
-    protected String ccdCaseId;
+    String ccdCaseId;
 
     private final String tcaInstance = System.getenv("TEST_URL");
     private final String localInstance = "http://localhost:8091";
@@ -68,25 +66,30 @@ public abstract class AbstractFunctionalTest {
         idamTokens = idamService.getIdamTokens();
     }
 
-    protected void createCaseInSendingToDwpState() {
+    void createCaseWithValidAppealState() {
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
-        SscsCaseData caseData = minimalCaseData.toBuilder().appeal(minimalCaseData.getAppeal().toBuilder()
-            .benefitType(BenefitType.builder().code("PIP").description("Personal Independence Payment").build())
-
-            .receivedVia("Paper")
-            .build()).build();
+        SscsCaseData caseData = minimalCaseData.toBuilder()
+            .appeal(minimalCaseData.getAppeal().toBuilder()
+                .benefitType(BenefitType.builder()
+                    .code("PIP")
+                    .description("Personal Independence Payment")
+                    .build())
+                .receivedVia("Paper")
+                .build())
+            .build();
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, "validAppealCreated",
-            "Evidence share service send to DWP test", "Evidence share service send to DWP case created", idamTokens);
+            "Evidence share service send to DWP test",
+            "Evidence share service send to DWP case created", idamTokens);
         ccdCaseId = String.valueOf(caseDetails.getId());
     }
 
 
-    protected SscsCaseDetails findCaseById(String ccdCaseId) {
+    SscsCaseDetails findCaseById(String ccdCaseId) {
         return ccdService.getByCaseId(Long.valueOf(ccdCaseId), idamTokens);
     }
 
-    protected String getJson(EventType eventType) throws IOException {
-        String resource = eventType.getCcdType()  + "Callback.json";
+    String getJson(EventType eventType) throws IOException {
+        String resource = eventType.getCcdType() + "Callback.json";
         String file = getClass().getClassLoader().getResource(resource).getFile();
         return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
     }
@@ -96,13 +99,13 @@ public abstract class AbstractFunctionalTest {
 
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured
-                .given()
-                .header("ServiceAuthorization", "" + idamTokens.getServiceAuthorization())
-                .contentType("application/json")
-                .body(json)
-                .when()
-                .post(callbackUrl)
-                .then()
-                .statusCode(HttpStatus.OK.value());
+            .given()
+            .header("ServiceAuthorization", "" + idamTokens.getServiceAuthorization())
+            .contentType("application/json")
+            .body(json)
+            .when()
+            .post(callbackUrl)
+            .then()
+            .statusCode(HttpStatus.OK.value());
     }
 }

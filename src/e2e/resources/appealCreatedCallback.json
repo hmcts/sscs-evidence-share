@@ -83,7 +83,8 @@
         "address2": "Social Security & Child Support Appeals",
         "address3": "Administrative Support Centre",
         "postcode": "B16 6FR",
-        "city": "BIRMINGHAM"
+        "city": "BIRMINGHAM",
+        "email":"Birmingham-SYA-Receipts@justice.gov.uk"
       },
       "appeal": {
         "mrnDetails": {

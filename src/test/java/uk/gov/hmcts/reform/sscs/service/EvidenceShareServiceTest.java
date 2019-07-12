@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
@@ -16,6 +17,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -72,11 +74,12 @@ public class EvidenceShareServiceTest {
 
     @Before
     public void setUp() {
-        evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer, documentManagementServiceWrapper, documentRequestFactory,
-            evidenceManagementService, bulkPrintService, evidenceShareConfig, ccdCaseService, idamService, roboticsHandler);
+        evidenceShareService = new EvidenceShareService(sscsCaseCallbackDeserializer, documentManagementServiceWrapper,
+            documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig,
+            ccdCaseService, idamService, roboticsHandler);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(Collections.singletonList("paper"));
 
-        ReflectionTestUtils.setField(evidenceShareService, "sendToDwpFeature", true);
+        ReflectionTestUtils.setField(evidenceShareService, "bulkPrintFeature", true);
     }
 
     @Test
@@ -126,16 +129,54 @@ public class EvidenceShareServiceTest {
         when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
             .thenReturn(expectedOptionalUuid);
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
-
-        assertEquals(expectedOptionalUuid, optionalUuid);
+        evidenceShareService.processMessage(MY_JSON_DATA);
 
         verify(roboticsHandler).sendCaseToRobotics(any());
         verify(evidenceManagementService, times(2)).download(eq(URI.create(docUrl)), any());
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any());
 
-        String documentList =  "Case has been sent to the DWP via Bulk Print with documents: evidence1.pdf, evidence2.pdf";
+        String documentList = "Case has been sent to the DWP via Bulk Print with documents: evidence1.pdf, evidence2.pdf";
         verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq(documentList), any());
+    }
+
+    @Test
+    public void givenAnErrorWhenSendToBulkPrint_shouldUpdateCaseInCcdToFlagError() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper",
+            null, APPEAL_CREATED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
+
+        ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        evidenceShareService.processMessage(MY_JSON_DATA);
+
+        then(ccdCaseService)
+            .should(times(1))
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
+    }
+
+    @Test
+    public void givenNoTemplates_shouldThrowAnExceptionAndFlagError() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper",
+            null, APPEAL_CREATED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
+
+        ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+        when(documentRequestFactory.create(caseDetails.getCaseData(), now))
+            .thenReturn(DocumentHolder.builder()
+                .template(null)
+                .build());
+
+        evidenceShareService.processMessage(MY_JSON_DATA);
+
+        then(ccdCaseService)
+            .should(times(1))
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
+
+
     }
 
     @Test
@@ -152,12 +193,10 @@ public class EvidenceShareServiceTest {
 
         when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
+        evidenceShareService.processMessage(MY_JSON_DATA);
 
         verifyNoMoreInteractions(documentManagementServiceWrapper);
         verify(roboticsHandler).sendCaseToRobotics(any());
-
-        assertEquals(Optional.empty(), optionalUuid);
     }
 
     @Test
@@ -167,42 +206,25 @@ public class EvidenceShareServiceTest {
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
+        evidenceShareService.processMessage(MY_JSON_DATA);
 
         verify(roboticsHandler).sendCaseToRobotics(any());
         verifyNoMoreInteractions(documentManagementServiceWrapper);
-        assertEquals(Optional.empty(), optionalUuid);
     }
 
-    @Test
-    public void givenSendToDwpFeatureFlagIsOffAndEventNotValidAppealCreated_doNotProcess() {
-        ReflectionTestUtils.setField(evidenceShareService, "sendToDwpFeature", false);
-
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null, APPEAL_CREATED);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SYA_APPEAL_CREATED);
-        when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
-
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
-
-        verifyNoMoreInteractions(roboticsHandler);
-        verifyNoMoreInteractions(documentManagementServiceWrapper);
-        assertEquals(Optional.empty(), optionalUuid);
-    }
 
     @Test
-    public void givenSendToDwpFeatureFlagIsOffAndEventIsValidAppealCreated_doNotProcess() {
-        ReflectionTestUtils.setField(evidenceShareService, "sendToDwpFeature", false);
+    public void givenBulkPrintFeatureFlagIsOff_doNotProcess() {
+        ReflectionTestUtils.setField(evidenceShareService, "bulkPrintFeature", false);
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null, VALID_APPEAL);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED);
         when(sscsCaseCallbackDeserializer.deserialize(eq(MY_JSON_DATA))).thenReturn(callback);
 
-        Optional<UUID> optionalUuid = evidenceShareService.processMessage(MY_JSON_DATA);
+        evidenceShareService.processMessage(MY_JSON_DATA);
 
-        assertEquals(Optional.empty(), optionalUuid);
-        verifyNoMoreInteractions(roboticsHandler);
-        verifyNoMoreInteractions(documentManagementServiceWrapper);
-        verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.MOVE_TO_APPEAL_CREATED.getCcdType()), eq("Case created"), eq("Sending back to appealCreated state"), any());
+        verifyNoMoreInteractions(bulkPrintService);
+        verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case state is now sent to DWP"), eq(null));
     }
 
     private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments, State state) {
