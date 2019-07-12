@@ -6,4 +6,8 @@ public class BulkPrintException extends RuntimeException {
     public BulkPrintException(String message, Throwable exception) {
         super(message, exception);
     }
+
+    public BulkPrintException(String message) {
+        super(message);
+    }
 }
