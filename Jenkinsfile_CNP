@@ -30,6 +30,7 @@ def secrets = [
     secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
     secret('robotics-email-from', 'ROBOTICS_EMAIL_FROM'),
     secret('robotics-email-to', 'ROBOTICS_EMAIL_TO'),
+    secret('robotics-email-scottish-to', 'ROBOTICS_EMAIL_SCOTTISH_TO'),
 
   ]
 ]
