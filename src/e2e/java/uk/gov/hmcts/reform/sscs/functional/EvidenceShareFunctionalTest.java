@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
-import static org.junit.Assert.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -22,7 +23,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
         createCaseWithValidAppealState();
 
-        String json = getJson(SYA_APPEAL_CREATED);
+        String json = getJson(SEND_TO_DWP);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
 
@@ -42,7 +43,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     public void processAnAppealWithNoValidMrnDate_shouldNoTBeSentToDwpAndShouldBeUpdatedToFlagError() throws IOException {
         createCaseWithValidAppealState();
 
-        String json = getJson(SYA_APPEAL_CREATED);
+        String json = getJson(SEND_TO_DWP);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", "");
 
@@ -59,7 +60,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
         createCaseWithValidAppealState();
 
-        String json = getJson(SYA_APPEAL_CREATED);
+        String json = getJson(SEND_TO_DWP);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
 

@@ -1,30 +1,37 @@
 package uk.gov.hmcts.reform.sscs.servicebus;
 
 import static java.lang.String.format;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
-import uk.gov.hmcts.reform.sscs.service.EvidenceShareService;
 
 @Slf4j
 @Component
 @Lazy(false)
 public class TopicConsumer {
 
-    private final EvidenceShareService evidenceShareService;
     private final Integer maxRetryAttempts;
+    private final CallbackDispatcher dispatcher;
+    private final SscsCaseCallbackDeserializer sscsDeserializer;
 
-    public TopicConsumer(final EvidenceShareService evidenceShareService,
-                         @Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts) {
-        this.evidenceShareService = evidenceShareService;
+    public TopicConsumer(@Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts,
+                         CallbackDispatcher dispatcher,
+                         SscsCaseCallbackDeserializer sscsDeserializer) {
         this.maxRetryAttempts = maxRetryAttempts;
+        this.dispatcher = dispatcher;
+        this.sscsDeserializer = sscsDeserializer;
     }
 
     @JmsListener(
@@ -54,7 +61,10 @@ public class TopicConsumer {
 
     private void processMessage(String message) {
         try {
-            evidenceShareService.processMessage(message);
+            Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
+
+            dispatcher.handle(SUBMITTED, callback);
+            log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
         } catch (PdfStoreException | BulkPrintException | DwpAddressLookupException | NoMrnDetailsException exception) {
             // unrecoverable. Catch to remove it from the queue.
             log.error(format("Caught unrecoverable error: %s", exception.getMessage()), exception);

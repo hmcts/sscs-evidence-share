@@ -1,8 +1,8 @@
 {
   "case_details": {
-    "id": 12345656789,
+    "id": "CASE_ID_TO_BE_REPLACED",
     "jurisdiction": "SSCS",
-    "state": "appealCreated",
+    "state": "validAppealCreated",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
@@ -83,10 +83,14 @@
         "address2": "Social Security & Child Support Appeals",
         "address3": "Administrative Support Centre",
         "postcode": "B16 6FR",
-        "city": "BIRMINGHAM"
+        "city": "BIRMINGHAM",
+        "email":"Birmingham-SYA-Receipts@justice.gov.uk"
       },
       "appeal": {
-        "mrnDetails": {},
+        "mrnDetails": {
+          "dwpIssuingOffice": "test-hmcts-address",
+          "mrnDate": "MRN_DATE_TO_BE_REPLACED"
+        },
         "appellant": {
           "name": {
             "title": "Miss",
@@ -109,14 +113,13 @@
             "dob": "1900-01-01",
             "nino": "JT 12 34 56 D"
           },
-          "appointee": null,
-          "isAddressSameAsAppointee" : null
+          "isAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "PIP",
+          "description": "Personal Independence Payment"
         },
-        "receivedVia": "PAPER",
+        "receivedVia": "Paper",
         "hearingOptions": {
           "wantsToAttend": "No",
           "other": "No"
@@ -597,5 +600,5 @@
     }
   },
   "case_details_before": null,
-  "event_id": "appealReceived"
+  "event_id": "sendToDwp"
 }

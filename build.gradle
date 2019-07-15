@@ -46,7 +46,7 @@ sourceSets {
 }
 
 tasks.withType(JavaCompile) {
-  options.compilerArgs << "-Xlint:unchecked" << "-Werror"
+  options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked"
 }
 
 task functional(type: Test) {
