@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +34,10 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && priority == DispatchPriority.EARLIEST
-            && (callback.getEvent() == EventType.SEND_TO_DWP
-            || callback.getEvent() == EventType.VALID_APPEAL
-            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL);
+            && (callback.getEvent() == SEND_TO_DWP
+            || callback.getEvent() == VALID_APPEAL
+                || callback.getEvent() == INTERLOC_VALID_APPEAL
+            || callback.getEvent() == CREATE_APPEAL_PDF);
     }
 
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback, DispatchPriority priority) {

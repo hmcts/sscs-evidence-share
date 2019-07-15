@@ -48,6 +48,27 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
+    public void givenAValidAppealEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL);
+
+        assertTrue(handler.canHandle(SUBMITTED, callback, EARLIEST));
+    }
+
+    @Test
+    public void givenAInterlocValidAppealEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.INTERLOC_VALID_APPEAL);
+
+        assertTrue(handler.canHandle(SUBMITTED, callback, EARLIEST));
+    }
+
+    @Test
+    public void givenACreateAppealPdfEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.CREATE_APPEAL_PDF);
+
+        assertTrue(handler.canHandle(SUBMITTED, callback, EARLIEST));
+    }
+
+    @Test
     public void givenANonRoboticsEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
