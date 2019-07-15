@@ -76,11 +76,11 @@ configurations {
   e2eRuntime.extendsFrom(testRuntime)
   smokeTestCompile.extendsFrom(testCompile)
   smokeTestRuntime.extendsFrom(testRuntime)
-  
-  testCompile.exclude module: "android-json" 
-  testRuntime.exclude module: "android-json" 
+
+  testCompile.exclude module: "android-json"
+  testRuntime.exclude module: "android-json"
   integrationTestCompile.exclude module: "android-json"
-  integrationTestRuntime.exclude module: "android-json" 
+  integrationTestRuntime.exclude module: "android-json"
 }
 
 checkstyle {
@@ -185,6 +185,7 @@ def versions = [
 ]
 
 dependencies {
+  compile group: 'com.google.guava', name: 'guava', version: '27.1-jre' //to remove CVE-2018-10237
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
