@@ -92,7 +92,3 @@ variable "appeal_email_smtp_ssl_trust" {
   type    = "string"
   default = "*"
 }
-
-variable "feature_rpc_email_robotics" {
-  default = "true"
-}

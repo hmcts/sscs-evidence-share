@@ -21,7 +21,7 @@
     <Class name="uk.gov.hmcts.reform.sscs.service.EvidenceShareService">
       <Method name="processMessage" reportCaughtExceptions="true" reportExecutionTime="true"/>
     </Class>
-    <Class name="uk.gov.hmcts.reform.sscs.service.RoboticsHandler">
+    <Class name="uk.gov.hmcts.reform.sscs.service.RoboticsService">
       <Method name="sendCaseToRobotics" reportCaughtExceptions="true" reportExecutionTime="true"/>
     </Class>
   </Instrumentation>

@@ -107,7 +107,7 @@ public class EvidenceShareServiceIt {
     private BulkPrintService bulkPrintService;
 
     @MockBean
-    private RoboticsHandler roboticsHandler;
+    private RoboticsService roboticsService;
 
     @Autowired
     private SendToBulkPrintHandler bulkPrintHandler;
@@ -173,7 +173,7 @@ public class EvidenceShareServiceIt {
         verify(evidenceManagementService).upload(any(), eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
-        verify(roboticsHandler).sendCaseToRobotics(any());
+        verify(roboticsService).sendCaseToRobotics(any());
 
         verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
     }
@@ -213,7 +213,7 @@ public class EvidenceShareServiceIt {
         verify(evidenceManagementService).upload(any(), eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
-        verify(roboticsHandler).sendCaseToRobotics(any());
+        verify(roboticsService).sendCaseToRobotics(any());
 
         verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
     }
@@ -238,7 +238,7 @@ public class EvidenceShareServiceIt {
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
-        verify(roboticsHandler).sendCaseToRobotics(any());
+        verify(roboticsService).sendCaseToRobotics(any());
     }
 
     @Test
@@ -255,7 +255,7 @@ public class EvidenceShareServiceIt {
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
         verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to DWP"), any());
-        verify(roboticsHandler).sendCaseToRobotics(any());
+        verify(roboticsService).sendCaseToRobotics(any());
     }
 
     private String updateMrnDate(String json, String updatedDate) {

@@ -23,7 +23,7 @@ import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
 public class TopicConsumer {
 
     private final Integer maxRetryAttempts;
-    private final CallbackDispatcher dispatcher;
+    private final CallbackDispatcher<SscsCaseData> dispatcher;
     private final SscsCaseCallbackDeserializer sscsDeserializer;
 
     public TopicConsumer(@Value("${send-letter.maxRetryAttempts}") Integer maxRetryAttempts,

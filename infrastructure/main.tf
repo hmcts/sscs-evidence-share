@@ -163,6 +163,5 @@ module "sscs-evidence-share" {
     EMAIL_SMTP_TLS_ENABLED = "${var.appeal_email_smtp_tls_enabled}"
     EMAIL_SMTP_SSL_TRUST   = "${var.appeal_email_smtp_ssl_trust}"
 
-    FEATURE_RPC_EMAIL_ROBOTICS = "${var.feature_rpc_email_robotics}"
   }
 }

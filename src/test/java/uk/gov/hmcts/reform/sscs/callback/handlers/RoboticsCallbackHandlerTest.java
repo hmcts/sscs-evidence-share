@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.RoboticsHandler;
+import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @RunWith(JUnitParamsRunner.class)
 public class RoboticsCallbackHandlerTest {
@@ -29,7 +29,7 @@ public class RoboticsCallbackHandlerTest {
     private Callback<SscsCaseData> callback;
 
     @Mock
-    private RoboticsHandler roboticsHandler;
+    private RoboticsService roboticsService;
 
     private RoboticsCallbackHandler handler;
 
@@ -39,7 +39,7 @@ public class RoboticsCallbackHandlerTest {
     public void setUp() {
         initMocks(this);
         when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
-        handler = new RoboticsCallbackHandler(roboticsHandler);
+        handler = new RoboticsCallbackHandler(roboticsService);
     }
 
     @Test
@@ -87,7 +87,7 @@ public class RoboticsCallbackHandlerTest {
 
         handler.handle(SUBMITTED, callback, EARLIEST);
 
-        verify(roboticsHandler).sendCaseToRobotics(any());
+        verify(roboticsService).sendCaseToRobotics(any());
     }
 
     private CaseDetails<SscsCaseData> getCaseDetails(State state) {

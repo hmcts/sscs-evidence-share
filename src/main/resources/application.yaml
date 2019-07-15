@@ -95,9 +95,6 @@ docmosis:
     dl16:
       templateName: TB-SCS-GNO-ENG-00011.doc
 
-feature:
-  rpc_email_robotics: ${FEATURE_RPC_EMAIL_ROBOTICS:true}
-
 evidence-share:
   submit-types:
   - PAPER

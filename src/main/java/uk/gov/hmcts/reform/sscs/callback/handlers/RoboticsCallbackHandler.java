@@ -11,9 +11,8 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.RoboticsHandler;
+import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @Component
 @Slf4j
@@ -21,11 +20,11 @@ import uk.gov.hmcts.reform.sscs.service.RoboticsHandler;
 @Service
 public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
-    private final RoboticsHandler roboticsHandler;
+    private final RoboticsService roboticsService;
 
     @Autowired
-    public RoboticsCallbackHandler(RoboticsHandler roboticsHandler) {
-        this.roboticsHandler = roboticsHandler;
+    public RoboticsCallbackHandler(RoboticsService roboticsService) {
+        this.roboticsService = roboticsService;
     }
 
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback, DispatchPriority priority) {
@@ -44,7 +43,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         log.info("Processing robotics for case id {} in evidence share service", callback.getCaseDetails().getId());
 
         try {
-            roboticsHandler.sendCaseToRobotics(callback.getCaseDetails().getCaseData());
+            roboticsService.sendCaseToRobotics(callback.getCaseDetails().getCaseData());
         } catch (Exception e) {
             log.error("Error when sending to robotics: {}", callback.getCaseDetails().getId(), e);
         }

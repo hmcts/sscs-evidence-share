@@ -23,7 +23,7 @@ public class TopicConsumerTest {
     private static final int RETRY_THREE_TIMES = 3;
 
     @Mock
-    private CallbackDispatcher dispatcher;
+    private CallbackDispatcher<SscsCaseData> dispatcher;
 
     @Mock
     private SscsCaseCallbackDeserializer deserializer;
@@ -72,6 +72,7 @@ public class TopicConsumerTest {
     @Test
     public void nullPointerExceptionWillBeCaught() {
         exception = new NullPointerException();
+
         doThrow(exception).when(dispatcher).handle(any(), any());
         topicConsumer.onMessage(MESSAGE);
         verify(dispatcher, atLeast(RETRY_THREE_TIMES)).handle(any(), any());
