@@ -57,10 +57,17 @@
   </suppress>
   <suppress>
     <notes><![CDATA[
-            file name: jackson-databind-2.9.8.jar
-            We've upgraded to jackson-databind 2.9.9 but the dependecy check keeps flagging it, thus mark as false positive.
+            file name: jackson-databind-2.9.9.jar
         ]]></notes>
-    <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.9\.8$</gav>
-    <cve>CVE-2019-12086</cve>
+    <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.9\.9$</gav>
+    <cve>CVE-2019-12814</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+            file name: sscs-pdf-email-common-1.0.8.jar: jquery-1.11.3.js
+      ]]></notes>
+    <sha1>c041edaa88886863aa784de15170a08a2b9f17ba</sha1>
+    <cve>CVE-2015-9251</cve>
+    <cve>CVE-2019-11358</cve>
   </suppress>
 </suppressions>
