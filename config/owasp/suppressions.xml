@@ -64,8 +64,9 @@
   </suppress>
   <suppress>
     <notes><![CDATA[
-   From jquery-1.11.3.js, but cannot work out the regex.
-   ]]></notes>
+            file name: sscs-pdf-email-common-1.0.8.jar: jquery-1.11.3.js
+      ]]></notes>
+    <sha1>c041edaa88886863aa784de15170a08a2b9f17ba</sha1>
     <cve>CVE-2015-9251</cve>
     <cve>CVE-2019-11358</cve>
   </suppress>
