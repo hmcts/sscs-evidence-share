@@ -48,6 +48,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.callback.handlers.RoboticsCallbackHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -59,6 +61,7 @@ import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
@@ -103,8 +106,17 @@ public class EvidenceShareServiceIt {
     @MockBean
     private BulkPrintService bulkPrintService;
 
+    @MockBean
+    private RoboticsService roboticsService;
+
     @Autowired
-    private EvidenceShareService evidenceShareService;
+    private SendToBulkPrintHandler bulkPrintHandler;
+
+    @Autowired
+    private RoboticsCallbackHandler roboticsCallbackHandler;
+
+    @Autowired
+    private TopicConsumer topicConsumer;
 
     @Captor
     ArgumentCaptor<ArrayList<Pdf>> documentCaptor;
@@ -122,14 +134,14 @@ public class EvidenceShareServiceIt {
     public void setup() {
         message = new MimeMessage(session);
         when(mailSender.createMimeMessage()).thenReturn(message);
-        ReflectionTestUtils.setField(evidenceShareService, "bulkPrintFeature", true);
+        ReflectionTestUtils.setField(bulkPrintHandler, "bulkPrintFeature", true);
     }
 
     @Test
-    public void appealWithMrnDateWithin30Days_shouldGenerateDL6TemplateAndAndAddToCaseInCcdAndSendToBulkPrintInCorrectOrder() throws IOException {
-        assertNotNull("evidenceShareService must be autowired", evidenceShareService);
+    public void appealWithMrnDateWithin30Days_shouldGenerateDL6TemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrintInCorrectOrder() throws IOException {
+        assertNotNull("SendToBulkPrintHandler must be autowired", bulkPrintHandler);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("appealReceivedCallbackWithMrn.json")).getFile();
+            .getResource("sendToDwpCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = updateMrnDate(json, LocalDate.now().toString());
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
@@ -150,7 +162,7 @@ public class EvidenceShareServiceIt {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        evidenceShareService.processMessage(json);
+        topicConsumer.onMessage(json);
 
         assertEquals(3, documentCaptor.getValue().size());
         assertEquals("dl6-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -161,15 +173,16 @@ public class EvidenceShareServiceIt {
         verify(evidenceManagementService).upload(any(), eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
+        verify(roboticsService).sendCaseToRobotics(any());
 
         verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
     }
 
     @Test
-    public void appealWithMrnDateOlderThan30Days_shouldGenerateDL16TemplateAndAndAddToCaseInCcdAndSendToBulkPrint() throws IOException {
-        assertNotNull("evidenceShareService must be autowired", evidenceShareService);
+    public void appealWithMrnDateOlderThan30Days_shouldGenerateDL16TemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
+        assertNotNull("SendToBulkPrintHandler must be autowired", bulkPrintHandler);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("appealReceivedCallbackWithMrn.json")).getFile();
+            .getResource("sendToDwpCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
 
@@ -189,7 +202,7 @@ public class EvidenceShareServiceIt {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        evidenceShareService.processMessage(json);
+        topicConsumer.onMessage(json);
 
         assertEquals(3, documentCaptor.getValue().size());
         assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -200,6 +213,7 @@ public class EvidenceShareServiceIt {
         verify(evidenceManagementService).upload(any(), eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
+        verify(roboticsService).sendCaseToRobotics(any());
 
         verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
     }
@@ -207,14 +221,14 @@ public class EvidenceShareServiceIt {
     @Test
     public void appealWithNoMrnDate_shouldNotGenerateTemplateOrAddToCcdAndShouldUpdateCaseWithSecondaryState()
         throws IOException {
-        assertNotNull("evidenceShareService must be autowired", evidenceShareService);
+        assertNotNull("SendToBulkPrintHandler must be autowired", bulkPrintHandler);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("appealReceivedCallback.json")).getFile();
+            .getResource("sendToDwpCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
-        evidenceShareService.processMessage(json);
+        topicConsumer.onMessage(json);
 
         then(ccdService)
             .should(times(1))
@@ -224,22 +238,24 @@ public class EvidenceShareServiceIt {
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
+        verify(roboticsService).sendCaseToRobotics(any());
     }
 
     @Test
     @Parameters({"ONLINE", "COR"})
     public void nonReceivedViaPaper_shouldNotBeBulkPrintedAndStateShouldBeUpdated(String receivedVia) throws IOException {
-        assertNotNull("evidenceShareService must be autowired", evidenceShareService);
+        assertNotNull("SendToBulkPrintHandler must be autowired", bulkPrintHandler);
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("appealReceivedCallback.json")).getFile();
+            .getResource("sendToDwpCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("PAPER", receivedVia);
-        evidenceShareService.processMessage(json);
 
+        topicConsumer.onMessage(json);
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
         verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to DWP"), any());
+        verify(roboticsService).sendCaseToRobotics(any());
     }
 
     private String updateMrnDate(String json, String updatedDate) {

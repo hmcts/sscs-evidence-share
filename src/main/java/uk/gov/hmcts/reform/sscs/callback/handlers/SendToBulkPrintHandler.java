@@ -1,7 +1,8 @@
-package uk.gov.hmcts.reform.sscs.service;
+package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -16,8 +17,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -30,15 +34,18 @@ import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.BulkPrintInfo;
+import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
+import uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @Component
 @Slf4j
-public class EvidenceShareService {
+
+@Service
+public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private static final String DM_STORE_USER_ID = "sscs";
     private static final String SENT_TO_DWP = "Sent to DWP";
-
-    private final SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer;
 
     private final DocumentManagementServiceWrapper documentManagementServiceWrapper;
 
@@ -54,24 +61,19 @@ public class EvidenceShareService {
 
     private final IdamService idamService;
 
-    private final RoboticsHandler roboticsHandler;
-
     @Value("${send-letter.enabled}")
     private Boolean bulkPrintFeature;
 
     @Autowired
-    public EvidenceShareService(
-        SscsCaseCallbackDeserializer sscsDeserializer,
+    public SendToBulkPrintHandler(
         DocumentManagementServiceWrapper documentManagementServiceWrapper,
         DocumentRequestFactory documentRequestFactory,
         EvidenceManagementService evidenceManagementService,
         BulkPrintService bulkPrintService,
         EvidenceShareConfig evidenceShareConfig,
         CcdService ccdService,
-        IdamService idamService,
-        RoboticsHandler roboticsHandler
+        IdamService idamService
     ) {
-        this.sscsCaseCallbackDeserializer = sscsDeserializer;
         this.documentManagementServiceWrapper = documentManagementServiceWrapper;
         this.documentRequestFactory = documentRequestFactory;
         this.evidenceManagementService = evidenceManagementService;
@@ -79,26 +81,33 @@ public class EvidenceShareService {
         this.evidenceShareConfig = evidenceShareConfig;
         this.ccdService = ccdService;
         this.idamService = idamService;
-        this.roboticsHandler = roboticsHandler;
     }
 
-    public void processMessage(final String message) {
-        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(message);
-        SscsCaseData caseData = sscsCaseDataCallback.getCaseDetails().getCaseData();
+    public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback, DispatchPriority priority) {
+        requireNonNull(callback, "callback must not be null");
+        requireNonNull(callbackType, "callbacktype must not be null");
+
+        return callbackType.equals(CallbackType.SUBMITTED)
+            && priority == DispatchPriority.LATEST
+            && (callback.getEvent() == EventType.SEND_TO_DWP
+            || callback.getEvent() == EventType.VALID_APPEAL
+            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL);
+    }
+
+    public void handle(CallbackType callbackType, Callback<SscsCaseData> callback, DispatchPriority priority) {
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         BulkPrintInfo bulkPrintInfo = null;
 
-        log.info("Processing event {} for case id {} in evidence share service", sscsCaseDataCallback.getEvent(),
-            sscsCaseDataCallback.getCaseDetails().getId());
+        log.info("Processing event {} for case id {} in evidence share service", callback.getEvent(),
+            callback.getCaseDetails().getId());
 
         try {
-            roboticsHandler.sendCaseToRobotics(caseData);
-            bulkPrintInfo = bulkPrintCase(sscsCaseDataCallback);
+            bulkPrintInfo = bulkPrintCase(callback);
         } catch (Exception e) {
-            log.info("Error when bulk-printing caseId: {}", sscsCaseDataCallback.getCaseDetails().getId(), e);
+            log.info("Error when bulk-printing caseId: {}", callback.getCaseDetails().getId(), e);
             updateCaseToFlagError(caseData);
         }
-        updateCaseToSentToDwp(sscsCaseDataCallback, caseData, bulkPrintInfo);
-
+        updateCaseToSentToDwp(callback, caseData, bulkPrintInfo);
     }
 
     private void updateCaseToFlagError(SscsCaseData caseData) {
