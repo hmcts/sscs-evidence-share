@@ -159,7 +159,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                     .desc(buildEventDescription(existingCasePdfs))
                     .build();
 
-                updateSscsDocumentsWithIssueFlag(sscsDocuments);
+                updateSscsDocumentsWithFurtherEvidenceIssuedFlag(sscsDocuments);
 
                 return info;
             }
@@ -236,10 +236,13 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         return Stream.concat(Stream.concat(dlDocs, appealDocs), allOtherDocs).collect(Collectors.toList());
     }
 
-    private void updateSscsDocumentsWithIssueFlag(List<SscsDocument> sscsDocuments) {
+    private void updateSscsDocumentsWithFurtherEvidenceIssuedFlag(List<SscsDocument> sscsDocuments) {
 
         for (SscsDocument doc : sscsDocuments) {
-            doc.getValue().setEvidenceIssued("Yes");
+            if (doc.getValue().getEvidenceIssued() != null && doc.getValue().getEvidenceIssued().equals("No")) {
+                // Only set to Yes if previous value was No (This is only set for further evidence)
+                doc.getValue().setEvidenceIssued("Yes");
+            }
         }
     }
 

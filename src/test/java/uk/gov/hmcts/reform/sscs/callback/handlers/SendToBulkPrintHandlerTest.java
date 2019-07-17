@@ -125,6 +125,7 @@ public class SendToBulkPrintHandlerTest {
                 .documentType("appellantEvidence")
                 .documentLink(DocumentLink.builder().documentUrl(docUrl)
                     .documentFilename(docPdf2.getName()).build())
+                .evidenceIssued("No")
                 .build()).build(),
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("filtered out word.doc")
@@ -163,7 +164,7 @@ public class SendToBulkPrintHandlerTest {
         verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq(documentList), any());
 
         List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
-        assertEquals("Yes", docs.get(0).getValue().getEvidenceIssued());
+        assertNull(docs.get(0).getValue().getEvidenceIssued());
         assertEquals("Yes", docs.get(1).getValue().getEvidenceIssued());
     }
 
