@@ -21,6 +21,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -74,6 +75,13 @@ public class SendToBulkPrintHandlerTest {
 
     private LocalDateTime now = LocalDateTime.now();
 
+    @Captor
+    private ArgumentCaptor<SscsCaseData> caseDataCaptor;
+
+    String docUrl = "my/1/url.pdf";
+    Pdf docPdf = new Pdf(docUrl.getBytes(), "evidence1.pdf");
+    Pdf docPdf2 = new Pdf(docUrl.getBytes(), "evidence2.pdf");
+
     @Before
     public void setUp() {
         when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
@@ -105,9 +113,6 @@ public class SendToBulkPrintHandlerTest {
     @Test
     public void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint() {
 
-        String docUrl = "my/1/url.pdf";
-        Pdf docPdf = new Pdf(docUrl.getBytes(), "evidence1.pdf");
-        Pdf docPdf2 = new Pdf(docUrl.getBytes(), "evidence2.pdf");
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(docPdf.getName())
@@ -120,6 +125,7 @@ public class SendToBulkPrintHandlerTest {
                 .documentType("appellantEvidence")
                 .documentLink(DocumentLink.builder().documentUrl(docUrl)
                     .documentFilename(docPdf2.getName()).build())
+                .evidenceIssued("No")
                 .build()).build(),
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("filtered out word.doc")
@@ -155,23 +161,37 @@ public class SendToBulkPrintHandlerTest {
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any());
 
         String documentList = "Case has been sent to the DWP via Bulk Print with documents: evidence1.pdf, evidence2.pdf";
-        verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq(documentList), any());
+        verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq(documentList), any());
+
+        List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
+        assertNull(docs.get(0).getValue().getEvidenceIssued());
+        assertEquals("Yes", docs.get(1).getValue().getEvidenceIssued());
     }
 
     @Test
     public void givenAnErrorWhenSendToBulkPrint_shouldUpdateCaseInCcdToFlagError() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper",
-            null, APPEAL_CREATED);
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
+            SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName(docPdf.getName())
+                .documentType("sscs1")
+                .evidenceIssued("No")
+                .documentLink(DocumentLink.builder().documentUrl(docUrl)
+                    .documentFilename(docPdf.getName()).build())
+                .build()).build()), APPEAL_CREATED);
+
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
 
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
         handler.handle(CallbackType.SUBMITTED, callback, DispatchPriority.LATEST);
-
         then(ccdCaseService)
             .should(times(1))
             .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
+
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
+
+        List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
+        assertEquals("No", docs.get(0).getValue().getEvidenceIssued());
     }
 
     @Test
@@ -180,7 +200,6 @@ public class SendToBulkPrintHandlerTest {
             null, APPEAL_CREATED);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
 
-        ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
         when(documentRequestFactory.create(caseDetails.getCaseData(), now))
             .thenReturn(DocumentHolder.builder()
                 .template(null)

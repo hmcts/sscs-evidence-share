@@ -123,18 +123,12 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     private void updateCaseToSentToDwp(Callback<SscsCaseData> sscsCaseDataCallback, SscsCaseData caseData,
                                        BulkPrintInfo bulkPrintInfo) {
         if (bulkPrintInfo != null) {
+            ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
+                EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
+                idamService.getIdamTokens());
             if (bulkPrintInfo.isAllowedTypeForBulkPrint()) {
-                ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
-                    EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
-                    idamService.getIdamTokens());
                 log.info("Case sent to dwp for case id {} with returned value {}",
                     sscsCaseDataCallback.getCaseDetails().getId(), bulkPrintInfo.getUuid());
-            } else {
-                log.info("Skipping bulk print. Sending straight to {} state for case id {}",
-                    EventType.SENT_TO_DWP.getCcdType(), sscsCaseDataCallback.getCaseDetails().getId());
-                ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
-                    EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
-                    idamService.getIdamTokens());
             }
         }
     }
@@ -153,15 +147,21 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
                 IdamTokens idamTokens = idamService.getIdamTokens();
                 documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
-                List<Pdf> existingCasePdfs = toPdf(caseData.getSscsDocument());
+                List<SscsDocument> sscsDocuments = getSscsDocumentsToPrint(caseData.getSscsDocument());
+                List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
 
                 log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
                 caseData.setDateSentToDwp(LocalDate.now().toString());
-                return BulkPrintInfo.builder()
+
+                BulkPrintInfo info = BulkPrintInfo.builder()
                     .uuid(bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData).orElse(null))
                     .allowedTypeForBulkPrint(true)
                     .desc(buildEventDescription(existingCasePdfs))
                     .build();
+
+                updateSscsDocumentsWithFurtherEvidenceIssuedFlag(sscsDocuments);
+
+                return info;
             }
             throw new BulkPrintException(
                 format("Failed to send to bulk print for case %s because no template was found",
@@ -196,7 +196,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
     }
 
-    private List<Pdf> toPdf(List<SscsDocument> sscsDocument) {
+    private List<SscsDocument> getSscsDocumentsToPrint(List<SscsDocument> sscsDocument) {
         if (sscsDocument == null) {
             return Collections.emptyList();
         }
@@ -208,17 +208,23 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                 && nonNull(doc.getValue().getDocumentType())
                 && nonNull(doc.getValue().getDocumentLink())
                 && nonNull(doc.getValue().getDocumentLink().getDocumentUrl())
+                && StringUtils.containsIgnoreCase(doc.getValue().getDocumentFileName(), ".pdf")
             );
 
-        Stream<SscsDocument> allDocs = buildStreamOfDocuments(sscsDocumentStream);
-
-        return allDocs.flatMap(doc -> StringUtils.containsIgnoreCase(doc.getValue().getDocumentFileName(), "pdf")
-            ? Stream.of(new Pdf(toBytes(doc), doc.getValue().getDocumentFileName()))
-            : Stream.empty()
-        ).collect(Collectors.toList());
+        return buildStreamOfDocuments(sscsDocumentStream);
     }
 
-    private Stream<SscsDocument> buildStreamOfDocuments(Supplier<Stream<SscsDocument>> sscsDocumentStream) {
+    private List<Pdf> toPdf(List<SscsDocument> sscsDocuments) {
+
+        List<Pdf> pdfs = new ArrayList<>();
+        for (SscsDocument doc : sscsDocuments) {
+            pdfs.add(new Pdf(toBytes(doc), doc.getValue().getDocumentFileName()));
+        }
+
+        return pdfs;
+    }
+
+    private List<SscsDocument> buildStreamOfDocuments(Supplier<Stream<SscsDocument>> sscsDocumentStream) {
         Stream<SscsDocument> dlDocs = sscsDocumentStream.get().filter(doc -> doc.getValue().getDocumentType().equals("dl6") || doc.getValue().getDocumentType().equals("dl16"));
 
         Stream<SscsDocument> appealDocs = sscsDocumentStream.get().filter(doc -> doc.getValue().getDocumentType().equals("sscs1"));
@@ -227,7 +233,17 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             && !doc.getValue().getDocumentType().equals("dl16")
             && !doc.getValue().getDocumentType().equals("sscs1"));
 
-        return Stream.concat(Stream.concat(dlDocs, appealDocs), allOtherDocs);
+        return Stream.concat(Stream.concat(dlDocs, appealDocs), allOtherDocs).collect(Collectors.toList());
+    }
+
+    private void updateSscsDocumentsWithFurtherEvidenceIssuedFlag(List<SscsDocument> sscsDocuments) {
+
+        for (SscsDocument doc : sscsDocuments) {
+            if (doc.getValue().getEvidenceIssued() != null && doc.getValue().getEvidenceIssued().equals("No")) {
+                // Only set to Yes if previous value was No (This is only set for further evidence)
+                doc.getValue().setEvidenceIssued("Yes");
+            }
+        }
     }
 
     private byte[] toBytes(SscsDocument sscsDocument) {
