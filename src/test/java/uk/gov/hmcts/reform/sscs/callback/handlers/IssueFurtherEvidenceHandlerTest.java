@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -36,6 +37,7 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     private Object[] generateDifferentTestScenarios() {
+
         SscsCaseData sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued = SscsCaseData.builder()
             .sscsDocument(Collections.singletonList(SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
@@ -54,9 +56,20 @@ public class IssueFurtherEvidenceHandlerTest {
                 .build()))
             .build();
 
+        SscsCaseData sscsCaseDataWithNoAppointeeAndDocTypeWithRepsEvidenceAndNoIssued = SscsCaseData.builder()
+            .sscsDocument(Collections.singletonList(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                    .documentType(REPRESENTATIVE_EVIDENCE.getValue())
+                    .evidenceIssued("No")
+                    .build())
+                .build()))
+            .build();
+
         return new Object[]{
             new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued, true},
-            new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndYesIssued, false}
+            new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndYesIssued, false},
+            new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithRepsEvidenceAndNoIssued, false},
+
         };
     }
 
