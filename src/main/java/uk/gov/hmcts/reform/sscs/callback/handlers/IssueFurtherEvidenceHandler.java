@@ -15,13 +15,18 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback, DispatchPriority priority) {
         requireNonNull(callback, "callback must not be null");
-        return validateCallback(callback.getCaseDetails().getCaseData().getSscsDocument());
+        return canHandleAnyDocument(callback.getCaseDetails().getCaseData().getSscsDocument());
     }
 
-    private boolean validateCallback(List<SscsDocument> sscsDocument) {
+    private boolean canHandleAnyDocument(List<SscsDocument> sscsDocument) {
+        return null != sscsDocument && sscsDocument.stream().anyMatch(this::canHandleDocument);
+    }
 
-        return sscsDocument != null && sscsDocument.get(0).getValue().getEvidenceIssued().equals("No")
-            && sscsDocument.get(0).getValue().getDocumentType().equals(DocumentType.APPELLANT_EVIDENCE.getValue());
+    private boolean canHandleDocument(SscsDocument sscsDocument) {
+
+        return sscsDocument != null && sscsDocument.getValue() != null
+            && "No".equals(sscsDocument.getValue().getEvidenceIssued())
+            && DocumentType.APPELLANT_EVIDENCE.getValue().equals(sscsDocument.getValue().getDocumentType());
     }
 
     @Override
