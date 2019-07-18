@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -12,7 +13,6 @@ import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -24,32 +24,45 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 public class IssueFurtherEvidenceHandlerTest {
 
     @Test
-    @Parameters({"No,APPELLANT_EVIDENCE,true", "Yes,APPELLANT_EVIDENCE,false"})
-    public void givenIssueFurtherEvidenceCallback_shouldBeHandledUnderCertainConditions(String evidenceIssued,
-                                                                                        DocumentType documentType,
+    @Parameters(method = "generateDifferentTestScenarios")
+    public void givenIssueFurtherEvidenceCallback_shouldBeHandledUnderCertainConditions(SscsCaseData sscsCaseData,
                                                                                         boolean expected) {
         IssueFurtherEvidenceHandler issueFurtherEvidenceHandler = new IssueFurtherEvidenceHandler();
 
-        Callback<SscsCaseData> callbackWithSscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued =
-            buildTestCallbackForGivenParams(evidenceIssued, documentType.getValue());
-
         boolean actual = issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED,
-            callbackWithSscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued, DispatchPriority.EARLIEST);
+            buildTestCallbackForGivenData(sscsCaseData), DispatchPriority.EARLIEST);
 
         assertEquals(expected, actual);
     }
 
-    private Callback<SscsCaseData> buildTestCallbackForGivenParams(String evidenceIssued, String documentType) {
+    private Object[] generateDifferentTestScenarios() {
         SscsCaseData sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued = SscsCaseData.builder()
             .sscsDocument(Collections.singletonList(SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
-                    .documentType(documentType)
-                    .evidenceIssued(evidenceIssued)
+                    .documentType(APPELLANT_EVIDENCE.getValue())
+                    .evidenceIssued("No")
                     .build())
                 .build()))
             .build();
+
+        SscsCaseData sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndYesIssued = SscsCaseData.builder()
+            .sscsDocument(Collections.singletonList(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                    .documentType(APPELLANT_EVIDENCE.getValue())
+                    .evidenceIssued("Yes")
+                    .build())
+                .build()))
+            .build();
+
+        return new Object[]{
+            new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued, true},
+            new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndYesIssued, false}
+        };
+    }
+
+    private Callback<SscsCaseData> buildTestCallbackForGivenData(SscsCaseData sscsCaseData) {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "SSCS",
-            State.INTERLOCUTORY_REVIEW_STATE, sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued,
+            State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData,
             LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), EventType.ISSUE_FURTHER_EVIDENCE);
     }
