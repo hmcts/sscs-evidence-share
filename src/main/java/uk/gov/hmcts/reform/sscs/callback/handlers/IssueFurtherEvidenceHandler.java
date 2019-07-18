@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback, DispatchPriority priority) {
-        return true;
+        return callback.getCaseDetails().getCaseData().getSscsDocument().get(0).getValue().getEvidenceIssued().equals("No");
     }
 
     @Override

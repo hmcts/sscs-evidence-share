@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -24,9 +24,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 public class IssueFurtherEvidenceHandlerTest {
 
     @Test
-    @Parameters({"No,APPELLANT_EVIDENCE"})
+    @Parameters({"No,APPELLANT_EVIDENCE,true", "Yes,APPELLANT_EVIDENCE,false"})
     public void givenIssueFurtherEvidenceCallback_shouldBeHandledUnderCertainConditions(String evidenceIssued,
-                                                                                        DocumentType documentType) {
+                                                                                        DocumentType documentType,
+                                                                                        boolean expected) {
         IssueFurtherEvidenceHandler issueFurtherEvidenceHandler = new IssueFurtherEvidenceHandler();
 
         Callback<SscsCaseData> callbackWithSscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued =
@@ -35,7 +36,7 @@ public class IssueFurtherEvidenceHandlerTest {
         boolean actual = issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED,
             callbackWithSscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued, DispatchPriority.EARLIEST);
 
-        assertTrue(actual);
+        assertEquals(expected, actual);
     }
 
     private Callback<SscsCaseData> buildTestCallbackForGivenParams(String evidenceIssued, String documentType) {
