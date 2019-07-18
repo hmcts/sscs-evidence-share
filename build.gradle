@@ -185,7 +185,7 @@ def versions = [
 ]
 
 dependencies {
-  compile group: 'com.google.guava', name: 'guava', version: '27.1-jre' //to remove CVE-2018-10237
+  compile group: 'com.google.guava', name: 'guava', version: '28.0-jre' //to remove CVE-2018-10237
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
