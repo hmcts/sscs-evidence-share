@@ -38,6 +38,8 @@ public class IssueFurtherEvidenceHandlerTest {
 
     private Object[] generateDifferentTestScenarios() {
 
+        //Happy path scenarios
+
         SscsCaseData sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued = SscsCaseData.builder()
             .sscsDocument(Collections.singletonList(SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
@@ -65,10 +67,16 @@ public class IssueFurtherEvidenceHandlerTest {
                 .build()))
             .build();
 
+        //edge case scenarios
+
+        SscsCaseData sscsCaseDataWithNoDocuments = SscsCaseData.builder().build();
+
+
         return new Object[]{
             new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued, true},
             new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndYesIssued, false},
             new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithRepsEvidenceAndNoIssued, false},
+            new Object[]{sscsCaseDataWithNoDocuments, false}
 
         };
     }
