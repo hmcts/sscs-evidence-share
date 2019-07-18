@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @Component
 @Slf4j
-
 @Service
 public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 

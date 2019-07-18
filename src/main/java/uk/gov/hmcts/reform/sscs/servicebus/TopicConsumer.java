@@ -62,7 +62,6 @@ public class TopicConsumer {
     private void processMessage(String message) {
         try {
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
-
             dispatcher.handle(SUBMITTED, callback);
             log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
         } catch (PdfStoreException | BulkPrintException | DwpAddressLookupException | NoMrnDetailsException exception) {

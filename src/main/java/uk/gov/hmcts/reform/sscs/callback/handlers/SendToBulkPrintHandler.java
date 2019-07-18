@@ -40,7 +40,6 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @Component
 @Slf4j
-
 @Service
 public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
