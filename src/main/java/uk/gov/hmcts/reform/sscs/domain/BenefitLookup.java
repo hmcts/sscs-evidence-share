@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.json.simple.JSONObject;
 
 
-public class BenefitLookup<T> extends ConcurrentHashMap<T, DwpAddress> {
+public class BenefitLookup extends ConcurrentHashMap<String, DwpAddress> {
     private static final long serialVersionUID = -7017349940075567843L;
     private static final String CODE = "code";
 
@@ -19,7 +19,7 @@ public class BenefitLookup<T> extends ConcurrentHashMap<T, DwpAddress> {
         super();
         jsonArray.forEach(jsonObj -> {
             @SuppressWarnings("unchecked")
-            T code = (T) jsonObj.get(CODE);
+            String code = String.valueOf(jsonObj.get(CODE)).toLowerCase();
             this.put(code, getAddress((JSONObject) jsonObj.get(ADDRESS)));
         });
     }
@@ -31,4 +31,9 @@ public class BenefitLookup<T> extends ConcurrentHashMap<T, DwpAddress> {
         String postCode = (String) jsonObj.get(POST_CODE);
         return new DwpAddress(line1, line2, line3, postCode);
     }
+
+    public DwpAddress get(String key) {
+        return super.get(key.toLowerCase());
+    }
+
 }
