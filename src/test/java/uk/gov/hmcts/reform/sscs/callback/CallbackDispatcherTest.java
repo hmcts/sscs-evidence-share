@@ -49,8 +49,7 @@ public class CallbackDispatcherTest {
         "LATE,LATEST,EARLIEST",
         "LATEST,EARLIEST,LATE",
         "LATEST,EARLIEST,EARLY",
-        "EARLY,EARLIEST,LATEST",
-
+        "EARLY,EARLIEST,LATEST"
     })
     public void givenHandlers_shouldBeHandledInDispatchPriority(DispatchPriority p1, DispatchPriority p2,
                                                                 DispatchPriority p3) {
