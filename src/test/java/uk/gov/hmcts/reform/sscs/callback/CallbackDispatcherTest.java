@@ -57,28 +57,18 @@ public class CallbackDispatcherTest {
     public void givenHandlers_shouldBeHandledInDispatchPriority(DispatchPriority p1, DispatchPriority p2,
                                                                 DispatchPriority p3) {
         mockHandlers(p1, p2, p3);
-
         List<CallbackHandler<SscsCaseData>> handlers = Arrays.asList(
             roboticsHandler, sendToBulkPrintHandler, issueFurtherEvidenceHandler);
         CallbackDispatcher<SscsCaseData> callbackDispatcher = new CallbackDispatcher<>(handlers);
         callbackDispatcher.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().build()));
-
         verifyMethodsAreCalledCorrectNumberOfTimes();
         verifyHandlersAreExecutedInPriorityOrder(handlers);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void verifyMethodsAreCalledCorrectNumberOfTimes() {
-        then(roboticsHandler).should(times(1)).canHandle(any(), any());
-        then(roboticsHandler).should(times(1)).handle(any(), any());
         then(roboticsHandler).should(times(DispatchPriority.values().length)).getPriority();
-
-        then(sendToBulkPrintHandler).should(times(1)).canHandle(any(), any());
-        then(sendToBulkPrintHandler).should(times(1)).handle(any(), any());
         then(sendToBulkPrintHandler).should(times(DispatchPriority.values().length)).getPriority();
-
-        then(issueFurtherEvidenceHandler).should(times(1)).canHandle(any(), any());
-        then(issueFurtherEvidenceHandler).should(times(1)).handle(any(), any());
         then(issueFurtherEvidenceHandler).should(times(DispatchPriority.values().length)).getPriority();
     }
 
@@ -99,8 +89,8 @@ public class CallbackDispatcherTest {
     }
 
     private void verifyCalls(InOrder orderVerifier, CallbackHandler<SscsCaseData> handler) {
-        orderVerifier.verify(handler).canHandle(any(), any());
-        orderVerifier.verify(handler).handle(any(), any());
+        orderVerifier.verify(handler, times(1)).canHandle(any(), any());
+        orderVerifier.verify(handler, times(1)).handle(any(), any());
         orderVerifier.verify(handler, times(0)).canHandle(any(), any());
         orderVerifier.verify(handler, times(0)).handle(any(), any());
     }
