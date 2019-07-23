@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 public class BulkPrintService {
 
     private static final String XEROX_TYPE_PARAMETER = "SSC001";
-    private static final String CCD_ID = "ccdId";
+    private static final String CASE_IDENTIFIER = "caseIdentifier";
     private static final String LETTER_TYPE_KEY = "letterType";
     private static final String APPELLANT_NAME = "appellantName";
 
@@ -88,7 +88,7 @@ public class BulkPrintService {
     private static Map<String, Object> getAdditionalData(final SscsCaseData sscsCaseData) {
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put(LETTER_TYPE_KEY, "sscs-data-pack");
-        additionalData.put(CCD_ID, sscsCaseData.getCcdCaseId());
+        additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
         return additionalData;
     }
