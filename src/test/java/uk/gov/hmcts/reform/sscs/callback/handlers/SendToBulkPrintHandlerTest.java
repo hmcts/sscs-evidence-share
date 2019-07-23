@@ -251,7 +251,7 @@ public class SendToBulkPrintHandlerTest {
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
 
-        handler.handle(CallbackType.SUBMITTED, callback, DispatchPriority.LATEST);
+        handler.handle(CallbackType.SUBMITTED, callback);
 
         then(ccdCaseService)
             .should(times(1))
