@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Rule;
@@ -49,7 +50,9 @@ public class CallbackDispatcherTest {
         "LATE,LATEST,EARLIEST",
         "LATEST,EARLIEST,LATE",
         "LATEST,EARLIEST,EARLY",
-        "EARLY,EARLIEST,LATEST"
+        "EARLY,EARLIEST,LATEST",
+        "EARLY,EARLY,LATEST",
+        "EARLIEST,LATEST,LATEST"
     })
     public void givenHandlers_shouldBeHandledInDispatchPriority(DispatchPriority p1, DispatchPriority p2,
                                                                 DispatchPriority p3) {
@@ -89,13 +92,17 @@ public class CallbackDispatcherTest {
 
     private void verifyPriorityOrder(List<CallbackHandler<SscsCaseData>> handlers, InOrder orderVerifier,
                                      DispatchPriority priority) {
-        CallbackHandler<SscsCaseData> handler = getHandlerForGivenPriority(handlers, priority);
-        if (handler != null) {
-            orderVerifier.verify(handler).canHandle(any(), any());
-            orderVerifier.verify(handler).handle(any(), any());
-            orderVerifier.verify(handler, times(0)).canHandle(any(), any());
-            orderVerifier.verify(handler, times(0)).handle(any(), any());
+        List<CallbackHandler<SscsCaseData>> handlersForGivenPriority = getHandlerForGivenPriority(handlers, priority);
+        if (handlersForGivenPriority != null) {
+            handlersForGivenPriority.forEach(handler -> verifyCalls(orderVerifier, handler));
         }
+    }
+
+    private void verifyCalls(InOrder orderVerifier, CallbackHandler<SscsCaseData> handler) {
+        orderVerifier.verify(handler).canHandle(any(), any());
+        orderVerifier.verify(handler).handle(any(), any());
+        orderVerifier.verify(handler, times(0)).canHandle(any(), any());
+        orderVerifier.verify(handler, times(0)).handle(any(), any());
     }
 
     private void mockHandlers(DispatchPriority priority1, DispatchPriority priority2, DispatchPriority priority3) {
@@ -109,11 +116,10 @@ public class CallbackDispatcherTest {
         given(issueFurtherEvidenceHandler.canHandle(any(), any())).willReturn(true);
     }
 
-    private CallbackHandler<SscsCaseData> getHandlerForGivenPriority(List<CallbackHandler<SscsCaseData>> handlers,
-                                                                     DispatchPriority priority) {
+    private List<CallbackHandler<SscsCaseData>> getHandlerForGivenPriority(List<CallbackHandler<SscsCaseData>> handlers,
+                                                                           DispatchPriority priority) {
         return handlers.stream()
             .filter(handler -> handler.getPriority().equals(priority))
-            .findFirst()
-            .orElse(null);
+            .collect(Collectors.toList());
     }
 }
