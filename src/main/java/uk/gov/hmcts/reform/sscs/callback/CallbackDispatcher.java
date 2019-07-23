@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.callback;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -14,29 +16,28 @@ public class CallbackDispatcher<T extends CaseData> {
 
     private final List<CallbackHandler<T>> callbackHandlers;
 
-    public CallbackDispatcher(
-        List<CallbackHandler<T>> callbackHandlers
-    ) {
+    public CallbackDispatcher(List<CallbackHandler<T>> callbackHandlers) {
         requireNonNull(callbackHandlers, "callbackHandlers must not be null");
         this.callbackHandlers = callbackHandlers;
     }
 
     public void handle(CallbackType callbackType, Callback<T> callback) {
         requireNonNull(callback, "callback must not be null");
-
-        dispatchToHandlers(callbackType, callback, callbackHandlers, DispatchPriority.EARLIEST);
-        dispatchToHandlers(callbackType, callback, callbackHandlers, DispatchPriority.LATEST);
+        Stream.of(DispatchPriority.values())
+            .forEach(dispatchPriority ->
+                dispatchToHandlers(callbackType, callback, getCallbackHandlersByPriority(dispatchPriority)));
     }
 
-    private void dispatchToHandlers(
-        CallbackType callbackType, Callback<T> callback,
-        List<CallbackHandler<T>> callbackHandlers, DispatchPriority dispatchPriority) {
+    private List<CallbackHandler<T>> getCallbackHandlersByPriority(DispatchPriority dispatchPriority) {
+        return callbackHandlers.stream()
+            .filter(handler -> handler.getPriority() == dispatchPriority)
+            .collect(Collectors.toList());
+    }
 
-        for (CallbackHandler<T> callbackHandler : callbackHandlers) {
-
-            if (callbackHandler.canHandle(callbackType, callback, dispatchPriority)) {
-                callbackHandler.handle(callbackType, callback, dispatchPriority);
-            }
-        }
+    private void dispatchToHandlers(CallbackType callbackType, Callback<T> callback,
+                                    List<CallbackHandler<T>> callbackHandlers) {
+        callbackHandlers.stream()
+            .filter(handler -> handler.canHandle(callbackType, callback))
+            .forEach(handler -> handler.handle(callbackType, callback));
     }
 }

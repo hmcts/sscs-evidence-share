@@ -1,0 +1,120 @@
+package uk.gov.hmcts.reform.sscs.callback;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandlerTest.buildTestCallbackForGivenData;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLIEST;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLY;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
+
+import java.util.Arrays;
+import java.util.List;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
+import uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.RoboticsCallbackHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+
+@RunWith(JUnitParamsRunner.class)
+public class CallbackDispatcherTest {
+
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+    @Mock
+    private RoboticsCallbackHandler roboticsHandler;
+    @Mock
+    private SendToBulkPrintHandler sendToBulkPrintHandler;
+    @Mock
+    private IssueFurtherEvidenceHandler issueFurtherEvidenceHandler;
+
+    @Test
+    @Parameters({
+        "EARLIEST,LATE,LATEST",
+        "LATE,LATEST,EARLIEST",
+        "LATEST,EARLIEST,LATE",
+        "LATEST,EARLIEST,EARLY",
+        "EARLY,EARLIEST,LATEST",
+
+    })
+    public void givenHandlers_shouldBeHandledInDispatchPriority(DispatchPriority p1, DispatchPriority p2,
+                                                                DispatchPriority p3) {
+        mockHandlers(p1, p2, p3);
+
+        List<CallbackHandler<SscsCaseData>> handlers = Arrays.asList(
+            roboticsHandler, sendToBulkPrintHandler, issueFurtherEvidenceHandler);
+        CallbackDispatcher<SscsCaseData> callbackDispatcher = new CallbackDispatcher<>(handlers);
+        callbackDispatcher.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().build()));
+
+        verifyMethodsAreCalledCorrectNumberOfTimes();
+        verifyHandlersAreExecutedInPriorityOrder(handlers);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void verifyMethodsAreCalledCorrectNumberOfTimes() {
+        then(roboticsHandler).should(times(1)).canHandle(any(), any());
+        then(roboticsHandler).should(times(1)).handle(any(), any());
+        then(roboticsHandler).should(times(DispatchPriority.values().length)).getPriority();
+
+        then(sendToBulkPrintHandler).should(times(1)).canHandle(any(), any());
+        then(sendToBulkPrintHandler).should(times(1)).handle(any(), any());
+        then(sendToBulkPrintHandler).should(times(DispatchPriority.values().length)).getPriority();
+
+        then(issueFurtherEvidenceHandler).should(times(1)).canHandle(any(), any());
+        then(issueFurtherEvidenceHandler).should(times(1)).handle(any(), any());
+        then(issueFurtherEvidenceHandler).should(times(DispatchPriority.values().length)).getPriority();
+    }
+
+    private void verifyHandlersAreExecutedInPriorityOrder(List<CallbackHandler<SscsCaseData>> handlers) {
+        InOrder orderVerifier = inOrder(roboticsHandler, sendToBulkPrintHandler, issueFurtherEvidenceHandler);
+        verifyPriorityOrder(handlers, orderVerifier, EARLIEST);
+        verifyPriorityOrder(handlers, orderVerifier, EARLY);
+        verifyPriorityOrder(handlers, orderVerifier, LATE);
+        verifyPriorityOrder(handlers, orderVerifier, LATEST);
+    }
+
+    private void verifyPriorityOrder(List<CallbackHandler<SscsCaseData>> handlers, InOrder orderVerifier,
+                                     DispatchPriority priority) {
+        CallbackHandler<SscsCaseData> handler = getHandlerForGivenPriority(handlers, priority);
+        if (handler != null) {
+            orderVerifier.verify(handler).canHandle(any(), any());
+            orderVerifier.verify(handler).handle(any(), any());
+            orderVerifier.verify(handler, times(0)).canHandle(any(), any());
+            orderVerifier.verify(handler, times(0)).handle(any(), any());
+        }
+    }
+
+    private void mockHandlers(DispatchPriority priority1, DispatchPriority priority2, DispatchPriority priority3) {
+        given(roboticsHandler.getPriority()).willReturn(priority1);
+        given(roboticsHandler.canHandle(any(), any())).willReturn(true);
+
+        given(sendToBulkPrintHandler.getPriority()).willReturn(priority2);
+        given(sendToBulkPrintHandler.canHandle(any(), any())).willReturn(true);
+
+        given(issueFurtherEvidenceHandler.getPriority()).willReturn(priority3);
+        given(issueFurtherEvidenceHandler.canHandle(any(), any())).willReturn(true);
+    }
+
+    private CallbackHandler<SscsCaseData> getHandlerForGivenPriority(List<CallbackHandler<SscsCaseData>> handlers,
+                                                                     DispatchPriority priority) {
+        return handlers.stream()
+            .filter(handler -> handler.getPriority().equals(priority))
+            .findFirst()
+            .orElse(null);
+    }
+}

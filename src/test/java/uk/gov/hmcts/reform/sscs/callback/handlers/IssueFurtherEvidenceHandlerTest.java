@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -32,7 +31,7 @@ public class IssueFurtherEvidenceHandlerTest {
         IssueFurtherEvidenceHandler issueFurtherEvidenceHandler = new IssueFurtherEvidenceHandler();
 
         boolean actual = issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(sscsCaseData), DispatchPriority.EARLIEST);
+            buildTestCallbackForGivenData(sscsCaseData));
 
         assertEquals(expected, actual);
     }
@@ -151,7 +150,7 @@ public class IssueFurtherEvidenceHandlerTest {
         };
     }
 
-    private Callback<SscsCaseData> buildTestCallbackForGivenData(SscsCaseData sscsCaseData) {
+    public static Callback<SscsCaseData> buildTestCallbackForGivenData(SscsCaseData sscsCaseData) {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "SSCS",
             State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData,
             LocalDateTime.now());

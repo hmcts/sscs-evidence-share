@@ -6,8 +6,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 
 public interface CallbackHandler<T extends CaseData> {
+    boolean canHandle(CallbackType callbackType, Callback<T> callback);
 
-    boolean canHandle(CallbackType callbackType, Callback<T> callback, DispatchPriority priority);
+    void handle(CallbackType callbackType, Callback<T> callback);
 
-    void handle(CallbackType callbackType, Callback<T> callback, DispatchPriority priority);
+    DispatchPriority getPriority();
 }

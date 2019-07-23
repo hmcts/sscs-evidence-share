@@ -7,8 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLIEST;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 import java.time.LocalDateTime;
@@ -19,7 +17,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -44,40 +46,35 @@ public class RoboticsCallbackHandlerTest {
 
     @Test
     public void givenASendToDwpEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(SUBMITTED, callback, EARLIEST));
+        assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
     public void givenAValidAppealEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL);
 
-        assertTrue(handler.canHandle(SUBMITTED, callback, EARLIEST));
+        assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
     public void givenAInterlocValidAppealEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.INTERLOC_VALID_APPEAL);
 
-        assertTrue(handler.canHandle(SUBMITTED, callback, EARLIEST));
+        assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
     public void givenACreateAppealPdfEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.CREATE_APPEAL_PDF);
 
-        assertTrue(handler.canHandle(SUBMITTED, callback, EARLIEST));
+        assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
     public void givenANonRoboticsEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(handler.canHandle(SUBMITTED, callback, EARLIEST));
-    }
-
-    @Test
-    public void givenAnInvalidDispatchPriority_thenReturnFalse() {
-        assertFalse(handler.canHandle(SUBMITTED, callback, LATEST));
+        assertFalse(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
@@ -85,7 +82,7 @@ public class RoboticsCallbackHandlerTest {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
 
-        handler.handle(SUBMITTED, callback, EARLIEST);
+        handler.handle(SUBMITTED, callback);
 
         verify(roboticsService).sendCaseToRobotics(any());
     }
