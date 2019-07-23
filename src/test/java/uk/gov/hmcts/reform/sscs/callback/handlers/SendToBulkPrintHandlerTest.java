@@ -148,7 +148,7 @@ public class SendToBulkPrintHandlerTest {
 
         when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
 
-        Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
+        Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
 
         when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
             .thenReturn(expectedOptionalUuid);
@@ -160,7 +160,7 @@ public class SendToBulkPrintHandlerTest {
         verify(evidenceManagementService, times(2)).download(eq(URI.create(docUrl)), any());
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any());
 
-        String documentList = "Case has been sent to the DWP via Bulk Print with documents: evidence1.pdf, evidence2.pdf";
+        String documentList = "Case has been sent to the DWP via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: evidence1.pdf, evidence2.pdf";
         verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq(documentList), any());
 
         List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
@@ -204,6 +204,40 @@ public class SendToBulkPrintHandlerTest {
             .thenReturn(DocumentHolder.builder()
                 .template(null)
                 .build());
+
+        handler.handle(CallbackType.SUBMITTED, callback, DispatchPriority.LATEST);
+
+        then(ccdCaseService)
+            .should(times(1))
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
+    }
+
+    @Test
+    public void givenNoBulkPrintIdReturned_shouldThrowAnExceptionAndFlagError() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
+            SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName(docPdf.getName())
+                .documentType("sscs1")
+                .documentLink(DocumentLink.builder().documentUrl(docUrl)
+                    .documentFilename(docPdf.getName()).build())
+                .build()).build()), APPEAL_CREATED);
+
+        when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenReturn(docPdf.getContent());
+
+        Map<String, Object> placeholders = new HashMap<>();
+        placeholders.put("Test", "Value");
+
+        Template template = new Template("bla", "bla2");
+
+        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
+
+        when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
+
+        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
+            .thenReturn(Optional.empty());
+
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
 
         handler.handle(CallbackType.SUBMITTED, callback, DispatchPriority.LATEST);
 
