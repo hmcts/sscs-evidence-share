@@ -35,6 +35,12 @@ public class DwpAddressLookupTest {
     }
 
     @Test
+    public void handleCaseInsensitiveAddresses() {
+        DwpAddress address = dwpAddressLookup.lookup("ESA", "BALHAM DRT");
+        assertNotNull(address);
+    }
+
+    @Test
     @Parameters({
         "Balham DRT", "Birkenhead LM DRT", "Lowestoft DRT", "Wellingborough DRT", "Chesterfield DRT",
         "Coatbridge Benefit Centre", "Inverness DRT", "Milton Keynes DRT", "Springburn DRT", "Watford DRT",

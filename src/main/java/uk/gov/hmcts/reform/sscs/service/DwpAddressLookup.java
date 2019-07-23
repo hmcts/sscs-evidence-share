@@ -4,11 +4,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.stereotype.Service;
@@ -40,8 +38,8 @@ public class DwpAddressLookup {
         }
     }
 
-    private static final BenefitLookup<Long> PIP_LOOKUP = new BenefitLookup<>(getJsonArray(PIP));
-    private static final BenefitLookup<String> ESA_LOOKUP = new BenefitLookup<>(getJsonArray(ESA));
+    private static final BenefitLookup PIP_LOOKUP = new BenefitLookup(getJsonArray(PIP));
+    private static final BenefitLookup ESA_LOOKUP = new BenefitLookup(getJsonArray(ESA));
     private static final JSONObject TEST_ADDRESS_CONFIG = (JSONObject) configObject.get(TEST_HMCTS_ADDRESS);
     private static final DwpAddress TEST_ADDRESS = BenefitLookup.getAddress((JSONObject) TEST_ADDRESS_CONFIG.get(ADDRESS));
     private static final JSONObject EXCELA_CONFIG = (JSONObject) configObject.get(EXCELA);
@@ -63,8 +61,8 @@ public class DwpAddressLookup {
         if (StringUtils.equalsIgnoreCase(dwpIssuingOffice, TEST_HMCTS_ADDRESS)) {
             return Optional.of(TEST_ADDRESS);
         }
-        if (StringUtils.equalsIgnoreCase(PIP, benefitType) && NumberUtils.isCreatable(dwpIssuingOffice)) {
-            return Optional.ofNullable(PIP_LOOKUP.get(NumberUtils.toLong(dwpIssuingOffice, 0)));
+        if (StringUtils.equalsIgnoreCase(PIP, benefitType)) {
+            return Optional.ofNullable(PIP_LOOKUP.get(StringUtils.stripToEmpty(dwpIssuingOffice)));
         } else if (StringUtils.equalsIgnoreCase(ESA, benefitType)) {
             return Optional.ofNullable(ESA_LOOKUP.get(StringUtils.stripToEmpty(dwpIssuingOffice)));
         }
