@@ -6,9 +6,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -157,15 +155,22 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                 log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
                 caseData.setDateSentToDwp(LocalDate.now().toString());
 
-                BulkPrintInfo info = BulkPrintInfo.builder()
-                    .uuid(bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData).orElse(null))
-                    .allowedTypeForBulkPrint(true)
-                    .desc(buildEventDescription(existingCasePdfs))
-                    .build();
+                Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
 
-                updateSscsDocumentsWithFurtherEvidenceIssuedFlag(sscsDocuments);
+                if (id.isPresent()) {
+                    BulkPrintInfo info = BulkPrintInfo.builder()
+                        .uuid(id.get())
+                        .allowedTypeForBulkPrint(true)
+                        .desc(buildEventDescription(existingCasePdfs, id.get()))
+                        .build();
 
-                return info;
+                    updateSscsDocumentsWithFurtherEvidenceIssuedFlag(sscsDocuments);
+
+                    return info;
+                } else {
+                    throw new BulkPrintException(
+                        format("Failed to send to bulk print for case %s. No print id returned",
+                            caseData.getCcdCaseId()));                }
             }
             throw new BulkPrintException(
                 format("Failed to send to bulk print for case %s because no template was found",
@@ -181,14 +186,17 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         }
     }
 
-    private String buildEventDescription(List<Pdf> pdfs) {
+    private String buildEventDescription(List<Pdf> pdfs, UUID bulkPrintId) {
         List<String> arr = new ArrayList<>();
 
         for (Pdf pdf : pdfs) {
             arr.add(pdf.getName());
         }
 
-        return "Case has been sent to the DWP via Bulk Print with documents: " + String.join(", ", arr);
+        return "Case has been sent to the DWP via Bulk Print with bulk print id: "
+            + bulkPrintId
+            + " and with documents: "
+            + String.join(", ", arr);
     }
 
     private boolean isAllowedReceivedTypeForBulkPrint(SscsCaseData caseData) {

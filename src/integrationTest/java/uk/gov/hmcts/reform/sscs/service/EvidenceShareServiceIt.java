@@ -130,6 +130,8 @@ public class EvidenceShareServiceIt {
     @MockBean
     protected JavaMailSender mailSender;
 
+    Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
+
     @Before
     public void setup() {
         message = new MimeMessage(session);
@@ -152,12 +154,11 @@ public class EvidenceShareServiceIt {
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(), eq("sscs"))).thenReturn(uploadResponse);
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
-        Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
         when(ccdService.updateCase(any(), any(), eq("uploadDocument"), any(), eq("Uploaded dl6-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
-        String documentList = "Case has been sent to the DWP via Bulk Print with documents: dl6-12345656789.pdf, sscs1.pdf, filename1.pdf";
+        String documentList = "Case has been sent to the DWP via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl6-12345656789.pdf, sscs1.pdf, filename1.pdf";
         when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -192,12 +193,11 @@ public class EvidenceShareServiceIt {
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(), eq("sscs"))).thenReturn(uploadResponse);
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().build());
-        Optional<UUID> expectedOptionalUuid = Optional.of(UUID.randomUUID());
         when(ccdService.updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
-        String documentList = "Case has been sent to the DWP via Bulk Print with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
+        String documentList = "Case has been sent to the DWP via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
         when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);

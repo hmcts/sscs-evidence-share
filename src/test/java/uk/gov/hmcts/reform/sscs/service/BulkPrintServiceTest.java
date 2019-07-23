@@ -13,6 +13,8 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
@@ -46,6 +48,9 @@ public class BulkPrintServiceTest {
     @Mock
     private IdamService idamService;
 
+    @Captor
+    ArgumentCaptor<LetterWithPdfsRequest> captor;
+
     @Before
     public void setUp() {
         this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, true, 1);
@@ -54,6 +59,17 @@ public class BulkPrintServiceTest {
 
     @Test
     public void willSendToBulkPrint() {
+        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
+            .thenReturn(new SendLetterResponse(LETTER_ID));
+        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
+        assertEquals("sscs-data-pack", captor.getValue().getAdditionalData().get("letterType"));
+        assertEquals("Appellant LastName", captor.getValue().getAdditionalData().get("appellantName"));
+        assertEquals("234", captor.getValue().getAdditionalData().get("caseIdentifier"));
+    }
+
+    @Test
+    public void willSendToBulkPrintWithAdditionalData() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenReturn(new SendLetterResponse(LETTER_ID));
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
