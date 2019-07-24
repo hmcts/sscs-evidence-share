@@ -14,14 +14,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
+import uk.gov.hmcts.reform.sscs.service.placeholders.Dl6AndDl16PlaceholderService;
+import uk.gov.hmcts.reform.sscs.service.placeholders.RpcPlaceholderService;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DocumentPlaceholderServiceTest {
+public class Dl6AndDl16PlaceholderServiceTest {
 
     private static final String RPC_ADDRESS1 = "HM Courts & Tribunals Service";
     private static final String RPC_ADDRESS2 = "Social Security & Child Support Appeals";
@@ -39,8 +42,11 @@ public class DocumentPlaceholderServiceTest {
     @Mock
     private PdfDocumentConfig pdfDocumentConfig;
 
+    @Spy
+    private RpcPlaceholderService rpcPlaceholderService;
+
     @InjectMocks
-    private DocumentPlaceholderService service;
+    private Dl6AndDl16PlaceholderService dl6AndDl16PlaceholderService;
 
     @Before
     public void setup() {
@@ -61,7 +67,7 @@ public class DocumentPlaceholderServiceTest {
         DwpAddress dwpAddress = new DwpAddress(RPC_ADDRESS1, RPC_ADDRESS2, RPC_CITY, POSTCODE);
         when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
 
-        Map<String, Object> result = service.generatePlaceholders(caseData, now);
+        Map<String, Object> result = dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
 
         assertEquals(now.toLocalDate().toString(), result.get(CASE_CREATED_DATE_LITERAL));
         assertEquals(RPC_ADDRESS1, result.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
@@ -88,7 +94,7 @@ public class DocumentPlaceholderServiceTest {
         when(dwpAddressLookup.lookup("PIP", "1"))
             .thenReturn(new DwpAddress(RPC_ADDRESS1, RPC_ADDRESS2, RPC_CITY, POSTCODE));
 
-        Map<String, Object> result = service.generatePlaceholders(caseData, now);
+        Map<String, Object> result = dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
 
         assertEquals(now.toLocalDate().toString(), result.get(CASE_CREATED_DATE_LITERAL));
         assertNull(result.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
@@ -104,7 +110,7 @@ public class DocumentPlaceholderServiceTest {
         buildCaseData(null);
         DwpAddress dwpAddress = new DwpAddress(RPC_ADDRESS1, RPC_ADDRESS2, POSTCODE);
         when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
-        Map<String, Object> result = service.generatePlaceholders(caseData, now);
+        Map<String, Object> result = dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
         assertEquals(dwpAddress.lines()[0], result.get(DWP_ADDRESS_LINE1_LITERAL));
         assertEquals(dwpAddress.lines()[1], result.get(DWP_ADDRESS_LINE2_LITERAL));
         assertEquals(dwpAddress.lines()[2], result.get(DWP_ADDRESS_LINE3_LITERAL));
@@ -116,7 +122,7 @@ public class DocumentPlaceholderServiceTest {
         buildCaseData(null);
         DwpAddress dwpAddress = new DwpAddress(RPC_ADDRESS1, "", POSTCODE);
         when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
-        Map<String, Object> result = service.generatePlaceholders(caseData, now);
+        Map<String, Object> result = dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
         assertEquals(dwpAddress.lines()[0], result.get(DWP_ADDRESS_LINE1_LITERAL));
         assertEquals(dwpAddress.lines()[1], result.get(DWP_ADDRESS_LINE2_LITERAL));
         assertNull(result.get(DWP_ADDRESS_LINE3_LITERAL));
@@ -128,7 +134,7 @@ public class DocumentPlaceholderServiceTest {
         buildCaseData(null);
         DwpAddress dwpAddress = new DwpAddress("", "", POSTCODE);
         when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
-        Map<String, Object> result = service.generatePlaceholders(caseData, now);
+        Map<String, Object> result = dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
         assertEquals(dwpAddress.lines()[0], result.get(DWP_ADDRESS_LINE1_LITERAL));
         assertNull(result.get(DWP_ADDRESS_LINE2_LITERAL));
         assertNull(result.get(DWP_ADDRESS_LINE3_LITERAL));
@@ -140,7 +146,7 @@ public class DocumentPlaceholderServiceTest {
         buildCaseData(null);
         DwpAddress dwpAddress = new DwpAddress("", "", "");
         when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
-        Map<String, Object> result = service.generatePlaceholders(caseData, now);
+        Map<String, Object> result = dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
         assertNull(result.get(DWP_ADDRESS_LINE1_LITERAL));
         assertNull(result.get(DWP_ADDRESS_LINE2_LITERAL));
         assertNull(result.get(DWP_ADDRESS_LINE3_LITERAL));
@@ -151,7 +157,7 @@ public class DocumentPlaceholderServiceTest {
     public void asAppealWithNoMrnDetailsWillNotHaveADwpAddress() {
         buildCaseData(null);
         caseData = caseData.toBuilder().appeal(caseData.getAppeal().toBuilder().mrnDetails(null).build()).build();
-        service.generatePlaceholders(caseData, now);
+        dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
     }
 
     @Test(expected = NoMrnDetailsException.class)
@@ -159,7 +165,7 @@ public class DocumentPlaceholderServiceTest {
         buildCaseData(null);
         caseData = caseData.toBuilder().appeal(caseData.getAppeal().toBuilder().mrnDetails(
             MrnDetails.builder().mrnLateReason("soz").build()).build()).build();
-        service.generatePlaceholders(caseData, now);
+        dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
     }
 
     private void buildCaseData(RegionalProcessingCenter rpc) {

@@ -18,12 +18,10 @@ import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFI
 import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.SSCS_URL;
 import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.SSCS_URL_LITERAL;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -74,17 +72,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
     @Override
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        //generate the 609-97 (original sender) cover letter using docmosis
-
         byte[] coverLetter = generate609_97_OriginalSenderCoverLetter(callback);
-
-
-        try {
-            FileUtils.writeByteArrayToFile(new File("coverLetter.pdf"), coverLetter);
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
-        }
-
         // bulk print cover letter and pdf doc
         //And the Evidence Issued Flag on the Document is set to "Yes"
     }
