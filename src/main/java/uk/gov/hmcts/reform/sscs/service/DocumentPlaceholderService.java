@@ -1,12 +1,30 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.*;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.CASE_ID_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.DWP_ADDRESS_LINE1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.DWP_ADDRESS_LINE2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.DWP_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.DWP_ADDRESS_LINE4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.GENERATED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.NINO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_COUNTY_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_FAX_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_PHONE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_POSTCODE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.SSCS_URL;
+import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.SSCS_URL_LITERAL;
 
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +70,9 @@ public class DocumentPlaceholderService {
     }
 
     private void setRegionalProcessingOfficeAddress(Map<String, Object> placeholders, SscsCaseData caseData) {
-        RegionalProcessingCenter rpc = null;
-
         if (hasRegionalProcessingCenter(caseData)) {
-            rpc = caseData.getRegionalProcessingCenter();
-        }
-        //FIXME: somehow add to some exception queue when null - this should be covered by another ticket
-        if (rpc != null) {
+            RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
+            //FIXME: somehow add to some exception queue when null - this should be covered by another ticket
             placeholders.put(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL, defaultToEmptyStringIfNull(rpc.getAddress1()));
             placeholders.put(REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL, defaultToEmptyStringIfNull(rpc.getAddress2()));
             placeholders.put(REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL, defaultToEmptyStringIfNull(rpc.getAddress3()));
@@ -101,7 +115,7 @@ public class DocumentPlaceholderService {
         }
     }
 
-    private static boolean hasRegionalProcessingCenter(SscsCaseData ccdResponse) {
+    private boolean hasRegionalProcessingCenter(SscsCaseData ccdResponse) {
         return nonNull(ccdResponse.getRegionalProcessingCenter())
             && nonNull(ccdResponse.getRegionalProcessingCenter().getName());
     }
