@@ -23,12 +23,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -41,24 +41,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
-import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
 
-@Slf4j
 @Service
 public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
-
-    @Value("${service.pdf-service.uri}")
-    private String pdfServiceEndpoint;
-
-    @Value("${service.pdf-service.accessKey}")
-    private String pdfServiceAccessKey;
 
     @Value("${document.pdf.hmctsImgKey}")
     private String hmctsImgKey;
 
     @Value("${document.pdf.hmctsImgVal}")
     private String hmctsImgVal;
+
+    @Qualifier("docmosisPdfGenerationService")
+    @Autowired
+    private PdfGenerationService pdfGenerationService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -78,29 +74,28 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
     @Override
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        log.debug("handling {} event", callback.getEvent().getCcdType());
-
         //generate the 609-97 (original sender) cover letter using docmosis
-        PdfGenerationService pdfGenerationService = new DocmosisPdfGenerationService(pdfServiceEndpoint,
-            pdfServiceAccessKey, new RestTemplate());
 
-        byte[] coverLetter = pdfGenerationService.generatePdf(DocumentHolder.builder()
-            .template(new Template("TB-SCS-GNO-ENG-00068.doc",
-                "609-97-template (original sender)"))
-            .placeholders(populatePlaceHolders(callback))
-            .pdfArchiveMode(true)
-            .build());
+        byte[] coverLetter = generate609_97_OriginalSenderCoverLetter(callback);
 
 
         try {
             FileUtils.writeByteArrayToFile(new File("coverLetter.pdf"), coverLetter);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Exception: " + e);
         }
 
         // bulk print cover letter and pdf doc
         //And the Evidence Issued Flag on the Document is set to "Yes"
+    }
+
+    private byte[] generate609_97_OriginalSenderCoverLetter(Callback<SscsCaseData> callback) {
+        return pdfGenerationService.generatePdf(DocumentHolder.builder()
+                .template(new Template("TB-SCS-GNO-ENG-00068.doc",
+                    "609-97-template (original sender)"))
+                .placeholders(populatePlaceHolders(callback))
+                .pdfArchiveMode(true)
+                .build());
     }
 
     private Map<String, Object> populatePlaceHolders(Callback<SscsCaseData> callback) {
