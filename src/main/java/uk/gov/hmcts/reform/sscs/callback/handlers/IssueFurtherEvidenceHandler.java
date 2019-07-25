@@ -1,20 +1,11 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
 import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.CASE_ID_LITERAL;
 import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.NINO_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_COUNTY_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_FAX_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_PHONE_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.REGIONAL_OFFICE_POSTCODE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.SSCS_URL;
 import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.SSCS_URL_LITERAL;
 
@@ -34,12 +25,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
+import uk.gov.hmcts.reform.sscs.service.placeholders.RpcPlaceholderService;
 
 @Service
 public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
@@ -53,6 +44,9 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     @Qualifier("docmosisPdfGenerationService")
     @Autowired
     private PdfGenerationService pdfGenerationService;
+
+    @Autowired
+    private RpcPlaceholderService rpcPlaceholderService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -79,11 +73,11 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
     private byte[] generate609_97_OriginalSenderCoverLetter(Callback<SscsCaseData> callback) {
         return pdfGenerationService.generatePdf(DocumentHolder.builder()
-                .template(new Template("TB-SCS-GNO-ENG-00068.doc",
-                    "609-97-template (original sender)"))
-                .placeholders(populatePlaceHolders(callback))
-                .pdfArchiveMode(true)
-                .build());
+            .template(new Template("TB-SCS-GNO-ENG-00068.doc",
+                "609-97-template (original sender)"))
+            .placeholders(populatePlaceHolders(callback))
+            .pdfArchiveMode(true)
+            .build());
     }
 
     private Map<String, Object> populatePlaceHolders(Callback<SscsCaseData> callback) {
@@ -105,31 +99,12 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         placeholders.put("original_sender_address_line3", defaultToEmptyStringIfNull(address.getCounty()));
         placeholders.put("original_sender_address_line4", defaultToEmptyStringIfNull(address.getPostcode()));
 
-        setRegionalProcessingOfficeAddress(placeholders, caseData);
+        rpcPlaceholderService.setRegionalProcessingOfficeAddress(placeholders, caseData);
         return placeholders;
-    }
-
-    private boolean hasRegionalProcessingCenter(SscsCaseData ccdResponse) {
-        return nonNull(ccdResponse.getRegionalProcessingCenter())
-            && nonNull(ccdResponse.getRegionalProcessingCenter().getName());
     }
 
     private Object defaultToEmptyStringIfNull(Object value) {
         return (value == null) ? StringUtils.EMPTY : value;
-    }
-
-    private void setRegionalProcessingOfficeAddress(Map<String, Object> placeholders, SscsCaseData caseData) {
-        if (hasRegionalProcessingCenter(caseData)) {
-            RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
-            placeholders.put(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL, defaultToEmptyStringIfNull(rpc.getAddress1()));
-            placeholders.put(REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL, defaultToEmptyStringIfNull(rpc.getAddress2()));
-            placeholders.put(REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL, defaultToEmptyStringIfNull(rpc.getAddress3()));
-            placeholders.put(REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL, defaultToEmptyStringIfNull(rpc.getAddress4()));
-            placeholders.put(REGIONAL_OFFICE_COUNTY_LITERAL, defaultToEmptyStringIfNull(rpc.getCity()));
-            placeholders.put(REGIONAL_OFFICE_PHONE_LITERAL, defaultToEmptyStringIfNull(rpc.getPhoneNumber()));
-            placeholders.put(REGIONAL_OFFICE_FAX_LITERAL, defaultToEmptyStringIfNull(rpc.getFaxNumber()));
-            placeholders.put(REGIONAL_OFFICE_POSTCODE_LITERAL, defaultToEmptyStringIfNull(rpc.getPostcode()));
-        }
     }
 
     @Override

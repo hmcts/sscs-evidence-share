@@ -33,7 +33,14 @@ public class Dl6AndDl16PlaceholderService {
 
     public Map<String, Object> generatePlaceholders(SscsCaseData caseData, LocalDateTime caseCreatedDate) {
         Map<String, Object> placeholders = new ConcurrentHashMap<>();
+        setCommonPlaceholders(caseData, placeholders);
+        placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate.toLocalDate().toString());
+        rpcPlaceholderService.setRegionalProcessingOfficeAddress(placeholders, caseData);
+        dwpAddressPlaceholderService.verifyAndSetDwpAddress(placeholders, caseData);
+        return placeholders;
+    }
 
+    private void setCommonPlaceholders(SscsCaseData caseData, Map<String, Object> placeholders) {
         Appeal appeal = caseData.getAppeal();
         placeholders.put(BENEFIT_TYPE_LITERAL, appeal.getBenefitType().getDescription().toUpperCase());
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
@@ -42,11 +49,6 @@ public class Dl6AndDl16PlaceholderService {
         placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, generateNowDate());
         placeholders.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());
-
-        placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate.toLocalDate().toString());
-        rpcPlaceholderService.setRegionalProcessingOfficeAddress(placeholders, caseData);
-        dwpAddressPlaceholderService.verifyAndSetDwpAddress(placeholders, caseData);
-        return placeholders;
     }
 
     private String generateNowDate() {
