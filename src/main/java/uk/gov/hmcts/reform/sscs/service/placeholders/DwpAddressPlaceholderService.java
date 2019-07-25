@@ -7,7 +7,6 @@ import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.config.PlaceholderConstants;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;

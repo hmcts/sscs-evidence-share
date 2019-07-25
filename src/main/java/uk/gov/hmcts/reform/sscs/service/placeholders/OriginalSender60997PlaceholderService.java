@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ORIGINAL_SENDER_ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ORIGINAL_SENDER_ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ORIGINAL_SENDER_ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ORIGINAL_SENDER_ADDRESS_LINE_4;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 
 import java.util.Map;
@@ -7,11 +11,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Service
 public class OriginalSender60997PlaceholderService {
+
     @Autowired
     private RpcPlaceholderService rpcPlaceholderService;
     @Autowired
@@ -23,13 +27,11 @@ public class OriginalSender60997PlaceholderService {
         commonPlaceholderService.populatePlaceholders(caseData, placeholders);
         rpcPlaceholderService.populatePlaceHolders(placeholders, caseData);
 
-        Appeal appeal = caseData.getAppeal();
-        Address address = appeal.getAppellant().getAddress();
-        //todo: add literal string to the constant class
-        placeholders.put("original_sender_address_line1", defaultToEmptyStringIfNull(address.getLine1()));
-        placeholders.put("original_sender_address_line2", defaultToEmptyStringIfNull(address.getLine2()));
-        placeholders.put("original_sender_address_line3", defaultToEmptyStringIfNull(address.getCounty()));
-        placeholders.put("original_sender_address_line4", defaultToEmptyStringIfNull(address.getPostcode()));
+        Address address = caseData.getAppeal().getAppellant().getAddress();
+        placeholders.put(ORIGINAL_SENDER_ADDRESS_LINE_1, defaultToEmptyStringIfNull(address.getLine1()));
+        placeholders.put(ORIGINAL_SENDER_ADDRESS_LINE_2, defaultToEmptyStringIfNull(address.getLine2()));
+        placeholders.put(ORIGINAL_SENDER_ADDRESS_LINE_3, defaultToEmptyStringIfNull(address.getCounty()));
+        placeholders.put(ORIGINAL_SENDER_ADDRESS_LINE_4, defaultToEmptyStringIfNull(address.getPostcode()));
 
         return placeholders;
     }

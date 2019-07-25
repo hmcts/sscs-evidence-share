@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
 
 import java.time.LocalDateTime;
 import java.util.Map;

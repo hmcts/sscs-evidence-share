@@ -3,10 +3,10 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.DWP_ADDRESS_LINE1_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.DWP_ADDRESS_LINE2_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.DWP_ADDRESS_LINE3_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.DWP_ADDRESS_LINE4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.DWP_ADDRESS_LINE1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.DWP_ADDRESS_LINE2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.DWP_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.DWP_ADDRESS_LINE4_LITERAL;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
