@@ -10,8 +10,14 @@ import java.util.Collections;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -20,15 +26,31 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
+import uk.gov.hmcts.reform.sscs.service.placeholders.OriginalSender60997PlaceholderService;
 
 @RunWith(JUnitParamsRunner.class)
 public class IssueFurtherEvidenceHandlerTest {
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+
+    @Mock
+    private PdfGenerationService pdfGenerationService;
+    @Mock
+    private OriginalSender60997PlaceholderService originalSender60997PlaceholderService;
+    @InjectMocks
+    private IssueFurtherEvidenceHandler issueFurtherEvidenceHandler;
+
+    @Test
+    public void givenIssueFurtherEvidenceCallback_shouldHandleIt() {
+
+    }
 
     @Test
     @Parameters(method = "generateDifferentTestScenarios")
     public void givenIssueFurtherEvidenceCallback_shouldBeHandledUnderCertainConditions(SscsCaseData sscsCaseData,
                                                                                         boolean expected) {
-        IssueFurtherEvidenceHandler issueFurtherEvidenceHandler = new IssueFurtherEvidenceHandler();
 
         boolean actual = issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(sscsCaseData));
