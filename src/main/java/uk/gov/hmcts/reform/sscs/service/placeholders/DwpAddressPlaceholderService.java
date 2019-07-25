@@ -18,7 +18,7 @@ public class DwpAddressPlaceholderService {
     @Autowired
     private DwpAddressLookup dwpAddressLookup;
 
-    void verifyAndSetDwpAddress(Map<String, Object> placeholders, SscsCaseData caseData) {
+    void populatePlaceholders(Map<String, Object> placeholders, SscsCaseData caseData) {
         if (Objects.nonNull(caseData.getAppeal()) && Objects.nonNull(caseData.getAppeal().getMrnDetails())
             && Objects.nonNull(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice())) {
 

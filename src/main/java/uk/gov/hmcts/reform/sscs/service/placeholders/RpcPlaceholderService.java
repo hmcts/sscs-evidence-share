@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @Service
 public class RpcPlaceholderService {
 
-    public void setRegionalProcessingOfficeAddress(Map<String, Object> placeholders, SscsCaseData caseData) {
+    public void populatePlaceHolders(Map<String, Object> placeholders, SscsCaseData caseData) {
         if (hasRegionalProcessingCenter(caseData)) {
             RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
             placeholders.put(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL, defaultToEmptyStringIfNull(rpc.getAddress1()));

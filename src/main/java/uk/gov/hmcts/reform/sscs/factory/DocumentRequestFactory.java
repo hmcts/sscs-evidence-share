@@ -23,7 +23,7 @@ public class DocumentRequestFactory {
 
     public <E extends SscsCaseData> DocumentHolder create(E caseData, LocalDateTime caseCreatedDate) {
         Template template = templateService.findTemplate(caseData);
-        Map<String, Object> placeholders = dl6AndDl16PlaceholderService.generatePlaceholders(caseData, caseCreatedDate);
+        Map<String, Object> placeholders = dl6AndDl16PlaceholderService.populatePlaceholders(caseData, caseCreatedDate);
 
         return DocumentHolder.builder()
             .template(template)

@@ -57,18 +57,6 @@ public class Dl6AndDl16PlaceholderServiceIt {
     private LocalDateTime now;
 
     @Autowired
-    private DwpAddressLookup dwpAddressLookup;
-
-    @Autowired
-    private DwpAddressPlaceholderService dwpAddressPlaceholderService;
-
-    @Autowired
-    private PdfDocumentConfig pdfDocumentConfig;
-
-    @Autowired
-    private RpcPlaceholderService rpcPlaceholderService;
-
-    @Autowired
     private Dl6AndDl16PlaceholderService dl6AndDl16PlaceholderService;
 
     @Before
@@ -85,7 +73,7 @@ public class Dl6AndDl16PlaceholderServiceIt {
             .address4(RPC_ADDRESS4).city(RPC_CITY).postcode(POSTCODE).build();
 
         caseData = buildCaseData(rpc);
-        Map<String, Object> result = dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
+        Map<String, Object> result = dl6AndDl16PlaceholderService.populatePlaceholders(caseData, now);
 
         assertEquals(now.toLocalDate().toString(), result.get(CASE_CREATED_DATE_LITERAL));
         assertEquals(RPC_ADDRESS1, result.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
@@ -107,7 +95,7 @@ public class Dl6AndDl16PlaceholderServiceIt {
     @Test
     public void givenACaseDataWithNoRpc_thenGenerateThePlaceholderMappingsWithoutRpc() {
         caseData = buildCaseData(null);
-        Map<String, Object> result = dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
+        Map<String, Object> result = dl6AndDl16PlaceholderService.populatePlaceholders(caseData, now);
 
         assertEquals(now.toLocalDate().toString(), result.get(CASE_CREATED_DATE_LITERAL));
         assertNull(result.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
@@ -122,7 +110,7 @@ public class Dl6AndDl16PlaceholderServiceIt {
     public void anAddressWithTwoLinesAndPostCodeWillNotHaveRow4() {
         caseData = buildCaseData(null);
         DwpAddress dwpAddress = new DwpAddress("Mail Handling Site A", "WOLVERHAMPTON", "WV98 1AA");
-        Map<String, Object> result = dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
+        Map<String, Object> result = dl6AndDl16PlaceholderService.populatePlaceholders(caseData, now);
         assertEquals(dwpAddress.lines()[0], result.get(DWP_ADDRESS_LINE1_LITERAL));
         assertEquals(dwpAddress.lines()[1], result.get(DWP_ADDRESS_LINE2_LITERAL));
         assertEquals(dwpAddress.lines()[2], result.get(DWP_ADDRESS_LINE3_LITERAL));
@@ -133,7 +121,7 @@ public class Dl6AndDl16PlaceholderServiceIt {
     public void asAppealWithNoMrnDetailsWillNotHaveADwpAddress() {
         caseData = buildCaseData(null);
         caseData = caseData.toBuilder().appeal(caseData.getAppeal().toBuilder().mrnDetails(null).build()).build();
-        dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
+        dl6AndDl16PlaceholderService.populatePlaceholders(caseData, now);
     }
 
     @Test(expected = NoMrnDetailsException.class)
@@ -141,7 +129,7 @@ public class Dl6AndDl16PlaceholderServiceIt {
         caseData = buildCaseData(null);
         caseData = caseData.toBuilder().appeal(caseData.getAppeal().toBuilder().mrnDetails(
             MrnDetails.builder().mrnLateReason("soz").build()).build()).build();
-        dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now);
+        dl6AndDl16PlaceholderService.populatePlaceholders(caseData, now);
     }
 
     private SscsCaseData buildCaseData(RegionalProcessingCenter rpc) {

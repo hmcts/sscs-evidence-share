@@ -42,7 +42,7 @@ public class DocumentRequestFactoryTest {
         Template template = new Template("bla", "bla2");
 
         given(templateService.findTemplate(caseData)).willReturn(template);
-        given(dl6AndDl16PlaceholderService.generatePlaceholders(caseData, now)).willReturn(placeholders);
+        given(dl6AndDl16PlaceholderService.populatePlaceholders(caseData, now)).willReturn(placeholders);
 
         DocumentHolder holder = factory.create(caseData, now);
 

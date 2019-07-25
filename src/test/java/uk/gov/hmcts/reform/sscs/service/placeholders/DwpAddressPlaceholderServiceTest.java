@@ -54,7 +54,7 @@ public class DwpAddressPlaceholderServiceTest {
         dwpAddress = new DwpAddress(RPC_ADDRESS1, "", POSTCODE);
         when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
 
-        dwpAddressPlaceholderService.verifyAndSetDwpAddress(placeholders, caseData);
+        dwpAddressPlaceholderService.populatePlaceholders(placeholders, caseData);
 
         assertEquals(dwpAddress.lines()[0], placeholders.get(DWP_ADDRESS_LINE1_LITERAL));
         assertEquals(dwpAddress.lines()[1], placeholders.get(DWP_ADDRESS_LINE2_LITERAL));
@@ -67,7 +67,7 @@ public class DwpAddressPlaceholderServiceTest {
         dwpAddress = new DwpAddress("", "", POSTCODE);
         when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
 
-        dwpAddressPlaceholderService.verifyAndSetDwpAddress(placeholders, caseData);
+        dwpAddressPlaceholderService.populatePlaceholders(placeholders, caseData);
 
         assertEquals(dwpAddress.lines()[0], placeholders.get(DWP_ADDRESS_LINE1_LITERAL));
         assertNull(placeholders.get(DWP_ADDRESS_LINE2_LITERAL));
@@ -80,7 +80,7 @@ public class DwpAddressPlaceholderServiceTest {
         dwpAddress = new DwpAddress("", "", "");
         when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
 
-        dwpAddressPlaceholderService.verifyAndSetDwpAddress(placeholders, caseData);
+        dwpAddressPlaceholderService.populatePlaceholders(placeholders, caseData);
 
         assertNull(placeholders.get(DWP_ADDRESS_LINE1_LITERAL));
         assertNull(placeholders.get(DWP_ADDRESS_LINE2_LITERAL));

@@ -1,19 +1,11 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.CASE_ID_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.GENERATED_DATE_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.NINO_LITERAL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.SSCS_URL;
-import static uk.gov.hmcts.reform.sscs.config.PlaceholderConstants.SSCS_URL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
+import uk.gov.hmcts.reform.sscs.service.placeholders.CommonPlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.RpcPlaceholderService;
 
 @Service
@@ -37,16 +30,15 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
     @Value("${document.pdf.hmctsImgKey}")
     private String hmctsImgKey;
-
     @Value("${document.pdf.hmctsImgVal}")
     private String hmctsImgVal;
-
     @Qualifier("docmosisPdfGenerationService")
     @Autowired
     private PdfGenerationService pdfGenerationService;
-
     @Autowired
     private RpcPlaceholderService rpcPlaceholderService;
+    @Autowired
+    private CommonPlaceholderService commonPlaceholderService;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -75,36 +67,25 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         return pdfGenerationService.generatePdf(DocumentHolder.builder()
             .template(new Template("TB-SCS-GNO-ENG-00068.doc",
                 "609-97-template (original sender)"))
-            .placeholders(populatePlaceHolders(callback))
+            .placeholders(populatePlaceHolders(callback.getCaseDetails().getCaseData()))
             .pdfArchiveMode(true)
             .build());
     }
 
-    private Map<String, Object> populatePlaceHolders(Callback<SscsCaseData> callback) {
+    //todo: extract and delegate to new OriginalSender609_97PlaceholderService
+    private Map<String, Object> populatePlaceHolders(SscsCaseData caseData) {
         Map<String, Object> placeholders = new ConcurrentHashMap<>();
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        commonPlaceholderService.populatePlaceholders(caseData, placeholders);
+        rpcPlaceholderService.populatePlaceHolders(placeholders, caseData);
+
         Appeal appeal = caseData.getAppeal();
-
-        placeholders.put(BENEFIT_TYPE_LITERAL, appeal.getBenefitType().getDescription().toUpperCase());
-        placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
-        placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
-        placeholders.put(NINO_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getNino()));
-        placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
-        placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
-        placeholders.put(hmctsImgKey, hmctsImgVal);
-
         Address address = appeal.getAppellant().getAddress();
         placeholders.put("original_sender_address_line1", defaultToEmptyStringIfNull(address.getLine1()));
         placeholders.put("original_sender_address_line2", defaultToEmptyStringIfNull(address.getLine2()));
         placeholders.put("original_sender_address_line3", defaultToEmptyStringIfNull(address.getCounty()));
         placeholders.put("original_sender_address_line4", defaultToEmptyStringIfNull(address.getPostcode()));
 
-        rpcPlaceholderService.setRegionalProcessingOfficeAddress(placeholders, caseData);
         return placeholders;
-    }
-
-    private Object defaultToEmptyStringIfNull(Object value) {
-        return (value == null) ? StringUtils.EMPTY : value;
     }
 
     @Override
