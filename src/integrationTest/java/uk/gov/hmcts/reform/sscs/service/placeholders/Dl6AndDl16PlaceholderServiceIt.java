@@ -37,10 +37,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
-import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
