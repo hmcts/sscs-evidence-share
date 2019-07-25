@@ -16,12 +16,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @Service
 public class OriginalSender60997PlaceholderService {
 
-    @Autowired
-    private RpcPlaceholderService rpcPlaceholderService;
-    @Autowired
-    private CommonPlaceholderService commonPlaceholderService;
+    private final RpcPlaceholderService rpcPlaceholderService;
+    private final CommonPlaceholderService commonPlaceholderService;
 
-    //todo: add junit test
+    @Autowired
+    public OriginalSender60997PlaceholderService(RpcPlaceholderService rpcPlaceholderService,
+                                                 CommonPlaceholderService commonPlaceholderService) {
+        this.rpcPlaceholderService = rpcPlaceholderService;
+        this.commonPlaceholderService = commonPlaceholderService;
+    }
+
     public Map<String, Object> populatePlaceHolders(SscsCaseData caseData) {
         Map<String, Object> placeholders = new ConcurrentHashMap<>();
         commonPlaceholderService.populatePlaceholders(caseData, placeholders);

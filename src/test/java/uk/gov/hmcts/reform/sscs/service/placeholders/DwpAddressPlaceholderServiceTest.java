@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.DWP_ADDRESS_LINE2_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.DWP_ADDRESS_LINE3_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.DWP_ADDRESS_LINE4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseData;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,13 +17,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;
@@ -45,7 +39,7 @@ public class DwpAddressPlaceholderServiceTest {
 
     @Before
     public void setUp() {
-        caseData = buildCaseData(null);
+        caseData = buildCaseData();
         placeholders = new ConcurrentHashMap<>();
     }
 
@@ -86,21 +80,6 @@ public class DwpAddressPlaceholderServiceTest {
         assertNull(placeholders.get(DWP_ADDRESS_LINE2_LITERAL));
         assertNull(placeholders.get(DWP_ADDRESS_LINE3_LITERAL));
         assertNull(placeholders.get(DWP_ADDRESS_LINE4_LITERAL));
-    }
-
-    public static SscsCaseData buildCaseData(RegionalProcessingCenter rpc) {
-        return SscsCaseData.builder()
-            .ccdCaseId("123456")
-            .regionalProcessingCenter(rpc)
-            .appeal(Appeal.builder()
-                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
-                .benefitType(BenefitType.builder().code("PIP").description("Personal Independence Payment").build())
-                .appellant(Appellant.builder()
-                    .name(Name.builder().title("Mr").firstName("Terry").lastName("Tibbs").build())
-                    .identity(Identity.builder().nino("JT0123456B").build())
-                    .build())
-                .build())
-            .build();
     }
 
 
