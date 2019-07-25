@@ -14,7 +14,6 @@ public class SscsDocumentToPdfService {
     @Autowired
     private EvidenceManagementService evidenceManagementService;
 
-    //todo: unit test
     public List<Pdf> getPdfsForGivenDocType(List<SscsDocument> sscsDocument, DocumentType documentType) {
         return sscsDocument.stream()
             .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType()))

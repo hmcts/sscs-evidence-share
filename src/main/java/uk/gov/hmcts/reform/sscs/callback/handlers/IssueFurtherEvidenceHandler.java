@@ -45,6 +45,9 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
     @Override
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         bulkPrintService.sendToBulkPrint(buildPdfsToBulkPrint(caseData), caseData);
         //And the Evidence Issued Flag on the Document is set to "Yes"

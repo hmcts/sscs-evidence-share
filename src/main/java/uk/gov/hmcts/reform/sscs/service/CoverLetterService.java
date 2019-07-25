@@ -20,7 +20,6 @@ public class CoverLetterService {
     @Qualifier("docmosisPdfGenerationService")
     private PdfGenerationService pdfGenerationService;
 
-    //todo: unit test
     public void appendCoverLetter(SscsCaseData caseData, List<Pdf> pdfsToBulkPrint) {
         byte[] coverLetterContent = generate609_97_OriginalSenderCoverLetter(caseData);
         Pdf pdfCoverLetter = new Pdf(coverLetterContent, "609_97_OriginalSenderCoverLetter");

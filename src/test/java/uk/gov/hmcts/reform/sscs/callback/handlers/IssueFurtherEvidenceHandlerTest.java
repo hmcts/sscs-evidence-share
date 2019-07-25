@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
@@ -53,7 +54,43 @@ public class IssueFurtherEvidenceHandlerTest {
     @InjectMocks
     private IssueFurtherEvidenceHandler issueFurtherEvidenceHandler;
 
-    //todo: test scenario for when callback or caseData is null or empty
+    @Test(expected = NullPointerException.class)
+    public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException() {
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, null);
+    }
+
+    @Test(expected = RequiredFieldMissingException.class)
+    public void givenCaseDataInCallbackIsNull_shouldThrowException() {
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(null));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void givenCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
+        issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED, null);
+    }
+
+    @Test(expected = RequiredFieldMissingException.class)
+    public void givenCaseDataInCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
+        issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(null));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void givenHandleMethodIsCalled_shouldThrowExceptionIfCanNotBeHandled() {
+        SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(APPELLANT_EVIDENCE.getValue())
+                .evidenceIssued("Yes")
+                .build())
+            .build();
+
+        SscsCaseData sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued = SscsCaseData.builder()
+            .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
+            .build();
+
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
+    }
+
     //todo: integration tests, functional tests??
 
     @Test
@@ -69,10 +106,6 @@ public class IssueFurtherEvidenceHandlerTest {
             .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
             .build();
 
-        //        given(originalSender60997PlaceholderService
-        //            .populatePlaceHolders(eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued)))
-        //            .willReturn(Collections.singletonMap("someKey", "someValue"));
-
         List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some name"));
         given(sscsDocumentToPdfService.getPdfsForGivenDocType(
             eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), eq(APPELLANT_EVIDENCE)))
@@ -87,16 +120,6 @@ public class IssueFurtherEvidenceHandlerTest {
         then(bulkPrintService).should(times(1))
             .sendToBulkPrint(eq(pdfList), eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
 
-        //        ArgumentCaptor<DocumentHolder> argumentCaptor = ArgumentCaptor.forClass(DocumentHolder.class);
-        //        then(pdfGenerationService).should(times(1)).generatePdf(argumentCaptor.capture());
-        //        DocumentHolder documentHolder = argumentCaptor.getValue();
-        //        assertEquals("TB-SCS-GNO-ENG-00068.doc", documentHolder.getTemplate().getTemplateName());
-        //        assertEquals(Collections.singletonMap("someKey", "someValue").toString(),
-        //            documentHolder.getPlaceholders().toString());
-        //        assertTrue(documentHolder.isPdfArchiveMode());
-        //
-        //        then(originalSender60997PlaceholderService).should(times(1))
-        //            .populatePlaceHolders(eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
     }
 
     @Test
