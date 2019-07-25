@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -12,13 +12,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -32,9 +32,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
-import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
-import uk.gov.hmcts.reform.sscs.service.placeholders.OriginalSender60997PlaceholderService;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
+import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
+import uk.gov.hmcts.reform.sscs.service.SscsDocumentToPdfService;
 
 @RunWith(JUnitParamsRunner.class)
 public class IssueFurtherEvidenceHandlerTest {
@@ -43,11 +44,17 @@ public class IssueFurtherEvidenceHandlerTest {
     public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
-    private PdfGenerationService pdfGenerationService;
+    private CoverLetterService coverLetterService;
     @Mock
-    private OriginalSender60997PlaceholderService originalSender60997PlaceholderService;
+    private SscsDocumentToPdfService sscsDocumentToPdfService;
+    @Mock
+    private BulkPrintService bulkPrintService;
+
     @InjectMocks
     private IssueFurtherEvidenceHandler issueFurtherEvidenceHandler;
+
+    //todo: test scenario for when callback or caseData is null or empty
+    //todo: integration tests, functional tests??
 
     @Test
     public void givenIssueFurtherEvidenceCallback_shouldHandleIt() {
@@ -62,23 +69,34 @@ public class IssueFurtherEvidenceHandlerTest {
             .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
             .build();
 
-        given(originalSender60997PlaceholderService
-            .populatePlaceHolders(eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued)))
-            .willReturn(Collections.singletonMap("someKey", "someValue"));
+        //        given(originalSender60997PlaceholderService
+        //            .populatePlaceHolders(eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued)))
+        //            .willReturn(Collections.singletonMap("someKey", "someValue"));
+
+        List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some name"));
+        given(sscsDocumentToPdfService.getPdfsForGivenDocType(
+            eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), eq(APPELLANT_EVIDENCE)))
+            .willReturn(pdfList);
 
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
 
-        ArgumentCaptor<DocumentHolder> argumentCaptor = ArgumentCaptor.forClass(DocumentHolder.class);
-        then(pdfGenerationService).should(times(1)).generatePdf(argumentCaptor.capture());
-        DocumentHolder documentHolder = argumentCaptor.getValue();
-        assertEquals("TB-SCS-GNO-ENG-00068.doc", documentHolder.getTemplate().getTemplateName());
-        assertEquals(Collections.singletonMap("someKey", "someValue").toString(),
-            documentHolder.getPlaceholders().toString());
-        assertTrue(documentHolder.isPdfArchiveMode());
+        then(coverLetterService).should(times(1))
+            .appendCoverLetter(eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued),
+                anyList());
+        then(bulkPrintService).should(times(1))
+            .sendToBulkPrint(eq(pdfList), eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
 
-        then(originalSender60997PlaceholderService).should(times(1))
-            .populatePlaceHolders(eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
+        //        ArgumentCaptor<DocumentHolder> argumentCaptor = ArgumentCaptor.forClass(DocumentHolder.class);
+        //        then(pdfGenerationService).should(times(1)).generatePdf(argumentCaptor.capture());
+        //        DocumentHolder documentHolder = argumentCaptor.getValue();
+        //        assertEquals("TB-SCS-GNO-ENG-00068.doc", documentHolder.getTemplate().getTemplateName());
+        //        assertEquals(Collections.singletonMap("someKey", "someValue").toString(),
+        //            documentHolder.getPlaceholders().toString());
+        //        assertTrue(documentHolder.isPdfArchiveMode());
+        //
+        //        then(originalSender60997PlaceholderService).should(times(1))
+        //            .populatePlaceHolders(eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
     }
 
     @Test
