@@ -50,7 +50,6 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         //And the Evidence Issued Flag on the Document is set to "Yes"
     }
 
-    //todo: add unit test
     private byte[] generate609_97_OriginalSenderCoverLetter(Callback<SscsCaseData> callback) {
         return pdfGenerationService.generatePdf(DocumentHolder.builder()
             .template(new Template("TB-SCS-GNO-ENG-00068.doc",

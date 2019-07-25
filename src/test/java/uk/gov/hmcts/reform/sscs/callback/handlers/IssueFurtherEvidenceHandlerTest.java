@@ -1,6 +1,11 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 
@@ -13,6 +18,7 @@ import junitparams.Parameters;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -26,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.OriginalSender60997PlaceholderService;
 
@@ -44,7 +51,34 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test
     public void givenIssueFurtherEvidenceCallback_shouldHandleIt() {
+        SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(APPELLANT_EVIDENCE.getValue())
+                .evidenceIssued("No")
+                .build())
+            .build();
 
+        SscsCaseData sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued = SscsCaseData.builder()
+            .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
+            .build();
+
+        given(originalSender60997PlaceholderService
+            .populatePlaceHolders(eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued)))
+            .willReturn(Collections.singletonMap("someKey", "someValue"));
+
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
+
+        ArgumentCaptor<DocumentHolder> argumentCaptor = ArgumentCaptor.forClass(DocumentHolder.class);
+        then(pdfGenerationService).should(times(1)).generatePdf(argumentCaptor.capture());
+        DocumentHolder documentHolder = argumentCaptor.getValue();
+        assertEquals("TB-SCS-GNO-ENG-00068.doc", documentHolder.getTemplate().getTemplateName());
+        assertEquals(Collections.singletonMap("someKey", "someValue").toString(),
+            documentHolder.getPlaceholders().toString());
+        assertTrue(documentHolder.isPdfArchiveMode());
+
+        then(originalSender60997PlaceholderService).should(times(1))
+            .populatePlaceHolders(eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
     }
 
     @Test
