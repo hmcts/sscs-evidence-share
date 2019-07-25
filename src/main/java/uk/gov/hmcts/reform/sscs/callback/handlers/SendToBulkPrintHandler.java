@@ -94,6 +94,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         BulkPrintInfo bulkPrintInfo = null;
+
+        caseData.setHmctsDwpState(null);
         try {
             bulkPrintInfo = bulkPrintCase(callback);
         } catch (Exception e) {

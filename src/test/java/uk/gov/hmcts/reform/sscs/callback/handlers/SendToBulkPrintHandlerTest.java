@@ -177,6 +177,8 @@ public class SendToBulkPrintHandlerTest {
 
         List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
         assertNull(docs.get(0).getValue().getEvidenceIssued());
+        assertEquals("Yes", docs.get(1).getValue().getEvidenceIssued());
+        assertNull(caseDataCaptor.getValue().getHmctsDwpState());
     }
 
     @Test
@@ -309,6 +311,7 @@ public class SendToBulkPrintHandlerTest {
                 .receivedVia(receivedVia)
                 .build())
             .sscsDocument(sscsDocuments)
+            .hmctsDwpState("hello")
             .build();
 
         return new CaseDetails<>(
