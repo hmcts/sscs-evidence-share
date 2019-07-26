@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -40,7 +42,12 @@ public class SscsDocumentToPdfServiceTest {
     private SscsDocumentToPdfService sscsDocumentToPdfService;
 
     @Test
-    public void getPdfsForGivenDocType() {
+    @Parameters({
+        "APPELLANT_EVIDENCE,appellantEvidenceDoc",
+        "REPRESENTATIVE_EVIDENCE,repsEvidenceDoc",
+        "OTHER_DOCUMENT,otherEvidenceDoc"
+    })
+    public void getPdfsForGivenDocType(DocumentType documentType, String expectedDocName) {
 
         given(evidenceManagementService.download(ArgumentMatchers.any(URI.class), eq("sscs")))
             .willReturn(new byte[]{'a'});
@@ -71,11 +78,11 @@ public class SscsDocumentToPdfServiceTest {
             .build();
 
         List<Pdf> actualPdfs = sscsDocumentToPdfService.getPdfsForGivenDocType(
-            Arrays.asList(sscsDocumentAppellantType, sscsDocumentRepsType, sscsDocumentOtherType), APPELLANT_EVIDENCE);
+            Arrays.asList(sscsDocumentAppellantType, sscsDocumentRepsType, sscsDocumentOtherType), documentType);
 
         assertThat(actualPdfs, hasSize(1));
         assertThat(actualPdfs, hasItems(
-            new Pdf(new byte[]{'a'}, "appellantEvidenceDoc")
+            new Pdf(new byte[]{'a'}, expectedDocName)
         ));
 
     }
