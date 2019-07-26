@@ -1,5 +1,5 @@
 java:
-  image: 'https://hmcts.azurecr.io/hmcts/sscs-evidence-share:latest'
+  image: 'https://hmctspublic.azurecr.io/hmcts/sscs/evidence-share:latest'
   applicationPort: 8091
   keyVaults:
     sscs:

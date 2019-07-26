@@ -3,6 +3,6 @@ description: SSCS Evidence Share
 home: https://github.com/hmcts/sscs-evidence-share
 apiVersion: v1
 appVersion: "1.0"
-version: 0.0.3
+version: 0.0.4
 maintainers:
   - name: HMCTS SSCS Team
