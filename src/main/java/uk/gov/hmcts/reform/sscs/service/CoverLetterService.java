@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +23,8 @@ public class CoverLetterService {
     private PdfGenerationService pdfGenerationService;
 
     public void appendCoverLetter(SscsCaseData caseData, List<Pdf> pdfsToBulkPrint) {
+        requireNonNull(caseData, "caseData must not be null");
+        requireNonNull(pdfsToBulkPrint, "pdfsToBulkPrint must not be null");
         byte[] coverLetterContent = generate609_97_OriginalSenderCoverLetter(caseData);
         Pdf pdfCoverLetter = new Pdf(coverLetterContent, "609_97_OriginalSenderCoverLetter");
         pdfsToBulkPrint.add(0, pdfCoverLetter);
