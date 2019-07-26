@@ -91,8 +91,6 @@ public class IssueFurtherEvidenceHandlerTest {
             buildTestCallbackForGivenData(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
     }
 
-    //todo: integration tests, functional tests??
-
     @Test
     public void givenIssueFurtherEvidenceCallback_shouldHandleIt() {
         SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()

@@ -14,21 +14,20 @@ public class SscsDocumentToPdfService {
     @Autowired
     private EvidenceManagementService evidenceManagementService;
 
-    public List<Pdf> getPdfsForGivenDocType(List<SscsDocument> sscsDocument, DocumentType documentType) {
-        return sscsDocument.stream()
+    public List<Pdf> getPdfsForGivenDocType(List<SscsDocument> sscsDocuments, DocumentType documentType) {
+        return sscsDocuments.stream()
             .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType()))
             .map(this::toPdf)
             .collect(Collectors.toList());
     }
 
     private Pdf toPdf(SscsDocument sscsDocument) {
-        return new Pdf(toBytes(sscsDocument), sscsDocument.getValue().getDocumentFileName());
+        return new Pdf(getContentForGivenDoc(sscsDocument), sscsDocument.getValue().getDocumentFileName());
     }
 
-    private byte[] toBytes(SscsDocument sscsDocument) {
+    private byte[] getContentForGivenDoc(SscsDocument sscsDocument) {
         return evidenceManagementService.download(URI.create(
-            sscsDocument.getValue().getDocumentLink().getDocumentUrl()),
-            "sscs");
+            sscsDocument.getValue().getDocumentLink().getDocumentUrl()), "sscs");
     }
 
 }
