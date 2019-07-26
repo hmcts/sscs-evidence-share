@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @Slf4j
 public class BulkPrintService {
 
-    private static final String XEROX_TYPE_PARAMETER = "SSC001";
+    private static final String XEROX_TYPE_PARAMETER = "SSCS001";
     private static final String CASE_IDENTIFIER = "caseIdentifier";
     private static final String LETTER_TYPE_KEY = "letterType";
     private static final String APPELLANT_NAME = "appellantName";
