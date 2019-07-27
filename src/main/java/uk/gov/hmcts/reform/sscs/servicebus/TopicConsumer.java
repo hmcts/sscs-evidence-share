@@ -49,8 +49,7 @@ public class TopicConsumer {
             processMessage(message);
         } catch (Exception e) {
             if (retry > maxRetryAttempts) {
-                // retried and now unrecoverable. Catch to remove it from the queue.
-                log.error(format("Caught unknown unrecoverable error %s", e.getMessage()), e);
+                throw new RuntimeException(String.format("Caught unknown unrecoverable error %s", e.getMessage()), e);
             } else {
                 log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
                     e.getMessage(), retry, maxRetryAttempts));
