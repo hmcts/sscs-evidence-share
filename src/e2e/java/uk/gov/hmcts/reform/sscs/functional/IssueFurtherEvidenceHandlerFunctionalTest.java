@@ -1,22 +1,50 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
+import static java.util.Collections.singletonList;
+import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Objects;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
+    private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
+    @Autowired
+    private EvidenceManagementService evidenceManagementService;
+
     @Test
     public void givenIssueFurtherEventIsTriggered_shouldBeHandled() throws IOException {
-        //todo: create the test data needed for this test
-        //1. create simple case in CCD
-        //2. upload some docs evidence to EM
-        //3. update the case created above with the document links -> use the updateCaseNoNoCallbacks for this
-        // Now we have a case in CCD with documentLinks that exist in EM and that we can use to issue further evidence
+        String issueFurtherEvidenceCallback = createTestData();
+        simulateCcdCallback(issueFurtherEvidenceCallback);
+    }
 
+    private String createTestData() throws IOException {
+        String docUrl = uploadDocToDMStore();
         String json = getJson(ISSUE_FURTHER_EVIDENCE);
-        simulateCcdCallback(json);
+        json = json.replace("APPELLANT_EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
+        return json.replace("APPELLANT_EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
+    }
 
-        //todo: check that the appellant evidence documents for this test case has the evidenceIssued to Yes
+    private String uploadDocToDMStore() throws IOException {
+        Path evidencePath = new File(Objects.requireNonNull(
+            getClass().getClassLoader().getResource(EVIDENCE_DOCUMENT_PDF)).getFile()).toPath();
+
+        ByteArrayMultipartFile file = ByteArrayMultipartFile.builder()
+            .content(Files.readAllBytes(evidencePath))
+            .name(EVIDENCE_DOCUMENT_PDF)
+            .contentType(APPLICATION_PDF)
+            .build();
+
+        UploadResponse upload = evidenceManagementService.upload(singletonList(file), "sscs");
+
+        return upload.getEmbedded().getDocuments().get(0).links.self.href;
     }
 }

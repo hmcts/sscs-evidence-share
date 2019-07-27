@@ -36,8 +36,9 @@ public class CoverLetterService {
     }
 
     /**
-     * Intended use of this method is only for local development or testing.
-     * This method produces a cover letter pdf and we can review and confirm is correct
+     * Intended use of this method is only for local development or testing. This method produces a
+     * cover letter pdf file and stores it in the application root path.
+     *
      * @param coverLetterContent this is the content in bytes of the cover letter from docmosis
      */
     private void printCoverLetterToPdfLocallyForDebuggingPurpose(byte[] coverLetterContent) {

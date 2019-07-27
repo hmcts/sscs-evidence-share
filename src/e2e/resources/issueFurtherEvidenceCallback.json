@@ -222,14 +222,14 @@
           "id": "636030ca-243f-4a96-8c81-813ab44c1ac8",
           "value": {
             "documentLink": {
-              "document_url": "http://dm-store:4506/documents/ed2d09cf-13ff-4d30-adf2-1c3839702c78",
-              "document_filename": "Screenshot 2019-07-17 at 19.05.10.pdf",
-              "document_binary_url": "http://dm-store:4506/documents/ed2d09cf-13ff-4d30-adf2-1c3839702c78/binary"
+              "document_url": "APPELLANT_EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+              "document_filename": "evidence-document.pdf",
+              "document_binary_url": "APPELLANT_EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
             },
             "documentType": "appellantEvidence",
             "controlNumber": "4",
             "evidenceIssued": "No",
-            "documentFileName": "test_doc",
+            "documentFileName": "evidence-document",
             "documentDateAdded": "2019-01-01"
           }
         },
@@ -241,7 +241,7 @@
               "document_filename": "Screenshot 2019-07-17 at 19.11.41.pdf",
               "document_binary_url": "http://dm-store:4506/documents/427dd05b-8b9f-4e04-a60d-928293c86c72/binary"
             },
-            "documentType": "appellantEvidence",
+            "documentType": "representativeEvidence",
             "controlNumber": "4",
             "evidenceIssued": "No",
             "documentFileName": "test_doc",
