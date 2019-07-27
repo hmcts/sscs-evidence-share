@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
+import uk.gov.hmcts.reform.sscs.exception.UnrecoverableError;
 
 @Slf4j
 @Component
@@ -49,7 +50,7 @@ public class TopicConsumer {
             processMessage(message);
         } catch (Exception e) {
             if (retry > maxRetryAttempts) {
-                throw new RuntimeException(String.format("Caught unknown unrecoverable error %s", e.getMessage()), e);
+                throw new UnrecoverableError(String.format("Caught unknown unrecoverable error %s", e.getMessage()), e);
             } else {
                 log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
                     e.getMessage(), retry, maxRetryAttempts));

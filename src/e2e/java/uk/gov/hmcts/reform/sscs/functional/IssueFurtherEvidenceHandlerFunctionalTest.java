@@ -27,13 +27,13 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     }
 
     private String createTestData() throws IOException {
-        String docUrl = uploadDocToDMStore();
+        String docUrl = uploadDocToDocMgmtStore();
         String json = getJson(ISSUE_FURTHER_EVIDENCE);
         json = json.replace("APPELLANT_EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
         return json.replace("APPELLANT_EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
     }
 
-    private String uploadDocToDMStore() throws IOException {
+    private String uploadDocToDocMgmtStore() throws IOException {
         Path evidencePath = new File(Objects.requireNonNull(
             getClass().getClassLoader().getResource(EVIDENCE_DOCUMENT_PDF)).getFile()).toPath();
 
