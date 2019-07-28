@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
@@ -36,7 +37,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.service.SscsDocumentService;
@@ -53,6 +57,10 @@ public class IssueFurtherEvidenceHandlerTest {
     private SscsDocumentService sscsDocumentService;
     @Mock
     private BulkPrintService bulkPrintService;
+    @Mock
+    private IdamService idamService;
+    @Mock
+    private CcdService ccdService;
 
     @InjectMocks
     private IssueFurtherEvidenceHandler issueFurtherEvidenceHandler;
@@ -98,7 +106,7 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test
     public void givenIssueFurtherEvidenceCallback_shouldGenerateCoverLetterAndBulkPrintDocs() {
-        createTestDataAndConfigureMocks();
+        createTestDataAndConfigureSscsDocumentServiceMock();
 
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(caseData));
@@ -108,17 +116,28 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     @Test
-    public void givenIssueFurtherEvidenceCallback_shouldUpdateEvidenceIssuedPropToYes() {
-        createTestDataAndConfigureMocks();
+    public void givenIssueFurtherEvidenceCallback_shouldUpdateEvidenceIssuedPropToYesInCcd() {
+        createTestDataAndConfigureSscsDocumentServiceMock();
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(caseData));
 
         assertEquals("Yes", caseData.getSscsDocument().get(0).getValue().getEvidenceIssued());
-        verify(sscsDocumentService, times(1)).filterByDocTypeAndApplyAction(anyList(), eq(APPELLANT_EVIDENCE), any());
+        verify(sscsDocumentService, times(1)).filterByDocTypeAndApplyAction(anyList(),
+            eq(APPELLANT_EVIDENCE), any());
+
+        verify(ccdService, times(1)).updateCase(
+            eq(caseData),
+            any(Long.class),
+            eq("sendToDwpError"),
+            any(),
+            any(),
+            any(IdamTokens.class));
     }
 
-    private void createTestDataAndConfigureMocks() {
+    private void createTestDataAndConfigureSscsDocumentServiceMock() {
         SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(APPELLANT_EVIDENCE.getValue())
@@ -127,6 +146,7 @@ public class IssueFurtherEvidenceHandlerTest {
             .build();
 
         caseData = SscsCaseData.builder()
+            .ccdCaseId("1563382899630221")
             .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
             .build();
 
