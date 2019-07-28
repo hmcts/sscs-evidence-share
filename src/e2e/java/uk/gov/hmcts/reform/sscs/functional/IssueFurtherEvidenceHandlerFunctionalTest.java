@@ -1,17 +1,24 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
 import static java.util.Collections.singletonList;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Objects;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
@@ -24,11 +31,23 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     public void givenIssueFurtherEventIsTriggered_shouldBeHandled() throws IOException {
         String issueFurtherEvidenceCallback = createTestData();
         simulateCcdCallback(issueFurtherEvidenceCallback);
+        verifyEvidenceIssued();
+    }
+
+    private void verifyEvidenceIssued() {
+        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+        SscsCaseData caseData = caseDetails.getData();
+        List<SscsDocument> docs = caseData.getSscsDocument();
+        docs.stream()
+            .filter(doc -> APPELLANT_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()))
+            .forEach(doc -> assertThat(doc.getValue().getEvidenceIssued(), is("Yes")));
     }
 
     private String createTestData() throws IOException {
         String docUrl = uploadDocToDocMgmtStore();
+        createCaseWithValidAppealState();
         String json = getJson(ISSUE_FURTHER_EVIDENCE);
+        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("APPELLANT_EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
         return json.replace("APPELLANT_EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
     }
