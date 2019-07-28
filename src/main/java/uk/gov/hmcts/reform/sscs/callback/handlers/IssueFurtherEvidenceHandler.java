@@ -10,7 +10,6 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -66,7 +65,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         ccdService.updateCase(
             caseData,
             Long.valueOf(caseData.getCcdCaseId()),
-            EventType.SENT_TO_DWP_ERROR.getCcdType(),
+            "updateCaseOnly",
             "Update case data only",
             "Simply update case data with no callbacks afterwards",
             idamService.getIdamTokens());
