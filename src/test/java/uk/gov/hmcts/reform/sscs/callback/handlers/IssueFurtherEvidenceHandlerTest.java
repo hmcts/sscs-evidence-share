@@ -92,7 +92,7 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     @Test
-    public void givenIssueFurtherEvidenceCallback_shouldHandleIt() {
+    public void givenIssueFurtherEvidenceCallback_shouldGenerateCoverLetterAndBulkPrintDocs() {
         SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(APPELLANT_EVIDENCE.getValue())
@@ -104,7 +104,7 @@ public class IssueFurtherEvidenceHandlerTest {
             .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
             .build();
 
-        List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some name"));
+        List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some doc name"));
         given(sscsDocumentToPdfService.getPdfsForGivenDocType(
             eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), eq(APPELLANT_EVIDENCE)))
             .willReturn(pdfList);
@@ -117,7 +117,34 @@ public class IssueFurtherEvidenceHandlerTest {
                 anyList());
         then(bulkPrintService).should(times(1))
             .sendToBulkPrint(eq(pdfList), eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
+    }
 
+    @Test
+    public void givenIssueFurtherEvidenceCallback_shouldUpdateEvidenceIssuedPropToYes() {
+        SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(APPELLANT_EVIDENCE.getValue())
+                .evidenceIssued("No")
+                .build())
+            .build();
+
+        SscsCaseData sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued = SscsCaseData.builder()
+            .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
+            .build();
+
+        List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some doc name"));
+        given(sscsDocumentToPdfService.getPdfsForGivenDocType(
+            eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), eq(APPELLANT_EVIDENCE)))
+            .willReturn(pdfList);
+
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
+
+        //todo: verify evidenceIssues prop is updated
+        assertEquals("Yes", sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued
+            .getSscsDocument().get(0).getValue().getEvidenceIssued());
+
+        //todo: verify ccd update is called here
     }
 
     @Test

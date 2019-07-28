@@ -50,7 +50,11 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         bulkPrintService.sendToBulkPrint(buildPdfsToBulkPrint(caseData), caseData);
+
         //And the Evidence Issued Flag on the Document is set to "Yes"
+        caseData.getSscsDocument().stream()
+            .filter(doc -> APPELLANT_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()))
+            .forEach(doc -> doc.getValue().setEvidenceIssued("Yes"));
     }
 
     private List<Pdf> buildPdfsToBulkPrint(SscsCaseData caseData) {
