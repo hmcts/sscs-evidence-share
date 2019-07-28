@@ -2,20 +2,14 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -24,7 +18,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -37,13 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
-import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
-import uk.gov.hmcts.reform.sscs.service.SscsDocumentService;
+import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
 @RunWith(JUnitParamsRunner.class)
 public class IssueFurtherEvidenceHandlerTest {
@@ -52,20 +39,10 @@ public class IssueFurtherEvidenceHandlerTest {
     public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
-    private CoverLetterService coverLetterService;
-    @Spy
-    private SscsDocumentService sscsDocumentService;
-    @Mock
-    private BulkPrintService bulkPrintService;
-    @Mock
-    private IdamService idamService;
-    @Mock
-    private CcdService ccdService;
+    private FurtherEvidenceService furtherEvidenceService;
 
     @InjectMocks
     private IssueFurtherEvidenceHandler issueFurtherEvidenceHandler;
-    private final List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some doc name"));
-    private SscsCaseData caseData;
 
     @Test(expected = NullPointerException.class)
     public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException() {
@@ -105,38 +82,7 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     @Test
-    public void givenIssueFurtherEvidenceCallback_shouldGenerateCoverLetterAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock();
-
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(caseData));
-
-        then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList());
-        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
-    }
-
-    @Test
-    public void givenIssueFurtherEvidenceCallback_shouldUpdateEvidenceIssuedPropToYesInCcd() {
-        createTestDataAndConfigureSscsDocumentServiceMock();
-
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData));
-
-        assertEquals("Yes", caseData.getSscsDocument().get(0).getValue().getEvidenceIssued());
-        verify(sscsDocumentService, times(1)).filterByDocTypeAndApplyAction(anyList(),
-            eq(APPELLANT_EVIDENCE), any());
-
-        verify(ccdService, times(1)).updateCase(
-            eq(caseData),
-            any(Long.class),
-            eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
-            any(),
-            any(),
-            any(IdamTokens.class));
-    }
-
-    private void createTestDataAndConfigureSscsDocumentServiceMock() {
+    public void givenIssueFurtherEvidenceCallback_shouldIssueEvidence() {
         SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(APPELLANT_EVIDENCE.getValue())
@@ -144,13 +90,15 @@ public class IssueFurtherEvidenceHandlerTest {
                 .build())
             .build();
 
-        caseData = SscsCaseData.builder()
+        SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("1563382899630221")
             .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
             .build();
 
-        doReturn(pdfList).when(sscsDocumentService).getPdfsForGivenDocType(
-            eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), eq(APPELLANT_EVIDENCE));
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(caseData));
+
+        verify(furtherEvidenceService).issue(any(SscsCaseData.class), eq(APPELLANT_EVIDENCE));
     }
 
     @Test
@@ -284,4 +232,5 @@ public class IssueFurtherEvidenceHandlerTest {
             LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), EventType.ISSUE_FURTHER_EVIDENCE);
     }
+
 }
