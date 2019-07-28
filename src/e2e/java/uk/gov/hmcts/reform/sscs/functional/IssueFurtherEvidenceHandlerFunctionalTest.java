@@ -28,7 +28,8 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     private EvidenceManagementService evidenceManagementService;
 
     @Test
-    public void givenIssueFurtherEventIsTriggered_shouldBeHandled() throws IOException {
+    public void givenIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
+        throws IOException {
         String issueFurtherEvidenceCallback = createTestData();
         simulateCcdCallback(issueFurtherEvidenceCallback);
         verifyEvidenceIssued();

@@ -75,7 +75,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private List<Pdf> buildPdfsToBulkPrint(SscsCaseData caseData) {
         List<Pdf> pdfsToBulkPrint = sscsDocumentService.getPdfsForGivenDocType(
             caseData.getSscsDocument(), APPELLANT_EVIDENCE);
-        coverLetterService.appendCoverLetter(caseData, pdfsToBulkPrint);
+        byte[] coverLetterContent = coverLetterService.generate609_97_OriginalSenderCoverLetter(caseData);
+        coverLetterService.appendCoverLetter(coverLetterContent, pdfsToBulkPrint);
         return pdfsToBulkPrint;
     }
 

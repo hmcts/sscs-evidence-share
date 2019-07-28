@@ -26,11 +26,9 @@ public class CoverLetterService {
     @Qualifier("docmosisPdfGenerationService")
     private PdfGenerationService pdfGenerationService;
 
-    public void appendCoverLetter(SscsCaseData caseData, List<Pdf> pdfsToBulkPrint) {
-        requireNonNull(caseData, "caseData must not be null");
+    public void appendCoverLetter(byte[] coverLetterContent, List<Pdf> pdfsToBulkPrint) {
+        requireNonNull(coverLetterContent, "coverLetter must not be null");
         requireNonNull(pdfsToBulkPrint, "pdfsToBulkPrint must not be null");
-        byte[] coverLetterContent = generate609_97_OriginalSenderCoverLetter(caseData);
-        printCoverLetterToPdfLocallyForDebuggingPurpose(coverLetterContent);
         Pdf pdfCoverLetter = new Pdf(coverLetterContent, "609_97_OriginalSenderCoverLetter");
         pdfsToBulkPrint.add(0, pdfCoverLetter);
     }
@@ -51,12 +49,15 @@ public class CoverLetterService {
         }
     }
 
-    private byte[] generate609_97_OriginalSenderCoverLetter(SscsCaseData caseData) {
-        return pdfGenerationService.generatePdf(DocumentHolder.builder()
+    public byte[] generate609_97_OriginalSenderCoverLetter(SscsCaseData caseData) {
+        requireNonNull(caseData, "caseData must not be null");
+        byte[] coverLetterContent = pdfGenerationService.generatePdf(DocumentHolder.builder()
             .template(new Template("TB-SCS-GNO-ENG-00068.doc",
                 "609-97-template (original sender)"))
             .placeholders(originalSender60997PlaceholderService.populatePlaceHolders(caseData))
             .pdfArchiveMode(true)
             .build());
+        printCoverLetterToPdfLocallyForDebuggingPurpose(coverLetterContent);
+        return coverLetterContent;
     }
 }

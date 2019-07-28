@@ -45,9 +45,9 @@ public class CoverLetterServiceTest {
 
     @Test
     @Parameters(method = "generateNullScenarios")
-    public void givenNullArgs_shouldThrowException(SscsCaseData caseData, List<Pdf> pdfsToBulkPrint) {
+    public void givenNullArgs_shouldThrowException(byte[] coverLetterContent, List<Pdf> pdfsToBulkPrint) {
         try {
-            coverLetterService.appendCoverLetter(caseData, pdfsToBulkPrint);
+            coverLetterService.appendCoverLetter(coverLetterContent, pdfsToBulkPrint);
             fail();
         } catch (NullPointerException e) {
             assertNotNull(e);
@@ -57,12 +57,21 @@ public class CoverLetterServiceTest {
     private Object[] generateNullScenarios() {
         return new Object[]{
             new Object[]{null, buildPdfListWithOneDoc()},
-            new Object[]{SscsCaseData.builder().build(), null}
+            new Object[]{new byte[]{'d', 'o', 'c'}, null}
         };
     }
 
     @Test
     public void appendCoverLetter() {
+        List<Pdf> pdfsToBulkPrint = buildPdfListWithOneDoc();
+        coverLetterService.appendCoverLetter(new byte[]{'l', 'e', 't', 't', 'e', 'r'}, pdfsToBulkPrint);
+        assertCoverLetterIsFirstDocInList(pdfsToBulkPrint);
+        assertEquals("doc", pdfsToBulkPrint.get(1).getName());
+        assertEquals(Arrays.toString(new byte[]{'d', 'o', 'c'}), Arrays.toString(pdfsToBulkPrint.get(1).getContent()));
+    }
+
+    @Test
+    public void generateCoverLetter() {
         SscsCaseData caseData = SscsCaseData.builder().build();
 
         given(originalSender60997PlaceholderService
@@ -71,16 +80,11 @@ public class CoverLetterServiceTest {
         given(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
             .willReturn(new byte[]{'l', 'e', 't', 't', 'e', 'r'});
 
-        List<Pdf> pdfsToBulkPrint = buildPdfListWithOneDoc();
-        coverLetterService.appendCoverLetter(caseData, pdfsToBulkPrint);
+        coverLetterService.generate609_97_OriginalSenderCoverLetter(caseData);
 
         then(originalSender60997PlaceholderService).should(times(1))
             .populatePlaceHolders(eq(caseData));
-        assertCoverLetterIsFirstDocInList(pdfsToBulkPrint);
-        assertEquals("doc", pdfsToBulkPrint.get(1).getName());
-        assertEquals(Arrays.toString(new byte[]{'d', 'o', 'c'}), Arrays.toString(pdfsToBulkPrint.get(1).getContent()));
         assertArgumentsForPdfGeneration();
-
     }
 
     private void assertArgumentsForPdfGeneration() {

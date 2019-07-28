@@ -111,7 +111,7 @@ public class IssueFurtherEvidenceHandlerTest {
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(caseData));
 
-        then(coverLetterService).should(times(1)).appendCoverLetter(eq(caseData), anyList());
+        then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
     }
 
@@ -121,8 +121,7 @@ public class IssueFurtherEvidenceHandlerTest {
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(caseData));
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData));
 
         assertEquals("Yes", caseData.getSscsDocument().get(0).getValue().getEvidenceIssued());
         verify(sscsDocumentService, times(1)).filterByDocTypeAndApplyAction(anyList(),
@@ -131,7 +130,7 @@ public class IssueFurtherEvidenceHandlerTest {
         verify(ccdService, times(1)).updateCase(
             eq(caseData),
             any(Long.class),
-            eq("sendToDwpError"),
+            eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
             any(),
             any(),
             any(IdamTokens.class));
