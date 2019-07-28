@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
@@ -21,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -36,7 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
-import uk.gov.hmcts.reform.sscs.service.SscsDocumentToPdfService;
+import uk.gov.hmcts.reform.sscs.service.SscsDocumentService;
 
 @RunWith(JUnitParamsRunner.class)
 public class IssueFurtherEvidenceHandlerTest {
@@ -46,13 +49,15 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Mock
     private CoverLetterService coverLetterService;
-    @Mock
-    private SscsDocumentToPdfService sscsDocumentToPdfService;
+    @Spy
+    private SscsDocumentService sscsDocumentService;
     @Mock
     private BulkPrintService bulkPrintService;
 
     @InjectMocks
     private IssueFurtherEvidenceHandler issueFurtherEvidenceHandler;
+    private final List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some doc name"));
+    private SscsCaseData caseData;
 
     @Test(expected = NullPointerException.class)
     public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException() {
@@ -93,34 +98,27 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test
     public void givenIssueFurtherEvidenceCallback_shouldGenerateCoverLetterAndBulkPrintDocs() {
-        SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .documentType(APPELLANT_EVIDENCE.getValue())
-                .evidenceIssued("No")
-                .build())
-            .build();
-
-        SscsCaseData sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued = SscsCaseData.builder()
-            .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
-            .build();
-
-        List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some doc name"));
-        given(sscsDocumentToPdfService.getPdfsForGivenDocType(
-            eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), eq(APPELLANT_EVIDENCE)))
-            .willReturn(pdfList);
+        createTestDataAndConfigureMocks();
 
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
+            buildTestCallbackForGivenData(caseData));
 
-        then(coverLetterService).should(times(1))
-            .appendCoverLetter(eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued),
-                anyList());
-        then(bulkPrintService).should(times(1))
-            .sendToBulkPrint(eq(pdfList), eq(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
+        then(coverLetterService).should(times(1)).appendCoverLetter(eq(caseData), anyList());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
     }
 
     @Test
     public void givenIssueFurtherEvidenceCallback_shouldUpdateEvidenceIssuedPropToYes() {
+        createTestDataAndConfigureMocks();
+
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(caseData));
+
+        assertEquals("Yes", caseData.getSscsDocument().get(0).getValue().getEvidenceIssued());
+        verify(sscsDocumentService, times(1)).filterByDocTypeAndApplyAction(anyList(), eq(APPELLANT_EVIDENCE), any());
+    }
+
+    private void createTestDataAndConfigureMocks() {
         SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(APPELLANT_EVIDENCE.getValue())
@@ -128,23 +126,12 @@ public class IssueFurtherEvidenceHandlerTest {
                 .build())
             .build();
 
-        SscsCaseData sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
             .build();
 
-        List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some doc name"));
-        given(sscsDocumentToPdfService.getPdfsForGivenDocType(
-            eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), eq(APPELLANT_EVIDENCE)))
-            .willReturn(pdfList);
-
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
-
-        //todo: verify evidenceIssues prop is updated
-        assertEquals("Yes", sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued
-            .getSscsDocument().get(0).getValue().getEvidenceIssued());
-
-        //todo: verify ccd update is called here
+        doReturn(pdfList).when(sscsDocumentService).getPdfsForGivenDocType(
+            eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), eq(APPELLANT_EVIDENCE));
     }
 
     @Test

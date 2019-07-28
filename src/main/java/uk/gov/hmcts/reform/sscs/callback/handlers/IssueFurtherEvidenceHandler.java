@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
-import uk.gov.hmcts.reform.sscs.service.SscsDocumentToPdfService;
+import uk.gov.hmcts.reform.sscs.service.SscsDocumentService;
 
 @Service
 public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
@@ -23,7 +23,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     @Autowired
     private CoverLetterService coverLetterService;
     @Autowired
-    private SscsDocumentToPdfService sscsDocumentToPdfService;
+    private SscsDocumentService sscsDocumentService;
     @Autowired
     private BulkPrintService bulkPrintService;
 
@@ -50,15 +50,16 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         bulkPrintService.sendToBulkPrint(buildPdfsToBulkPrint(caseData), caseData);
+        updateEvidenceIssuedProp(caseData);
+    }
 
-        //And the Evidence Issued Flag on the Document is set to "Yes"
-        caseData.getSscsDocument().stream()
-            .filter(doc -> APPELLANT_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()))
-            .forEach(doc -> doc.getValue().setEvidenceIssued("Yes"));
+    private void updateEvidenceIssuedProp(SscsCaseData caseData) {
+        sscsDocumentService.filterByDocTypeAndApplyAction(caseData.getSscsDocument(), APPELLANT_EVIDENCE,
+            doc -> doc.getValue().setEvidenceIssued("Yes"));
     }
 
     private List<Pdf> buildPdfsToBulkPrint(SscsCaseData caseData) {
-        List<Pdf> pdfsToBulkPrint = sscsDocumentToPdfService.getPdfsForGivenDocType(
+        List<Pdf> pdfsToBulkPrint = sscsDocumentService.getPdfsForGivenDocType(
             caseData.getSscsDocument(), APPELLANT_EVIDENCE);
         coverLetterService.appendCoverLetter(caseData, pdfsToBulkPrint);
         return pdfsToBulkPrint;

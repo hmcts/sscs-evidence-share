@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 
 @RunWith(JUnitParamsRunner.class)
-public class SscsDocumentToPdfServiceTest {
+public class SscsDocumentServiceTest {
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
@@ -39,7 +39,7 @@ public class SscsDocumentToPdfServiceTest {
     private EvidenceManagementService evidenceManagementService;
 
     @InjectMocks
-    private SscsDocumentToPdfService sscsDocumentToPdfService;
+    private SscsDocumentService sscsDocumentService;
 
     @Test
     @Parameters({
@@ -77,7 +77,7 @@ public class SscsDocumentToPdfServiceTest {
                 .build())
             .build();
 
-        List<Pdf> actualPdfs = sscsDocumentToPdfService.getPdfsForGivenDocType(
+        List<Pdf> actualPdfs = sscsDocumentService.getPdfsForGivenDocType(
             Arrays.asList(sscsDocumentAppellantType, sscsDocumentRepsType, sscsDocumentOtherType), documentType);
 
         assertThat(actualPdfs, hasSize(1));
