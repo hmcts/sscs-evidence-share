@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -12,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Rule;
@@ -42,6 +44,18 @@ public class SscsDocumentServiceTest {
     private SscsDocumentService sscsDocumentService;
 
     @Test
+    public void filterByDocTypeAndApplyActionHappyPath() {
+        List<SscsDocument> sscsDocumentList = createTestData();
+        Consumer<SscsDocument> action = doc -> doc.getValue().setEvidenceIssued("Yes");
+
+        sscsDocumentService.filterByDocTypeAndApplyAction(sscsDocumentList, APPELLANT_EVIDENCE, action);
+
+        sscsDocumentList.stream()
+            .filter(doc -> APPELLANT_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()))
+            .forEach(doc -> assertThat(doc.getValue().getEvidenceIssued(), is("Yes")));
+    }
+
+    @Test
     @Parameters({
         "APPELLANT_EVIDENCE,appellantEvidenceDoc",
         "REPRESENTATIVE_EVIDENCE,repsEvidenceDoc",
@@ -52,6 +66,16 @@ public class SscsDocumentServiceTest {
         given(evidenceManagementService.download(ArgumentMatchers.any(URI.class), eq("sscs")))
             .willReturn(new byte[]{'a'});
 
+        List<Pdf> actualPdfs = sscsDocumentService.getPdfsForGivenDocType(createTestData(), documentType);
+
+        assertThat(actualPdfs, hasSize(1));
+        assertThat(actualPdfs, hasItems(
+            new Pdf(new byte[]{'a'}, expectedDocName)
+        ));
+
+    }
+
+    private List<SscsDocument> createTestData() {
         DocumentLink documentLink = DocumentLink.builder()
             .documentUrl("http://documentUrl")
             .build();
@@ -76,14 +100,6 @@ public class SscsDocumentServiceTest {
                 .documentLink(documentLink)
                 .build())
             .build();
-
-        List<Pdf> actualPdfs = sscsDocumentService.getPdfsForGivenDocType(
-            Arrays.asList(sscsDocumentAppellantType, sscsDocumentRepsType, sscsDocumentOtherType), documentType);
-
-        assertThat(actualPdfs, hasSize(1));
-        assertThat(actualPdfs, hasItems(
-            new Pdf(new byte[]{'a'}, expectedDocName)
-        ));
-
+        return Arrays.asList(sscsDocumentAppellantType, sscsDocumentRepsType, sscsDocumentOtherType);
     }
 }

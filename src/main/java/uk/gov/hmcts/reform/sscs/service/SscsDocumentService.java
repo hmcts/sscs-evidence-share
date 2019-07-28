@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ public class SscsDocumentService {
     private EvidenceManagementService evidenceManagementService;
 
     public List<Pdf> getPdfsForGivenDocType(List<SscsDocument> sscsDocuments, DocumentType documentType) {
+        Objects.requireNonNull(sscsDocuments);
+        Objects.requireNonNull(documentType);
         return sscsDocuments.stream()
             .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType()))
             .map(this::toPdf)
@@ -33,6 +36,9 @@ public class SscsDocumentService {
 
     public void filterByDocTypeAndApplyAction(List<SscsDocument> sscsDocument, DocumentType documentType,
                                               Consumer<SscsDocument> action) {
+        Objects.requireNonNull(sscsDocument);
+        Objects.requireNonNull(documentType);
+        Objects.requireNonNull(action);
         sscsDocument.stream()
             .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType()))
             .forEach(action);
