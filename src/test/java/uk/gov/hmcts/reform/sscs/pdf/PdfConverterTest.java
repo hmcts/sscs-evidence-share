@@ -10,11 +10,11 @@ class PdfConverterTest {
 
     @Test
     void testJpegToPdfConversion() throws Exception {
-        PdfConverter conv = new PdfConverter();
+        PdfConverter pdfConverter = new PdfConverter();
         byte[] imageBytes = IOUtils.resourceToByteArray("/pdf/dl6.jpg");
-        byte[] pdf = conv.jpegToPdf(imageBytes);
+        byte[] pdf = pdfConverter.jpegToPdf(imageBytes);
         try (PDDocument doc = PDDocument.load(pdf)) {
-            assertEquals(1, doc.getPages().getCount());
+            assertEquals(1, doc.getNumberOfPages());
         }
     }
 
