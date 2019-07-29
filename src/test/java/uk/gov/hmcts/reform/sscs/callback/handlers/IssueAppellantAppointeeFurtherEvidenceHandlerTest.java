@@ -60,7 +60,7 @@ public class IssueAppellantAppointeeFurtherEvidenceHandlerTest {
 
     @Test(expected = IllegalStateException.class)
     public void givenHandleMethodIsCalled_shouldThrowExceptionIfCanNotBeHandled() {
-        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(false);
+        given(furtherEvidenceService.canHandleAnyDocument(any(), eq(APPELLANT_EVIDENCE))).willReturn(false);
 
         issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(SscsCaseData.builder().build()));
@@ -68,7 +68,7 @@ public class IssueAppellantAppointeeFurtherEvidenceHandlerTest {
 
     @Test
     public void givenIssueFurtherEvidenceCallback_shouldIssueEvidence() {
-        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
+        given(furtherEvidenceService.canHandleAnyDocument(any(), eq(APPELLANT_EVIDENCE))).willReturn(true);
 
         issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(SscsCaseData.builder().build()));

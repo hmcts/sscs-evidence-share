@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,13 +51,14 @@ public class FurtherEvidenceService {
         return pdfsToBulkPrint;
     }
 
-    public boolean canHandleAnyDocument(List<SscsDocument> sscsDocument) {
-        return null != sscsDocument && sscsDocument.stream().anyMatch(this::canHandleDocument);
+    public boolean canHandleAnyDocument(List<SscsDocument> sscsDocumentList, DocumentType documentType) {
+        return null != sscsDocumentList && sscsDocumentList.stream()
+            .anyMatch(sscsDocument -> canHandleDocument(sscsDocument, documentType));
     }
 
-    private boolean canHandleDocument(SscsDocument sscsDocument) {
+    private boolean canHandleDocument(SscsDocument sscsDocument, DocumentType documentType) {
         return sscsDocument != null && sscsDocument.getValue() != null
             && "No".equals(sscsDocument.getValue().getEvidenceIssued())
-            && APPELLANT_EVIDENCE.getValue().equals(sscsDocument.getValue().getDocumentType());
+            && documentType.getValue().equals(sscsDocument.getValue().getDocumentType());
     }
 }
