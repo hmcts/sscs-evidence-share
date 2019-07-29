@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseData;
 
 import java.util.Map;
@@ -15,12 +16,14 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)
@@ -39,9 +42,9 @@ public class OriginalSender60997PlaceholderServiceTest {
 
     @Test
     @Parameters(method = "generateSscsCaseDataScenariosForAppellantAndAppointes")
-    public void populatePlaceHolders(SscsCaseData caseData, String expected) {
+    public void populatePlaceHolders(SscsCaseData caseData, DocumentType documentType, String expected) {
         Map<String, Object> actual = originalSender60997PlaceholderService
-            .populatePlaceHolders(caseData, APPELLANT_EVIDENCE);
+            .populatePlaceHolders(caseData, documentType);
         assertEquals(expected, actual.toString());
     }
 
@@ -64,6 +67,19 @@ public class OriginalSender60997PlaceholderServiceTest {
                 .build())
             .build();
 
+        SscsCaseData sscsCaseDataWithRep = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .rep(Representative.builder()
+                    .address(Address.builder()
+                        .line1("HM Courts & Tribunals Service Reps")
+                        .line2("Social Security & Child Support Appeals Reps")
+                        .county("Prudential Buildings Reps")
+                        .postcode("L2 5UZ")
+                        .build())
+                    .build())
+                .build())
+            .build();
+
         String expectedAppellant = "{original_sender_address_line3=Prudential Buildings, "
             + "original_sender_address_line4=L2 5UZ, "
             + "original_sender_address_line1=HM Courts & Tribunals Service, "
@@ -73,6 +89,11 @@ public class OriginalSender60997PlaceholderServiceTest {
             + "original_sender_address_line4=L2 5UZ, "
             + "original_sender_address_line1=HM Courts & Tribunals Service Appointee, "
             + "original_sender_address_line2=Social Security & Child Support Appeals Appointee}";
+
+        String expectedRep = "{original_sender_address_line3=Prudential Buildings Reps, "
+            + "original_sender_address_line4=L2 5UZ, "
+            + "original_sender_address_line1=HM Courts & Tribunals Service Reps, "
+            + "original_sender_address_line2=Social Security & Child Support Appeals Reps}";
 
         //edge cases
 
@@ -102,11 +123,13 @@ public class OriginalSender60997PlaceholderServiceTest {
             + "original_sender_address_line1=, original_sender_address_line2=}";
 
         return new Object[]{
-            new Object[]{sscsCaseDataWithAppointee, expectedAppointee},
-            new Object[]{buildCaseData(), expectedAppellant},
-            new Object[]{caseDataWithNullAppellantAddress, expectedDefaultEmptyAddress},
-            new Object[]{caseDataWithNullAppellant, expectedDefaultEmptyAddress},
-            new Object[]{caseDataWithNullAppointeeAddress, expectedDefaultEmptyAddress}
+            new Object[]{sscsCaseDataWithAppointee, APPELLANT_EVIDENCE, expectedAppointee},
+            new Object[]{buildCaseData(), APPELLANT_EVIDENCE, expectedAppellant},
+            new Object[]{sscsCaseDataWithRep, REPRESENTATIVE_EVIDENCE, expectedRep},
+            //edge scenarios
+            new Object[]{caseDataWithNullAppellantAddress, APPELLANT_EVIDENCE, expectedDefaultEmptyAddress},
+            new Object[]{caseDataWithNullAppellant, APPELLANT_EVIDENCE, expectedDefaultEmptyAddress},
+            new Object[]{caseDataWithNullAppointeeAddress, APPELLANT_EVIDENCE, expectedDefaultEmptyAddress}
         };
     }
 }
