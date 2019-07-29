@@ -23,8 +23,14 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -143,6 +149,44 @@ public class IssueFurtherEvidenceHandlerTest {
 
         //Happy path scenarios
 
+        SscsCaseData sscsCaseDataWithAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued = SscsCaseData.builder()
+            .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .appointee(Appointee.builder()
+                        .name(Name.builder().title("Mr").firstName("Terry").lastName("Tibbs").build())
+                        .identity(Identity.builder().nino("JT0123456B").build())
+                        .address(Address.builder()
+                            .line1("HM Courts & Tribunals Service")
+                            .line2("Social Security & Child Support Appeals")
+                            .county("Prudential Buildings")
+                            .postcode("L2 5UZ")
+                            .build())
+                        .build())
+                    .isAppointee("Yes")
+                    .build())
+                .build())
+            .build();
+
+        SscsCaseData sscsCaseDataWithAppointeeAndDocTypeWithAppellantEvidenceAndYesIssued = SscsCaseData.builder()
+            .sscsDocument(Collections.singletonList(sscsDocument3WithAppellantEvidenceAndYesIssued))
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .appointee(Appointee.builder()
+                        .name(Name.builder().title("Mr").firstName("Terry").lastName("Tibbs").build())
+                        .identity(Identity.builder().nino("JT0123456B").build())
+                        .address(Address.builder()
+                            .line1("HM Courts & Tribunals Service")
+                            .line2("Social Security & Child Support Appeals")
+                            .county("Prudential Buildings")
+                            .postcode("L2 5UZ")
+                            .build())
+                        .build())
+                    .isAppointee("Yes")
+                    .build())
+                .build())
+            .build();
+
         SscsCaseData sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued = SscsCaseData.builder()
             .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
             .build();
@@ -210,6 +254,8 @@ public class IssueFurtherEvidenceHandlerTest {
 
 
         return new Object[]{
+            new Object[]{sscsCaseDataWithAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued, true},
+            new Object[]{sscsCaseDataWithAppointeeAndDocTypeWithAppellantEvidenceAndYesIssued, false},
             new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued, true},
             new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndYesIssued, false},
             new Object[]{sscsCaseDataWithNoAppointeeAndDocTypeWithRepsEvidenceAndNoIssued, false},

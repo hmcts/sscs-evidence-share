@@ -150,7 +150,7 @@
               "nino": "JJ123457A"
             }
           },
-          "isAppointee": "Yes",
+          "isAppointee": "No",
           "isAddressSameAsAppointee": null
         },
         "mrnDetails": {
