@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -32,7 +33,7 @@ public class OriginalSender60997PlaceholderService {
         this.commonPlaceholderService = commonPlaceholderService;
     }
 
-    public Map<String, Object> populatePlaceHolders(SscsCaseData caseData) {
+    public Map<String, Object> populatePlaceHolders(SscsCaseData caseData, DocumentType documentType) {
         requireNonNull(caseData, "caseData must not be null");
         Map<String, Object> placeholders = new ConcurrentHashMap<>();
         commonPlaceholderService.populatePlaceholders(caseData, placeholders);

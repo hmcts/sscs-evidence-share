@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseData;
 
 import java.util.Map;
@@ -39,7 +40,8 @@ public class OriginalSender60997PlaceholderServiceTest {
     @Test
     @Parameters(method = "generateSscsCaseDataScenariosForAppellantAndAppointes")
     public void populatePlaceHolders(SscsCaseData caseData, String expected) {
-        Map<String, Object> actual = originalSender60997PlaceholderService.populatePlaceHolders(caseData);
+        Map<String, Object> actual = originalSender60997PlaceholderService
+            .populatePlaceHolders(caseData, APPELLANT_EVIDENCE);
         assertEquals(expected, actual.toString());
     }
 

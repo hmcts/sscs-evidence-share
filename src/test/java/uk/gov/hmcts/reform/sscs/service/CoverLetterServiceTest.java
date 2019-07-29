@@ -76,7 +76,8 @@ public class CoverLetterServiceTest {
         SscsCaseData caseData = SscsCaseData.builder().build();
 
         given(originalSender60997PlaceholderService
-            .populatePlaceHolders(eq(caseData))).willReturn(Collections.singletonMap("someKey", "someValue"));
+            .populatePlaceHolders(eq(caseData), eq(APPELLANT_EVIDENCE)))
+            .willReturn(Collections.singletonMap("someKey", "someValue"));
 
         given(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
             .willReturn(new byte[]{'l', 'e', 't', 't', 'e', 'r'});
@@ -84,7 +85,7 @@ public class CoverLetterServiceTest {
         coverLetterService.generate609_97_OriginalSenderCoverLetter(caseData, APPELLANT_EVIDENCE);
 
         then(originalSender60997PlaceholderService).should(times(1))
-            .populatePlaceHolders(eq(caseData));
+            .populatePlaceHolders(eq(caseData), eq(APPELLANT_EVIDENCE));
         assertArgumentsForPdfGeneration();
     }
 

@@ -55,7 +55,7 @@ public class CoverLetterService {
         byte[] coverLetterContent = pdfGenerationService.generatePdf(DocumentHolder.builder()
             .template(new Template("TB-SCS-GNO-ENG-00068.doc",
                 "609-97-template (original sender)"))
-            .placeholders(originalSender60997PlaceholderService.populatePlaceHolders(caseData))
+            .placeholders(originalSender60997PlaceholderService.populatePlaceHolders(caseData, documentType))
             .pdfArchiveMode(true)
             .build());
         printCoverLetterToPdfLocallyForDebuggingPurpose(coverLetterContent);
