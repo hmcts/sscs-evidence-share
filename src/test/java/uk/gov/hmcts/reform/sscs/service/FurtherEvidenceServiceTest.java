@@ -10,11 +10,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -30,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
+@RunWith(JUnitParamsRunner.class)
 public class FurtherEvidenceServiceTest {
 
     @Rule
@@ -100,6 +106,82 @@ public class FurtherEvidenceServiceTest {
 
         doReturn(pdfList).when(sscsDocumentService).getPdfsForGivenDocType(
             eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), eq(APPELLANT_EVIDENCE));
+    }
+
+    @Test
+    @Parameters(method = "generateDifferentTestScenarios")
+    public void givenDocList_shouldBeHandledUnderCertainConditions(List<SscsDocument> documentList, boolean expected) {
+
+        boolean actual = furtherEvidenceService.canHandleAnyDocument(documentList);
+
+        assertEquals(expected, actual);
+    }
+
+    private Object[] generateDifferentTestScenarios() {
+
+        SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(APPELLANT_EVIDENCE.getValue())
+                .evidenceIssued("No")
+                .build())
+            .build();
+
+        SscsDocument sscsDocument2WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(APPELLANT_EVIDENCE.getValue())
+                .evidenceIssued("No")
+                .build())
+            .build();
+
+        SscsDocument sscsDocument3WithAppellantEvidenceAndYesIssued = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(APPELLANT_EVIDENCE.getValue())
+                .evidenceIssued("Yes")
+                .build())
+            .build();
+
+        SscsDocument sscsDocument4WithRepEvidenceAndNoIssued = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType(REPRESENTATIVE_EVIDENCE.getValue())
+                .evidenceIssued("Yes")
+                .build())
+            .build();
+
+        return new Object[]{
+            //happy path sceanrios
+            new Object[]{Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued), true},
+            new Object[]{Collections.singletonList(sscsDocument3WithAppellantEvidenceAndYesIssued), false},
+            new Object[]{Collections.singletonList(sscsDocument4WithRepEvidenceAndNoIssued), false},
+
+            new Object[]{Arrays.asList(sscsDocument1WithAppellantEvidenceAndNoIssued,
+                sscsDocument2WithAppellantEvidenceAndNoIssued), true},
+            new Object[]{Arrays.asList(sscsDocument3WithAppellantEvidenceAndYesIssued,
+                sscsDocument1WithAppellantEvidenceAndNoIssued), true},
+
+            //edge scenarios
+            new Object[]{null, false},
+            new Object[]{Collections.singletonList(SscsDocument.builder().build()), false},
+            new Object[]{Collections.singletonList(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder().build())
+                .build()), false},
+            new Object[]{Collections.singletonList(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                    .evidenceIssued("No")
+                    .build())
+                .build()), false},
+            new Object[]{Collections.singletonList(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                    .evidenceIssued("No")
+                    .documentType(null)
+                    .build())
+                .build()), false},
+            new Object[]{Collections.singletonList(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                    .documentType(APPELLANT_EVIDENCE.getValue())
+                    .build())
+                .build()), false},
+            new Object[]{Arrays.asList(null, sscsDocument1WithAppellantEvidenceAndNoIssued), true}
+        };
     }
 
 }

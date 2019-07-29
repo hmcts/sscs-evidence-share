@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -48,5 +51,15 @@ public class FurtherEvidenceService {
         byte[] coverLetterContent = coverLetterService.generate609_97_OriginalSenderCoverLetter(caseData);
         coverLetterService.appendCoverLetter(coverLetterContent, pdfsToBulkPrint);
         return pdfsToBulkPrint;
+    }
+
+    public boolean canHandleAnyDocument(List<SscsDocument> sscsDocument) {
+        return null != sscsDocument && sscsDocument.stream().anyMatch(this::canHandleDocument);
+    }
+
+    private boolean canHandleDocument(SscsDocument sscsDocument) {
+        return sscsDocument != null && sscsDocument.getValue() != null
+            && "No".equals(sscsDocument.getValue().getEvidenceIssued())
+            && APPELLANT_EVIDENCE.getValue().equals(sscsDocument.getValue().getDocumentType());
     }
 }
