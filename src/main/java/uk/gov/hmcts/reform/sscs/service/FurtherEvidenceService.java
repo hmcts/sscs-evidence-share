@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,8 +54,9 @@ public class FurtherEvidenceService {
         return pdfsToBulkPrint;
     }
 
-    public boolean canHandleAnyDocument(List<SscsDocument> sscsDocumentList, DocumentType documentType) {
-        return null != sscsDocumentList && sscsDocumentList.stream()
+    public boolean canHandleAnyDocument(EventType event, List<SscsDocument> sscsDocumentList,
+                                        DocumentType documentType) {
+        return ISSUE_FURTHER_EVIDENCE.equals(event) && null != sscsDocumentList && sscsDocumentList.stream()
             .anyMatch(sscsDocument -> canHandleDocument(sscsDocument, documentType));
     }
 

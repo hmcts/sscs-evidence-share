@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLIEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLY;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +61,7 @@ public class CallbackDispatcherTest {
         List<CallbackHandler<SscsCaseData>> handlers = Arrays.asList(
             roboticsHandler, sendToBulkPrintHandler, issueAppellantAppointeeFurtherEvidenceHandler);
         CallbackDispatcher<SscsCaseData> callbackDispatcher = new CallbackDispatcher<>(handlers);
-        callbackDispatcher.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().build()));
+        callbackDispatcher.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().build(), ISSUE_FURTHER_EVIDENCE));
         verifyMethodsAreCalledCorrectNumberOfTimes();
         verifyHandlersAreExecutedInPriorityOrder(handlers);
     }

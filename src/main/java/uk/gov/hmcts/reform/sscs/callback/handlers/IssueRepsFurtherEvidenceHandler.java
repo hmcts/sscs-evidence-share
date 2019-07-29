@@ -21,7 +21,8 @@ public class IssueRepsFurtherEvidenceHandler implements CallbackHandler<SscsCase
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        return furtherEvidenceService.canHandleAnyDocument(callback.getCaseDetails().getCaseData().getSscsDocument(),
+        return furtherEvidenceService.canHandleAnyDocument(callback.getEvent(),
+            callback.getCaseDetails().getCaseData().getSscsDocument(),
             REPRESENTATIVE_EVIDENCE);
     }
 
