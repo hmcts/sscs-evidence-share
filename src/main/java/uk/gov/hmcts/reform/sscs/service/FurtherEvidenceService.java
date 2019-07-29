@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +26,7 @@ public class FurtherEvidenceService {
 
 
     public void issue(SscsCaseData caseData, DocumentType documentType) {
-        bulkPrintService.sendToBulkPrint(buildPdfsToBulkPrint(caseData), caseData);
+        bulkPrintService.sendToBulkPrint(buildPdfsToBulkPrint(caseData, documentType), caseData);
         setEvidenceIssuedFlagToYes(caseData, documentType);
     }
 
@@ -44,9 +42,9 @@ public class FurtherEvidenceService {
             idamService.getIdamTokens());
     }
 
-    private List<Pdf> buildPdfsToBulkPrint(SscsCaseData caseData) {
+    private List<Pdf> buildPdfsToBulkPrint(SscsCaseData caseData, DocumentType documentType) {
         List<Pdf> pdfsToBulkPrint = sscsDocumentService.getPdfsForGivenDocType(
-            caseData.getSscsDocument(), APPELLANT_EVIDENCE);
+            caseData.getSscsDocument(), documentType);
         byte[] coverLetterContent = coverLetterService.generate609_97_OriginalSenderCoverLetter(caseData);
         coverLetterService.appendCoverLetter(coverLetterContent, pdfsToBulkPrint);
         return pdfsToBulkPrint;

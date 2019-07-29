@@ -5,7 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandlerTest.buildTestCallbackForGivenData;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.IssueAppellantAppointeeFurtherEvidenceHandlerTest.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLIEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLY;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
@@ -24,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
-import uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.IssueAppellantAppointeeFurtherEvidenceHandler;
 import uk.gov.hmcts.reform.sscs.callback.handlers.RoboticsCallbackHandler;
 import uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -42,7 +42,7 @@ public class CallbackDispatcherTest {
     @Mock
     private SendToBulkPrintHandler sendToBulkPrintHandler;
     @Mock
-    private IssueFurtherEvidenceHandler issueFurtherEvidenceHandler;
+    private IssueAppellantAppointeeFurtherEvidenceHandler issueAppellantAppointeeFurtherEvidenceHandler;
 
     @Test
     @Parameters({
@@ -58,7 +58,7 @@ public class CallbackDispatcherTest {
                                                                 DispatchPriority p3) {
         mockHandlers(p1, p2, p3);
         List<CallbackHandler<SscsCaseData>> handlers = Arrays.asList(
-            roboticsHandler, sendToBulkPrintHandler, issueFurtherEvidenceHandler);
+            roboticsHandler, sendToBulkPrintHandler, issueAppellantAppointeeFurtherEvidenceHandler);
         CallbackDispatcher<SscsCaseData> callbackDispatcher = new CallbackDispatcher<>(handlers);
         callbackDispatcher.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().build()));
         verifyMethodsAreCalledCorrectNumberOfTimes();
@@ -69,11 +69,11 @@ public class CallbackDispatcherTest {
     private void verifyMethodsAreCalledCorrectNumberOfTimes() {
         then(roboticsHandler).should(times(DispatchPriority.values().length)).getPriority();
         then(sendToBulkPrintHandler).should(times(DispatchPriority.values().length)).getPriority();
-        then(issueFurtherEvidenceHandler).should(times(DispatchPriority.values().length)).getPriority();
+        then(issueAppellantAppointeeFurtherEvidenceHandler).should(times(DispatchPriority.values().length)).getPriority();
     }
 
     private void verifyHandlersAreExecutedInPriorityOrder(List<CallbackHandler<SscsCaseData>> handlers) {
-        InOrder orderVerifier = inOrder(roboticsHandler, sendToBulkPrintHandler, issueFurtherEvidenceHandler);
+        InOrder orderVerifier = inOrder(roboticsHandler, sendToBulkPrintHandler, issueAppellantAppointeeFurtherEvidenceHandler);
         verifyPriorityOrder(handlers, orderVerifier, EARLIEST);
         verifyPriorityOrder(handlers, orderVerifier, EARLY);
         verifyPriorityOrder(handlers, orderVerifier, LATE);
@@ -102,8 +102,8 @@ public class CallbackDispatcherTest {
         given(sendToBulkPrintHandler.getPriority()).willReturn(priority2);
         given(sendToBulkPrintHandler.canHandle(any(), any())).willReturn(true);
 
-        given(issueFurtherEvidenceHandler.getPriority()).willReturn(priority3);
-        given(issueFurtherEvidenceHandler.canHandle(any(), any())).willReturn(true);
+        given(issueAppellantAppointeeFurtherEvidenceHandler.getPriority()).willReturn(priority3);
+        given(issueAppellantAppointeeFurtherEvidenceHandler.canHandle(any(), any())).willReturn(true);
     }
 
     private List<CallbackHandler<SscsCaseData>> getHandlerForGivenPriority(List<CallbackHandler<SscsCaseData>> handlers,

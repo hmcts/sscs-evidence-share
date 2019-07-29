@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
 @Service
-public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
+public class IssueAppellantAppointeeFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
 
     @Autowired
     private FurtherEvidenceService furtherEvidenceService;

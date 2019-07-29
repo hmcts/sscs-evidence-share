@@ -39,7 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
 @RunWith(JUnitParamsRunner.class)
-public class IssueFurtherEvidenceHandlerTest {
+public class IssueAppellantAppointeeFurtherEvidenceHandlerTest {
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
@@ -48,26 +48,26 @@ public class IssueFurtherEvidenceHandlerTest {
     private FurtherEvidenceService furtherEvidenceService;
 
     @InjectMocks
-    private IssueFurtherEvidenceHandler issueFurtherEvidenceHandler;
+    private IssueAppellantAppointeeFurtherEvidenceHandler issueAppellantAppointeeFurtherEvidenceHandler;
 
     @Test(expected = NullPointerException.class)
     public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException() {
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, null);
+        issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, null);
     }
 
     @Test(expected = RequiredFieldMissingException.class)
     public void givenCaseDataInCallbackIsNull_shouldThrowException() {
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(null));
+        issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(null));
     }
 
     @Test(expected = NullPointerException.class)
     public void givenCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED, null);
+        issueAppellantAppointeeFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED, null);
     }
 
     @Test(expected = RequiredFieldMissingException.class)
     public void givenCaseDataInCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(null));
+        issueAppellantAppointeeFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(null));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -83,7 +83,7 @@ public class IssueFurtherEvidenceHandlerTest {
             .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
             .build();
 
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+        issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(sscsCaseDataWithNoAppointeeAndDocTypeWithAppellantEvidenceAndNoIssued));
     }
 
@@ -101,7 +101,7 @@ public class IssueFurtherEvidenceHandlerTest {
             .sscsDocument(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued))
             .build();
 
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+        issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(caseData));
 
         verify(furtherEvidenceService).issue(any(SscsCaseData.class), eq(APPELLANT_EVIDENCE));
@@ -112,7 +112,7 @@ public class IssueFurtherEvidenceHandlerTest {
     public void givenIssueFurtherEvidenceCallback_shouldBeHandledUnderCertainConditions(SscsCaseData sscsCaseData,
                                                                                         boolean expected) {
 
-        boolean actual = issueFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED,
+        boolean actual = issueAppellantAppointeeFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(sscsCaseData));
 
         assertEquals(expected, actual);

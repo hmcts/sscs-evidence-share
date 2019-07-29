@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
-public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
+public class IssueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
     @Autowired
     private EvidenceManagementService evidenceManagementService;
