@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,7 +81,7 @@ public class CoverLetterServiceTest {
         given(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
             .willReturn(new byte[]{'l', 'e', 't', 't', 'e', 'r'});
 
-        coverLetterService.generate609_97_OriginalSenderCoverLetter(caseData);
+        coverLetterService.generate609_97_OriginalSenderCoverLetter(caseData, APPELLANT_EVIDENCE);
 
         then(originalSender60997PlaceholderService).should(times(1))
             .populatePlaceHolders(eq(caseData));

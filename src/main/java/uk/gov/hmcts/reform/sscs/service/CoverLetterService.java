@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
@@ -49,7 +50,7 @@ public class CoverLetterService {
         }
     }
 
-    public byte[] generate609_97_OriginalSenderCoverLetter(SscsCaseData caseData) {
+    public byte[] generate609_97_OriginalSenderCoverLetter(SscsCaseData caseData, DocumentType documentType) {
         requireNonNull(caseData, "caseData must not be null");
         byte[] coverLetterContent = pdfGenerationService.generatePdf(DocumentHolder.builder()
             .template(new Template("TB-SCS-GNO-ENG-00068.doc",

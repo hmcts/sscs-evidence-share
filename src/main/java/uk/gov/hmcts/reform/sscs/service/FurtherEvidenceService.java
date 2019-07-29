@@ -27,7 +27,8 @@ public class FurtherEvidenceService {
 
 
     public void issue(SscsCaseData caseData, DocumentType documentType) {
-        bulkPrintService.sendToBulkPrint(buildPdfsToBulkPrint(caseData, documentType), caseData);
+        List<Pdf> pdfsToBulkPrint = buildPdfsToBulkPrint(caseData, documentType);
+        bulkPrintService.sendToBulkPrint(pdfsToBulkPrint, caseData);
         setEvidenceIssuedFlagToYes(caseData, documentType);
     }
 
@@ -46,7 +47,7 @@ public class FurtherEvidenceService {
     private List<Pdf> buildPdfsToBulkPrint(SscsCaseData caseData, DocumentType documentType) {
         List<Pdf> pdfsToBulkPrint = sscsDocumentService.getPdfsForGivenDocType(
             caseData.getSscsDocument(), documentType);
-        byte[] coverLetterContent = coverLetterService.generate609_97_OriginalSenderCoverLetter(caseData);
+        byte[] coverLetterContent = coverLetterService.generate609_97_OriginalSenderCoverLetter(caseData, documentType);
         coverLetterService.appendCoverLetter(coverLetterContent, pdfsToBulkPrint);
         return pdfsToBulkPrint;
     }

@@ -66,7 +66,7 @@ public class FurtherEvidenceServiceTest {
         furtherEvidenceService.issue(caseData, APPELLANT_EVIDENCE);
 
         then(coverLetterService).should(times(1))
-            .generate609_97_OriginalSenderCoverLetter(eq(caseData));
+            .generate609_97_OriginalSenderCoverLetter(eq(caseData), eq(APPELLANT_EVIDENCE));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
     }
