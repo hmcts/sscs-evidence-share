@@ -69,15 +69,15 @@ public class TopicConsumerTest {
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
-    @Test(expected = UnrecoverableError.class)
-    public void givenUnrecoverableError_shouldThrowException() {
+    @Test
+    public void nullPointerExceptionWillBeCaught() {
         exception = new NullPointerException();
         doThrow(exception).when(dispatcher).handle(any(), any());
         topicConsumer.onMessage(MESSAGE);
         verify(dispatcher, atLeast(RETRY_THREE_TIMES)).handle(any(), any());
     }
 
-    @Test(expected = UnrecoverableError.class)
+    @Test
     public void clientAuthorisationExceptionWillBeCaught() {
         exception = new ClientAuthorisationException(EXCEPTION);
         doThrow(exception).when(dispatcher).handle(any(), any());
