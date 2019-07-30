@@ -212,7 +212,10 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.3-RC-SSCS-5227'
 
   //Remove when our dependencies pull in this version or later
-  compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.10.0.pr1'
+  
+  compile group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.16'
+  compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.16'
 
   integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
 
@@ -249,7 +252,7 @@ dependencyManagement {
 
     // solves CVE-2019-12086
     // remove once spring manager incorporates this changes
-    dependencySet(group: 'com.fasterxml.jackson.core', version: '2.9.9') {
+    dependencySet(group: 'com.fasterxml.jackson.core', version: '2.10.0.pr1') {
       entry 'jackson-core'
       entry 'jackson-databind'
     }
