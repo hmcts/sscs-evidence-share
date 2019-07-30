@@ -213,6 +213,9 @@ dependencies {
 
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
+  
+  compile group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.16'
+  compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.16'
 
   integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
 
