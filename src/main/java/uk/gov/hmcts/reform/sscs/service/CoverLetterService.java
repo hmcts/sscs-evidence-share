@@ -15,14 +15,15 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
-import uk.gov.hmcts.reform.sscs.service.placeholders.OriginalSender60997PlaceholderService;
+import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.service.placeholders.FurtherEvidencePlaceholderService;
 
 @Service
 @Slf4j
 public class CoverLetterService {
 
     @Autowired
-    private OriginalSender60997PlaceholderService originalSender60997PlaceholderService;
+    private FurtherEvidencePlaceholderService furtherEvidencePlaceholderService;
     @Autowired
     @Qualifier("docmosisPdfGenerationService")
     private PdfGenerationService pdfGenerationService;
@@ -50,12 +51,11 @@ public class CoverLetterService {
         }
     }
 
-    public byte[] generate609_97_OriginalSenderCoverLetter(SscsCaseData caseData, DocumentType documentType) {
+    public byte[] generateCoverLetter(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String templateName, String hmctsDocName) {
         requireNonNull(caseData, "caseData must not be null");
         byte[] coverLetterContent = pdfGenerationService.generatePdf(DocumentHolder.builder()
-            .template(new Template("TB-SCS-GNO-ENG-00068.doc",
-                "609-97-template (original sender)"))
-            .placeholders(originalSender60997PlaceholderService.populatePlaceHolders(caseData, documentType))
+            .template(new Template(templateName, hmctsDocName))
+            .placeholders(furtherEvidencePlaceholderService.populatePlaceHolders(caseData, letterType))
             .pdfArchiveMode(true)
             .build());
         printCoverLetterToPdfLocallyForDebuggingPurpose(coverLetterContent);

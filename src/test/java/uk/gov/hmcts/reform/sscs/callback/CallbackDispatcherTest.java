@@ -5,7 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.IssueAppellantAppointeeFurtherEvidenceHandlerTest.buildTestCallbackForGivenData;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandlerTest.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLIEST;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLY;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
@@ -25,7 +25,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
-import uk.gov.hmcts.reform.sscs.callback.handlers.IssueAppellantAppointeeFurtherEvidenceHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler;
 import uk.gov.hmcts.reform.sscs.callback.handlers.RoboticsCallbackHandler;
 import uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -43,7 +43,7 @@ public class CallbackDispatcherTest {
     @Mock
     private SendToBulkPrintHandler sendToBulkPrintHandler;
     @Mock
-    private IssueAppellantAppointeeFurtherEvidenceHandler issueAppellantAppointeeFurtherEvidenceHandler;
+    private IssueFurtherEvidenceHandler issueAppellantAppointeeFurtherEvidenceHandler;
 
     @Test
     @Parameters({

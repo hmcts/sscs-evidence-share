@@ -10,6 +10,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
-import uk.gov.hmcts.reform.sscs.service.placeholders.OriginalSender60997PlaceholderService;
+import uk.gov.hmcts.reform.sscs.service.placeholders.FurtherEvidencePlaceholderService;
 
 @RunWith(JUnitParamsRunner.class)
 public class CoverLetterServiceTest {
@@ -38,7 +39,7 @@ public class CoverLetterServiceTest {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
     @Mock
-    private OriginalSender60997PlaceholderService originalSender60997PlaceholderService;
+    private FurtherEvidencePlaceholderService furtherEvidencePlaceholderService;
     @Mock
     private PdfGenerationService pdfGenerationService;
     @InjectMocks
@@ -75,17 +76,17 @@ public class CoverLetterServiceTest {
     public void generateCoverLetter() {
         SscsCaseData caseData = SscsCaseData.builder().build();
 
-        given(originalSender60997PlaceholderService
-            .populatePlaceHolders(eq(caseData), eq(APPELLANT_EVIDENCE)))
+        given(furtherEvidencePlaceholderService
+            .populatePlaceHolders(eq(caseData), eq(APPELLANT_LETTER)))
             .willReturn(Collections.singletonMap("someKey", "someValue"));
 
         given(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
             .willReturn(new byte[]{'l', 'e', 't', 't', 'e', 'r'});
 
-        coverLetterService.generate609_97_OriginalSenderCoverLetter(caseData, APPELLANT_EVIDENCE);
+        coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName");
 
-        then(originalSender60997PlaceholderService).should(times(1))
-            .populatePlaceHolders(eq(caseData), eq(APPELLANT_EVIDENCE));
+        then(furtherEvidencePlaceholderService).should(times(1))
+            .populatePlaceHolders(eq(caseData), eq(APPELLANT_LETTER));
         assertArgumentsForPdfGeneration();
     }
 
@@ -93,7 +94,7 @@ public class CoverLetterServiceTest {
         ArgumentCaptor<DocumentHolder> argumentCaptor = ArgumentCaptor.forClass(DocumentHolder.class);
         then(pdfGenerationService).should(times(1)).generatePdf(argumentCaptor.capture());
         DocumentHolder documentHolder = argumentCaptor.getValue();
-        assertEquals("TB-SCS-GNO-ENG-00068.doc", documentHolder.getTemplate().getTemplateName());
+        assertEquals("testName.doc", documentHolder.getTemplate().getTemplateName());
         assertEquals(Collections.singletonMap("someKey", "someValue").toString(),
             documentHolder.getPlaceholders().toString());
         assertTrue(documentHolder.isPdfArchiveMode());
