@@ -44,22 +44,17 @@ public class FurtherEvidencePlaceholderServiceTest {
     @InjectMocks
     private FurtherEvidencePlaceholderService furtherEvidencePlaceholderService;
 
-    private DwpAddress dwpAddress = new DwpAddress("HM Courts & Tribunals Service Dwp", "Social Security & Child Support Appeals Dwp,", "Prudential Buildings Dwp",  "L2 5UZ");
+    SscsCaseData sscsCaseDataWithAppointee;
 
-    @Test
-    @Parameters(method = "generateSscsCaseDataScenariosForAppellantAndAppointees")
-    public void populatePlaceHolders(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String expected) {
-        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
+    SscsCaseData sscsCaseDataWithRep;
 
-        Map<String, Object> actual = furtherEvidencePlaceholderService
-            .populatePlaceHolders(caseData, letterType);
-        assertEquals(expected, actual.toString());
-    }
+    SscsCaseData caseDataWithNullAppellantAddress;
 
-    //TODO: DWP address test
+    private DwpAddress dwpAddress = new DwpAddress("HM Courts & Tribunals Service Dwp", "Social Security & Child Support Appeals Dwp", "Prudential Buildings Dwp",  "L2 5UZ");
 
-    private Object[] generateSscsCaseDataScenariosForAppellantAndAppointees() {
-        SscsCaseData sscsCaseDataWithAppointee = SscsCaseData.builder()
+    @Before
+    public void setup() {
+        sscsCaseDataWithAppointee = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("PIP").build())
                 .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
@@ -69,7 +64,7 @@ public class FurtherEvidencePlaceholderServiceTest {
                         .identity(Identity.builder().nino("JT0123456B").build())
                         .address(Address.builder()
                             .line1("HM Courts & Tribunals Service Appointee")
-                            .line2("Social Security & Child Support Appeals Appointee")
+                            .town("Social Security & Child Support Appeals Appointee")
                             .county("Prudential Buildings Appointee")
                             .postcode("L2 5UZ")
                             .build())
@@ -79,25 +74,54 @@ public class FurtherEvidencePlaceholderServiceTest {
                 .build())
             .build();
 
-        SscsCaseData sscsCaseDataWithRep = SscsCaseData.builder()
+        sscsCaseDataWithRep = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("PIP").build())
                 .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
                 .rep(Representative.builder()
                     .address(Address.builder()
                         .line1("HM Courts & Tribunals Service Reps")
-                        .line2("Social Security & Child Support Appeals Reps")
+                        .town("Social Security & Child Support Appeals Reps")
                         .county("Prudential Buildings Reps")
                         .postcode("L2 5UZ")
                         .build())
                     .build())
                 .build())
             .build();
+    }
+
+    @Test
+    @Parameters(method = "generateSscsCaseDataScenariosForAppellantAndAppointees")
+    public void populatePlaceHolders(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String expected) {
+        Map<String, Object> actual = furtherEvidencePlaceholderService
+            .populatePlaceHolders(caseData, letterType);
+        assertEquals(expected, actual.toString());
+    }
+
+    @Test
+    public void populateDwpAddressPlaceHolders() {
+
+        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
+
+        String expectedDwp = "{party_address_line1=HM Courts & Tribunals Service Dwp, "
+            + "party_address_line3=Prudential Buildings Dwp, "
+            + "party_address_line2=Social Security & Child Support Appeals Dwp, "
+            + "party_address_line4=L2 5UZ}";
+
+        Map<String, Object> actual = furtherEvidencePlaceholderService
+            .populatePlaceHolders(sscsCaseDataWithRep, DWP_LETTER);
+        assertEquals(expectedDwp, actual.toString());
+    }
+
+
+    private Object[] generateSscsCaseDataScenariosForAppellantAndAppointees() {
+        setup();
 
         String expectedAppellant = "{party_address_line1=HM Courts & Tribunals Service, "
-            + "party_address_line3=Prudential Buildings, "
-            + "party_address_line2=Social Security & Child Support Appeals, "
-            + "party_address_line4=L2 5UZ}";
+            + "party_address_line3=Social Security & Child Support Appeals, "
+            + "party_address_line2=Down the road, "
+            + "party_address_line5=L2 5UZ, "
+            + "party_address_line4=Prudential Buildings}";
 
         String expectedAppointee = "{party_address_line1=HM Courts & Tribunals Service Appointee, "
             + "party_address_line3=Prudential Buildings Appointee, "
@@ -107,11 +131,6 @@ public class FurtherEvidencePlaceholderServiceTest {
         String expectedRep = "{party_address_line1=HM Courts & Tribunals Service Reps, "
             + "party_address_line3=Prudential Buildings Reps, "
             + "party_address_line2=Social Security & Child Support Appeals Reps, "
-            + "party_address_line4=L2 5UZ}";
-
-        String expectedDwp = "{party_address_line1=HM Courts & Tribunals Service Dwp, "
-            + "party_address_line3=Prudential Buildings Dwp, "
-            + "party_address_line2=Social Security & Child Support Appeals Dwp, "
             + "party_address_line4=L2 5UZ}";
 
         //edge cases
@@ -141,14 +160,13 @@ public class FurtherEvidencePlaceholderServiceTest {
             + "party_address_line2=, party_address_line4=}";
 
         return new Object[]{
-//            new Object[]{sscsCaseDataWithAppointee, APPELLANT_LETTER, expectedAppointee},
-//            new Object[]{buildCaseData(), APPELLANT_LETTER, expectedAppellant},
-//            new Object[]{sscsCaseDataWithRep, REPRESENTATIVE_LETTER, expectedRep},
-            new Object[]{sscsCaseDataWithRep, DWP_LETTER, expectedDwp},
+            new Object[]{sscsCaseDataWithAppointee, APPELLANT_LETTER, expectedAppointee},
+            new Object[]{buildCaseData(), APPELLANT_LETTER, expectedAppellant},
+            new Object[]{sscsCaseDataWithRep, REPRESENTATIVE_LETTER, expectedRep},
             //edge scenarios
-//            new Object[]{caseDataWithNullAppellantAddress, APPELLANT_LETTER, expectedDefaultEmptyAddress},
-//            new Object[]{caseDataWithNullAppellant, APPELLANT_LETTER, expectedDefaultEmptyAddress},
-//            new Object[]{caseDataWithNullAppointeeAddress, APPELLANT_LETTER, expectedDefaultEmptyAddress}
+            new Object[]{caseDataWithNullAppellantAddress, APPELLANT_LETTER, expectedDefaultEmptyAddress},
+            new Object[]{caseDataWithNullAppellant, APPELLANT_LETTER, expectedDefaultEmptyAddress},
+            new Object[]{caseDataWithNullAppointeeAddress, APPELLANT_LETTER, expectedDefaultEmptyAddress}
         };
     }
 }

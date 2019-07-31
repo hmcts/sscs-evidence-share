@@ -1,10 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.PARTY_ADDRESS_LINE_1;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.PARTY_ADDRESS_LINE_2;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.PARTY_ADDRESS_LINE_3;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.PARTY_ADDRESS_LINE_4;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 
 import java.util.Map;
@@ -14,12 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;
@@ -48,13 +41,25 @@ public class FurtherEvidencePlaceholderService {
         rpcPlaceholderService.populatePlaceHolders(placeholders, caseData);
 
         Address address = getAddress(caseData, letterType);
-        //TODO: Use 5 lines
-        placeholders.put(PARTY_ADDRESS_LINE_1, defaultToEmptyStringIfNull(address.getLine1()));
-        placeholders.put(PARTY_ADDRESS_LINE_2, defaultToEmptyStringIfNull(address.getLine2()));
-        placeholders.put(PARTY_ADDRESS_LINE_3, defaultToEmptyStringIfNull(address.getCounty()));
-        placeholders.put(PARTY_ADDRESS_LINE_4, defaultToEmptyStringIfNull(address.getPostcode()));
+
+        buildAddressPlaceholders(address, placeholders);
 
         return placeholders;
+    }
+
+    private void buildAddressPlaceholders(Address address, Map<String, Object> placeholders) {
+        if (isNotBlank(address.getLine2())) {
+            placeholders.put(PARTY_ADDRESS_LINE_1, defaultToEmptyStringIfNull(address.getLine1()));
+            placeholders.put(PARTY_ADDRESS_LINE_2, defaultToEmptyStringIfNull(address.getLine2()));
+            placeholders.put(PARTY_ADDRESS_LINE_3, defaultToEmptyStringIfNull(address.getTown()));
+            placeholders.put(PARTY_ADDRESS_LINE_4, defaultToEmptyStringIfNull(address.getCounty()));
+            placeholders.put(PARTY_ADDRESS_LINE_5, defaultToEmptyStringIfNull(address.getPostcode()));
+        } else {
+            placeholders.put(PARTY_ADDRESS_LINE_1, defaultToEmptyStringIfNull(address.getLine1()));
+            placeholders.put(PARTY_ADDRESS_LINE_2, defaultToEmptyStringIfNull(address.getTown()));
+            placeholders.put(PARTY_ADDRESS_LINE_3, defaultToEmptyStringIfNull(address.getCounty()));
+            placeholders.put(PARTY_ADDRESS_LINE_4, defaultToEmptyStringIfNull(address.getPostcode()));
+        }
     }
 
     private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {

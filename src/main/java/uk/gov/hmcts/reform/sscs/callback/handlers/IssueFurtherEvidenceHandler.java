@@ -11,14 +11,12 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
-import uk.gov.hmcts.reform.sscs.service.SscsDocumentService;
 
 @Service
 public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
@@ -48,20 +46,22 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), APPELLANT_EVIDENCE);
         furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), REPRESENTATIVE_EVIDENCE);
 
-        updateSscsDocumentsWithFurtherEvidenceIssuedFlag(callback.getCaseDetails().getCaseData().getSscsDocument());
-        setEvidenceIssuedFlagToYes(callback.getCaseDetails().getCaseData());
+        setEvidenceIssuedFlagToYes(callback.getCaseDetails().getCaseData().getSscsDocument());
+        updateCase(callback.getCaseDetails().getCaseData());
     }
 
-    private void updateSscsDocumentsWithFurtherEvidenceIssuedFlag(List<SscsDocument> sscsDocuments) {
+    private void setEvidenceIssuedFlagToYes(List<SscsDocument> sscsDocuments) {
 
-        for (SscsDocument doc : sscsDocuments) {
-            if (doc.getValue().getEvidenceIssued() != null && doc.getValue().getEvidenceIssued().equals("No")) {
-                doc.getValue().setEvidenceIssued("Yes");
+        if (sscsDocuments != null) {
+            for (SscsDocument doc : sscsDocuments) {
+                if (doc.getValue().getEvidenceIssued() != null && doc.getValue().getEvidenceIssued().equals("No")) {
+                    doc.getValue().setEvidenceIssued("Yes");
+                }
             }
         }
     }
 
-    private void setEvidenceIssuedFlagToYes(SscsCaseData caseData) {
+    private void updateCase(SscsCaseData caseData) {
         ccdService.updateCase(
             caseData,
             Long.valueOf(caseData.getCcdCaseId()),

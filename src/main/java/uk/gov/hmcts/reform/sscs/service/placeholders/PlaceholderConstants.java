@@ -29,6 +29,7 @@ public final class PlaceholderConstants {
     static final String PARTY_ADDRESS_LINE_2 = "party_address_line2";
     static final String PARTY_ADDRESS_LINE_3 = "party_address_line3";
     static final String PARTY_ADDRESS_LINE_4 = "party_address_line4";
+    static final String PARTY_ADDRESS_LINE_5 = "party_address_line5";
 
     private PlaceholderConstants() {
         //

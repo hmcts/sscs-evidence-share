@@ -15,8 +15,8 @@ public class TemplateService {
 
     private final String dl16TemplateName;
 
-    public TemplateService(@Value("${docmosis.template.dl6.templateName}") String dl6TemplateName,
-                           @Value("${docmosis.template.dl16.templateName}") String dl16TemplateName) {
+    public TemplateService(@Value("${docmosis.template.dl6.name}") String dl6TemplateName,
+                           @Value("${docmosis.template.dl16.name}") String dl16TemplateName) {
         this.dl6TemplateName = dl6TemplateName;
         this.dl16TemplateName = dl16TemplateName;
     }
