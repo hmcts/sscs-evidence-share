@@ -6,11 +6,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandlerTest.buildTestCallbackForGivenData;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLIEST;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLY;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.*;
 
 import java.util.Arrays;
 import java.util.List;

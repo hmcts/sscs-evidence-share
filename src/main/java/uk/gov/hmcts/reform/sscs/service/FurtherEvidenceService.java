@@ -52,8 +52,8 @@ public class FurtherEvidenceService {
     }
 
     private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs) {
-        byte[] bulkPrintList609_97 = buildPdfsFor609_97(caseData, findLetterType(documentType));
-        bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList609_97, pdfs), caseData);
+        byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, findLetterType(documentType));
+        bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs), caseData);
     }
 
     private void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs) {
@@ -61,16 +61,16 @@ public class FurtherEvidenceService {
             || (documentType == APPELLANT_EVIDENCE && caseData.getAppeal().getRep() != null
             && caseData.getAppeal().getRep().getHasRepresentative().toLowerCase().equals("yes"))) {
 
-            byte[] bulkPrintList609_98 = buildPdfsFor609_98(caseData, switchLetterType(documentType));
+            byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, switchLetterType(documentType));
 
-            List<Pdf> pdfs609_98 = buildPdfs(bulkPrintList609_98, pdfs);
-            bulkPrintService.sendToBulkPrint(pdfs609_98, caseData);
+            List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs);
+            bulkPrintService.sendToBulkPrint(pdfs60998, caseData);
         }
     }
 
     private void send609_98_Dwp(SscsCaseData caseData, List<Pdf> pdfs) {
-        byte[] bulkPrintList609_98Dwp = buildPdfsFor609_98(caseData, DWP_LETTER);
-        bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList609_98Dwp, pdfs), caseData);
+        byte[] bulkPrintList60998Dwp = buildPdfsFor609_98(caseData, DWP_LETTER);
+        bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60998Dwp, pdfs), caseData);
     }
 
     private FurtherEvidenceLetterType findLetterType(DocumentType documentType) {
