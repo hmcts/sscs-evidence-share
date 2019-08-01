@@ -24,8 +24,6 @@ public class FunctionalTestController {
         this.consumer = consumer;
     }
 
-    //FIXME: This is a test endpoint until we figure out a way of using topics and queues for functional tests
-
     @PostMapping(value = "/send", produces = APPLICATION_JSON_VALUE)
     public void send(@RequestHeader(AuthorisationService.SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
                      @RequestBody String message) {

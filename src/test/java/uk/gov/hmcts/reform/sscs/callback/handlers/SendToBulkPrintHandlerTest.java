@@ -1,19 +1,29 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.EARLIEST;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -28,8 +38,15 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
@@ -95,19 +112,14 @@ public class SendToBulkPrintHandlerTest {
 
     @Test
     public void givenASendToDwpEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(SUBMITTED, callback, LATEST));
+        assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
     public void givenANonBulkPrintEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(handler.canHandle(SUBMITTED, callback, LATEST));
-    }
-
-    @Test
-    public void givenAnInvalidDispatchPriority_thenReturnFalse() {
-        assertFalse(handler.canHandle(SUBMITTED, callback, EARLIEST));
+        assertFalse(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
@@ -155,7 +167,7 @@ public class SendToBulkPrintHandlerTest {
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
 
-        handler.handle(CallbackType.SUBMITTED, callback, DispatchPriority.LATEST);
+        handler.handle(CallbackType.SUBMITTED, callback);
 
         verify(evidenceManagementService, times(2)).download(eq(URI.create(docUrl)), any());
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any());
@@ -183,7 +195,7 @@ public class SendToBulkPrintHandlerTest {
 
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
-        handler.handle(CallbackType.SUBMITTED, callback, DispatchPriority.LATEST);
+        handler.handle(CallbackType.SUBMITTED, callback);
         then(ccdCaseService)
             .should(times(1))
             .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
@@ -205,7 +217,7 @@ public class SendToBulkPrintHandlerTest {
                 .template(null)
                 .build());
 
-        handler.handle(CallbackType.SUBMITTED, callback, DispatchPriority.LATEST);
+        handler.handle(CallbackType.SUBMITTED, callback);
 
         then(ccdCaseService)
             .should(times(1))
@@ -239,7 +251,7 @@ public class SendToBulkPrintHandlerTest {
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
 
-        handler.handle(CallbackType.SUBMITTED, callback, DispatchPriority.LATEST);
+        handler.handle(CallbackType.SUBMITTED, callback);
 
         then(ccdCaseService)
             .should(times(1))
@@ -260,7 +272,7 @@ public class SendToBulkPrintHandlerTest {
 
         when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
 
-        handler.handle(CallbackType.SUBMITTED, callback, DispatchPriority.LATEST);
+        handler.handle(CallbackType.SUBMITTED, callback);
 
         verifyNoMoreInteractions(documentManagementServiceWrapper);
     }
@@ -271,7 +283,7 @@ public class SendToBulkPrintHandlerTest {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", receivedVia, null, APPEAL_CREATED);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
 
-        handler.handle(CallbackType.SUBMITTED, callback, DispatchPriority.LATEST);
+        handler.handle(CallbackType.SUBMITTED, callback);
 
         verifyNoMoreInteractions(documentManagementServiceWrapper);
     }
@@ -284,7 +296,7 @@ public class SendToBulkPrintHandlerTest {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null, VALID_APPEAL);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED);
 
-        handler.handle(CallbackType.SUBMITTED, callback, DispatchPriority.LATEST);
+        handler.handle(CallbackType.SUBMITTED, callback);
 
         verifyNoMoreInteractions(bulkPrintService);
         verify(ccdCaseService).updateCase(any(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case state is now sent to DWP"), eq(null));

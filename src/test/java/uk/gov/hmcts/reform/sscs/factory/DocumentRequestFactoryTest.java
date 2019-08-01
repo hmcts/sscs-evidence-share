@@ -14,13 +14,13 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
-import uk.gov.hmcts.reform.sscs.service.DocumentPlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.TemplateService;
+import uk.gov.hmcts.reform.sscs.service.placeholders.Dl6AndDl16PlaceholderService;
 
 public class DocumentRequestFactoryTest {
 
     @Mock
-    private DocumentPlaceholderService documentPlaceholderService;
+    private Dl6AndDl16PlaceholderService dl6AndDl16PlaceholderService;
 
     @Mock
     private TemplateService templateService;
@@ -42,7 +42,7 @@ public class DocumentRequestFactoryTest {
         Template template = new Template("bla", "bla2");
 
         given(templateService.findTemplate(caseData)).willReturn(template);
-        given(documentPlaceholderService.generatePlaceholders(caseData, now)).willReturn(placeholders);
+        given(dl6AndDl16PlaceholderService.populatePlaceholders(caseData, now)).willReturn(placeholders);
 
         DocumentHolder holder = factory.create(caseData, now);
 

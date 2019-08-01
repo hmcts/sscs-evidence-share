@@ -49,7 +49,6 @@ public class TopicConsumer {
             processMessage(message);
         } catch (Exception e) {
             if (retry > maxRetryAttempts) {
-                // retried and now unrecoverable. Catch to remove it from the queue.
                 log.error(format("Caught unknown unrecoverable error %s", e.getMessage()), e);
             } else {
                 log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
@@ -62,7 +61,6 @@ public class TopicConsumer {
     private void processMessage(String message) {
         try {
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
-
             dispatcher.handle(SUBMITTED, callback);
             log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
         } catch (PdfStoreException | BulkPrintException | DwpAddressLookupException | NoMrnDetailsException exception) {

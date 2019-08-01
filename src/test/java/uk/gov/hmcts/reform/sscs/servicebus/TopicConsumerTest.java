@@ -72,7 +72,6 @@ public class TopicConsumerTest {
     @Test
     public void nullPointerExceptionWillBeCaught() {
         exception = new NullPointerException();
-
         doThrow(exception).when(dispatcher).handle(any(), any());
         topicConsumer.onMessage(MESSAGE);
         verify(dispatcher, atLeast(RETRY_THREE_TIMES)).handle(any(), any());

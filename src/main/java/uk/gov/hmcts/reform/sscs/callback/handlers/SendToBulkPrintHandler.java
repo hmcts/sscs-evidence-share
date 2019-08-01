@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -36,14 +35,13 @@ import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
-@Component
 @Slf4j
-
 @Service
 public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private static final String DM_STORE_USER_ID = "sscs";
     private static final String SENT_TO_DWP = "Sent to DWP";
+    private final DispatchPriority dispatchPriority;
 
     private final DocumentManagementServiceWrapper documentManagementServiceWrapper;
 
@@ -63,8 +61,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     private Boolean bulkPrintFeature;
 
     @Autowired
-    public SendToBulkPrintHandler(
-        DocumentManagementServiceWrapper documentManagementServiceWrapper,
+    public SendToBulkPrintHandler(DocumentManagementServiceWrapper documentManagementServiceWrapper,
         DocumentRequestFactory documentRequestFactory,
         EvidenceManagementService evidenceManagementService,
         BulkPrintService bulkPrintService,
@@ -72,6 +69,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         CcdService ccdService,
         IdamService idamService
     ) {
+        this.dispatchPriority = DispatchPriority.LATEST;
         this.documentManagementServiceWrapper = documentManagementServiceWrapper;
         this.documentRequestFactory = documentRequestFactory;
         this.evidenceManagementService = evidenceManagementService;
@@ -81,24 +79,21 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         this.idamService = idamService;
     }
 
-    public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback, DispatchPriority priority) {
+    @Override
+    public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-            && priority == DispatchPriority.LATEST
             && (callback.getEvent() == EventType.SEND_TO_DWP
             || callback.getEvent() == EventType.VALID_APPEAL
             || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL);
     }
 
-    public void handle(CallbackType callbackType, Callback<SscsCaseData> callback, DispatchPriority priority) {
+    @Override
+    public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         BulkPrintInfo bulkPrintInfo = null;
-
-        log.info("Processing event {} for case id {} in evidence share service", callback.getEvent(),
-            callback.getCaseDetails().getId());
-
         try {
             bulkPrintInfo = bulkPrintCase(callback);
         } catch (Exception e) {
@@ -106,6 +101,11 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             updateCaseToFlagError(caseData);
         }
         updateCaseToSentToDwp(callback, caseData, bulkPrintInfo);
+    }
+
+    @Override
+    public DispatchPriority getPriority() {
+        return this.dispatchPriority;
     }
 
     private void updateCaseToFlagError(SscsCaseData caseData) {
