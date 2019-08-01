@@ -53,6 +53,13 @@ withPipeline(type, product, component) {
     }
   }
 
+  before('functionalTest:aat') {
+    withAksClient('nonprod') {
+      // Vars needed for AKS testing
+      env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+    }
+  }
+
 
   enableDockerBuild()
   installCharts()
