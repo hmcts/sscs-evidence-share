@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
-import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
 
 @Configuration
 public class PdfGenerationServiceConfig {
     @Bean
-    public PdfGenerationService docmosisPdfGenerationService() {
-        return new DocmosisPdfGenerationService();
+    public DocmosisPdfGenerationService docmosisPdfGenerationService(
+        @Value("${service.pdf-service.uri}") String pdfServiceEndpoint,
+        @Value("${service.pdf-service.accessKey}") String pdfServiceAccessKey,
+        RestTemplate restTemplate) {
+        return new DocmosisPdfGenerationService(pdfServiceEndpoint, pdfServiceAccessKey, restTemplate);
     }
 }
