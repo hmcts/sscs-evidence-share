@@ -25,10 +25,11 @@ public final class PlaceholderConstants {
     public static final String DWP_ADDRESS_LINE3_LITERAL = "dwp_address_line3";
     public static final String DWP_ADDRESS_LINE4_LITERAL = "dwp_address_line4";
 
-    static final String ORIGINAL_SENDER_ADDRESS_LINE_1 = "original_sender_address_line1";
-    static final String ORIGINAL_SENDER_ADDRESS_LINE_2 = "original_sender_address_line2";
-    static final String ORIGINAL_SENDER_ADDRESS_LINE_3 = "original_sender_address_line3";
-    static final String ORIGINAL_SENDER_ADDRESS_LINE_4 = "original_sender_address_line4";
+    static final String PARTY_ADDRESS_LINE_1 = "party_address_line1";
+    static final String PARTY_ADDRESS_LINE_2 = "party_address_line2";
+    static final String PARTY_ADDRESS_LINE_3 = "party_address_line3";
+    static final String PARTY_ADDRESS_LINE_4 = "party_address_line4";
+    static final String PARTY_ADDRESS_LINE_5 = "party_address_line5";
 
     private PlaceholderConstants() {
         //

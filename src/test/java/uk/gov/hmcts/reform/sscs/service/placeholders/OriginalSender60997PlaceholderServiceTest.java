@@ -17,14 +17,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class OriginalSender60997PlaceholderServiceTest {
@@ -51,13 +44,15 @@ public class OriginalSender60997PlaceholderServiceTest {
     private Object[] generateSscsCaseDataScenariosForAppellantAndAppointes() {
         SscsCaseData sscsCaseDataWithAppointee = SscsCaseData.builder()
             .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
+                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
                 .appellant(Appellant.builder()
                     .appointee(Appointee.builder()
                         .name(Name.builder().title("Mr").firstName("Terry").lastName("Appointee").build())
                         .identity(Identity.builder().nino("JT0123456B").build())
                         .address(Address.builder()
                             .line1("HM Courts & Tribunals Service Appointee")
-                            .line2("Social Security & Child Support Appeals Appointee")
+                            .town("Social Security & Child Support Appeals Appointee")
                             .county("Prudential Buildings Appointee")
                             .postcode("L2 5UZ")
                             .build())
@@ -69,10 +64,12 @@ public class OriginalSender60997PlaceholderServiceTest {
 
         SscsCaseData sscsCaseDataWithRep = SscsCaseData.builder()
             .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
+                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
                 .rep(Representative.builder()
                     .address(Address.builder()
                         .line1("HM Courts & Tribunals Service Reps")
-                        .line2("Social Security & Child Support Appeals Reps")
+                        .town("Social Security & Child Support Appeals Reps")
                         .county("Prudential Buildings Reps")
                         .postcode("L2 5UZ")
                         .build())
@@ -80,20 +77,21 @@ public class OriginalSender60997PlaceholderServiceTest {
                 .build())
             .build();
 
-        String expectedAppellant = "{original_sender_address_line3=Prudential Buildings, "
-            + "original_sender_address_line4=L2 5UZ, "
-            + "original_sender_address_line1=HM Courts & Tribunals Service, "
-            + "original_sender_address_line2=Social Security & Child Support Appeals}";
+        String expectedAppellant = "{party_address_line1=HM Courts & Tribunals Service, "
+            + "party_address_line3=Social Security & Child Support Appeals, "
+            + "party_address_line2=Down the road, "
+            + "party_address_line5=L2 5UZ, "
+            + "party_address_line4=Prudential Buildings}";
 
-        String expectedAppointee = "{original_sender_address_line3=Prudential Buildings Appointee, "
-            + "original_sender_address_line4=L2 5UZ, "
-            + "original_sender_address_line1=HM Courts & Tribunals Service Appointee, "
-            + "original_sender_address_line2=Social Security & Child Support Appeals Appointee}";
+        String expectedAppointee = "{party_address_line1=HM Courts & Tribunals Service Appointee, "
+            + "party_address_line3=Prudential Buildings Appointee, "
+            + "party_address_line2=Social Security & Child Support Appeals Appointee, "
+            + "party_address_line4=L2 5UZ}";
 
-        String expectedRep = "{original_sender_address_line3=Prudential Buildings Reps, "
-            + "original_sender_address_line4=L2 5UZ, "
-            + "original_sender_address_line1=HM Courts & Tribunals Service Reps, "
-            + "original_sender_address_line2=Social Security & Child Support Appeals Reps}";
+        String expectedRep = "{party_address_line1=HM Courts & Tribunals Service Reps, "
+            + "party_address_line3=Prudential Buildings Reps, "
+            + "party_address_line2=Social Security & Child Support Appeals Reps, "
+            + "party_address_line4=L2 5UZ}";
 
         //edge cases
 
@@ -119,8 +117,8 @@ public class OriginalSender60997PlaceholderServiceTest {
                 .build())
             .build();
 
-        String expectedDefaultEmptyAddress = "{original_sender_address_line3=, original_sender_address_line4=, "
-            + "original_sender_address_line1=, original_sender_address_line2=}";
+        String expectedDefaultEmptyAddress = "{party_address_line1=, party_address_line3=, "
+            + "party_address_line2=, party_address_line4=}";
 
         return new Object[]{
             new Object[]{sscsCaseDataWithAppointee, APPELLANT_EVIDENCE, expectedAppointee},
