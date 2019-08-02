@@ -40,7 +40,7 @@ public class IssueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
         docs.stream()
-            .filter(doc -> APPELLANT_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()))
+            .filter(doc -> APPELLANT_EVIDENCE.getValuPdfGenerationServiceConfig.javae().equals(doc.getValue().getDocumentType()))
             .forEach(doc -> assertThat(doc.getValue().getEvidenceIssued(), is("Yes")));
     }
 
