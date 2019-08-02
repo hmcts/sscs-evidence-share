@@ -17,13 +17,10 @@ import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 @Service
 public class FurtherEvidenceService {
 
-    @Autowired
     private CoverLetterService coverLetterService;
 
-    @Autowired
     private SscsDocumentService sscsDocumentService;
 
-    @Autowired
     private BulkPrintService bulkPrintService;
 
     private final String furtherEvidenceOriginalSenderTemplateName;
