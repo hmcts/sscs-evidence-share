@@ -47,7 +47,7 @@ public class FurtherEvidencePlaceholderServiceTest {
 
     SscsCaseData caseDataWithNullAppellantAddress;
 
-    private DwpAddress dwpAddress = new DwpAddress("HM Courts & Tribunals Service Dwp", "Social Security & Child Support Appeals Dwp", "Prudential Buildings Dwp",  "L2 5UZ");
+    private DwpAddress dwpAddress = new DwpAddress("HM Courts & Tribunals Service Dwp", "Prudential Buildings Dwp",  "L2 5UZ");
 
     @Before
     public void setup() {
@@ -101,9 +101,9 @@ public class FurtherEvidencePlaceholderServiceTest {
         when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
 
         String expectedDwp = "{party_address_line1=HM Courts & Tribunals Service Dwp, "
-            + "party_address_line3=Prudential Buildings Dwp, "
-            + "party_address_line2=Social Security & Child Support Appeals Dwp, "
-            + "party_address_line4=L2 5UZ}";
+            + "party_address_line3=L2 5UZ, "
+            + "party_address_line2=Prudential Buildings Dwp"
+            + "}";
 
         Map<String, Object> actual = furtherEvidencePlaceholderService
             .populatePlaceHolders(sscsCaseDataWithRep, DWP_LETTER);

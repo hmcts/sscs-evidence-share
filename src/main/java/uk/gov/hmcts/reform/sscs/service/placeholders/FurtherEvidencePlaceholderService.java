@@ -8,6 +8,8 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.d
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,18 +50,29 @@ public class FurtherEvidencePlaceholderService {
     }
 
     private void buildAddressPlaceholders(Address address, Map<String, Object> placeholders) {
-        if (isNotBlank(address.getLine2())) {
-            placeholders.put(PARTY_ADDRESS_LINE_1, defaultToEmptyStringIfNull(address.getLine1()));
-            placeholders.put(PARTY_ADDRESS_LINE_2, defaultToEmptyStringIfNull(address.getLine2()));
-            placeholders.put(PARTY_ADDRESS_LINE_3, defaultToEmptyStringIfNull(address.getTown()));
-            placeholders.put(PARTY_ADDRESS_LINE_4, defaultToEmptyStringIfNull(address.getCounty()));
-            placeholders.put(PARTY_ADDRESS_LINE_5, defaultToEmptyStringIfNull(address.getPostcode()));
-        } else {
-            placeholders.put(PARTY_ADDRESS_LINE_1, defaultToEmptyStringIfNull(address.getLine1()));
-            placeholders.put(PARTY_ADDRESS_LINE_2, defaultToEmptyStringIfNull(address.getTown()));
-            placeholders.put(PARTY_ADDRESS_LINE_3, defaultToEmptyStringIfNull(address.getCounty()));
-            placeholders.put(PARTY_ADDRESS_LINE_4, defaultToEmptyStringIfNull(address.getPostcode()));
+        String[] lines = lines(address);
+
+        if (lines.length >= 1) {
+            placeholders.put(PARTY_ADDRESS_LINE_1, defaultToEmptyStringIfNull(lines[0]));
         }
+        if (lines.length >= 2) {
+            placeholders.put(PARTY_ADDRESS_LINE_2, defaultToEmptyStringIfNull(lines[1]));
+        }
+        if (lines.length >= 3) {
+            placeholders.put(PARTY_ADDRESS_LINE_3, defaultToEmptyStringIfNull(lines[2]));
+        }
+        if (lines.length >= 4) {
+            placeholders.put(PARTY_ADDRESS_LINE_4, defaultToEmptyStringIfNull(lines[3]));
+        }
+        if (lines.length >= 5) {
+            placeholders.put(PARTY_ADDRESS_LINE_5, defaultToEmptyStringIfNull(lines[4]));
+        }
+    }
+
+    public static String[] lines(Address address) {
+        return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
+            .filter(x -> x != null)
+            .toArray(String[]::new);
     }
 
     private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
