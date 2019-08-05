@@ -40,10 +40,10 @@ public class CoverLetterService {
      *
      * @param coverLetterContent this is the content in bytes of the cover letter from docmosis
      */
-    private void printCoverLetterToPdfLocallyForDebuggingPurpose(byte[] coverLetterContent) {
+    private void printCoverLetterToPdfLocallyForDebuggingPurpose(byte[] coverLetterContent, FurtherEvidenceLetterType letterType, String hmctsDocName) {
         if (log.isDebugEnabled()) {
             try {
-                FileUtils.writeByteArrayToFile(new File("coverLetter.pdf"), coverLetterContent);
+                FileUtils.writeByteArrayToFile(new File(hmctsDocName + letterType.getValue() + "CoverLetter" + ".pdf"), coverLetterContent);
             } catch (Exception e) {
                 log.info("CoverLetter fails to be created", e);
             }
@@ -57,7 +57,7 @@ public class CoverLetterService {
             .placeholders(furtherEvidencePlaceholderService.populatePlaceHolders(caseData, letterType))
             .pdfArchiveMode(true)
             .build());
-        printCoverLetterToPdfLocallyForDebuggingPurpose(coverLetterContent);
+        printCoverLetterToPdfLocallyForDebuggingPurpose(coverLetterContent, letterType, hmctsDocName);
         return coverLetterContent;
     }
 }
