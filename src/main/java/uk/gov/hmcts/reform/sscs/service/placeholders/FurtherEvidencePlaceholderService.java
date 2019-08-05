@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -42,8 +40,12 @@ public class FurtherEvidencePlaceholderService {
         commonPlaceholderService.populatePlaceholders(caseData, placeholders);
         rpcPlaceholderService.populatePlaceHolders(placeholders, caseData);
 
-        Address address = getAddress(caseData, letterType);
+        Name name = getName(caseData, letterType);
+        if (name != null) {
+            placeholders.put(NAME, name.getFullNameNoTitle());
+        }
 
+        Address address = getAddress(caseData, letterType);
         buildAddressPlaceholders(address, placeholders);
 
         return placeholders;
@@ -73,6 +75,24 @@ public class FurtherEvidencePlaceholderService {
         return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
             .filter(x -> x != null)
             .toArray(String[]::new);
+    }
+
+    private Name getName(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
+        if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
+            return Optional.of(caseData.getAppeal())
+                .map(Appeal::getAppellant)
+                .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
+                .map(Appellant::getAppointee)
+                .map(Appointee::getName)
+                .orElseGet(() -> Optional.of(caseData.getAppeal())
+                .map(Appeal::getAppellant)
+                .map(Appellant::getName)
+                .orElse(null));
+        } else if (FurtherEvidenceLetterType.REPRESENTATIVE_LETTER.getValue().equals(letterType.getValue())) {
+            return caseData.getAppeal().getRep().getName();
+        } else {
+            return null;
+        }
     }
 
     private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
