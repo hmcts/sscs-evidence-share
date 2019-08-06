@@ -43,9 +43,11 @@ public class FurtherEvidenceService {
     public void issue(SscsCaseData caseData, DocumentType documentType) {
         List<Pdf> pdfs = sscsDocumentService.getPdfsForGivenDocType(caseData.getSscsDocument(), documentType);
 
-        send609_97_OriginalSender(caseData, documentType, pdfs);
-        send609_98_OtherParty(caseData, documentType, pdfs);
-        send609_98_Dwp(caseData, pdfs);
+        if (pdfs != null && pdfs.size() > 0) {
+            send609_97_OriginalSender(caseData, documentType, pdfs);
+            send609_98_OtherParty(caseData, documentType, pdfs);
+            send609_98_Dwp(caseData, pdfs);
+        }
     }
 
     private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs) {
