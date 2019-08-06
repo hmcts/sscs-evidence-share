@@ -1,10 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_APPEAL_PDF;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +35,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             && (callback.getEvent() == SEND_TO_DWP
             || callback.getEvent() == VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL
-            || callback.getEvent() == CREATE_APPEAL_PDF);
+            || callback.getEvent() == RESEND_CASE_TO_GAPS2);
     }
 
     @Override
