@@ -16,11 +16,12 @@ public class SscsDocumentService {
     @Autowired
     private EvidenceManagementService evidenceManagementService;
 
-    public List<Pdf> getPdfsForGivenDocType(List<SscsDocument> sscsDocuments, DocumentType documentType) {
+    public List<Pdf> getPdfsForGivenDocTypeNotIssued(List<SscsDocument> sscsDocuments, DocumentType documentType) {
         Objects.requireNonNull(sscsDocuments);
         Objects.requireNonNull(documentType);
         return sscsDocuments.stream()
-            .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType()))
+            .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType())
+                && "No".equals(doc.getValue().getEvidenceIssued()))
             .map(this::toPdf)
             .collect(Collectors.toList());
     }

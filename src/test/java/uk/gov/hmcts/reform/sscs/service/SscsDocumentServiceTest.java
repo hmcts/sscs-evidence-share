@@ -66,7 +66,7 @@ public class SscsDocumentServiceTest {
         given(evidenceManagementService.download(ArgumentMatchers.any(URI.class), eq("sscs")))
             .willReturn(new byte[]{'a'});
 
-        List<Pdf> actualPdfs = sscsDocumentService.getPdfsForGivenDocType(createTestData(), documentType);
+        List<Pdf> actualPdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(createTestData(), documentType);
 
         assertThat(actualPdfs, hasSize(1));
         assertThat(actualPdfs, hasItems(
@@ -84,6 +84,15 @@ public class SscsDocumentServiceTest {
                 .documentFileName("appellantEvidenceDoc")
                 .documentType(APPELLANT_EVIDENCE.getValue())
                 .documentLink(documentLink)
+                .evidenceIssued("No")
+                .build())
+            .build();
+        SscsDocument sscsDocumentAppellantTypeIssued = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentFileName("appellantEvidenceDoc")
+                .documentType(APPELLANT_EVIDENCE.getValue())
+                .documentLink(documentLink)
+                .evidenceIssued("Yes")
                 .build())
             .build();
         SscsDocument sscsDocumentRepsType = SscsDocument.builder()
@@ -91,6 +100,7 @@ public class SscsDocumentServiceTest {
                 .documentFileName("repsEvidenceDoc")
                 .documentType(REPRESENTATIVE_EVIDENCE.getValue())
                 .documentLink(documentLink)
+                .evidenceIssued("No")
                 .build())
             .build();
         SscsDocument sscsDocumentOtherType = SscsDocument.builder()
@@ -98,8 +108,9 @@ public class SscsDocumentServiceTest {
                 .documentFileName("otherEvidenceDoc")
                 .documentType(OTHER_DOCUMENT.getValue())
                 .documentLink(documentLink)
+                .evidenceIssued("No")
                 .build())
             .build();
-        return Arrays.asList(sscsDocumentAppellantType, sscsDocumentRepsType, sscsDocumentOtherType);
+        return Arrays.asList(sscsDocumentAppellantType, sscsDocumentAppellantTypeIssued, sscsDocumentRepsType, sscsDocumentOtherType);
     }
 }

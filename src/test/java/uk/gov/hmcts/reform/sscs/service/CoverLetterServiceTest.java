@@ -45,7 +45,7 @@ public class CoverLetterServiceTest {
     @Parameters(method = "generateNullScenarios")
     public void givenNullArgs_shouldThrowException(byte[] coverLetterContent, List<Pdf> pdfsToBulkPrint) {
         try {
-            coverLetterService.appendCoverLetter(coverLetterContent, pdfsToBulkPrint);
+            coverLetterService.appendCoverLetter(coverLetterContent, pdfsToBulkPrint, "");
             fail();
         } catch (NullPointerException e) {
             assertNotNull(e);
@@ -62,7 +62,7 @@ public class CoverLetterServiceTest {
     @Test
     public void appendCoverLetter() {
         List<Pdf> pdfsToBulkPrint = buildPdfListWithOneDoc();
-        coverLetterService.appendCoverLetter(new byte[]{'l', 'e', 't', 't', 'e', 'r'}, pdfsToBulkPrint);
+        coverLetterService.appendCoverLetter(new byte[]{'l', 'e', 't', 't', 'e', 'r'}, pdfsToBulkPrint, "609_97_OriginalSenderCoverLetter");
         assertCoverLetterIsFirstDocInList(pdfsToBulkPrint);
         assertEquals("doc", pdfsToBulkPrint.get(1).getName());
         assertEquals(Arrays.toString(new byte[]{'d', 'o', 'c'}), Arrays.toString(pdfsToBulkPrint.get(1).getContent()));

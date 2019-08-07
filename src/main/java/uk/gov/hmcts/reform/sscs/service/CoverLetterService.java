@@ -27,10 +27,11 @@ public class CoverLetterService {
     @Qualifier("docmosisPdfGenerationService")
     private PdfGenerationService pdfGenerationService;
 
-    public void appendCoverLetter(byte[] coverLetterContent, List<Pdf> pdfsToBulkPrint) {
+    public void appendCoverLetter(byte[] coverLetterContent, List<Pdf> pdfsToBulkPrint, String pdfName) {
         requireNonNull(coverLetterContent, "coverLetter must not be null");
         requireNonNull(pdfsToBulkPrint, "pdfsToBulkPrint must not be null");
-        Pdf pdfCoverLetter = new Pdf(coverLetterContent, "609_97_OriginalSenderCoverLetter");
+        Pdf pdfCoverLetter = new Pdf(coverLetterContent, pdfName);
+
         pdfsToBulkPrint.add(0, pdfCoverLetter);
     }
 
