@@ -64,8 +64,8 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    public void givenACreateAppealPdfEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.CREATE_APPEAL_PDF);
+    public void givenAResendCaseToGaps2Event_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.RESEND_CASE_TO_GAPS2);
 
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
