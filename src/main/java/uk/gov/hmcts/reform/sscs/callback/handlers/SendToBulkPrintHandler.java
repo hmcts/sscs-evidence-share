@@ -95,7 +95,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         BulkPrintInfo bulkPrintInfo = null;
 
-        caseData.setHmctsDwpState(null);
         try {
             bulkPrintInfo = bulkPrintCase(callback);
         } catch (Exception e) {
@@ -123,6 +122,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     private void updateCaseToSentToDwp(Callback<SscsCaseData> sscsCaseDataCallback, SscsCaseData caseData,
                                        BulkPrintInfo bulkPrintInfo) {
         if (bulkPrintInfo != null) {
+            caseData.setHmctsDwpState("sentToDwp");
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
                 idamService.getIdamTokens());
