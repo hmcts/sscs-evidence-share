@@ -9,28 +9,29 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
-import uk.gov.hmcts.reform.sscs.service.placeholders.OriginalSender60997PlaceholderService;
+import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.service.placeholders.FurtherEvidencePlaceholderService;
 
 @Service
 @Slf4j
 public class CoverLetterService {
 
     @Autowired
-    private OriginalSender60997PlaceholderService originalSender60997PlaceholderService;
+    private FurtherEvidencePlaceholderService furtherEvidencePlaceholderService;
     @Autowired
     @Qualifier("docmosisPdfGenerationService")
     private PdfGenerationService pdfGenerationService;
 
-    public void appendCoverLetter(byte[] coverLetterContent, List<Pdf> pdfsToBulkPrint) {
+    public void appendCoverLetter(byte[] coverLetterContent, List<Pdf> pdfsToBulkPrint, String pdfName) {
         requireNonNull(coverLetterContent, "coverLetter must not be null");
         requireNonNull(pdfsToBulkPrint, "pdfsToBulkPrint must not be null");
-        Pdf pdfCoverLetter = new Pdf(coverLetterContent, "609_97_OriginalSenderCoverLetter");
+        Pdf pdfCoverLetter = new Pdf(coverLetterContent, pdfName);
+
         pdfsToBulkPrint.add(0, pdfCoverLetter);
     }
 
@@ -40,25 +41,24 @@ public class CoverLetterService {
      *
      * @param coverLetterContent this is the content in bytes of the cover letter from docmosis
      */
-    private void printCoverLetterToPdfLocallyForDebuggingPurpose(byte[] coverLetterContent) {
+    private void printCoverLetterToPdfLocallyForDebuggingPurpose(byte[] coverLetterContent, FurtherEvidenceLetterType letterType, String hmctsDocName) {
         if (log.isDebugEnabled()) {
             try {
-                FileUtils.writeByteArrayToFile(new File("coverLetter.pdf"), coverLetterContent);
+                FileUtils.writeByteArrayToFile(new File(hmctsDocName + letterType.getValue() + "CoverLetter" + ".pdf"), coverLetterContent);
             } catch (Exception e) {
                 log.info("CoverLetter fails to be created", e);
             }
         }
     }
 
-    public byte[] generate609_97_OriginalSenderCoverLetter(SscsCaseData caseData, DocumentType documentType) {
+    public byte[] generateCoverLetter(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String templateName, String hmctsDocName) {
         requireNonNull(caseData, "caseData must not be null");
         byte[] coverLetterContent = pdfGenerationService.generatePdf(DocumentHolder.builder()
-            .template(new Template("TB-SCS-GNO-ENG-00068.doc",
-                "609-97-template (original sender)"))
-            .placeholders(originalSender60997PlaceholderService.populatePlaceHolders(caseData, documentType))
+            .template(new Template(templateName, hmctsDocName))
+            .placeholders(furtherEvidencePlaceholderService.populatePlaceHolders(caseData, letterType))
             .pdfArchiveMode(true)
             .build());
-        printCoverLetterToPdfLocallyForDebuggingPurpose(coverLetterContent);
+        printCoverLetterToPdfLocallyForDebuggingPurpose(coverLetterContent, letterType, hmctsDocName);
         return coverLetterContent;
     }
 }

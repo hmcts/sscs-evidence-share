@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
 import static java.util.Collections.singletonList;
+import static junit.framework.TestCase.assertNull;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 
 import java.io.File;
@@ -39,9 +39,11 @@ public class IssueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
-        docs.stream()
-            .filter(doc -> APPELLANT_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()))
-            .forEach(doc -> assertThat(doc.getValue().getEvidenceIssued(), is("Yes")));
+
+        assertNull(docs.get(0).getValue().getEvidenceIssued());
+        assertThat(docs.get(1).getValue().getEvidenceIssued(), is("Yes"));
+        assertThat(docs.get(2).getValue().getEvidenceIssued(), is("Yes"));
+        assertThat(docs.get(3).getValue().getEvidenceIssued(), is("Yes"));
     }
 
     private String createTestData() throws IOException {
@@ -49,8 +51,8 @@ public class IssueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends
         createCaseWithValidAppealState();
         String json = getJson(ISSUE_FURTHER_EVIDENCE);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
-        json = json.replace("APPELLANT_EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
-        return json.replace("APPELLANT_EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
+        json = json.replace("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
+        return json.replace("EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
     }
 
     private String uploadDocToDocMgmtStore() throws IOException {
@@ -67,4 +69,5 @@ public class IssueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends
 
         return upload.getEmbedded().getDocuments().get(0).links.self.href;
     }
+
 }

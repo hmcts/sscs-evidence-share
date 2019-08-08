@@ -1,6 +1,6 @@
 {
   "case_details": {
-    "id": "CASE_ID_TO_BE_REPLACED",
+    "id": "12345656789",
     "jurisdiction": "SSCS",
     "state": "withDwp",
     "case_type_id": "Benefit",
@@ -222,9 +222,9 @@
           "id": "636030ca-243f-4a96-8c81-813ab44c1ac8",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+              "document_url": "http://bla.com/",
               "document_filename": "evidence-document.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_binary_url": "http://bla.com/binary"
             },
             "documentType": "appellantEvidence",
             "controlNumber": "4",
@@ -234,17 +234,17 @@
           }
         },
         {
-          "id": "c6838220-88f6-43db-b163-a3eb5008ec11",
+          "id": "636030ca-243f-4a96-8c81-813ab44c1ac9",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
-              "document_filename": "rep-doc.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_url": "http://bla.com/",
+              "document_filename": "evidence-document-issued.pdf",
+              "document_binary_url": "http://bla.com/binary"
             },
-            "documentType": "representativeEvidence",
+            "documentType": "appellantEvidence",
             "controlNumber": "4",
-            "evidenceIssued": "No",
-            "documentFileName": "test_doc",
+            "evidenceIssued": "Yes",
+            "documentFileName": "evidence-document-issued",
             "documentDateAdded": "2019-01-01"
           }
         },

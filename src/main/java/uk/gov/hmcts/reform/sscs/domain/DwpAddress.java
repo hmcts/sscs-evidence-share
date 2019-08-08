@@ -22,6 +22,21 @@ public class DwpAddress {
         this(line1, line2, null, postCode);
     }
 
+    public Optional<String> getLine1() {
+        return line1;
+    }
+
+    public Optional<String> getLine2() {
+        return line2;
+    }
+
+    public Optional<String> getLine3() {
+        return line3;
+    }
+
+    public Optional<String> getPostCode() {
+        return postCode;
+    }
 
     public String[] lines() {
         return Stream.of(line1, line2, line3, postCode).filter(Optional::isPresent).map(Optional::get).toArray(String[]::new);
