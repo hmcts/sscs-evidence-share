@@ -41,7 +41,7 @@ public class SscsBundlePopulator {
         List<SscsDocument> sortedDocuments = new ArrayList<>();
 
         for (SscsDocument doc : sscsDocuments) {
-            if (null != doc.getValue().getDocumentType() && (doc.getValue().getDocumentType().equals("dl6") || doc.getValue().getDocumentType().equals("dl16"))) {
+            if (null != doc.getValue().getDocumentType() && (doc.getValue().getDocumentType().equals("DWP response"))) {
                 sortedDocuments.add(0, doc);
             } else {
                 sortedDocuments.add(doc);
