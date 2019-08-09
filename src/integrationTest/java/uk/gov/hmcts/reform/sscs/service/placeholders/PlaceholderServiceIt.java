@@ -69,7 +69,7 @@ public class PlaceholderServiceIt {
         assertEquals("PERSONAL INDEPENDENCE PAYMENT", placeholders.get(BENEFIT_TYPE_LITERAL));
         assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
         assertEquals("JT0123456B", placeholders.get(NINO_LITERAL));
-        assertEquals("http://www.tribunals.gov.uk/", placeholders.get(SSCS_URL_LITERAL));
+        assertEquals("https://www.gov.uk/appeal-benefit-decision", placeholders.get(SSCS_URL_LITERAL));
         assertEquals("HMCTS SSCS", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
         assertEquals("PO BOX 12626", placeholders.get(EXELA_ADDRESS_LINE2_LITERAL));
         assertEquals("Harlow", placeholders.get(EXELA_ADDRESS_LINE3_LITERAL));
