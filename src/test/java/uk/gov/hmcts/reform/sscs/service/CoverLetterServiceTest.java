@@ -73,7 +73,7 @@ public class CoverLetterServiceTest {
         SscsCaseData caseData = SscsCaseData.builder().build();
 
         given(furtherEvidencePlaceholderService
-            .populatePlaceHolders(eq(caseData), eq(APPELLANT_LETTER)))
+            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER)))
             .willReturn(Collections.singletonMap("someKey", "someValue"));
 
         given(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
@@ -82,7 +82,7 @@ public class CoverLetterServiceTest {
         coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName");
 
         then(furtherEvidencePlaceholderService).should(times(1))
-            .populatePlaceHolders(eq(caseData), eq(APPELLANT_LETTER));
+            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER));
         assertArgumentsForPdfGeneration();
     }
 

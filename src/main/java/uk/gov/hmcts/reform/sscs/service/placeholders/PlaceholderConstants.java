@@ -20,18 +20,18 @@ public final class PlaceholderConstants {
     static final String REGIONAL_OFFICE_FAX_LITERAL = "rpc_address_fax";
     public static final String REGIONAL_OFFICE_POSTCODE_LITERAL = "rpc_address_postcode";
 
+    public static final String EXELA_ADDRESS_LINE1_LITERAL = "exela_address_line1";
+    public static final String EXELA_ADDRESS_LINE2_LITERAL = "exela_address_line2";
+    public static final String EXELA_ADDRESS_LINE3_LITERAL = "exela_address_line3";
+    public static final String EXELA_ADDRESS_POSTCODE_LITERAL = "exela_address_postcode";
+
     public static final String NAME = "name";
 
-    public static final String DWP_ADDRESS_LINE1_LITERAL = "dwp_address_line1";
-    public static final String DWP_ADDRESS_LINE2_LITERAL = "dwp_address_line2";
-    public static final String DWP_ADDRESS_LINE3_LITERAL = "dwp_address_line3";
-    public static final String DWP_ADDRESS_LINE4_LITERAL = "dwp_address_line4";
-
-    static final String PARTY_ADDRESS_LINE_1 = "party_address_line1";
-    static final String PARTY_ADDRESS_LINE_2 = "party_address_line2";
-    static final String PARTY_ADDRESS_LINE_3 = "party_address_line3";
-    static final String PARTY_ADDRESS_LINE_4 = "party_address_line4";
-    static final String PARTY_ADDRESS_LINE_5 = "party_address_line5";
+    public static final String RECIPIENT_ADDRESS_LINE_1_LITERAL = "recipient_address_line1";
+    public static final String RECIPIENT_ADDRESS_LINE_2_LITERAL = "recipient_address_line2";
+    public static final String RECIPIENT_ADDRESS_LINE_3_LITERAL = "recipient_address_line3";
+    public static final String RECIPIENT_ADDRESS_LINE_4_LITERAL = "recipient_address_line4";
+    public static final String RECIPIENT_ADDRESS_LINE_5_LITERAL = "recipient_address_line5";
 
     private PlaceholderConstants() {
         //

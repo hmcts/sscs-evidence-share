@@ -102,3 +102,10 @@ docmosis:
 evidence-share:
   submit-types:
   - PAPER
+
+exela:
+  addressLine1: HMCTS SSCS
+  addressLine2: PO BOX 12626
+  addressLine3: Harlow
+  addressPostcode: CM20 9QF
+

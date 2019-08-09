@@ -10,9 +10,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-final class PlaceholderHelper {
+public class PlaceholderHelper {
 
     private PlaceholderHelper() {
+
     }
 
     private static final String RPC_ADDRESS1 = "HM Courts & Tribunals Service";
@@ -23,7 +24,7 @@ final class PlaceholderHelper {
     private static final String POSTCODE = "L2 5UZ";
 
 
-    static SscsCaseData buildCaseData() {
+    public static SscsCaseData buildCaseData() {
 
         RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
             .name("Liverpool").address1(RPC_ADDRESS1).address2(RPC_ADDRESS2).address3(RPC_ADDRESS3)
