@@ -2,18 +2,15 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;
 
@@ -21,60 +18,29 @@ import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;
 @Slf4j
 public class FurtherEvidencePlaceholderService {
 
-    private final RpcPlaceholderService rpcPlaceholderService;
-    private final CommonPlaceholderService commonPlaceholderService;
+    private final PlaceholderService placeholderService;
     private final DwpAddressLookup dwpAddressLookup;
 
     @Autowired
-    public FurtherEvidencePlaceholderService(RpcPlaceholderService rpcPlaceholderService,
-                                             CommonPlaceholderService commonPlaceholderService,
+    public FurtherEvidencePlaceholderService(PlaceholderService placeholderService,
                                              DwpAddressLookup dwpAddressLookup) {
-        this.rpcPlaceholderService = rpcPlaceholderService;
-        this.commonPlaceholderService = commonPlaceholderService;
+        this.placeholderService = placeholderService;
         this.dwpAddressLookup = dwpAddressLookup;
     }
 
-    public Map<String, Object> populatePlaceHolders(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
+    public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
         requireNonNull(caseData, "caseData must not be null");
         Map<String, Object> placeholders = new ConcurrentHashMap<>();
-        commonPlaceholderService.populatePlaceholders(caseData, placeholders);
-        rpcPlaceholderService.populatePlaceHolders(placeholders, caseData);
+        Address address = getAddress(caseData, letterType);
+
+        placeholderService.build(caseData, placeholders, address, null);
 
         Name name = getName(caseData, letterType);
         if (name != null) {
             placeholders.put(NAME, name.getFullNameNoTitle());
         }
 
-        Address address = getAddress(caseData, letterType);
-        buildAddressPlaceholders(address, placeholders);
-
         return placeholders;
-    }
-
-    private void buildAddressPlaceholders(Address address, Map<String, Object> placeholders) {
-        String[] lines = lines(address);
-
-        if (lines.length >= 1) {
-            placeholders.put(PARTY_ADDRESS_LINE_1, defaultToEmptyStringIfNull(lines[0]));
-        }
-        if (lines.length >= 2) {
-            placeholders.put(PARTY_ADDRESS_LINE_2, defaultToEmptyStringIfNull(lines[1]));
-        }
-        if (lines.length >= 3) {
-            placeholders.put(PARTY_ADDRESS_LINE_3, defaultToEmptyStringIfNull(lines[2]));
-        }
-        if (lines.length >= 4) {
-            placeholders.put(PARTY_ADDRESS_LINE_4, defaultToEmptyStringIfNull(lines[3]));
-        }
-        if (lines.length >= 5) {
-            placeholders.put(PARTY_ADDRESS_LINE_5, defaultToEmptyStringIfNull(lines[4]));
-        }
-    }
-
-    public static String[] lines(Address address) {
-        return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
-            .filter(x -> x != null)
-            .toArray(String[]::new);
     }
 
     private Name getName(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
@@ -85,9 +51,9 @@ public class FurtherEvidencePlaceholderService {
                 .map(Appellant::getAppointee)
                 .map(Appointee::getName)
                 .orElseGet(() -> Optional.of(caseData.getAppeal())
-                .map(Appeal::getAppellant)
-                .map(Appellant::getName)
-                .orElse(null));
+                    .map(Appeal::getAppellant)
+                    .map(Appellant::getName)
+                    .orElse(null));
         } else if (FurtherEvidenceLetterType.REPRESENTATIVE_LETTER.getValue().equals(letterType.getValue())) {
             return caseData.getAppeal().getRep().getName();
         } else {
@@ -97,16 +63,11 @@ public class FurtherEvidencePlaceholderService {
 
     private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
         if (FurtherEvidenceLetterType.DWP_LETTER.getValue().equals(letterType.getValue())) {
-            return getDwpAddress(caseData);
+            return dwpAddressLookup.lookupDwpAddress(caseData);
         } else if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
             return getAppellantAddress(caseData);
         }
         return getRepsAddress(caseData);
-    }
-
-    private Address getDwpAddress(SscsCaseData caseData) {
-        return buildDwpAddress(dwpAddressLookup.lookup(caseData.getAppeal().getBenefitType().getCode(),
-            caseData.getAppeal().getMrnDetails().getDwpIssuingOffice()));
     }
 
     private Address getRepsAddress(SscsCaseData caseData) {
@@ -140,15 +101,6 @@ public class FurtherEvidencePlaceholderService {
             .line2(StringUtils.EMPTY)
             .county(StringUtils.EMPTY)
             .postcode(StringUtils.EMPTY)
-            .build();
-    }
-
-    private Address buildDwpAddress(DwpAddress dwpAddress) {
-        return Address.builder()
-            .line1(dwpAddress.getLine1().orElse(null))
-            .town(dwpAddress.getLine2().orElse(null))
-            .county(dwpAddress.getLine3().orElse(null))
-            .postcode(dwpAddress.getPostCode().orElse(null))
             .build();
     }
 }
