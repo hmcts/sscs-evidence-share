@@ -40,6 +40,10 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
     @Override
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
+
         log.info("Processing robotics for case id {} in evidence share service", callback.getCaseDetails().getId());
 
         try {

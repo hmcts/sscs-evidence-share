@@ -5,8 +5,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandlerTest.buildTestCallbackForGivenData;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 
 import java.util.Arrays;
 import java.util.List;
@@ -57,7 +59,7 @@ public class CallbackDispatcherTest {
         List<CallbackHandler<SscsCaseData>> handlers = Arrays.asList(
             roboticsHandler, sendToBulkPrintHandler, issueAppellantAppointeeFurtherEvidenceHandler);
         CallbackDispatcher<SscsCaseData> callbackDispatcher = new CallbackDispatcher<>(handlers);
-        callbackDispatcher.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().build()));
+        callbackDispatcher.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
         verifyMethodsAreCalledCorrectNumberOfTimes();
         verifyHandlersAreExecutedInPriorityOrder(handlers);
     }
