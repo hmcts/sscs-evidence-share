@@ -1,40 +1,37 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseData;
 
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
-import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;
 
 @RunWith(JUnitParamsRunner.class)
 public class FurtherEvidencePlaceholderServiceTest {
 
-    private static final String RPC_ADDRESS1 = "HM Courts & Tribunals Service";
-    private static final String POSTCODE = "L2 5UZ";
-
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
-    private RpcPlaceholderService rpcPlaceholderService;
-    @Mock
-    private CommonPlaceholderService commonPlaceholderService;
+    private PlaceholderService placeholderService;
     @Mock
     private DwpAddressLookup dwpAddressLookup;
 
@@ -45,9 +42,8 @@ public class FurtherEvidencePlaceholderServiceTest {
 
     SscsCaseData sscsCaseDataWithRep;
 
-    SscsCaseData caseDataWithNullAppellantAddress;
-
-    private DwpAddress dwpAddress = new DwpAddress("HM Courts & Tribunals Service Dwp", "Prudential Buildings Dwp",  "L2 5UZ");
+    @Captor
+    ArgumentCaptor<Address> captor;
 
     @Before
     public void setup() {
@@ -90,94 +86,38 @@ public class FurtherEvidencePlaceholderServiceTest {
 
     @Test
     public void givenAnAppellant_thenGenerateThePlaceholders() {
-        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceHolders(buildCaseData(), APPELLANT_LETTER);
+        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(buildCaseData(), APPELLANT_LETTER);
+        verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
 
-        assertEquals("HM Courts & Tribunals Service", actual.get("party_address_line1"));
-        assertEquals("Down the road", actual.get("party_address_line2"));
-        assertEquals("Social Security & Child Support Appeals", actual.get("party_address_line3"));
-        assertEquals("Prudential Buildings", actual.get("party_address_line4"));
-        assertEquals("L2 5UZ", actual.get("party_address_line5"));
         assertEquals("Terry Tibbs", actual.get("name"));
+        assertEquals("HM Courts & Tribunals Service", captor.getValue().getLine1());
+        assertEquals("Down the road", captor.getValue().getLine2());
+        assertEquals("Social Security & Child Support Appeals", captor.getValue().getTown());
+        assertEquals("Prudential Buildings", captor.getValue().getCounty());
+        assertEquals("L2 5UZ", captor.getValue().getPostcode());
     }
 
     @Test
     public void givenAnAppointee_thenGenerateThePlaceholders() {
-        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceHolders(sscsCaseDataWithAppointee, APPELLANT_LETTER);
+        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(sscsCaseDataWithAppointee, APPELLANT_LETTER);
+        verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
 
-        assertEquals("HM Courts & Tribunals Service Appointee", actual.get("party_address_line1"));
-        assertEquals("Social Security & Child Support Appeals Appointee", actual.get("party_address_line2"));
-        assertEquals("Prudential Buildings Appointee", actual.get("party_address_line3"));
-        assertEquals("L2 5UZ", actual.get("party_address_line4"));
         assertEquals("Terry Appointee", actual.get("name"));
+        assertEquals("HM Courts & Tribunals Service Appointee", captor.getValue().getLine1());
+        assertEquals("Social Security & Child Support Appeals Appointee", captor.getValue().getTown());
+        assertEquals("Prudential Buildings Appointee", captor.getValue().getCounty());
+        assertEquals("L2 5UZ", captor.getValue().getPostcode());
     }
 
     @Test
     public void givenARep_thenGenerateThePlaceholders() {
-        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceHolders(sscsCaseDataWithRep, REPRESENTATIVE_LETTER);
+        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(sscsCaseDataWithRep, REPRESENTATIVE_LETTER);
+        verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
 
-        assertEquals("HM Courts & Tribunals Service Reps", actual.get("party_address_line1"));
-        assertEquals("Social Security & Child Support Appeals Reps", actual.get("party_address_line2"));
-        assertEquals("Prudential Buildings Reps", actual.get("party_address_line3"));
-        assertEquals("L2 5UZ", actual.get("party_address_line4"));
         assertEquals("Terry Rep", actual.get("name"));
-    }
-
-    @Test
-    @Parameters(method = "generateSscsCaseDataEdgeCaseScenariosForAppellantAndAppointees")
-    public void handleEdgeCaseScenarios(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String expected) {
-        Map<String, Object> actual = furtherEvidencePlaceholderService
-            .populatePlaceHolders(caseData, letterType);
-        assertEquals(expected, actual.toString());
-    }
-
-    @Test
-    public void populateDwpAddressPlaceHolders() {
-
-        when(dwpAddressLookup.lookup("PIP", "1")).thenReturn(dwpAddress);
-
-        String expectedDwp = "{party_address_line1=HM Courts & Tribunals Service Dwp, "
-            + "party_address_line3=L2 5UZ, "
-            + "party_address_line2=Prudential Buildings Dwp"
-            + "}";
-
-        Map<String, Object> actual = furtherEvidencePlaceholderService
-            .populatePlaceHolders(sscsCaseDataWithRep, DWP_LETTER);
-        assertEquals(expectedDwp, actual.toString());
-    }
-
-
-    private Object[] generateSscsCaseDataEdgeCaseScenariosForAppellantAndAppointees() {
-        setup();
-
-        SscsCaseData caseDataWithNullAppellantAddress = SscsCaseData.builder()
-            .appeal(Appeal.builder()
-                .appellant(Appellant.builder()
-                    .build())
-                .build())
-            .build();
-
-        SscsCaseData caseDataWithNullAppellant = SscsCaseData.builder()
-            .appeal(Appeal.builder()
-                .appellant(null)
-                .build())
-            .build();
-
-        SscsCaseData caseDataWithNullAppointeeAddress = SscsCaseData.builder()
-            .appeal(Appeal.builder()
-                .appellant(Appellant.builder()
-                    .isAppointee("yes")
-                    .build())
-                .build())
-            .build();
-
-        String expectedDefaultEmptyAddress = "{party_address_line1=, party_address_line3=, "
-            + "party_address_line2=, party_address_line4=}";
-
-        return new Object[]{
-            //edge scenarios
-            new Object[]{caseDataWithNullAppellantAddress, APPELLANT_LETTER, expectedDefaultEmptyAddress},
-            new Object[]{caseDataWithNullAppellant, APPELLANT_LETTER, expectedDefaultEmptyAddress},
-            new Object[]{caseDataWithNullAppointeeAddress, APPELLANT_LETTER, expectedDefaultEmptyAddress}
-        };
+        assertEquals("HM Courts & Tribunals Service Reps", captor.getValue().getLine1());
+        assertEquals("Social Security & Child Support Appeals Reps", captor.getValue().getTown());
+        assertEquals("Prudential Buildings Reps", captor.getValue().getCounty());
+        assertEquals("L2 5UZ", captor.getValue().getPostcode());
     }
 }
