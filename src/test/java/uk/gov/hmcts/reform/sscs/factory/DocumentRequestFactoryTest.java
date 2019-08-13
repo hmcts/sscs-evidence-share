@@ -11,16 +11,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;
 import uk.gov.hmcts.reform.sscs.service.TemplateService;
-import uk.gov.hmcts.reform.sscs.service.placeholders.Dl6AndDl16PlaceholderService;
+import uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderService;
 
 public class DocumentRequestFactoryTest {
 
     @Mock
-    private Dl6AndDl16PlaceholderService dl6AndDl16PlaceholderService;
+    private PlaceholderService placeholderService;
+
+    @Mock
+    private DwpAddressLookup dwpAddressLookup;
 
     @Mock
     private TemplateService templateService;
@@ -40,14 +45,13 @@ public class DocumentRequestFactoryTest {
         placeholders.put("Test", "Value");
         LocalDateTime now = LocalDateTime.now();
         Template template = new Template("bla", "bla2");
-
+        Address address = Address.builder().build();
         given(templateService.findTemplate(caseData)).willReturn(template);
-        given(dl6AndDl16PlaceholderService.populatePlaceholders(caseData, now)).willReturn(placeholders);
+        given(dwpAddressLookup.lookupDwpAddress(caseData)).willReturn(address);
 
         DocumentHolder holder = factory.create(caseData, now);
 
-        assertEquals(holder.getTemplate(), template);
-        assertEquals(holder.getPlaceholders(), placeholders);
-        assertEquals(holder.isPdfArchiveMode(), true);
+        assertEquals(template, holder.getTemplate());
+        assertEquals(true, holder.isPdfArchiveMode());
     }
 }

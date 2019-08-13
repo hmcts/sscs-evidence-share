@@ -1,13 +1,19 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.*;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseData;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
+import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpAddressLookupTest {
@@ -15,7 +21,23 @@ public class DwpAddressLookupTest {
     private static final String PIP = "PIP";
     private static final String ESA = "ESA";
 
+    private SscsCaseData caseData;
+
     private final DwpAddressLookup dwpAddressLookup = new DwpAddressLookup();
+
+    @Before
+    public void setup() {
+        caseData = buildCaseData();
+    }
+
+    @Test
+    public void dwpLookupAddressShouldBeHandled() {
+        Address address = dwpAddressLookup.lookupDwpAddress(caseData);
+
+        assertEquals("Mail Handling Site A", address.getLine1());
+        assertEquals("WOLVERHAMPTON", address.getTown());
+        assertEquals("WV98 1AA", address.getPostcode());
+    }
 
     @Test
     @Parameters({"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"})
@@ -70,13 +92,6 @@ public class DwpAddressLookupTest {
     }
 
     @Test
-    public void excela_addressIsConfigured() {
-        String[] lines = DwpAddressLookup.EXCELA_DWP_ADDRESS.lines();
-        assertArrayEquals(new String[]{"PO BOX XXX", "Exela BSP Services", "Harlow", "CM19 5QS"}, lines);
-    }
-
-
-    @Test
     public void pip_1_isConfiguredCorrectly() {
         DwpAddress address = dwpAddressLookup.lookup(PIP, "1");
         assertNotNull(address);
@@ -89,5 +104,24 @@ public class DwpAddressLookupTest {
         DwpAddress address = dwpAddressLookup.lookup(benefitType, "test-hmcts-address");
         assertNotNull(address);
         assertEquals("E1 8FA", address.lines()[3]);
+    }
+
+    @Test(expected = NoMrnDetailsException.class)
+    public void asAppealWithNoMrnDetailsWillNotHaveADwpAddress() {
+        caseData = buildCaseData();
+        caseData.setRegionalProcessingCenter(null);
+
+        caseData = caseData.toBuilder().appeal(caseData.getAppeal().toBuilder().mrnDetails(null).build()).build();
+        dwpAddressLookup.lookupDwpAddress(caseData);
+    }
+
+    @Test(expected = NoMrnDetailsException.class)
+    public void anAppealWithNoDwpIssuingOfficeWillNotHaveADwpAddress() {
+        caseData = buildCaseData();
+        caseData.setRegionalProcessingCenter(null);
+
+        caseData = caseData.toBuilder().appeal(caseData.getAppeal().toBuilder().mrnDetails(
+            MrnDetails.builder().mrnLateReason("soz").build()).build()).build();
+        dwpAddressLookup.lookupDwpAddress(caseData);
     }
 }
