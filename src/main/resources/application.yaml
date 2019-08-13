@@ -103,6 +103,10 @@ evidence-share:
   submit-types:
   - PAPER
 
+feature:
+  bundle-stitching:
+    enabled: true
+
 exela:
   addressLine1: HMCTS SSCS
   addressLine2: PO BOX 12626

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.bundling;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.STITCH_BUNDLE;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,8 @@ public class SscsBundlingAndStitchingService implements CcdCaseUpdater {
 
             addBundleToCase(sscsCaseData, newBundle);
 
-            SscsCaseDetails caseDetails = updateCcdCaseService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), "stitchBundle", "Stitch bundle", "Stitch bundle before sending to DWP", idamService.getIdamTokens());
+            SscsCaseDetails caseDetails = updateCcdCaseService.updateCase(
+                sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), STITCH_BUNDLE.getCcdType(), "Stitch bundle", "Stitching the bundle before sending", idamService.getIdamTokens());
 
             return caseDetails.getData().getCaseBundles();
         }

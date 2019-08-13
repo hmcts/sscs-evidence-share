@@ -80,7 +80,7 @@ public class RoboticsCallbackHandlerTest {
     @Test
     public void givenARoboticsRequest_thenSendCaseToRobotics() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
         handler.handle(SUBMITTED, callback);
 

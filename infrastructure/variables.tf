@@ -55,6 +55,10 @@ variable "send_letter_service_enabled" {
   default = true
 }
 
+variable "bundling_stitching_enabled" {
+  default = false
+}
+
 variable "core_case_data_jurisdiction_id" {
   default = "SSCS"
 }
