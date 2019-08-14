@@ -1,29 +1,31 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.bundling.SscsBundlingAndStitchingService;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @Slf4j
 @Service
-public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
+public class BundlerHandler implements CallbackHandler<SscsCaseData> {
 
-    private final RoboticsService roboticsService;
-    private final DispatchPriority dispatchPriority;
+    private final SscsBundlingAndStitchingService sscsBundlingAndStitchingService;
+    private final boolean bundleStitchingFeature;
 
     @Autowired
-    public RoboticsCallbackHandler(RoboticsService roboticsService) {
-        this.roboticsService = roboticsService;
-        this.dispatchPriority = DispatchPriority.EARLIEST;
+    public BundlerHandler(SscsBundlingAndStitchingService sscsBundlingAndStitchingService,
+                          @Value("${feature.bundle-stitching.enabled}") boolean bundleStitchingFeature) {
+        this.sscsBundlingAndStitchingService = sscsBundlingAndStitchingService;
+        this.bundleStitchingFeature = bundleStitchingFeature;
     }
 
     @Override
@@ -32,10 +34,8 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-            && (callback.getEvent() == SEND_TO_DWP
-            || callback.getEvent() == VALID_APPEAL
-            || callback.getEvent() == INTERLOC_VALID_APPEAL
-            || callback.getEvent() == RESEND_CASE_TO_GAPS2);
+            && callback.getEvent() == EventType.CREATE_BUNDLE
+            && bundleStitchingFeature;
     }
 
     @Override
@@ -44,17 +44,12 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        log.info("Processing robotics for case id {} in evidence share service", callback.getCaseDetails().getId());
-
-        try {
-            roboticsService.sendCaseToRobotics(callback.getCaseDetails().getCaseData());
-        } catch (Exception e) {
-            log.error("Error when sending to robotics: {}", callback.getCaseDetails().getId(), e);
-        }
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        sscsBundlingAndStitchingService.bundleAndStitch(caseData);
     }
 
     @Override
     public DispatchPriority getPriority() {
-        return this.dispatchPriority;
+        return DispatchPriority.EARLY;
     }
 }

@@ -33,6 +33,7 @@ public class SscsBundlePopulator {
             .title("SSCS DWP Bundle")
             .documents(bundledDocs)
             .eligibleForStitching("yes")
+            .hasTableOfContents("Yes")
             .build())
         .build();
     }
@@ -41,9 +42,9 @@ public class SscsBundlePopulator {
         List<SscsDocument> sortedDocuments = new ArrayList<>();
 
         for (SscsDocument doc : sscsDocuments) {
-            if (null != doc.getValue().getDocumentType() && (doc.getValue().getDocumentType().equals("dl6") || doc.getValue().getDocumentType().equals("dl16"))) {
+            if (null != doc.getValue().getDocumentType() && doc.getValue().getDocumentType().equals("DWP response")) {
                 sortedDocuments.add(0, doc);
-            } else {
+            } else if (null != doc.getValue() && null != doc.getValue().getBundleAddition()) {
                 sortedDocuments.add(doc);
             }
         }
