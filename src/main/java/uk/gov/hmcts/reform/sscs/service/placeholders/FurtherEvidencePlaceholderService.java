@@ -37,7 +37,7 @@ public class FurtherEvidencePlaceholderService {
 
         Name name = getName(caseData, letterType);
         if (name != null) {
-            placeholders.put(NAME, name.getFullNameNoTitle());
+            placeholders.put(NAME, name.getFullNameNoTitle().substring(0, 40));
         }
 
         return placeholders;
