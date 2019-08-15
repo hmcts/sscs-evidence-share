@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.truncateAddressLine;
 
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public class FurtherEvidencePlaceholderService {
 
         Name name = getName(caseData, letterType);
         if (name != null) {
-            placeholders.put(NAME, name.getFullNameNoTitle().substring(0, 40));
+            placeholders.put(NAME, truncateAddressLine(name.getFullNameNoTitle()));
         }
 
         return placeholders;
