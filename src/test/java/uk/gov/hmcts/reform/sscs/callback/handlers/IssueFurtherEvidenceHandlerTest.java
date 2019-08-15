@@ -7,8 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 
@@ -83,7 +82,7 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     @Test
-    public void givenIssueFurtherEvidenceCallback_shouldIssueEvidenceForAppellantAndRep() {
+    public void givenIssueFurtherEvidenceCallback_shouldIssueEvidenceForAppellantAndRepAndDwp() {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
@@ -106,6 +105,7 @@ public class IssueFurtherEvidenceHandlerTest {
 
         verify(furtherEvidenceService).issue(eq(caseData), eq(APPELLANT_EVIDENCE));
         verify(furtherEvidenceService).issue(eq(caseData), eq(REPRESENTATIVE_EVIDENCE));
+        verify(furtherEvidenceService).issue(eq(caseData), eq(DWP_EVIDENCE));
 
         verify(ccdService).updateCase(captor.capture(), any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
             any(), any(), any(IdamTokens.class));
