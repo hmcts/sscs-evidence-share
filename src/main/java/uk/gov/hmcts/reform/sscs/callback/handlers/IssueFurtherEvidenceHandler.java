@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +44,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
         furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), APPELLANT_EVIDENCE);
         furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), REPRESENTATIVE_EVIDENCE);
+        furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), DWP_EVIDENCE);
 
         setEvidenceIssuedFlagToYes(callback.getCaseDetails().getCaseData().getSscsDocument());
         updateCase(callback.getCaseDetails().getCaseData());

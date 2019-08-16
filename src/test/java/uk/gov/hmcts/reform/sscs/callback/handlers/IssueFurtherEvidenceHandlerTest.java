@@ -6,12 +6,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,7 +23,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
@@ -59,7 +58,8 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test(expected = RequiredFieldMissingException.class)
     public void givenCaseDataInCallbackIsNull_shouldThrowException() {
-        issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(null));
+        issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
     }
 
     @Test(expected = NullPointerException.class)
@@ -69,7 +69,8 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test(expected = RequiredFieldMissingException.class)
     public void givenCaseDataInCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        issueAppellantAppointeeFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(null));
+        issueAppellantAppointeeFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -77,11 +78,11 @@ public class IssueFurtherEvidenceHandlerTest {
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(false);
 
         issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(SscsCaseData.builder().build()));
+            buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
     }
 
     @Test
-    public void givenIssueFurtherEvidenceCallback_shouldIssueEvidenceForAppellantAndRep() {
+    public void givenIssueFurtherEvidenceCallback_shouldIssueEvidenceForAppellantAndRepAndDwp() {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
@@ -100,21 +101,15 @@ public class IssueFurtherEvidenceHandlerTest {
             .build();
 
         issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(caseData));
+            buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
 
         verify(furtherEvidenceService).issue(eq(caseData), eq(APPELLANT_EVIDENCE));
         verify(furtherEvidenceService).issue(eq(caseData), eq(REPRESENTATIVE_EVIDENCE));
+        verify(furtherEvidenceService).issue(eq(caseData), eq(DWP_EVIDENCE));
 
         verify(ccdService).updateCase(captor.capture(), any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
             any(), any(), any(IdamTokens.class));
 
         assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
-    }
-
-    public static Callback<SscsCaseData> buildTestCallbackForGivenData(SscsCaseData sscsCaseData) {
-        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "SSCS",
-            State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData,
-            LocalDateTime.now());
-        return new Callback<>(caseDetails, Optional.empty(), EventType.ISSUE_FURTHER_EVIDENCE);
     }
 }
