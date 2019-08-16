@@ -57,6 +57,12 @@ public class DwpAddressLookupTest {
     }
 
     @Test
+    public void dwpOfficeStripsText() {
+        DwpAddress address = dwpAddressLookup.lookup("PIP", "DWP Issuing Office(10)");
+        assertNotNull(address);
+    }
+
+    @Test
     public void handleCaseInsensitiveAddresses() {
         DwpAddress address = dwpAddressLookup.lookup("ESA", "BALHAM DRT");
         assertNotNull(address);

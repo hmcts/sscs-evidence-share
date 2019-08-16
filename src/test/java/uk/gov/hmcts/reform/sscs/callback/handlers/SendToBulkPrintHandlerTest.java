@@ -165,7 +165,7 @@ public class SendToBulkPrintHandlerTest {
         when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
             .thenReturn(expectedOptionalUuid);
 
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -177,6 +177,7 @@ public class SendToBulkPrintHandlerTest {
 
         List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
         assertNull(docs.get(0).getValue().getEvidenceIssued());
+        assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
     @Test
@@ -190,7 +191,7 @@ public class SendToBulkPrintHandlerTest {
                     .documentFilename(docPdf.getName()).build())
                 .build()).build()), APPEAL_CREATED);
 
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
@@ -209,7 +210,7 @@ public class SendToBulkPrintHandlerTest {
     public void givenNoTemplates_shouldThrowAnExceptionAndFlagError() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper",
             null, APPEAL_CREATED);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
         when(documentRequestFactory.create(caseDetails.getCaseData(), now))
             .thenReturn(DocumentHolder.builder()
@@ -248,7 +249,7 @@ public class SendToBulkPrintHandlerTest {
         when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
             .thenReturn(Optional.empty());
 
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -262,7 +263,7 @@ public class SendToBulkPrintHandlerTest {
     public void givenAMessageWhichCannotFindATemplate_thenConvertToSscsCaseDataAndDoNotAddPdfToCase() {
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null, APPEAL_CREATED);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
         Map<String, Object> placeholders = new HashMap<>();
         placeholders.put("Test", "Value");
@@ -280,7 +281,7 @@ public class SendToBulkPrintHandlerTest {
     @Parameters({"Online", "COR"})
     public void nonReceivedViaPaperCases_doesNotGetSentToBulkPrint(String receivedVia) {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", receivedVia, null, APPEAL_CREATED);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -293,7 +294,7 @@ public class SendToBulkPrintHandlerTest {
         ReflectionTestUtils.setField(handler, "bulkPrintFeature", false);
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null, VALID_APPEAL);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -309,6 +310,7 @@ public class SendToBulkPrintHandlerTest {
                 .receivedVia(receivedVia)
                 .build())
             .sscsDocument(sscsDocuments)
+            .hmctsDwpState("hello")
             .build();
 
         return new CaseDetails<>(

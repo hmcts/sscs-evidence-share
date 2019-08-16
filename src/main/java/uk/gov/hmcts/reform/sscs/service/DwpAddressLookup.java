@@ -83,7 +83,8 @@ public class DwpAddressLookup {
             return Optional.of(TEST_ADDRESS);
         }
         if (StringUtils.equalsIgnoreCase(PIP, benefitType)) {
-            return Optional.ofNullable(PIP_LOOKUP.get(StringUtils.stripToEmpty(dwpIssuingOffice)));
+            String dwpIssuingOfficeStripped = dwpIssuingOffice.replaceAll("\\D+","");
+            return Optional.ofNullable(PIP_LOOKUP.get(StringUtils.stripToEmpty(dwpIssuingOfficeStripped)));
         } else if (StringUtils.equalsIgnoreCase(ESA, benefitType)) {
             return Optional.ofNullable(ESA_LOOKUP.get(StringUtils.stripToEmpty(dwpIssuingOffice)));
         }

@@ -5,8 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
 
 import java.util.Arrays;
@@ -100,6 +99,37 @@ public class FurtherEvidenceServiceTest {
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName));
+        then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(3)).sendToBulkPrint(eq(pdfList), eq(caseData));
+    }
+
+    @Test
+    public void givenDwpIssueFurtherEvidenceCallbackWithAppellant_shouldGenerateCoverLetterOriginalSenderAndOtherPartyAppellantAndBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock();
+
+        furtherEvidenceService.issue(caseData, DWP_EVIDENCE);
+
+        then(coverLetterService).should(times(1))
+            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
+        then(coverLetterService).should(times(1))
+            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
+        then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
+    }
+
+    @Test
+    public void givenDwpIssueFurtherEvidenceCallbackWithAppellantAndRep_shouldGenerateCoverLetterOriginalSenderAndOtherPartyAppellantAndRepAndBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock();
+        withRep();
+
+        furtherEvidenceService.issue(caseData, DWP_EVIDENCE);
+
+        then(coverLetterService).should(times(1))
+            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
+        then(coverLetterService).should(times(1))
+            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
+        then(coverLetterService).should(times(1))
+            .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
         then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(3)).sendToBulkPrint(eq(pdfList), eq(caseData));
     }
