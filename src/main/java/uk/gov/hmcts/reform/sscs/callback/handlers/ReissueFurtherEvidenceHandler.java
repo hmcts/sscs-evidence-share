@@ -18,24 +18,25 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
 @Service
-public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
+public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
 
     private FurtherEvidenceService furtherEvidenceService;
     private CcdService ccdService;
     private IdamService idamService;
 
     @Autowired
-    public IssueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService, CcdService ccdService, IdamService idamService) {
+    public ReissueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService, CcdService ccdService, IdamService idamService) {
         this.furtherEvidenceService = furtherEvidenceService;
         this.ccdService = ccdService;
         this.idamService = idamService;
     }
 
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         return callbackType.equals(CallbackType.SUBMITTED)
-            && callback.getEvent() == EventType.ISSUE_FURTHER_EVIDENCE && furtherEvidenceService.canHandleAnyDocument(callback.getCaseDetails().getCaseData().getSscsDocument());
+            && callback.getEvent() == EventType.REISSUE_FURTHER_EVIDENCE && furtherEvidenceService.canHandleAnyDocument(callback.getCaseDetails().getCaseData().getSscsDocument());
     }
 
     @Override
@@ -44,12 +45,16 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), APPELLANT_EVIDENCE);
-        furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), REPRESENTATIVE_EVIDENCE);
-        furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), DWP_EVIDENCE);
+        issueToAllParties(callback);
 
         setEvidenceIssuedFlagToYes(callback.getCaseDetails().getCaseData().getSscsDocument());
         updateCase(callback.getCaseDetails().getCaseData());
+    }
+
+    private void issueToAllParties(Callback<SscsCaseData> callback) {
+        furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), APPELLANT_EVIDENCE);
+        furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), REPRESENTATIVE_EVIDENCE);
+        furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), DWP_EVIDENCE);
     }
 
     private void setEvidenceIssuedFlagToYes(List<SscsDocument> sscsDocuments) {
@@ -69,7 +74,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             Long.valueOf(caseData.getCcdCaseId()),
             EventType.UPDATE_CASE_ONLY.getCcdType(),
             "Update case data only",
-            "Update document evidence issued flags after issuing further evidence to DWP",
+            "Update document evidence issued flags after re-issuing further evidence to DWP",
             idamService.getIdamTokens());
     }
 
