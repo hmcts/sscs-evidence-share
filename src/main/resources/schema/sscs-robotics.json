@@ -95,10 +95,7 @@
         "postCode": {
           "type": "string",
           "pattern": "^((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])|([Gg][Ii][Rr]))))\\s?([0-9][A-Za-z]{2})|(0[Aa]{2}))$"},
-        "phoneNumber": {
-          "type": "string",
-          "pattern": "^[0-9\\-+ ]{10,17}$"
-        },
+        "phoneNumber": { "type": "string" },
         "email": { "type": "string" },
         "dob": {"$ref": "#/definitions/dateType"},
         "sameAddressAsAppellant": {"$ref": "#/definitions/yesOrNo"}
