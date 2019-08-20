@@ -21,7 +21,7 @@ public class FurtherEvidenceService {
 
     private SscsDocumentService sscsDocumentService;
 
-    private BulkPrintService bulkPrintService;
+    private PrintService bulkPrintService;
 
     private final String furtherEvidenceOriginalSenderTemplateName;
 
@@ -31,7 +31,7 @@ public class FurtherEvidenceService {
                                   @Value("${docmosis.template.609-98.name}") String furtherEvidenceOtherPartiesTemplateName,
                                   @Autowired CoverLetterService coverLetterService,
                                   @Autowired SscsDocumentService sscsDocumentService,
-                                  @Autowired BulkPrintService bulkPrintService) {
+                                  @Autowired PrintService bulkPrintService) {
         this.furtherEvidenceOriginalSenderTemplateName = furtherEvidenceOriginalSenderTemplateName;
         this.furtherEvidenceOtherPartiesTemplateName = furtherEvidenceOtherPartiesTemplateName;
         this.coverLetterService = coverLetterService;
