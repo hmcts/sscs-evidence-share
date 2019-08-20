@@ -364,4 +364,28 @@ public class RoboticsJsonMapperTest {
         assertFalse(roboticsJson.has("appointee"));
     }
 
+    @Test
+    public void givenCaseCreatedDate_thenAppealDateShouldGetUpdated() {
+        String caseCreatedDate = "2019-08-01";
+
+        appeal.getSscsCaseData().setCaseCreated(caseCreatedDate);
+
+        roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertTrue(roboticsJson.has("appealDate"));
+
+        assertEquals(caseCreatedDate, roboticsJson.get("appealDate"));
+    }
+
+    @Test
+    public void givenCaseCreatedDateIsNull_thenAppealDateShouldBeCurrentDate() {
+        appeal.getSscsCaseData().setCaseCreated(null);
+
+        roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertTrue(roboticsJson.has("appealDate"));
+
+        assertEquals(LocalDate.now().toString(), roboticsJson.get("appealDate"));
+    }
+
 }

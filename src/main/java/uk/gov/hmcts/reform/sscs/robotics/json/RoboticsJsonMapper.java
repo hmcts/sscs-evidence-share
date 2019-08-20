@@ -22,7 +22,7 @@ public class RoboticsJsonMapper {
 
         SscsCaseData sscsCaseData = roboticsWrapper.getSscsCaseData();
 
-        JSONObject obj = buildAppealDetails(new JSONObject(), sscsCaseData.getAppeal(), roboticsWrapper.getVenueName());
+        JSONObject obj = buildAppealDetails(new JSONObject(), sscsCaseData, roboticsWrapper.getVenueName());
 
         obj.put("caseId", roboticsWrapper.getCcdCaseId());
         obj.put("evidencePresent", roboticsWrapper.getEvidencePresent());
@@ -56,11 +56,18 @@ public class RoboticsJsonMapper {
         }
     }
 
-    private static JSONObject buildAppealDetails(JSONObject obj, Appeal appeal, String venueName) {
+    private static JSONObject buildAppealDetails(JSONObject obj, SscsCaseData sscsCaseData, String venueName) {
+        Appeal appeal = sscsCaseData.getAppeal();
         obj.put("caseCode", getCaseCode(appeal.getBenefitType().getCode()));
         obj.put("appellantNino", appeal.getAppellant().getIdentity().getNino());
         obj.put("appellantPostCode", venueName);
-        obj.put("appealDate", LocalDate.now().toString());
+
+        if (sscsCaseData.getCaseCreated() != null) {
+            obj.put("appealDate", sscsCaseData.getCaseCreated());
+        } else {
+            obj.put("appealDate", LocalDate.now().toString());
+        }
+
         obj.put("receivedVia", appeal.getReceivedVia());
 
         if (appeal.getMrnDetails() != null) {
