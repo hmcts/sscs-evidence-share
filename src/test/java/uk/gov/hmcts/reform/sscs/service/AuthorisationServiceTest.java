@@ -53,8 +53,8 @@ public class AuthorisationServiceTest {
         service.authorise(SERVICE_NAME);
     }
 
-    private class CustomFeignException extends FeignException {
-        public CustomFeignException(int status, String message) {
+    private static class CustomFeignException extends FeignException {
+        CustomFeignException(int status, String message) {
             super(status, message, null);
         }
     }
