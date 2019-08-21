@@ -28,7 +28,7 @@ public class RoboticsJsonMapper {
         obj.put("evidencePresent", roboticsWrapper.getEvidencePresent());
 
         if (!isAppointeeDetailsEmpty(sscsCaseData.getAppeal().getAppellant().getAppointee())) {
-            Boolean sameAddressAsAppointee = "Yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());
+            boolean sameAddressAsAppointee = "Yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());
             obj.put("appointee", buildAppointeeDetails(sscsCaseData.getAppeal().getAppellant().getAppointee(), sameAddressAsAppointee));
         }
 
@@ -86,7 +86,7 @@ public class RoboticsJsonMapper {
 
         obj.put("hearingType", convertBooleanToPaperOral(appeal.getHearingOptions().isWantsToAttendHearing()));
 
-        if (appeal.getHearingOptions().isWantsToAttendHearing()) {
+        if (Boolean.TRUE.equals(appeal.getHearingOptions().isWantsToAttendHearing())) {
             obj.put("hearingRequestParty", appeal.getAppellant().getName().getFullName());
         }
 
@@ -110,7 +110,7 @@ public class RoboticsJsonMapper {
         return buildContactDetails(json, appellant.getAddress(), appellant.getContact());
     }
 
-    private static JSONObject buildAppointeeDetails(Appointee appointee, Boolean sameAddressAsAppointee) {
+    private static JSONObject buildAppointeeDetails(Appointee appointee, boolean sameAddressAsAppointee) {
         JSONObject json = new JSONObject();
 
         json.put("title", appointee.getName().getTitle());
@@ -150,7 +150,7 @@ public class RoboticsJsonMapper {
                 hearingArrangements.put("languageInterpreter", hearingOptions.getLanguages());
             }
 
-            if (hearingOptions.wantsSignLanguageInterpreter() && hearingOptions.getSignLanguageType() != null) {
+            if (Boolean.TRUE.equals(hearingOptions.wantsSignLanguageInterpreter()) && hearingOptions.getSignLanguageType() != null) {
                 hearingArrangements.put("signLanguageInterpreter", hearingOptions.getSignLanguageType());
             }
 
@@ -236,11 +236,11 @@ public class RoboticsJsonMapper {
     }
 
     private static String convertBooleanToYesNo(Boolean value) {
-        return value ? "Yes" : "No";
+        return Boolean.TRUE.equals(value) ? "Yes" : "No";
     }
 
     private static String convertBooleanToPaperOral(Boolean value) {
-        return value ? "Oral" : "Paper";
+        return Boolean.TRUE.equals(value) ? "Oral" : "Paper";
     }
 
     private static String getLocalDate(String dateStr) {
