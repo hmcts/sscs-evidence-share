@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -73,6 +74,7 @@ public class IssueFurtherEvidenceServiceIt {
     private BulkPrintService bulkPrintService;
 
     @Autowired
+    @Qualifier("issueFurtherEvidenceHandler")
     private IssueFurtherEvidenceHandler handler;
 
     @Autowired

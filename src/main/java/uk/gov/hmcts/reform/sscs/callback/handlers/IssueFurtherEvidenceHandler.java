@@ -63,7 +63,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         }
     }
 
-    private void updateCase(SscsCaseData caseData) {
+    protected void updateCase(SscsCaseData caseData) {
         ccdService.updateCase(
             caseData,
             Long.valueOf(caseData.getCcdCaseId()),
