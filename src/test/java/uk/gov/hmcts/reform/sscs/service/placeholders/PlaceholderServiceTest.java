@@ -103,6 +103,25 @@ public class PlaceholderServiceTest {
     }
 
     @Test
+    public void givenAnAppellantWithALongNameAndAddressExceeding45Characters_thenGenerateThePlaceholdersWithTruncatedName() {
+        Address address = Address.builder()
+                .line1("MyFirstVeryVeryLongAddressLineWithLotsOfCharacters")
+                .line2("MySecondVeryVeryLongAddressLineWithLotsOfCharacters")
+                .town("MyTownVeryVeryLongAddressLineWithLotsOfCharacters")
+                .county("MyCountyVeryVeryLongAddressLineWithLotsOfCharacters")
+                .postcode("L2 5UZ").build();
+
+        service.build(caseData, placeholders, address, LocalDateTime.now());
+
+        assertEquals("MyFirstVeryVeryLongAddressLineWithLotsOfChara", placeholders.get(RECIPIENT_ADDRESS_LINE_1_LITERAL));
+        assertEquals("MySecondVeryVeryLongAddressLineWithLotsOfChar", placeholders.get(RECIPIENT_ADDRESS_LINE_2_LITERAL));
+        assertEquals("MyTownVeryVeryLongAddressLineWithLotsOfCharac", placeholders.get(RECIPIENT_ADDRESS_LINE_3_LITERAL));
+        assertEquals("MyCountyVeryVeryLongAddressLineWithLotsOfChar", placeholders.get(RECIPIENT_ADDRESS_LINE_4_LITERAL));
+        assertEquals("L2 5UZ", placeholders.get(RECIPIENT_ADDRESS_LINE_5_LITERAL));
+
+    }
+
+    @Test
     public void givenARecipientAddressWith3Lines_thenPopulateThePlaceholders() {
         Address address = Address.builder()
             .line1("Unit 2")
