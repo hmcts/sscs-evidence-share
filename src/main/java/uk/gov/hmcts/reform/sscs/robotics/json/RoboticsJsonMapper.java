@@ -198,7 +198,7 @@ public class RoboticsJsonMapper {
         return json;
     }
 
-    private Boolean isAppointeeDetailsEmpty(Appointee appointee) {
+    private boolean isAppointeeDetailsEmpty(Appointee appointee) {
         return appointee == null
             || (isAddressEmpty(appointee.getAddress())
             && isContactEmpty(appointee.getContact())
@@ -206,7 +206,7 @@ public class RoboticsJsonMapper {
             && isNameEmpty(appointee.getName()));
     }
 
-    private Boolean isAddressEmpty(Address address) {
+    private boolean isAddressEmpty(Address address) {
         return address == null
             || (address.getLine1() == null
             && address.getLine2() == null
@@ -215,20 +215,20 @@ public class RoboticsJsonMapper {
             && address.getPostcode() == null);
     }
 
-    private Boolean isContactEmpty(Contact contact) {
+    private boolean isContactEmpty(Contact contact) {
         return contact == null
             || (contact.getEmail() == null
             && contact.getPhone() == null
             && contact.getMobile() == null);
     }
 
-    private Boolean isIdentityEmpty(Identity identity) {
+    private boolean isIdentityEmpty(Identity identity) {
         return identity == null
             || (identity.getDob() == null
             && identity.getNino() == null);
     }
 
-    private Boolean isNameEmpty(Name name) {
+    private boolean isNameEmpty(Name name) {
         return name == null
             || (name.getFirstName() == null
             && name.getLastName() == null
