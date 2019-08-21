@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.truncateAddressLine;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -75,19 +76,19 @@ public class PlaceholderService {
         String[] lines = lines(address);
 
         if (lines.length >= 1) {
-            placeholders.put(RECIPIENT_ADDRESS_LINE_1_LITERAL, defaultToEmptyStringIfNull(lines[0]));
+            placeholders.put(RECIPIENT_ADDRESS_LINE_1_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[0])));
         }
         if (lines.length >= 2) {
-            placeholders.put(RECIPIENT_ADDRESS_LINE_2_LITERAL, defaultToEmptyStringIfNull(lines[1]));
+            placeholders.put(RECIPIENT_ADDRESS_LINE_2_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[1])));
         }
         if (lines.length >= 3) {
-            placeholders.put(RECIPIENT_ADDRESS_LINE_3_LITERAL, defaultToEmptyStringIfNull(lines[2]));
+            placeholders.put(RECIPIENT_ADDRESS_LINE_3_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[2])));
         }
         if (lines.length >= 4) {
-            placeholders.put(RECIPIENT_ADDRESS_LINE_4_LITERAL, defaultToEmptyStringIfNull(lines[3]));
+            placeholders.put(RECIPIENT_ADDRESS_LINE_4_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[3])));
         }
         if (lines.length >= 5) {
-            placeholders.put(RECIPIENT_ADDRESS_LINE_5_LITERAL, defaultToEmptyStringIfNull(lines[4]));
+            placeholders.put(RECIPIENT_ADDRESS_LINE_5_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[4])));
         }
     }
 

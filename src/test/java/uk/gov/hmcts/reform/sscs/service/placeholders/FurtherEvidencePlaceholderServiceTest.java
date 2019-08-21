@@ -98,6 +98,16 @@ public class FurtherEvidencePlaceholderServiceTest {
     }
 
     @Test
+    public void givenAnAppellantWithALongNameExceeding45Characters_thenGenerateThePlaceholdersWithTruncatedName() {
+        SscsCaseData caseData = buildCaseData();
+        caseData.getAppeal().getAppellant().setName(Name.builder().firstName("Jimmy").lastName("AVeryLongNameWithLotsaAdLotsAndLotsOfCharacters").build());
+        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER);
+        verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
+
+        assertEquals("Jimmy AVeryLongNameWithLotsaAdLotsAndLotsOfCh", actual.get("name"));
+    }
+
+    @Test
     public void givenAnAppointee_thenGenerateThePlaceholders() {
         Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(sscsCaseDataWithAppointee, APPELLANT_LETTER);
         verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
