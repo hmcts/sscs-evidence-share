@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.*;
 
@@ -10,11 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
@@ -26,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator;
 @Slf4j
 public class RoboticsService {
 
+
     private final RegionalProcessingCenterService regionalProcessingCenterService;
 
     private final EvidenceManagementService evidenceManagementService;
@@ -36,7 +36,11 @@ public class RoboticsService {
     private final RoboticsJsonMapper roboticsJsonMapper;
     private final RoboticsJsonValidator roboticsJsonValidator;
     private final RoboticsEmailTemplate roboticsEmailTemplate;
-    private final EvidenceShareConfig evidenceShareConfig;
+
+    private final int englishRoboticCount;
+    private final int scottishRoboticCount;
+
+    private Random rn;
 
     @Autowired
     public RoboticsService(
@@ -47,7 +51,8 @@ public class RoboticsService {
         RoboticsJsonMapper roboticsJsonMapper,
         RoboticsJsonValidator roboticsJsonValidator,
         RoboticsEmailTemplate roboticsEmailTemplate,
-        EvidenceShareConfig evidenceShareConfig
+        @Value("${robotics.englishCount}") int englishRoboticCount,
+        @Value("${robotics.scottishCount}") int scottishRoboticCount
     ) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.evidenceManagementService = evidenceManagementService;
@@ -56,7 +61,9 @@ public class RoboticsService {
         this.roboticsJsonMapper = roboticsJsonMapper;
         this.roboticsJsonValidator = roboticsJsonValidator;
         this.roboticsEmailTemplate = roboticsEmailTemplate;
-        this.evidenceShareConfig = evidenceShareConfig;
+        this.englishRoboticCount = englishRoboticCount;
+        this.scottishRoboticCount = scottishRoboticCount;
+        rn = new Random();
     }
 
     public void sendCaseToRobotics(SscsCaseData caseData) {
@@ -81,7 +88,7 @@ public class RoboticsService {
     }
 
     private Map<String, byte[]> downloadEvidence(SscsCaseData sscsCaseData, Long caseId) {
-        if (hasEvidence(sscsCaseData) && !isEvidenceSentForBulkPrint(sscsCaseData)) {
+        if (hasEvidence(sscsCaseData)) {
             Map<String, byte[]> map = new LinkedHashMap<>();
             for (SscsDocument doc : sscsCaseData.getSscsDocument()) {
                 if (doc.getValue().getDocumentType() == null || doc.getValue().getDocumentType().equalsIgnoreCase("appellantEvidence")) {
@@ -92,14 +99,6 @@ public class RoboticsService {
         } else {
             return Collections.emptyMap();
         }
-    }
-
-    private boolean isEvidenceSentForBulkPrint(SscsCaseData caseData) {
-        return nonNull(caseData)
-            && nonNull(caseData.getAppeal())
-            && nonNull(caseData.getAppeal().getReceivedVia())
-            && evidenceShareConfig.getSubmitTypes().stream()
-            .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
     }
 
     private byte[] downloadBinary(SscsDocument doc, Long caseId) {
@@ -150,14 +149,23 @@ public class RoboticsService {
         List<EmailAttachment> attachments = addDefaultAttachment(json, pdf, appellantUniqueId);
         log.info("Add additional evidence");
         addAdditionalEvidenceAttachments(additionalEvidence, attachments);
+        log.info("Generating subject for robotics email");
+        String subject = buildSubject(appellantUniqueId, isScottish);
         log.info("Send email");
         emailService.sendEmail(
             roboticsEmailTemplate.generateEmail(
-                appellantUniqueId,
+                subject,
                 attachments,
                 isScottish
             )
         );
+    }
+
+    private String buildSubject(String appellantUniqueId, boolean isScottish) {
+        int roboticCount = isScottish ? scottishRoboticCount : englishRoboticCount;
+        int randomNumber = rn.nextInt(roboticCount) + 1;
+
+        return appellantUniqueId + " for Robot [" + randomNumber + "]";
     }
 
     private void addAdditionalEvidenceAttachments(Map<String, byte[]> additionalEvidence, List<EmailAttachment> attachments) {

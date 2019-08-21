@@ -34,7 +34,6 @@ public class RoboticsServiceIt {
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
                 .benefitType(BenefitType.builder().code("PIP").description("Personal Independence Payment").build())
-                .receivedVia("paper")
                 .appellant(Appellant.builder()
                     .name(Name.builder().title("Mr").firstName("Terry").lastName("Tibbs").build())
                     .address(Address.builder().line1("99 My Road").town("Grantham").county("Surrey").postcode("RH5 6PO").build())
