@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.*;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
@@ -34,6 +36,7 @@ public class RoboticsService {
     private final RoboticsJsonMapper roboticsJsonMapper;
     private final RoboticsJsonValidator roboticsJsonValidator;
     private final RoboticsEmailTemplate roboticsEmailTemplate;
+    private final EvidenceShareConfig evidenceShareConfig;
 
     @Autowired
     public RoboticsService(
@@ -43,7 +46,8 @@ public class RoboticsService {
         EmailService emailService,
         RoboticsJsonMapper roboticsJsonMapper,
         RoboticsJsonValidator roboticsJsonValidator,
-        RoboticsEmailTemplate roboticsEmailTemplate
+        RoboticsEmailTemplate roboticsEmailTemplate,
+        EvidenceShareConfig evidenceShareConfig
     ) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.evidenceManagementService = evidenceManagementService;
@@ -52,6 +56,7 @@ public class RoboticsService {
         this.roboticsJsonMapper = roboticsJsonMapper;
         this.roboticsJsonValidator = roboticsJsonValidator;
         this.roboticsEmailTemplate = roboticsEmailTemplate;
+        this.evidenceShareConfig = evidenceShareConfig;
     }
 
     public void sendCaseToRobotics(SscsCaseData caseData) {
@@ -76,7 +81,7 @@ public class RoboticsService {
     }
 
     private Map<String, byte[]> downloadEvidence(SscsCaseData sscsCaseData, Long caseId) {
-        if (hasEvidence(sscsCaseData)) {
+        if (hasEvidence(sscsCaseData) && !isEvidenceSentForBulkPrint(sscsCaseData)) {
             Map<String, byte[]> map = new LinkedHashMap<>();
             for (SscsDocument doc : sscsCaseData.getSscsDocument()) {
                 if (doc.getValue().getDocumentType() == null || doc.getValue().getDocumentType().equalsIgnoreCase("appellantEvidence")) {
@@ -87,6 +92,14 @@ public class RoboticsService {
         } else {
             return Collections.emptyMap();
         }
+    }
+
+    private boolean isEvidenceSentForBulkPrint(SscsCaseData caseData) {
+        return nonNull(caseData)
+            && nonNull(caseData.getAppeal())
+            && nonNull(caseData.getAppeal().getReceivedVia())
+            && evidenceShareConfig.getSubmitTypes().stream()
+            .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
     }
 
     private byte[] downloadBinary(SscsDocument doc, Long caseId) {
