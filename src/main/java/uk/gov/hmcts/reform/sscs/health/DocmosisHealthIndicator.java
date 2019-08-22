@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.health;
 
 import java.util.Map;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,26 +33,19 @@ public class DocmosisHealthIndicator implements HealthIndicator {
     public Health health() {
 
         try {
-
-            Map<String, Object> response =
-                restTemplate
+            return Optional.ofNullable(restTemplate
                     .exchange(
                         docmosisStatusUri,
                         HttpMethod.GET,
                         null,
                         new ParameterizedTypeReference<Map<String, Object>>() {
                         }
-                    ).getBody();
-
-            if (response != null
-                && response.containsKey("ready")
-                && "true".equalsIgnoreCase((String) response.get("ready"))) {
-
-                return new Health.Builder().up().build();
-            } else {
-                return new Health.Builder().down().build();
-            }
-
+                    ).getBody())
+                .filter(response -> response.containsKey("ready"))
+                .filter(response -> "true".equalsIgnoreCase((String) response.get("ready")))
+                .map(response -> new Health.Builder().up())
+                .orElse(new Health.Builder().down())
+                .build();
         } catch (RestClientException e) {
 
             LOG.error("Error performing Docmosis healthcheck", e);
