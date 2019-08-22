@@ -12,6 +12,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
@@ -23,7 +24,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
 @Slf4j
-public class BulkPrintService {
+@ConditionalOnProperty(prefix = "send-letter", name = "url")
+public class BulkPrintService implements PrintService {
 
     private static final String XEROX_TYPE_PARAMETER = "SSCS001";
     private static final String CASE_IDENTIFIER = "caseIdentifier";
