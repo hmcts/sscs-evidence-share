@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.robotics.json;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.everit.json.schema.ValidationException;
