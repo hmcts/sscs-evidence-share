@@ -116,7 +116,7 @@ public class FurtherEvidenceService {
 
     public boolean canHandleAnyDocument(List<SscsDocument> sscsDocumentList) {
         return null != sscsDocumentList && sscsDocumentList.stream()
-            .anyMatch(sscsDocument -> canHandleDocument(sscsDocument));
+            .anyMatch(this::canHandleDocument);
     }
 
     private boolean canHandleDocument(SscsDocument sscsDocument) {
