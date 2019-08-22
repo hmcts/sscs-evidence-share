@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -33,8 +32,6 @@ public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest exten
     @Test
     public void givenReIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
-        byte[] bytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream(EVIDENCE_DOCUMENT_PDF));
-
         String reissueFurtherEvidenceCallback = createTestData();
         simulateCcdCallback(reissueFurtherEvidenceCallback);
         verifyEvidenceIssued();
