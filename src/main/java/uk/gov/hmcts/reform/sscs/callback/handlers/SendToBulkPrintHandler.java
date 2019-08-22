@@ -31,9 +31,9 @@ import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.BulkPrintInfo;
-import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PrintService;
 
 @Slf4j
 @Service
@@ -49,7 +49,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private final EvidenceManagementService evidenceManagementService;
 
-    private final BulkPrintService bulkPrintService;
+    private final PrintService bulkPrintService;
 
     private final EvidenceShareConfig evidenceShareConfig;
 
@@ -64,7 +64,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     public SendToBulkPrintHandler(DocumentManagementServiceWrapper documentManagementServiceWrapper,
         DocumentRequestFactory documentRequestFactory,
         EvidenceManagementService evidenceManagementService,
-        BulkPrintService bulkPrintService,
+        PrintService bulkPrintService,
         EvidenceShareConfig evidenceShareConfig,
         CcdService ccdService,
         IdamService idamService
