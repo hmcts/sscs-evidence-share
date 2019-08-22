@@ -94,7 +94,7 @@ public abstract class AbstractFunctionalTest {
         return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
     }
 
-    public void simulateCcdCallback(String json) throws IOException {
+    public void simulateCcdCallback(String json) {
         final String callbackUrl = baseURI + "/send";
 
         RestAssured.useRelaxedHTTPSValidation();
