@@ -4,8 +4,6 @@ import static java.util.Collections.singletonList;
 import static junit.framework.TestCase.assertNull;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
 
@@ -38,7 +36,6 @@ public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest exten
         byte[] bytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream(EVIDENCE_DOCUMENT_PDF));
 
         String reissueFurtherEvidenceCallback = createTestData();
-        when(evidenceManagementService.download(any(), any())).thenReturn(bytes);
         simulateCcdCallback(reissueFurtherEvidenceCallback);
         verifyEvidenceIssued();
     }
