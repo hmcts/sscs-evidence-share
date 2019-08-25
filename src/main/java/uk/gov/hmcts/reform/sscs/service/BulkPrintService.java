@@ -3,12 +3,13 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,10 +52,10 @@ public class BulkPrintService implements PrintService {
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData)
         throws BulkPrintException {
         if (sendLetterEnabled) {
-            List<String> encodedData = new ArrayList<>();
-            for (Pdf pdf : pdfs) {
-                encodedData.add(getEncoder().encodeToString(pdf.getContent()));
-            }
+            List<String> encodedData = pdfs.stream()
+                .map(Pdf::getContent)
+                .map(content -> getEncoder().encodeToString(content))
+                .collect(Collectors.toList());
             final String authToken = idamService.generateServiceAuthorization();
             return sendLetterWithRetry(authToken, sscsCaseData, encodedData, 1);
         }
