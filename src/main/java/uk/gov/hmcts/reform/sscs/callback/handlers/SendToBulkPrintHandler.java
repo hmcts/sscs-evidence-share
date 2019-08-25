@@ -151,8 +151,10 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
                 IdamTokens idamTokens = idamService.getIdamTokens();
                 documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
-                List<SscsDocument> sscsDocuments = getSscsDocumentsToPrint(caseData.getSscsDocument());
-                List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
+                List <Pdf> existingCasePdfs = getSscsDocumentsToPrint(caseData.getSscsDocument())
+                    .stream()
+                    .map(doc -> new Pdf(toBytes(doc), doc.getValue().getDocumentFileName()))
+                    .collect(Collectors.toCollection(ArrayList::new));
 
                 log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
                 caseData.setDateSentToDwp(LocalDate.now().toString());
@@ -217,16 +219,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             );
 
         return buildStreamOfDocuments(sscsDocumentStream);
-    }
-
-    private List<Pdf> toPdf(List<SscsDocument> sscsDocuments) {
-
-        List<Pdf> pdfs = new ArrayList<>();
-        for (SscsDocument doc : sscsDocuments) {
-            pdfs.add(new Pdf(toBytes(doc), doc.getValue().getDocumentFileName()));
-        }
-
-        return pdfs;
     }
 
     private List<SscsDocument> buildStreamOfDocuments(Supplier<Stream<SscsDocument>> sscsDocumentStream) {
