@@ -182,16 +182,14 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private String buildEventDescription(List<Pdf> pdfs, UUID bulkPrintId) {
-        List<String> arr = new ArrayList<>();
-
-        for (Pdf pdf : pdfs) {
-            arr.add(pdf.getName());
-        }
+        String documents = pdfs.stream()
+            .map(Pdf::getName)
+            .collect(Collectors.joining(", "));
 
         return "Case has been sent to the DWP via Bulk Print with bulk print id: "
             + bulkPrintId
             + " and with documents: "
-            + String.join(", ", arr);
+            + documents;
     }
 
     private boolean isAllowedReceivedTypeForBulkPrint(SscsCaseData caseData) {
