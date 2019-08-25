@@ -60,14 +60,9 @@ public class DwpAddressLookup {
 
     DwpAddress lookup(String benefitType, String dwpIssuingOffice) {
         log.info("looking up address for benefitType {} and dwpIssuingOffice {}", benefitType, dwpIssuingOffice);
-        Optional<DwpAddress> dwpAddressOptional =
-            getDwpAddress(StringUtils.stripToNull(benefitType), StringUtils.stripToNull(dwpIssuingOffice));
-        if (!dwpAddressOptional.isPresent()) {
-            throw new DwpAddressLookupException(String.format("could not find dwp address for benefitType %s and dwpIssuingOffice %s",
-                benefitType, dwpIssuingOffice));
-
-        }
-        return dwpAddressOptional.get();
+        return getDwpAddress(StringUtils.stripToNull(benefitType), StringUtils.stripToNull(dwpIssuingOffice))
+            .orElseThrow(() -> new DwpAddressLookupException(String.format("could not find dwp address for benefitType %s and dwpIssuingOffice %s",
+            benefitType, dwpIssuingOffice)));
     }
 
     private Address buildAddress(DwpAddress dwpAddress) {
