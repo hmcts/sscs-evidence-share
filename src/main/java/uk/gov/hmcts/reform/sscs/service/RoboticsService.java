@@ -5,6 +5,8 @@ import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.*;
 
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.json.JSONObject;
@@ -77,13 +79,9 @@ public class RoboticsService {
 
     private Map<String, byte[]> downloadEvidence(SscsCaseData sscsCaseData, Long caseId) {
         if (hasEvidence(sscsCaseData)) {
-            Map<String, byte[]> map = new LinkedHashMap<>();
-            for (SscsDocument doc : sscsCaseData.getSscsDocument()) {
-                if (doc.getValue().getDocumentType() == null || doc.getValue().getDocumentType().equalsIgnoreCase("appellantEvidence")) {
-                    map.put(doc.getValue().getDocumentFileName(), downloadBinary(doc, caseId));
-                }
-            }
-            return map;
+            return sscsCaseData.getSscsDocument().stream()
+                .filter(doc -> doc.getValue().getDocumentType() == null || doc.getValue().getDocumentType().equalsIgnoreCase("appellantEvidence"))
+                .collect(Collectors.toMap(doc -> doc.getValue().getDocumentFileName(), doc -> downloadBinary(doc, caseId)));
         } else {
             return Collections.emptyMap();
         }
