@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
@@ -57,13 +58,10 @@ public class DocumentManagementServiceWrapper {
     }
 
     private Boolean checkIfDlDocumentAlreadyExists(List<SscsDocument> sscsDocuments) {
-        for (SscsDocument sscsDocument : sscsDocuments) {
-            if (sscsDocument.getValue().getDocumentType().equalsIgnoreCase("dl6")
-                || sscsDocument.getValue().getDocumentType().equalsIgnoreCase("dl16")) {
-                return true;
-            }
-        }
-        return false;
+        return sscsDocuments.stream()
+            .map(SscsDocument::getValue)
+            .map(SscsDocumentDetails::getDocumentType)
+            .anyMatch(type -> type.equalsIgnoreCase("dl6") || type.equalsIgnoreCase("dl16"));
     }
 
 }
