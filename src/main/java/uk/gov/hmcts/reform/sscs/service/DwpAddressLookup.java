@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import java.nio.charset.Charset;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -14,6 +13,8 @@ import uk.gov.hmcts.reform.sscs.domain.BenefitLookup;
 import uk.gov.hmcts.reform.sscs.domain.DwpAddress;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 @Slf4j
@@ -30,7 +31,7 @@ public class DwpAddressLookup {
         JSONParser parser = new JSONParser();
         try {
             configObject = (JSONObject) parser.parse(IOUtils.resourceToString("dwpAddresses.json",
-                Charset.forName("UTF-8"), Thread.currentThread().getContextClassLoader()));
+                UTF_8, Thread.currentThread().getContextClassLoader()));
 
         } catch (Exception exception) {
             log.error("Cannot parse dwp addresses. " + exception.getMessage(), exception);
