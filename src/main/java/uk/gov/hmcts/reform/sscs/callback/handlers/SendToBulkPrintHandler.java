@@ -157,20 +157,15 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                 log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
                 caseData.setDateSentToDwp(LocalDate.now().toString());
 
-                Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
+                UUID id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData)
+                        .orElseThrow(() -> new BulkPrintException(format("Failed to send to bulk print for case %s. No print id returned",
+                        caseData.getCcdCaseId())));
 
-                if (id.isPresent()) {
-                    BulkPrintInfo info = BulkPrintInfo.builder()
-                        .uuid(id.get())
+                return BulkPrintInfo.builder()
+                        .uuid(id)
                         .allowedTypeForBulkPrint(true)
-                        .desc(buildEventDescription(existingCasePdfs, id.get()))
+                        .desc(buildEventDescription(existingCasePdfs, id))
                         .build();
-
-                    return info;
-                } else {
-                    throw new BulkPrintException(
-                        format("Failed to send to bulk print for case %s. No print id returned",
-                            caseData.getCcdCaseId()));                }
             }
             throw new BulkPrintException(
                 format("Failed to send to bulk print for case %s because no template was found",
