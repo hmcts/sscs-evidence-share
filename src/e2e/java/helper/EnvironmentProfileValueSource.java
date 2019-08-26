@@ -17,17 +17,7 @@ public class EnvironmentProfileValueSource implements ProfileValueSource {
     }
 
     private boolean isPreviewOrAatEnv() {
-        final String testUrl = getEnvOrEmpty("TEST_URL");
+        final String testUrl = System.getenv().getOrDefault("TEST_URL", "");
         return testUrl.contains("preview.internal") || testUrl.contains("aat.internal");
     }
-
-    public static String getEnvOrEmpty(String name) {
-        String value = System.getenv(name);
-        if (value == null) {
-            return "";
-        }
-
-        return value;
-    }
-
 }
