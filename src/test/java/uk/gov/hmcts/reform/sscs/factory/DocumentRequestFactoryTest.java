@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.factory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -52,6 +53,6 @@ public class DocumentRequestFactoryTest {
         DocumentHolder holder = factory.create(caseData, now);
 
         assertEquals(template, holder.getTemplate());
-        assertEquals(true, holder.isPdfArchiveMode());
+        assertTrue(holder.isPdfArchiveMode());
     }
 }
