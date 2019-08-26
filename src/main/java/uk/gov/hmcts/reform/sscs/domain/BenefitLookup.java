@@ -18,7 +18,6 @@ public class BenefitLookup extends ConcurrentHashMap<String, DwpAddress> {
     public BenefitLookup(List<JSONObject> jsonArray) {
         super();
         jsonArray.forEach(jsonObj -> {
-            @SuppressWarnings("unchecked")
             String code = String.valueOf(jsonObj.get(CODE)).toLowerCase();
             this.put(code, getAddress((JSONObject) jsonObj.get(ADDRESS)));
         });
