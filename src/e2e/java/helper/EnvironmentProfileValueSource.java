@@ -10,7 +10,7 @@ public class EnvironmentProfileValueSource implements ProfileValueSource {
     public String get(String key) {
 
         if ("environment.shared-ccd".equals(key)) {
-            return isPreviewOrAatEnv() ? "true" : "false";
+            return String.valueOf(isPreviewOrAatEnv());
         }
 
         return systemProfileValueSource.get(key);
