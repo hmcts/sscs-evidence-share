@@ -182,7 +182,7 @@ public class SendToBulkPrintHandlerTest {
 
     @Test
     public void givenAnErrorWhenSendToBulkPrint_shouldUpdateCaseInCcdToFlagError() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Collections.singletonList(
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(docPdf.getName())
                 .documentType("sscs1")
@@ -227,7 +227,7 @@ public class SendToBulkPrintHandlerTest {
 
     @Test
     public void givenNoBulkPrintIdReturned_shouldThrowAnExceptionAndFlagError() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Collections.singletonList(
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(docPdf.getName())
                 .documentType("sscs1")
