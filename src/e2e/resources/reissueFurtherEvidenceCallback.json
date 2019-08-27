@@ -228,7 +228,7 @@
             },
             "documentType": "appellantEvidence",
             "controlNumber": "4",
-            "evidenceIssued": "No",
+            "evidenceIssued": "Yes",
             "documentFileName": "evidence-document",
             "documentDateAdded": "2019-01-01"
           }
@@ -243,7 +243,7 @@
             },
             "documentType": "representativeEvidence",
             "controlNumber": "4",
-            "evidenceIssued": "No",
+            "evidenceIssued": "Yes",
             "documentFileName": "test_doc",
             "documentDateAdded": "2019-01-01"
           }
@@ -267,8 +267,8 @@
       "dateSentToDwp": "2019-07-17",
       "furtherEvidenceAction": {
         "value": {
-          "code": "otherDocumentManual",
-          "label": "Other document type - action manually"
+          "code": "http://dm-store:4506/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7",
+          "label": "test_doc - "
         },
         "list_items": [
           {
@@ -281,6 +281,9 @@
           }
         ]
       },
+      "resendToAppellant": "YES",
+      "resendToRepresentative": "NO",
+      "resendToDwp": "NO",
       "caseCreated": "2019-07-17",
       "regionalProcessingCenter": {
         "city": "BIRMINGHAM",

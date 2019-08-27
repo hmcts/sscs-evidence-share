@@ -4,8 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
@@ -93,38 +92,70 @@ public class ReissueFurtherEvidenceHandlerTest {
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(false);
 
         handler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+            buildTestCallbackForGivenData(SscsCaseData.builder()
+                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url", "label"), null))
+                .build(), INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
     }
 
     @Test
-    public void givenIssueFurtherEvidenceCallback_shouldReissueEvidenceForAppellantAndRepAndDwp() {
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+    @Parameters({"true, true, true",
+        "false, false, false",
+        "true, true, false",
+        "true, false, false",
+        "false, true, false",
+        "false, false, true"})
+    public void givenIssueFurtherEvidenceCallback_shouldReissueEvidenceForAppellantAndRepAndDwp(boolean resendToAppellant,
+                                                                                                boolean resendToRepresentative,
+                                                                                                boolean resendToDwp) {
+        if (resendToAppellant || resendToDwp || resendToRepresentative) {
+            when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        }
 
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
 
         SscsDocument sscsDocumentNotIssued = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentUrl("www.acme.co.uk").build())
                 .documentType(APPELLANT_EVIDENCE.getValue())
                 .evidenceIssued("No")
                 .build())
             .build();
 
+        DynamicListItem dynamicListItem = new DynamicListItem(
+            sscsDocumentNotIssued.getValue().getDocumentLink().getDocumentUrl(), "a label");
+        DynamicList dynamicList = new DynamicList(dynamicListItem, Collections.singletonList(dynamicListItem));
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("1563382899630221")
             .sscsDocument(Collections.singletonList(sscsDocumentNotIssued))
             .appeal(Appeal.builder().build())
+            .reissueFurtherEvidenceDocument(dynamicList)
+            .resendToAppellant(resendToAppellant ? "yes" : "no")
+            .resendToRepresentative(resendToRepresentative ? "yes" : "no")
+            .resendToDwp(resendToDwp ? "yes" : "no")
             .build();
 
         handler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
 
-        verify(furtherEvidenceService).issue(eq(caseData), eq(APPELLANT_EVIDENCE));
-        verify(furtherEvidenceService).issue(eq(caseData), eq(REPRESENTATIVE_EVIDENCE));
-        verify(furtherEvidenceService).issue(eq(caseData), eq(DWP_EVIDENCE));
+        verify(furtherEvidenceService).canHandleAnyDocument(eq(caseData.getSscsDocument()));
+        if (resendToAppellant) {
+            verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(APPELLANT_EVIDENCE));
+        }
+        if (resendToRepresentative) {
+            verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(REPRESENTATIVE_EVIDENCE));
+        }
+        if (resendToDwp) {
+            verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(DWP_EVIDENCE));
+        }
+        verifyNoMoreInteractions(furtherEvidenceService);
 
-        verify(ccdService).updateCase(captor.capture(), any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
-            any(), any(), any(IdamTokens.class));
+        if (resendToAppellant || resendToDwp || resendToRepresentative) {
+            verify(ccdService).updateCase(captor.capture(), any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                any(), any(), any(IdamTokens.class));
+            assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+        } else {
+            verifyZeroInteractions(ccdService);
+        }
 
-        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
     }
 }
