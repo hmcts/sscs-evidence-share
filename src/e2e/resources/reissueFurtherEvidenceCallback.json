@@ -265,19 +265,19 @@
         }
       ],
       "dateSentToDwp": "2019-07-17",
-      "furtherEvidenceAction": {
+      "reissueFurtherEvidenceDocument": {
         "value": {
           "code": "http://dm-store:4506/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7",
           "label": "test_doc - "
         },
         "list_items": [
           {
-            "code": "issueFurtherEvidence",
-            "label": "Issue further evidence to all parties"
+            "code": "http://dm-store:4506/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7",
+            "label": "test_doc - "
           },
           {
-            "code": "otherDocumentManual",
-            "label": "Other document type - action manually"
+            "code": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+            "label": "rep-doc.pdf - Representative evidence"
           }
         ]
       },
