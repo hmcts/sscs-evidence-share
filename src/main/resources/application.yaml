@@ -84,9 +84,10 @@ robotics:
     from: ${ROBOTICS_EMAIL_FROM:sscs@hmcts.net}
     to: ${ROBOTICS_EMAIL_TO:receiver@hmcts.net}
     scottishTo: ${ROBOTICS_EMAIL_SCOTTISH_TO:receiver2@hmcts.net}
-    subject: ${ROBOTICS_EMAIL_SUBJECT:Robotics Data}
     message: ${ROBOTICS_EMAIL_MESSAGE:Please find attached the robotics json file \nPlease do not respond to this email}
   schema.resource.location: /schema/sscs-robotics.json
+  englishCount: 2
+  scottishCount: 1
 
 docmosis:
   template:
