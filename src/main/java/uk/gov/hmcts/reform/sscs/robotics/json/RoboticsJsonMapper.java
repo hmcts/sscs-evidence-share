@@ -26,6 +26,7 @@ public class RoboticsJsonMapper {
 
         obj.put("caseId", roboticsWrapper.getCcdCaseId());
         obj.put("evidencePresent", roboticsWrapper.getEvidencePresent());
+        obj.put("caseCode", getCaseCode(sscsCaseData));
 
         if (!isAppointeeDetailsEmpty(sscsCaseData.getAppeal().getAppellant().getAppointee())) {
             Boolean sameAddressAsAppointee = "Yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());
@@ -57,7 +58,6 @@ public class RoboticsJsonMapper {
     }
 
     private static JSONObject buildAppealDetails(JSONObject obj, Appeal appeal, String venueName) {
-        obj.put("caseCode", getCaseCode(appeal.getBenefitType().getCode()));
         obj.put("appellantNino", appeal.getAppellant().getIdentity().getNino());
         obj.put("appellantPostCode", venueName);
         obj.put("appealDate", LocalDate.now().toString());
@@ -86,11 +86,17 @@ public class RoboticsJsonMapper {
         return obj;
     }
 
-    private static String getCaseCode(String code) {
-        if (StringUtils.equalsIgnoreCase("esa", code)) {
+    private static String getCaseCode(SscsCaseData sscsCaseData) {
+
+        if (StringUtils.isNotEmpty(sscsCaseData.getCaseCode())) {
+            return sscsCaseData.getCaseCode();
+            // Leave this in for now, whilst we have legacy cases where the case code is not set.
+            // This will be an issue for cases where the caseworker tries to regenerate the robotics json. Can remove after a few weeks I suspect.
+        } else if (StringUtils.equalsIgnoreCase("esa", sscsCaseData.getAppeal().getBenefitType().getCode())) {
             return ESA_CASE_CODE;
+        } else {
+            return PIP_CASE_CODE;
         }
-        return PIP_CASE_CODE;
     }
 
     private static JSONObject buildAppellantDetails(Appellant appellant) {
