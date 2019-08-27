@@ -66,12 +66,6 @@ public class RoboticsJsonValidatorTest {
     }
 
     @Test(expected = RoboticsValidationException.class)
-    public void givenInvalidInputForPhoneNumber_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
-        jsonData = updateEmbeddedProperty(jsonData.toString(), "0798", "appellant", "phoneNumber");
-        roboticsJsonValidator.validate(jsonData);
-    }
-
-    @Test(expected = RoboticsValidationException.class)
     public void givenInvalidInputForCaseCreatedDate_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData = updateEmbeddedProperty(jsonData.toString(), "2018/06/01", "caseCreatedDate");
         roboticsJsonValidator.validate(jsonData);

@@ -6,7 +6,11 @@ final class PlaceholderUtility {
     private PlaceholderUtility() {
     }
 
-    static Object defaultToEmptyStringIfNull(Object value) {
+    static String defaultToEmptyStringIfNull(String value) {
         return (value == null) ? StringUtils.EMPTY : value;
+    }
+
+    static String truncateAddressLine(String addressLine) {
+        return addressLine != null && addressLine.length() > 45  ? addressLine.substring(0, 45) : addressLine;
     }
 }

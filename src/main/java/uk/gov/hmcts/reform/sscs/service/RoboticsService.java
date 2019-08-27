@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator;
 @Slf4j
 public class RoboticsService {
 
+
     private final RegionalProcessingCenterService regionalProcessingCenterService;
 
     private final EvidenceManagementService evidenceManagementService;
@@ -35,6 +37,11 @@ public class RoboticsService {
     private final RoboticsJsonValidator roboticsJsonValidator;
     private final RoboticsEmailTemplate roboticsEmailTemplate;
 
+    private final int englishRoboticCount;
+    private final int scottishRoboticCount;
+
+    private Random rn;
+
     @Autowired
     public RoboticsService(
         RegionalProcessingCenterService regionalProcessingCenterService,
@@ -43,7 +50,9 @@ public class RoboticsService {
         EmailService emailService,
         RoboticsJsonMapper roboticsJsonMapper,
         RoboticsJsonValidator roboticsJsonValidator,
-        RoboticsEmailTemplate roboticsEmailTemplate
+        RoboticsEmailTemplate roboticsEmailTemplate,
+        @Value("${robotics.englishCount}") int englishRoboticCount,
+        @Value("${robotics.scottishCount}") int scottishRoboticCount
     ) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.evidenceManagementService = evidenceManagementService;
@@ -52,6 +61,9 @@ public class RoboticsService {
         this.roboticsJsonMapper = roboticsJsonMapper;
         this.roboticsJsonValidator = roboticsJsonValidator;
         this.roboticsEmailTemplate = roboticsEmailTemplate;
+        this.englishRoboticCount = englishRoboticCount;
+        this.scottishRoboticCount = scottishRoboticCount;
+        rn = new Random();
     }
 
     public void sendCaseToRobotics(SscsCaseData caseData) {
@@ -137,14 +149,23 @@ public class RoboticsService {
         List<EmailAttachment> attachments = addDefaultAttachment(json, pdf, appellantUniqueId);
         log.info("Add additional evidence");
         addAdditionalEvidenceAttachments(additionalEvidence, attachments);
+        log.info("Generating subject for robotics email");
+        String subject = buildSubject(appellantUniqueId, isScottish);
         log.info("Send email");
         emailService.sendEmail(
             roboticsEmailTemplate.generateEmail(
-                appellantUniqueId,
+                subject,
                 attachments,
                 isScottish
             )
         );
+    }
+
+    private String buildSubject(String appellantUniqueId, boolean isScottish) {
+        int roboticCount = isScottish ? scottishRoboticCount : englishRoboticCount;
+        int randomNumber = rn.nextInt(roboticCount) + 1;
+
+        return appellantUniqueId + " for Robot [" + randomNumber + "]";
     }
 
     private void addAdditionalEvidenceAttachments(Map<String, byte[]> additionalEvidence, List<EmailAttachment> attachments) {
