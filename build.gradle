@@ -208,7 +208,7 @@ dependencies {
 
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '2.2.0'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '2.0.0'
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.45'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.48'
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.2'
 
   //Remove when our dependencies pull in this version or later

@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.truncateAddressLine;
 
 import java.util.Map;
@@ -13,20 +13,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
-import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @Service
 @Slf4j
 public class FurtherEvidencePlaceholderService {
 
     private final PlaceholderService placeholderService;
-    private final DwpAddressLookup dwpAddressLookup;
+    private final DwpAddressLookupService dwpAddressLookupService;
 
     @Autowired
     public FurtherEvidencePlaceholderService(PlaceholderService placeholderService,
-                                             DwpAddressLookup dwpAddressLookup) {
+                                             DwpAddressLookupService dwpAddressLookupService) {
         this.placeholderService = placeholderService;
-        this.dwpAddressLookup = dwpAddressLookup;
+        this.dwpAddressLookupService = dwpAddressLookupService;
     }
 
     public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
@@ -64,7 +64,7 @@ public class FurtherEvidencePlaceholderService {
 
     private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
         if (FurtherEvidenceLetterType.DWP_LETTER.getValue().equals(letterType.getValue())) {
-            return dwpAddressLookup.lookupDwpAddress(caseData);
+            return dwpAddressLookupService.lookupDwpAddress(caseData);
         } else if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
             return getAppellantAddress(caseData);
         }

@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
-import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.TemplateService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderService;
 
@@ -25,7 +25,7 @@ public class DocumentRequestFactoryTest {
     private PlaceholderService placeholderService;
 
     @Mock
-    private DwpAddressLookup dwpAddressLookup;
+    private DwpAddressLookupService dwpAddressLookup;
 
     @Mock
     private TemplateService templateService;

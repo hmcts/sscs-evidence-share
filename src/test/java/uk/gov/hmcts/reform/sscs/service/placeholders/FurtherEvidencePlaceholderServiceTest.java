@@ -22,7 +22,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @RunWith(JUnitParamsRunner.class)
 public class FurtherEvidencePlaceholderServiceTest {
@@ -33,7 +33,7 @@ public class FurtherEvidencePlaceholderServiceTest {
     @Mock
     private PlaceholderService placeholderService;
     @Mock
-    private DwpAddressLookup dwpAddressLookup;
+    private DwpAddressLookupService dwpAddressLookup;
 
     @InjectMocks
     private FurtherEvidencePlaceholderService furtherEvidencePlaceholderService;
