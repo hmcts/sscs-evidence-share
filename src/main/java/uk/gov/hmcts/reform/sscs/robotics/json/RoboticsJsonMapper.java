@@ -59,7 +59,6 @@ public class RoboticsJsonMapper {
 
     private static JSONObject buildAppealDetails(JSONObject obj, SscsCaseData sscsCaseData, String venueName) {
         Appeal appeal = sscsCaseData.getAppeal();
-        obj.put("caseCode", getCaseCode(appeal.getBenefitType().getCode()));
         obj.put("appellantNino", appeal.getAppellant().getIdentity().getNino());
         obj.put("appellantPostCode", venueName);
 
