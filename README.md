@@ -59,6 +59,11 @@ You should get a response similar to this:
   {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
 ```
 
+### To run the application locally (with dummy call to bulk print service)
+```bash
+ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
+ ```
+
 ### Alternative script to run application
 
 To skip all the setting up and building, just execute the following command:

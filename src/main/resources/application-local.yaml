@@ -16,3 +16,6 @@ feign:
         loggerLevel: full
       document-management-metadata-download-api:
         loggerLevel: full
+
+send-letter:
+  url: ${SEND_LETTER_SERVICE_BASEURL:false}

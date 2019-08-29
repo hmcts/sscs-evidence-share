@@ -157,7 +157,6 @@ module "sscs-evidence-share" {
     ROBOTICS_EMAIL_FROM    = "${data.azurerm_key_vault_secret.robotics_email_from.value}"
     ROBOTICS_EMAIL_TO      = "${data.azurerm_key_vault_secret.robotics_email_to.value}"
     ROBOTICS_EMAIL_SCOTTISH_TO      = "${data.azurerm_key_vault_secret.robotics_email_scottish_to.value}"
-    ROBOTICS_EMAIL_SUBJECT = "${var.robotics_email_subject}"
     ROBOTICS_EMAIL_MESSAGE = "${var.robotics_email_message}"
 
     EMAIL_SERVER_HOST      = "${data.azurerm_key_vault_secret.smtp_host.value}"

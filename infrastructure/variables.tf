@@ -76,12 +76,6 @@ variable "appinsights_instrumentation_key" {
   default     = ""
 }
 
-
-variable "robotics_email_subject" {
-  type    = "string"
-  default = "Robotics Data"
-}
-
 variable "robotics_email_message" {
   type    = "string"
   default = "Please find attached the robotics json file \nPlease do not respond to this email"
