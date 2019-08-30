@@ -1,23 +1,22 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 
-import java.util.Collections;
-import java.util.Objects;
+import java.util.*;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
@@ -41,30 +40,40 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
             throw new IllegalStateException("Cannot handle callback");
         }
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        final boolean resendToAppellant = caseData.isResendToAppellant();
-        boolean resendToRepresentative = caseData.isResendToRepresentative();
-        final boolean resendToDwp = caseData.isResendToDwp();
+
 
         final SscsDocument selectedDocument = caseData.getSscsDocument().stream().filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getReissueFurtherEvidenceDocument().getValue().getCode())).findFirst()
             .orElseThrow(() ->
                 new IllegalStateException(String.format("Cannot find the selected document to reissue with url %s for caseId %s.", caseData.getReissueFurtherEvidenceDocument().getValue().getCode(), caseData.getCcdCaseId()))
             );
 
-        if (resendToAppellant) {
-            furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, APPELLANT_EVIDENCE);
-        }
-        if (resendToRepresentative) {
-            furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, REPRESENTATIVE_EVIDENCE);
-        }
-        if (resendToDwp) {
-            furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, DWP_EVIDENCE);
-        }
+        final DocumentType documentType = Arrays.stream(DocumentType.values()).filter(f -> f.getValue().equals(selectedDocument.getValue().getDocumentType())).findFirst().orElse(DocumentType.APPELLANT_EVIDENCE);
 
-        if (resendToAppellant || resendToDwp || resendToRepresentative) {
+        List<FurtherEvidenceLetterType> allowedLetterTypes = getAllowedFurtherEvidenceLetterTypes(caseData);
+        furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, documentType, allowedLetterTypes);
+
+        if (CollectionUtils.isNotEmpty(allowedLetterTypes)) {
             setEvidenceIssuedFlagToYes(selectedDocument);
             setReissueFlagsToNull(caseData);
             updateCase(caseData);
         }
+    }
+
+    private List<FurtherEvidenceLetterType> getAllowedFurtherEvidenceLetterTypes(SscsCaseData caseData) {
+        final boolean resendToAppellant = caseData.isResendToAppellant();
+        boolean resendToRepresentative = caseData.isResendToRepresentative();
+        final boolean resendToDwp = caseData.isResendToDwp();
+        List<FurtherEvidenceLetterType> allowedLetterTypes = new ArrayList<>();
+        if (resendToAppellant) {
+            allowedLetterTypes.add(FurtherEvidenceLetterType.APPELLANT_LETTER);
+        }
+        if (resendToRepresentative) {
+            allowedLetterTypes.add(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
+        }
+        if (resendToDwp) {
+            allowedLetterTypes.add(FurtherEvidenceLetterType.DWP_LETTER);
+        }
+        return allowedLetterTypes;
     }
 
     private void setReissueFlagsToNull(SscsCaseData sscsCaseData) {

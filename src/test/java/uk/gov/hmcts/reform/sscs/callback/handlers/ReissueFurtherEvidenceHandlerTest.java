@@ -5,12 +5,17 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Rule;
@@ -24,9 +29,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
@@ -98,13 +105,13 @@ public class ReissueFurtherEvidenceHandlerTest {
     }
 
     @Test
-    @Parameters({"true, true, true",
-        "false, false, false",
-        "true, true, false",
-        "true, false, false",
-        "false, true, false",
-        "false, false, true"})
-    public void givenIssueFurtherEvidenceCallback_shouldReissueEvidenceForAppellantAndRepAndDwp(boolean resendToAppellant,
+    @Parameters({"APPELLANT_EVIDENCE, true, true, true",
+        "REPRESENTATIVE_EVIDENCE, false, false, false",
+        "DWP_EVIDENCE, true, true, false",
+        "APPELLANT_EVIDENCE, true, false, false",
+        "APPELLANT_EVIDENCE, false, true, false",
+        "REPRESENTATIVE_EVIDENCE, false, false, true"})
+    public void givenIssueFurtherEvidenceCallback_shouldReissueEvidenceForAppellantAndRepAndDwp(DocumentType documentType, boolean resendToAppellant,
                                                                                                 boolean resendToRepresentative,
                                                                                                 boolean resendToDwp) {
         if (resendToAppellant || resendToDwp || resendToRepresentative) {
@@ -116,7 +123,7 @@ public class ReissueFurtherEvidenceHandlerTest {
         SscsDocument sscsDocumentNotIssued = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentLink(DocumentLink.builder().documentUrl("www.acme.co.uk").build())
-                .documentType(APPELLANT_EVIDENCE.getValue())
+                .documentType(documentType.getValue())
                 .evidenceIssued("No")
                 .build())
             .build();
@@ -127,7 +134,7 @@ public class ReissueFurtherEvidenceHandlerTest {
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("1563382899630221")
             .sscsDocument(Collections.singletonList(sscsDocumentNotIssued))
-            .appeal(Appeal.builder().build())
+            .appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("YES").build()).build())
             .reissueFurtherEvidenceDocument(dynamicList)
             .resendToAppellant(resendToAppellant ? "yes" : "no")
             .resendToRepresentative(resendToRepresentative ? "yes" : "no")
@@ -138,15 +145,19 @@ public class ReissueFurtherEvidenceHandlerTest {
             buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
 
         verify(furtherEvidenceService).canHandleAnyDocument(eq(caseData.getSscsDocument()));
+
+        List<FurtherEvidenceLetterType>  allowedLetterTypes = new ArrayList<>();
         if (resendToAppellant) {
-            verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(APPELLANT_EVIDENCE));
+            allowedLetterTypes.add(FurtherEvidenceLetterType.APPELLANT_LETTER);
         }
         if (resendToRepresentative) {
-            verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(REPRESENTATIVE_EVIDENCE));
+            allowedLetterTypes.add(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
         }
         if (resendToDwp) {
-            verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(DWP_EVIDENCE));
+            allowedLetterTypes.add(FurtherEvidenceLetterType.DWP_LETTER);
         }
+        verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(documentType), eq(allowedLetterTypes));
+
         verifyNoMoreInteractions(furtherEvidenceService);
 
         if (resendToAppellant || resendToDwp || resendToRepresentative) {
