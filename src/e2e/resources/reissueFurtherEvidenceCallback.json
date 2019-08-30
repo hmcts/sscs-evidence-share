@@ -267,8 +267,8 @@
       "dateSentToDwp": "2019-07-17",
       "reissueFurtherEvidenceDocument": {
         "value": {
-          "code": "http://dm-store:4506/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7",
-          "label": "test_doc - "
+          "code": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+          "label": "rep-doc.pdf - Representative evidence"
         },
         "list_items": [
           {
