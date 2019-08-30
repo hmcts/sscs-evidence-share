@@ -198,7 +198,7 @@ public class RoboticsServiceTest {
         roboticsService.sendCaseToRobotics(caseData);
 
         verify(emailService).sendEmail(any());
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123"), attachmentCaptor.capture(), eq(false));
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), attachmentCaptor.capture(), eq(false));
 
         assertEquals("Bloggs_123.txt", attachmentCaptor.getValue().get(0).getFilename());
         assertEquals(1, attachmentCaptor.getValue().size());
