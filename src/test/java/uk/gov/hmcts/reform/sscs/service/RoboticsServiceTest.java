@@ -25,6 +25,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
+import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
@@ -60,6 +61,9 @@ public class RoboticsServiceTest {
     @Mock
     RoboticsEmailTemplate roboticsEmailTemplate;
 
+    @Mock
+    EvidenceShareConfig evidenceShareConfig;
+
     SscsCcdConvertService convertService;
 
     LocalDate localDate;
@@ -84,7 +88,10 @@ public class RoboticsServiceTest {
             emailService,
             roboticsJsonMapper,
             roboticsJsonValidator,
-            roboticsEmailTemplate);
+            roboticsEmailTemplate,
+            evidenceShareConfig,
+            1,
+            1);
 
         localDate = LocalDate.now();
 
@@ -92,6 +99,7 @@ public class RoboticsServiceTest {
 
         JSONObject mappedJson = mock(JSONObject.class);
         given(roboticsJsonMapper.map(any())).willReturn(mappedJson);
+        given(evidenceShareConfig.getSubmitTypes()).willReturn(Collections.singletonList("paper"));
     }
 
     @Test
@@ -115,7 +123,7 @@ public class RoboticsServiceTest {
     }
 
     @Test
-    public void givenACaseWithCaseCreatedEventAndEvidenceToDownload_thenCreateRoboticsFileWithDownloadedEvidence() {
+    public void givenAnOnlineCaseWithCaseCreatedEventAndEvidenceToDownload_thenCreateRoboticsFileWithDownloadedEvidence() {
 
         given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
 
@@ -127,6 +135,7 @@ public class RoboticsServiceTest {
 
         Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
             .benefitType(BenefitType.builder().code("PIP").build())
+            .receivedVia("Online")
             .appellant(Appellant.builder().address(
                 Address.builder().postcode("CM120HN").build())
                 .build()).build();
@@ -147,10 +156,50 @@ public class RoboticsServiceTest {
         roboticsService.sendCaseToRobotics(caseData);
 
         verify(emailService).sendEmail(any());
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123"), attachmentCaptor.capture(), eq(false));
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), attachmentCaptor.capture(), eq(false));
 
         assertEquals("Bloggs_123.txt", attachmentCaptor.getValue().get(0).getFilename());
         assertEquals("test.jpg", attachmentCaptor.getValue().get(1).getFilename());
+    }
+
+    @Test
+    public void givenAPaperCaseWithCaseCreatedEventAndEvidenceToDownload_thenCreateRoboticsFileWithNoDownloadedEvidence() {
+
+        given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
+
+        byte[] expectedBytes = {1, 2, 3};
+        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
+
+        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
+        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
+
+        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
+            .benefitType(BenefitType.builder().code("PIP").build())
+            .receivedVia("Paper")
+            .appellant(Appellant.builder().address(
+                Address.builder().postcode("CM120HN").build())
+                .build()).build();
+
+        given(emailService.generateUniqueEmailId(appeal.getAppellant())).willReturn("Bloggs_123");
+
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType("appellantEvidence")
+                .documentFileName("test.jpg")
+                .documentLink(DocumentLink.builder().documentUrl("www.download.com").build())
+                .build())
+            .build());
+
+        SscsCaseData caseData = SscsCaseData.builder().appeal(appeal).sscsDocument(documents).ccdCaseId("123").build();
+
+        roboticsService.sendCaseToRobotics(caseData);
+
+        verify(emailService).sendEmail(any());
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), attachmentCaptor.capture(), eq(false));
+
+        assertEquals("Bloggs_123.txt", attachmentCaptor.getValue().get(0).getFilename());
+        assertEquals(1, attachmentCaptor.getValue().size());
     }
 
     @Test
@@ -196,7 +245,7 @@ public class RoboticsServiceTest {
         roboticsService.processRobotics(appeal, 123L, "AB12 XYZ", pdf, Collections.emptyMap());
 
         boolean isScottish = StringUtils.equalsAnyIgnoreCase(rpcName,"GLASGOW");
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123"), captor.capture(), eq(isScottish));
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(isScottish));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
         assertThat(attachmentResult.size(), is(2));
@@ -223,7 +272,7 @@ public class RoboticsServiceTest {
 
         roboticsService.processRobotics(appeal, 123L, "AB12 XYZ", null, Collections.emptyMap());
 
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123"), captor.capture(), eq(NOT_SCOTTISH));
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(NOT_SCOTTISH));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
         assertThat(attachmentResult.size(), is(1));
@@ -251,7 +300,7 @@ public class RoboticsServiceTest {
 
         roboticsService.processRobotics(appeal, 123L, "AB12 XYZ", pdf, Collections.singletonMap("Some Evidence.doc", someFile));
 
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123"), captor.capture(), eq(NOT_SCOTTISH));
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(NOT_SCOTTISH));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
         assertThat(attachmentResult.size(), is(3));
@@ -282,7 +331,7 @@ public class RoboticsServiceTest {
 
         roboticsService.processRobotics(appeal, 123L, "AB12 XYZ", pdf, Collections.singletonMap(null, someFile));
 
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123"), captor.capture(), eq(NOT_SCOTTISH));
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(NOT_SCOTTISH));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
         assertThat(attachmentResult.size(), is(2));
@@ -311,7 +360,7 @@ public class RoboticsServiceTest {
 
         roboticsService.processRobotics(appeal, 123L, "AB12 XYZ", pdf, Collections.singletonMap("Some Evidence.doc", null));
 
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123"), captor.capture(), eq(NOT_SCOTTISH));
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(NOT_SCOTTISH));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
         assertThat(attachmentResult.size(), is(2));

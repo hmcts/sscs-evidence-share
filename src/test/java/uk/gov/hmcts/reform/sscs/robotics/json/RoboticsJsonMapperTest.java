@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -156,6 +157,16 @@ public class RoboticsJsonMapperTest {
     @Parameters({"PIP, 002DD", "ESA, 051DD", "null, 002DD", ", 002DD"})
     public void givenBenefitType_shouldMapCaseCodeAccordingly(String benefitCode, String expectedCaseCode) {
         appeal.getSscsCaseData().getAppeal().getBenefitType().setCode(benefitCode);
+
+        roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertThat(roboticsJson.get("caseCode"), is(expectedCaseCode));
+    }
+
+    @Test
+    @Parameters({"051DD, 051DD", "null, 002DD", ", 002DD"})
+    public void givenCaseCodeOnCase_shouldSetRetrieveCaseCodeAccordingly(@Nullable String caseCode, String expectedCaseCode) {
+        appeal.getSscsCaseData().setCaseCode(caseCode);
 
         roboticsJson = roboticsJsonMapper.map(appeal);
 
@@ -362,6 +373,30 @@ public class RoboticsJsonMapperTest {
         roboticsJson = roboticsJsonMapper.map(appeal);
 
         assertFalse(roboticsJson.has("appointee"));
+    }
+
+    @Test
+    public void givenCaseCreatedDate_thenAppealDateShouldGetUpdated() {
+        String caseCreatedDate = "2019-08-01";
+
+        appeal.getSscsCaseData().setCaseCreated(caseCreatedDate);
+
+        roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertTrue(roboticsJson.has("appealDate"));
+
+        assertEquals(caseCreatedDate, roboticsJson.get("appealDate"));
+    }
+
+    @Test
+    public void givenCaseCreatedDateIsNull_thenAppealDateShouldBeCurrentDate() {
+        appeal.getSscsCaseData().setCaseCreated(null);
+
+        roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertTrue(roboticsJson.has("appealDate"));
+
+        assertEquals(LocalDate.now().toString(), roboticsJson.get("appealDate"));
     }
 
 }

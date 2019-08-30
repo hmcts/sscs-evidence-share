@@ -20,20 +20,22 @@ import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 @Service
 public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
 
-    @Autowired
     private FurtherEvidenceService furtherEvidenceService;
-
-    @Autowired
     private CcdService ccdService;
-
-    @Autowired
     private IdamService idamService;
 
+    @Autowired
+    public IssueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService, CcdService ccdService, IdamService idamService) {
+        this.furtherEvidenceService = furtherEvidenceService;
+        this.ccdService = ccdService;
+        this.idamService = idamService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        return furtherEvidenceService.canHandleAnyDocument(callback.getCaseDetails().getCaseData().getSscsDocument());
+        return callbackType.equals(CallbackType.SUBMITTED)
+            && callback.getEvent() == EventType.ISSUE_FURTHER_EVIDENCE && furtherEvidenceService.canHandleAnyDocument(callback.getCaseDetails().getCaseData().getSscsDocument());
     }
 
     @Override
@@ -61,7 +63,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         }
     }
 
-    private void updateCase(SscsCaseData caseData) {
+    protected void updateCase(SscsCaseData caseData) {
         ccdService.updateCase(
             caseData,
             Long.valueOf(caseData.getCcdCaseId()),
