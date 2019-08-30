@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -20,7 +22,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler;
+import uk.gov.hmcts.reform.sscs.callback.handlers.ReissueFurtherEvidenceHandler;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
@@ -40,7 +41,7 @@ import uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
-public class IssueFurtherEvidenceServiceIt {
+public class ReissueFurtherEvidenceServiceIt {
 
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
     @ClassRule
@@ -59,12 +60,15 @@ public class IssueFurtherEvidenceServiceIt {
     private CcdClient ccdClient;
 
     @MockBean
+    @SuppressWarnings({"PMD.UnusedPrivateField"})
     private EvidenceManagementService evidenceManagementService;
 
     @MockBean
+    @SuppressWarnings({"PMD.UnusedPrivateField"})
     private CcdService ccdService;
 
     @MockBean
+    @SuppressWarnings({"PMD.UnusedPrivateField"})
     private UpdateCcdCaseService updateCcdCaseService;
 
     @MockBean
@@ -74,8 +78,7 @@ public class IssueFurtherEvidenceServiceIt {
     private BulkPrintService bulkPrintService;
 
     @Autowired
-    @Qualifier("issueFurtherEvidenceHandler")
-    private IssueFurtherEvidenceHandler handler;
+    private ReissueFurtherEvidenceHandler handler;
 
     @Autowired
     private TopicConsumer topicConsumer;
@@ -88,20 +91,19 @@ public class IssueFurtherEvidenceServiceIt {
 
     private static final String FILE_CONTENT = "Welcome to PDF document service";
 
-    protected Session session = Session.getInstance(new Properties());
+    private Session session = Session.getInstance(new Properties());
 
-    protected MimeMessage message;
-
-    Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
+    private Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
 
     @Before
     public void setup() {
-        message = new MimeMessage(session);
+        MimeMessage message = new MimeMessage(session);
+        assertNotNull("ReissueFurtherEvidenceHandler must be autowired", handler);
+
     }
 
     @Test
     public void appealWithAppellantAndFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAnd609_98ToDwp() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -133,7 +135,6 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithAppellantAndRepFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAnd609_98ToRepAndDwp() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -170,7 +171,6 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithAppellantAndRepFurtherEvidenceFromRep_shouldSend609_97ToRepAnd609_98ToAppellantAndDwp() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -207,7 +207,6 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithAppellantFurtherEvidenceAndRepFurtherEvidence_shouldSend609_97ToRepAndAppellantAnd609_98ToAppellantAndRepAndDwp() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -259,7 +258,6 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithFurtherEvidenceFromDwp_shouldSend609_97ToDwpAnd609_98ToAppellant() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -291,7 +289,6 @@ public class IssueFurtherEvidenceServiceIt {
 
     @Test
     public void appealWithRepAndFurtherEvidenceFromDwp_shouldSend609_97ToDwpAnd609_98ToRepAndAppellant() throws IOException {
-        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
