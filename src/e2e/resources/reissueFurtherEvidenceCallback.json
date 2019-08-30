@@ -222,9 +222,9 @@
           "id": "636030ca-243f-4a96-8c81-813ab44c1ac8",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+              "document_url": "http://dm-store:4506/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb8",
               "document_filename": "evidence-document.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_binary_url": "http://dm-store:4506/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb8/binary"
             },
             "documentType": "appellantEvidence",
             "controlNumber": "4",
