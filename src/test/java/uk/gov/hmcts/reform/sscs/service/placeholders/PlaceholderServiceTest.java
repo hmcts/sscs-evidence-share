@@ -84,6 +84,7 @@ public class PlaceholderServiceTest {
         assertEquals("Lechworth", placeholders.get(RECIPIENT_ADDRESS_LINE_3_LITERAL));
         assertEquals("Bedford", placeholders.get(RECIPIENT_ADDRESS_LINE_4_LITERAL));
         assertEquals("L2 5UZ", placeholders.get(RECIPIENT_ADDRESS_LINE_5_LITERAL));
+        assertEquals("SC123/12/1234", placeholders.get(SC_NUMBER_LITERAL));
     }
 
     @Test
