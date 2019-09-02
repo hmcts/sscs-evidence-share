@@ -44,7 +44,7 @@ document:
     hmctsImgKey: hmcts2
     hmctsImgVal: "[userImage:hmcts-2.png]"
 
-document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:4506}
+document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:5005}
 
 send-letter:
   url: ${SEND_LETTER_SERVICE_BASEURL:http://localhost:4021}
