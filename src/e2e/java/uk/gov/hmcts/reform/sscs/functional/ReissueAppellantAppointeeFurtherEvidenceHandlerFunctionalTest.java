@@ -52,9 +52,9 @@ public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest exten
         String docUrl = uploadDocToDocMgmtStore();
         createCaseWithValidAppealState();
         String json = getJson(REISSUE_FURTHER_EVIDENCE);
-        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
-        json = json.replace("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
-        return json.replace("EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
+        json = json.replaceAll("CASE_ID_TO_BE_REPLACED", ccdCaseId);
+        json = json.replaceAll("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
+        return json.replaceAll("EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
     }
 
     private String uploadDocToDocMgmtStore() throws IOException {

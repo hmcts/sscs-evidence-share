@@ -24,6 +24,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 
 @RunWith(JUnitParamsRunner.class)
 public class FurtherEvidenceServiceTest {
@@ -132,6 +133,28 @@ public class FurtherEvidenceServiceTest {
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
         then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(3)).sendToBulkPrint(eq(pdfList), eq(caseData));
+    }
+
+    @Test
+    @Parameters({"APPELLANT_LETTER", "REPRESENTATIVE_LETTER", "DWP_LETTER" })
+    public void givenIssueForParty_shouldGenerateCoverLetterForSelectedParty(FurtherEvidenceLetterType furtherEvidenceLetterType) {
+        createTestDataAndConfigureSscsDocumentServiceMock();
+        withRep();
+
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, DWP_EVIDENCE, Collections.singletonList(furtherEvidenceLetterType));
+
+        String templateName = furtherEvidenceOtherPartiesTemplateName;
+        String docName = furtherEvidenceOtherPartiesDocName;
+        if (furtherEvidenceLetterType.equals(DWP_LETTER)) {
+            templateName = furtherEvidenceOriginalSenderTemplateName;
+            docName = furtherEvidenceOriginalSenderDocName;
+        }
+        then(coverLetterService).should(times(1))
+            .generateCoverLetter(eq(caseData), eq(furtherEvidenceLetterType), eq(templateName), eq(docName));
+        then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(coverLetterService).shouldHaveNoMoreInteractions();
+        then(bulkPrintService).shouldHaveNoMoreInteractions();
     }
 
     private void createTestDataAndConfigureSscsDocumentServiceMock() {
