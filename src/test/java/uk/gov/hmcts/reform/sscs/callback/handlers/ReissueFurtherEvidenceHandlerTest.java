@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 
 import java.util.Collections;
@@ -33,7 +33,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
 @RunWith(JUnitParamsRunner.class)
-public class IssueFurtherEvidenceHandlerTest {
+public class ReissueFurtherEvidenceHandlerTest {
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
@@ -47,57 +47,57 @@ public class IssueFurtherEvidenceHandlerTest {
     private CcdService ccdService;
 
     @InjectMocks
-    private IssueFurtherEvidenceHandler issueAppellantAppointeeFurtherEvidenceHandler;
+    private ReissueFurtherEvidenceHandler handler;
 
     @Captor
     ArgumentCaptor<SscsCaseData> captor;
 
     @Test(expected = NullPointerException.class)
     public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException() {
-        issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, null);
+        handler.handle(CallbackType.SUBMITTED, null);
     }
 
     @Test(expected = IllegalStateException.class)
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
-        issueAppellantAppointeeFurtherEvidenceHandler.handle(callbackType,
-            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+        handler.handle(callbackType,
+            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
     }
 
     @Test(expected = IllegalStateException.class)
-    @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
-    public void givenEventTypeIsNotIssueFurtherEvidence_willThrowAnException(EventType eventType) {
-        issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+    @Parameters({"ISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
+    public void givenEventTypeIsNotReIssueFurtherEvidence_willThrowAnException(EventType eventType) {
+        handler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, eventType));
     }
 
     @Test(expected = RequiredFieldMissingException.class)
     public void givenCaseDataInCallbackIsNull_shouldThrowException() {
-        issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+        handler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
     }
 
     @Test(expected = NullPointerException.class)
     public void givenCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        issueAppellantAppointeeFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED, null);
+        handler.canHandle(CallbackType.SUBMITTED, null);
     }
 
     @Test(expected = RequiredFieldMissingException.class)
     public void givenCaseDataInCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
-        issueAppellantAppointeeFurtherEvidenceHandler.canHandle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+        handler.canHandle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
     }
 
     @Test(expected = IllegalStateException.class)
     public void givenHandleMethodIsCalled_shouldThrowExceptionIfCanNotBeHandled() {
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(false);
 
-        issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+        handler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
     }
 
     @Test
-    public void givenIssueFurtherEvidenceCallback_shouldIssueEvidenceForAppellantAndRepAndDwp() {
+    public void givenIssueFurtherEvidenceCallback_shouldReissueEvidenceForAppellantAndRepAndDwp() {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
@@ -115,8 +115,8 @@ public class IssueFurtherEvidenceHandlerTest {
             .appeal(Appeal.builder().build())
             .build();
 
-        issueAppellantAppointeeFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+        handler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
 
         verify(furtherEvidenceService).issue(eq(caseData), eq(APPELLANT_EVIDENCE));
         verify(furtherEvidenceService).issue(eq(caseData), eq(REPRESENTATIVE_EVIDENCE));
