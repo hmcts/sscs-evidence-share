@@ -32,6 +32,7 @@ public class PlaceholderHelper {
 
         return SscsCaseData.builder()
             .ccdCaseId("123456")
+            .caseReference("SC123/12/1234")
             .regionalProcessingCenter(rpc)
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
