@@ -4,6 +4,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,32 +41,40 @@ public class FurtherEvidenceService {
 
     }
 
-    public void issue(SscsCaseData caseData, DocumentType documentType) {
-        List<Pdf> pdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(caseData.getSscsDocument(), documentType);
-
+    public void issue(List<SscsDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType, List<FurtherEvidenceLetterType> allowedLetterTypes) {
+        List<Pdf> pdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType);
         if (pdfs != null && pdfs.size() > 0) {
-            send609_97_OriginalSender(caseData, documentType, pdfs);
-            send609_98_OtherParty(caseData, documentType, pdfs);
+            send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes);
+            send609_98_OtherParty(caseData, documentType, pdfs, allowedLetterTypes);
         }
     }
 
-    private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs) {
-        String docName = "609-97-template (original sender)";
-        byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, findLetterType(documentType), docName);
-        bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData);
+    public void issue(SscsCaseData caseData, DocumentType documentType) {
+        issue(caseData.getSscsDocument(), caseData, documentType, Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
     }
 
-    private void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs) {
+    private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs, List<FurtherEvidenceLetterType> allowedLetterTypes) {
+        String docName = "609-97-template (original sender)";
+        final FurtherEvidenceLetterType letterType = findLetterType(documentType);
+        if (allowedLetterTypes.contains(letterType)) {
+            byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, letterType, docName);
+            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData);
+        }
+    }
+
+    private void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs, List<FurtherEvidenceLetterType> allowedLetterTypes) {
 
         List<FurtherEvidenceLetterType> otherPartiesList = buildOtherPartiesList(caseData, documentType);
 
         for (FurtherEvidenceLetterType letterType: otherPartiesList) {
             String docName = letterType == DWP_LETTER ? "609-98-template (DWP)" : "609-98-template (other parties)";
 
-            byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, letterType, docName);
+            if (allowedLetterTypes.contains(letterType)) {
+                byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, letterType, docName);
 
-            List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs, docName);
-            bulkPrintService.sendToBulkPrint(pdfs60998, caseData);
+                List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs, docName);
+                bulkPrintService.sendToBulkPrint(pdfs60998, caseData);
+            }
         }
     }
 
