@@ -39,6 +39,7 @@ public class PlaceholderService {
         placeholders.put(SSCS_URL_LITERAL, PlaceholderConstants.SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
         placeholders.put(pdfDocumentConfig.getHmctsImgKey(), pdfDocumentConfig.getHmctsImgVal());
+        placeholders.put(SC_NUMBER_LITERAL, defaultToEmptyStringIfNull(caseData.getCaseReference()));
 
         if (caseCreatedDate != null) {
             placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate.toLocalDate().toString());
