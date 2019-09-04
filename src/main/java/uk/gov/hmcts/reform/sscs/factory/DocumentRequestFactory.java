@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
-import uk.gov.hmcts.reform.sscs.service.DwpAddressLookup;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.TemplateService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderService;
 
@@ -21,7 +21,7 @@ public class DocumentRequestFactory {
     private PlaceholderService placeholderService;
 
     @Autowired
-    private DwpAddressLookup dwpAddressLookup;
+    private DwpAddressLookupService dwpAddressLookupService;
 
     @Autowired
     private TemplateService templateService;
@@ -30,7 +30,7 @@ public class DocumentRequestFactory {
         Template template = templateService.findTemplate(caseData);
         Map<String, Object> placeholders = new ConcurrentHashMap<>();
 
-        placeholderService.build(caseData, placeholders, dwpAddressLookup.lookupDwpAddress(caseData), caseCreatedDate);
+        placeholderService.build(caseData, placeholders, dwpAddressLookupService.lookupDwpAddress(caseData), caseCreatedDate);
 
         return DocumentHolder.builder()
             .template(template)
