@@ -119,6 +119,7 @@ module "sscs-evidence-share" {
     SEND_LETTER_SERVICE_ENABLED = "${var.send_letter_service_enabled}"
 
     BUNDLE_STITCHING_ENABLED    = "${var.bundling_stitching_enabled}"
+    READY_TO_LIST_ROBOTICS_ENABLED = "${var.ready_to_list_robotics_enabled}"
 
     PDF_SERVICE_BASE_URL        = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/render"
     PDF_SERVICE_ACCESS_KEY      = "${data.azurerm_key_vault_secret.pdf_service_access_key.value}"

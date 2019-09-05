@@ -3,13 +3,15 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
@@ -17,11 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -37,11 +35,16 @@ public class RoboticsCallbackHandlerTest {
 
     private LocalDateTime now = LocalDateTime.now();
 
+    private List<String> offices;
+
     @Before
     public void setUp() {
         initMocks(this);
         when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
-        handler = new RoboticsCallbackHandler(roboticsService);
+
+        offices = new ArrayList<>();
+        offices.add("1");
+        handler = new RoboticsCallbackHandler(roboticsService, false, offices);
     }
 
     @Test
@@ -78,8 +81,8 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    public void givenARoboticsRequest_thenSendCaseToRobotics() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED);
+    public void givenARoboticsRequestAndReadyToListFeatureFalse_thenSendCaseToRobotics() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "1");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
         handler.handle(SUBMITTED, callback);
@@ -87,10 +90,83 @@ public class RoboticsCallbackHandlerTest {
         verify(roboticsService).sendCaseToRobotics(any());
     }
 
-    private CaseDetails<SscsCaseData> getCaseDetails(State state) {
+    @Test
+    public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsAppealCreatedAndPipAndOfficeSelectedForReadyToList_thenDoNotSendCaseToRobotics() {
+        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "1");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+
+        handler.handle(SUBMITTED, callback);
+
+        verifyNoMoreInteractions(roboticsService);
+    }
+
+    @Test
+    public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsAppealCreatedAndPipAndOfficeNotSelectedForReadyToList_thenSendCaseToRobotics() {
+        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "2");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(roboticsService).sendCaseToRobotics(any());
+    }
+
+    @Test
+    public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsAppealCreatedAndEsa_thenSendCaseToRobotics() {
+        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Esa", "1");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(roboticsService).sendCaseToRobotics(any());
+    }
+
+    @Test
+    public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsReadyToListAndPipAndOfficeSelectedForReadyToList_thenSendCaseToRobotics() {
+        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, "Pip", "1");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(roboticsService).sendCaseToRobotics(any());
+    }
+
+    @Test
+    public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsReadyToListAndPipAndOfficeNotSelectedForReadyToList_thenDoNotSendCaseToRobotics() {
+        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, "Pip", "2");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+
+        handler.handle(SUBMITTED, callback);
+
+        verifyNoMoreInteractions(roboticsService);
+    }
+
+    @Test
+    public void givenARoboticsRequestAndReadyToListFeatureTrueAndEventIsReissuetoGaps2_thenSendCaseToRobotics() {
+        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "1");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.RESEND_CASE_TO_GAPS2);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(roboticsService).sendCaseToRobotics(any());
+    }
+
+    private CaseDetails<SscsCaseData> getCaseDetails(State state, String benefitTypeCode, String office) {
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("123")
-            .appeal(Appeal.builder().build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitTypeCode).build())
+            .mrnDetails(MrnDetails.builder().dwpIssuingOffice(office).build()).build())
             .build();
 
         return new CaseDetails<>(123L, "jurisdiction", state, caseData, now);

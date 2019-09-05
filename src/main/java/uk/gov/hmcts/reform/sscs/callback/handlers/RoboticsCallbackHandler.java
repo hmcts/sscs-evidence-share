@@ -2,14 +2,18 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
@@ -19,11 +23,17 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
     private final RoboticsService roboticsService;
     private final DispatchPriority dispatchPriority;
+    private final boolean readyToListFeatureEnabled;
+    private List<String> offices;
 
     @Autowired
-    public RoboticsCallbackHandler(RoboticsService roboticsService) {
+    public RoboticsCallbackHandler(RoboticsService roboticsService,
+                                   @Value("${robotics.readyToList.feature}") boolean readyToListFeatureEnabled,
+                                   @Value("#{'${robotics.readyToList.offices}'.split(',')}") List<String> offices) {
         this.roboticsService = roboticsService;
         this.dispatchPriority = DispatchPriority.EARLIEST;
+        this.readyToListFeatureEnabled = readyToListFeatureEnabled;
+        this.offices = offices;
     }
 
     @Override
@@ -47,10 +57,36 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         log.info("Processing robotics for case id {} in evidence share service", callback.getCaseDetails().getId());
 
         try {
-            roboticsService.sendCaseToRobotics(callback.getCaseDetails().getCaseData());
+            if (checkCaseValidToSendToRobotics(callback)) {
+                roboticsService.sendCaseToRobotics(callback.getCaseDetails());
+            }
         } catch (Exception e) {
             log.error("Error when sending to robotics: {}", callback.getCaseDetails().getId(), e);
         }
+    }
+
+    private boolean checkCaseValidToSendToRobotics(Callback<SscsCaseData> callback) {
+        if (readyToListFeatureEnabled && callback.getEvent() != RESEND_CASE_TO_GAPS2) {
+            CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+
+            if (caseDetails.getCaseData().getAppeal().getBenefitType().getCode().equalsIgnoreCase("pip")) {
+                if (caseDetails.getState().equals(READY_TO_LIST)) {
+                    for (String office : offices) {
+                        if (caseDetails.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice().equalsIgnoreCase(office)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                } else {
+                    for (String office : offices) {
+                        if (caseDetails.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice().equalsIgnoreCase(office)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     @Override

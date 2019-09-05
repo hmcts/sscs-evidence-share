@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
@@ -71,14 +72,30 @@ public class RoboticsService {
         rn = new Random();
     }
 
-    public void sendCaseToRobotics(SscsCaseData caseData) {
+    public JSONObject sendCaseToRobotics(CaseDetails<SscsCaseData> caseDetails) {
 
+        SscsCaseData caseData = caseDetails.getCaseData();
         String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(caseData.getAppeal().getAppellant().getAddress().getPostcode());
 
         byte[] sscs1Form = downloadSscs1(caseData, Long.valueOf(caseData.getCcdCaseId()));
         Map<String, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
 
-        processRobotics(caseData, Long.valueOf(caseData.getCcdCaseId()), firstHalfOfPostcode, sscs1Form, additionalEvidence);
+        AirlookupBenefitToVenue venue = airLookupService.lookupAirVenueNameByPostCode(firstHalfOfPostcode);
+
+        String venueName = caseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("esa") ? venue.getEsaVenue() : venue.getPipVenue();
+
+        JSONObject roboticsJson = createRobotics(RoboticsWrapper.builder().sscsCaseData(caseData)
+            .ccdCaseId(caseDetails.getId()).venueName(venueName).evidencePresent(caseData.getEvidencePresent()).state(caseDetails.getState()).build());
+
+        log.info("Case {} Robotics JSON successfully created for benefit type {}", caseDetails.getId(),
+            caseData.getAppeal().getBenefitType().getCode());
+
+        boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
+        sendJsonByEmail(caseData.getAppeal().getAppellant(), roboticsJson, sscs1Form, additionalEvidence, isScottish);
+        log.info("Case {} Robotics JSON email sent successfully for benefit type {} isScottish {}", caseDetails.getId(),
+            caseData.getAppeal().getBenefitType().getCode(), isScottish);
+
+        return roboticsJson;
     }
 
     private byte[] downloadSscs1(SscsCaseData sscsCaseData, Long caseId) {
@@ -127,26 +144,7 @@ public class RoboticsService {
         return CollectionUtils.isNotEmpty(sscsCaseData.getSscsDocument());
     }
 
-    public JSONObject processRobotics(SscsCaseData caseData, Long caseId, String postcode, byte[] pdf, Map<String, byte[]> additionalEvidence) {
-        AirlookupBenefitToVenue venue = airLookupService.lookupAirVenueNameByPostCode(postcode);
-
-        String venueName = caseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("esa") ? venue.getEsaVenue() : venue.getPipVenue();
-
-        JSONObject roboticsJson = createRobotics(RoboticsWrapper.builder().sscsCaseData(caseData)
-            .ccdCaseId(caseId).venueName(venueName).evidencePresent(caseData.getEvidencePresent()).build());
-
-        log.info("Case {} Robotics JSON successfully created for benefit type {}", caseId,
-            caseData.getAppeal().getBenefitType().getCode());
-
-        boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
-        sendJsonByEmail(caseData.getAppeal().getAppellant(), roboticsJson, pdf, additionalEvidence, isScottish);
-        log.info("Case {} Robotics JSON email sent successfully for benefit type {} isScottish {}", caseId,
-            caseData.getAppeal().getBenefitType().getCode(), isScottish);
-
-        return roboticsJson;
-    }
-
-    public JSONObject createRobotics(RoboticsWrapper appeal) {
+    private JSONObject createRobotics(RoboticsWrapper appeal) {
 
         JSONObject roboticsAppeal = roboticsJsonMapper.map(appeal);
 
