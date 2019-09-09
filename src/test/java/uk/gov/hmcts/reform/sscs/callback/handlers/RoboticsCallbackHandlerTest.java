@@ -18,8 +18,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -30,6 +32,9 @@ public class RoboticsCallbackHandlerTest {
 
     @Mock
     private RoboticsService roboticsService;
+
+    @Autowired
+    private DwpAddressLookupService dwpAddressLookupService;
 
     private RoboticsCallbackHandler handler;
 
@@ -44,7 +49,9 @@ public class RoboticsCallbackHandlerTest {
 
         offices = new ArrayList<>();
         offices.add("1");
-        handler = new RoboticsCallbackHandler(roboticsService, false, offices);
+        dwpAddressLookupService = new DwpAddressLookupService();
+        handler = new RoboticsCallbackHandler(roboticsService, dwpAddressLookupService, true, offices);
+
     }
 
     @Test
@@ -82,6 +89,8 @@ public class RoboticsCallbackHandlerTest {
 
     @Test
     public void givenARoboticsRequestAndReadyToListFeatureFalse_thenSendCaseToRobotics() {
+        handler = new RoboticsCallbackHandler(roboticsService, dwpAddressLookupService, false, offices);
+
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "1");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
@@ -92,8 +101,6 @@ public class RoboticsCallbackHandlerTest {
 
     @Test
     public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsAppealCreatedAndPipAndOfficeSelectedForReadyToList_thenDoNotSendCaseToRobotics() {
-        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
-
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "1");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
@@ -103,9 +110,27 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsAppealCreatedAndPipAndOfficeNotSelectedForReadyToList_thenSendCaseToRobotics() {
-        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
+    public void givenARoboticsRequestFromSyaAndReadyToListFeatureTrueAndCaseIsAppealCreatedAndPipAndOfficeSelectedForReadyToList_thenDoNotSendCaseToRobotics() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "DWP PIP Office(1)");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
+        handler.handle(SUBMITTED, callback);
+
+        verifyNoMoreInteractions(roboticsService);
+    }
+
+    @Test
+    public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsAppealCreatedAndPipAndOfficeSelectedDoesNotExist_thenDoNotSendCaseToRobotics() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "Dummy office");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+
+        handler.handle(SUBMITTED, callback);
+
+        verifyNoMoreInteractions(roboticsService);
+    }
+
+    @Test
+    public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsAppealCreatedAndPipAndOfficeNotSelectedForReadyToList_thenSendCaseToRobotics() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "2");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
@@ -116,7 +141,7 @@ public class RoboticsCallbackHandlerTest {
 
     @Test
     public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsAppealCreatedAndEsa_thenSendCaseToRobotics() {
-        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
+        handler = new RoboticsCallbackHandler(roboticsService, dwpAddressLookupService, true, offices);
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Esa", "1");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
@@ -128,8 +153,6 @@ public class RoboticsCallbackHandlerTest {
 
     @Test
     public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsReadyToListAndPipAndOfficeSelectedForReadyToList_thenSendCaseToRobotics() {
-        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
-
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, "Pip", "1");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
@@ -140,8 +163,6 @@ public class RoboticsCallbackHandlerTest {
 
     @Test
     public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsReadyToListAndPipAndOfficeNotSelectedForReadyToList_thenDoNotSendCaseToRobotics() {
-        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
-
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, "Pip", "2");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
@@ -152,8 +173,6 @@ public class RoboticsCallbackHandlerTest {
 
     @Test
     public void givenARoboticsRequestAndReadyToListFeatureTrueAndEventIsReissuetoGaps2_thenSendCaseToRobotics() {
-        handler = new RoboticsCallbackHandler(roboticsService, true, offices);
-
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "1");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.RESEND_CASE_TO_GAPS2);
 
