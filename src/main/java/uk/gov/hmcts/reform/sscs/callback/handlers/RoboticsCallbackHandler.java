@@ -72,7 +72,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private boolean checkCaseValidToSendToRobotics(Callback<SscsCaseData> callback) {
-        if (readyToListFeatureEnabled && callback.getEvent() != RESEND_CASE_TO_GAPS2) {
+        if (readyToListFeatureEnabled && callback.getEvent() != RESEND_CASE_TO_GAPS2 && callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode().equalsIgnoreCase("pip")) {
             CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
             Optional<OfficeMapping> selectedOfficeMapping = dwpAddressLookupService.getDwpMappingByOffice("pip", caseDetails.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice());
 
@@ -80,12 +80,10 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
                 log.error("Selected DWP office {} could not be found so skipping robotics for case : {}", callback.getCaseDetails().getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice(), callback.getCaseDetails().getId());
                 return false;
             }
-            if (caseDetails.getCaseData().getAppeal().getBenefitType().getCode().equalsIgnoreCase("pip")) {
-                for (String office : offices) {
-                    Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice("pip", office);
-                    if (selectedOfficeMapping.equals(officeMapping)) {
-                        return caseDetails.getState().equals(READY_TO_LIST) ? true : false;
-                    }
+            for (String office : offices) {
+                Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice("pip", office);
+                if (selectedOfficeMapping.equals(officeMapping)) {
+                    return caseDetails.getState().equals(READY_TO_LIST) ? true : false;
                 }
             }
             if (caseDetails.getState().equals(READY_TO_LIST)) {

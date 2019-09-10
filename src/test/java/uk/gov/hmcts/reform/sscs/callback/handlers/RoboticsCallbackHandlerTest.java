@@ -6,8 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -120,6 +119,16 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
+    public void givenARoboticsRequestFromSyaAndReadyToListFeatureTrueAndCaseIsAppealCreatedAndPipAndOfficeSelectedForReadyToList_thenDoNotSendCaseToRobotics2() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(INTERLOCUTORY_REVIEW_STATE, "Pip", "DWP PIP Office(2)");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(roboticsService).sendCaseToRobotics(any());
+    }
+
+    @Test
     public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsAppealCreatedAndPipAndOfficeSelectedDoesNotExist_thenDoNotSendCaseToRobotics() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "Dummy office");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
@@ -162,13 +171,13 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    public void givenARoboticsRequestAndReadyToListFeatureTrueAndCaseIsReadyToListAndPipAndOfficeNotSelectedForReadyToList_thenDoNotSendCaseToRobotics() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, "Pip", "2");
+    public void givenARoboticsRequestAndReadyToListFeatureTrueAndEsaCase_theSendCaseToRobotics() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Esa", "Watford DRT");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
         handler.handle(SUBMITTED, callback);
 
-        verifyNoMoreInteractions(roboticsService);
+        verify(roboticsService).sendCaseToRobotics(any());
     }
 
     @Test
