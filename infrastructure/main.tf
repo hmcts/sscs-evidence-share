@@ -101,7 +101,7 @@ data "azurerm_key_vault_secret" "smtp_port" {
 }
 
 module "sscs-evidence-share" {
-  source              = "git@github.com:hmcts/moj-module-webapp?ref=master"
+  source              = "git@github.com:hmcts/cnp-module-webappp?ref=master"
   product             = "${var.product}-${var.component}"
   location            = "${var.location_app}"
   env                 = "${var.env}"
