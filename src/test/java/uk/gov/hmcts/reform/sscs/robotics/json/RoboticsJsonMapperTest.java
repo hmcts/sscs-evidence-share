@@ -19,25 +19,29 @@ import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
 
 @RunWith(JUnitParamsRunner.class)
 public class RoboticsJsonMapperTest {
-    private RoboticsJsonMapper roboticsJsonMapper = new RoboticsJsonMapper();
-    private RoboticsWrapper appeal;
+
+    private RoboticsJsonMapper roboticsJsonMapper;
+    private RoboticsWrapper roboticsWrapper;
     private RoboticsJsonValidator roboticsJsonValidator = new RoboticsJsonValidator(
         "/schema/sscs-robotics.json");
     private JSONObject roboticsJson;
 
     @Before
     public void setup() {
-        appeal = RoboticsWrapper
+
+        roboticsJsonMapper = new RoboticsJsonMapper(false);
+
+        roboticsWrapper = RoboticsWrapper
             .builder()
             .sscsCaseData(buildCaseData())
             .ccdCaseId(123L).venueName("Bromley").evidencePresent("Yes")
+            .state(State.APPEAL_CREATED)
             .build();
     }
 
     @Test
     public void mapsAppealToRoboticsJson() {
-        roboticsJsonMapper = new RoboticsJsonMapper();
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         roboticsJsonValidator.validate(roboticsJson);
 
@@ -146,9 +150,9 @@ public class RoboticsJsonMapperTest {
 
     @Test
     public void mapRepTitleToDefaultValuesWhenSetToNull() {
-        appeal.getSscsCaseData().getAppeal().getRep().getName().setTitle(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getRep().getName().setTitle(null);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertEquals("s/m", roboticsJson.getJSONObject("representative").get("title"));
     }
@@ -156,9 +160,9 @@ public class RoboticsJsonMapperTest {
     @Test
     @Parameters({"PIP, 002DD", "ESA, 051DD", "null, 002DD", ", 002DD"})
     public void givenBenefitType_shouldMapCaseCodeAccordingly(String benefitCode, String expectedCaseCode) {
-        appeal.getSscsCaseData().getAppeal().getBenefitType().setCode(benefitCode);
+        roboticsWrapper.getSscsCaseData().getAppeal().getBenefitType().setCode(benefitCode);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertThat(roboticsJson.get("caseCode"), is(expectedCaseCode));
     }
@@ -166,37 +170,37 @@ public class RoboticsJsonMapperTest {
     @Test
     @Parameters({"051DD, 051DD", "null, 002DD", ", 002DD"})
     public void givenCaseCodeOnCase_shouldSetRetrieveCaseCodeAccordingly(@Nullable String caseCode, String expectedCaseCode) {
-        appeal.getSscsCaseData().setCaseCode(caseCode);
+        roboticsWrapper.getSscsCaseData().setCaseCode(caseCode);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertThat(roboticsJson.get("caseCode"), is(expectedCaseCode));
     }
 
     @Test
     public void mapRepFirstNameToDefaultValuesWhenSetToNull() {
-        appeal.getSscsCaseData().getAppeal().getRep().getName().setFirstName(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getRep().getName().setFirstName(null);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertEquals(".", roboticsJson.getJSONObject("representative").get("firstName"));
     }
 
     @Test
     public void mapRepLastNameToDefaultValuesWhenSetToNull() {
-        appeal.getSscsCaseData().getAppeal().getRep().getName().setLastName(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getRep().getName().setLastName(null);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertEquals(".", roboticsJson.getJSONObject("representative").get("lastName"));
     }
 
     @Test
     public void givenLanguageInterpreterIsTrue_thenSetToLanguageInterpreterType() {
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setLanguages("My Language");
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setLanguageInterpreter("Yes");
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setLanguages("My Language");
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setLanguageInterpreter("Yes");
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertEquals("My Language", roboticsJson.getJSONObject("hearingArrangements").get("languageInterpreter"));
     }
@@ -211,10 +215,10 @@ public class RoboticsJsonMapperTest {
         excludeDates.add(ExcludeDate.builder()
             .value(dateRange1)
             .build());
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setArrangements(null);
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDates);
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setArrangements(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDates);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertEquals("No", roboticsJson.getJSONObject("hearingArrangements").get("hearingLoop"));
         assertEquals("No", roboticsJson.getJSONObject("hearingArrangements").get("accessibleHearingRoom"));
@@ -238,10 +242,10 @@ public class RoboticsJsonMapperTest {
         excludeDates.add(ExcludeDate.builder()
             .value(dateRange2)
             .build());
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setArrangements(null);
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDates);
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setArrangements(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setExcludeDates(excludeDates);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertEquals("No", roboticsJson.getJSONObject("hearingArrangements").get("hearingLoop"));
         assertEquals("No", roboticsJson.getJSONObject("hearingArrangements").get("accessibleHearingRoom"));
@@ -251,64 +255,64 @@ public class RoboticsJsonMapperTest {
 
     @Test
     public void givenLanguageInterpreterIsFalse_thenDoNotSetLanguageInterpreter() {
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setLanguages("My Language");
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setLanguageInterpreter("No");
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setLanguages("My Language");
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setLanguageInterpreter("No");
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertFalse(roboticsJson.getJSONObject("hearingArrangements").has("languageInterpreter"));
     }
 
     @Test
     public void givenLanguageInterpreterIsTrueAndInterpreterLanguageTypeIsNull_thenDoNotSetLanguageInterpreter() {
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setLanguages(null);
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setLanguageInterpreter("Yes");
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setLanguages(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setLanguageInterpreter("Yes");
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertFalse(roboticsJson.getJSONObject("hearingArrangements").has("languageInterpreter"));
     }
 
     @Test
     public void givenSignLanguageInterpreterIsTrue_thenSetToSignLanguageInterpreterType() {
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setSignLanguageType("My Language");
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setSignLanguageType("My Language");
         List<String> arrangements = new ArrayList<>();
         arrangements.add("signLanguageInterpreter");
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setArrangements(arrangements);
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setArrangements(arrangements);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertEquals("My Language", roboticsJson.getJSONObject("hearingArrangements").get("signLanguageInterpreter"));
     }
 
     @Test
     public void givenSignLanguageInterpreterIsFalse_thenDoNotSetSignLanguageInterpreter() {
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setSignLanguageType("My Language");
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setSignLanguageType("My Language");
         List<String> arrangements = new ArrayList<>();
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setArrangements(arrangements);
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setArrangements(arrangements);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertFalse(roboticsJson.getJSONObject("hearingArrangements").has("signLanguageInterpreter"));
     }
 
     @Test
     public void givenSignLanguageInterpreterIsTrueAndSignInterpreterLanguageTypeIsNull_thenDoNotSetSignLanguageInterpreter() {
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setSignLanguageType(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setSignLanguageType(null);
         List<String> arrangements = new ArrayList<>();
         arrangements.add("signLanguageInterpreter");
-        appeal.getSscsCaseData().getAppeal().getHearingOptions().setArrangements(arrangements);
+        roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setArrangements(arrangements);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertFalse(roboticsJson.getJSONObject("hearingArrangements").has("signLanguageInterpreter"));
     }
 
     @Test
     public void givenCcdCaseIdIsNull_thenDoNotSetCcdCaseId() {
-        appeal.setCcdCaseId(null);
+        roboticsWrapper.setCcdCaseId(null);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         roboticsJsonValidator.validate(roboticsJson);
 
@@ -317,12 +321,12 @@ public class RoboticsJsonMapperTest {
 
     @Test
     public void givenAMissingRepresentative_thenProcessRobotics() {
-        appeal.getSscsCaseData().getAppeal().getRep().setAddress(null);
-        appeal.getSscsCaseData().getAppeal().getRep().setName(null);
-        appeal.getSscsCaseData().getAppeal().getRep().setOrganisation(null);
-        appeal.getSscsCaseData().getAppeal().getRep().setHasRepresentative("No");
+        roboticsWrapper.getSscsCaseData().getAppeal().getRep().setAddress(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getRep().setName(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getRep().setOrganisation(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getRep().setHasRepresentative("No");
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertFalse(roboticsJson.has("representative"));
     }
@@ -333,15 +337,15 @@ public class RoboticsJsonMapperTest {
 
         Appointee appointee = Appointee.builder()
             .name(appointeeName)
-            .address(appeal.getSscsCaseData().getAppeal().getAppellant().getAddress())
-            .contact(appeal.getSscsCaseData().getAppeal().getAppellant().getContact())
+            .address(roboticsWrapper.getSscsCaseData().getAppeal().getAppellant().getAddress())
+            .contact(roboticsWrapper.getSscsCaseData().getAppeal().getAppellant().getContact())
             .build();
 
-        appeal.getSscsCaseData().getAppeal().getAppellant().setIsAddressSameAsAppointee("Yes");
+        roboticsWrapper.getSscsCaseData().getAppeal().getAppellant().setIsAddressSameAsAppointee("Yes");
 
-        appeal.getSscsCaseData().getAppeal().getAppellant().setAppointee(appointee);
+        roboticsWrapper.getSscsCaseData().getAppeal().getAppellant().setAppointee(appointee);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertTrue(roboticsJson.has("appointee"));
         assertEquals("Yes", roboticsJson.getJSONObject("appointee").getString("sameAddressAsAppellant"));
@@ -358,9 +362,9 @@ public class RoboticsJsonMapperTest {
             .identity(Identity.builder().dob(null).nino(null).build())
             .build();
 
-        appeal.getSscsCaseData().getAppeal().getAppellant().setAppointee(appointee);
+        roboticsWrapper.getSscsCaseData().getAppeal().getAppellant().setAppointee(appointee);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertFalse(roboticsJson.has("appointee"));
     }
@@ -368,9 +372,9 @@ public class RoboticsJsonMapperTest {
 
     @Test
     public void givenNoAppointee_thenProcessRobotics() {
-        appeal.getSscsCaseData().getAppeal().getAppellant().setAppointee(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getAppellant().setAppointee(null);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertFalse(roboticsJson.has("appointee"));
     }
@@ -379,9 +383,9 @@ public class RoboticsJsonMapperTest {
     public void givenCaseCreatedDate_thenAppealDateShouldGetUpdated() {
         String caseCreatedDate = "2019-08-01";
 
-        appeal.getSscsCaseData().setCaseCreated(caseCreatedDate);
+        roboticsWrapper.getSscsCaseData().setCaseCreated(caseCreatedDate);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertTrue(roboticsJson.has("appealDate"));
 
@@ -390,13 +394,43 @@ public class RoboticsJsonMapperTest {
 
     @Test
     public void givenCaseCreatedDateIsNull_thenAppealDateShouldBeCurrentDate() {
-        appeal.getSscsCaseData().setCaseCreated(null);
+        roboticsWrapper.getSscsCaseData().setCaseCreated(null);
 
-        roboticsJson = roboticsJsonMapper.map(appeal);
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertTrue(roboticsJson.has("appealDate"));
 
         assertEquals(LocalDate.now().toString(), roboticsJson.get("appealDate"));
+    }
+
+    @Test
+    public void givenReadyToListFeatureIsFalse_thenDoNotSetReadyToListField() {
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertFalse(roboticsJson.has("isReadyToList"));
+    }
+
+    @Test
+    public void givenReadyToListFeatureIsTrueAndStateIsAppealCreated_thenSetReadyToListFieldToNo() {
+
+        roboticsJsonMapper = new RoboticsJsonMapper(true);
+        roboticsWrapper.setState(State.APPEAL_CREATED);
+
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertTrue(roboticsJson.has("isReadyToList"));
+        assertEquals("No", roboticsJson.get("isReadyToList"));
+    }
+
+    @Test
+    public void givenReadyToListFeatureIsTrueAndStateIsReadyToList_thenSetReadyToListFieldToYes() {
+        roboticsJsonMapper = new RoboticsJsonMapper(true);
+        roboticsWrapper.setState(State.READY_TO_LIST);
+
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertTrue(roboticsJson.has("isReadyToList"));
+        assertEquals("Yes", roboticsJson.get("isReadyToList"));
     }
 
 }

@@ -59,6 +59,10 @@ variable "bundling_stitching_enabled" {
   default = false
 }
 
+variable "ready_to_list_robotics_enabled" {
+  default = false
+}
+
 variable "core_case_data_jurisdiction_id" {
   default = "SSCS"
 }

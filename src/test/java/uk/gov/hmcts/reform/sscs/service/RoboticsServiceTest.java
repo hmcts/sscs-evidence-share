@@ -2,13 +2,13 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.net.URI;
@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
-import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator;
 
@@ -78,6 +77,10 @@ public class RoboticsServiceTest {
     @Captor
     private ArgumentCaptor<List<EmailAttachment>> attachmentCaptor;
 
+    private SscsCaseData appeal;
+
+    private CaseDetails<SscsCaseData> caseData;
+
     @Before
     public void setup() {
         initMocks(this);
@@ -102,30 +105,98 @@ public class RoboticsServiceTest {
         JSONObject mappedJson = mock(JSONObject.class);
         given(roboticsJsonMapper.map(any())).willReturn(mappedJson);
         given(evidenceShareConfig.getSubmitTypes()).willReturn(Collections.singletonList("paper"));
+
+        appeal = buildCaseData();
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, appeal, null);
     }
 
     @Test
-    public void givenACaseWithCaseCreatedEvent_thenCreateRoboticsFile() {
+    @Parameters({"CARDIFF", "GLASGOW", "", "null"})
+    public void generatingRoboticsSendsAnEmail(String rpcName) {
 
-        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
+        Appeal appeal = Appeal.builder()
+            .mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
             .benefitType(BenefitType.builder().code("PIP").build())
             .appellant(Appellant.builder().address(
                 Address.builder().postcode("CM120HN").build())
             .build()).build();
 
-        SscsCaseData caseData = SscsCaseData.builder().appeal(appeal).ccdCaseId("123").build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(appeal).regionalProcessingCenter(RegionalProcessingCenter.builder().name(rpcName).build()).ccdCaseId("123").build();
 
         given(evidenceManagementService.download(any(), eq(null))).willReturn(null);
 
+        given(emailService.generateUniqueEmailId(appeal.getAppellant())).willReturn("Bloggs_123");
+
         given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
 
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
         roboticsService.sendCaseToRobotics(caseData);
 
+        boolean isScottish = StringUtils.equalsAnyIgnoreCase(rpcName,"GLASGOW");
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(isScottish));
+        List<EmailAttachment> attachmentResult = captor.getValue();
+
+        assertThat(attachmentResult.size(), is(1));
+        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
+
+        verify(roboticsJsonMapper).map(any());
+        verify(roboticsJsonValidator).validate(any());
         verify(emailService).sendEmail(any());
     }
 
     @Test
-    public void givenAnOnlineCaseWithCaseCreatedEventAndEvidenceToDownload_thenCreateRoboticsFileWithDownloadedEvidence() {
+    @Parameters({"Paper", "Online"})
+    public void givenACaseWithEvidenceToDownload_thenCreateRoboticsFileWithDownloadedEvidence(String receivedVia) {
+
+        given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
+
+        byte[] expectedBytes = {1, 2, 3};
+        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
+
+        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
+        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
+
+        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
+            .benefitType(BenefitType.builder().code("PIP").build())
+            .receivedVia(receivedVia)
+            .appellant(Appellant.builder().address(
+                Address.builder().postcode("CM120HN").build())
+                .build()).build();
+
+        given(emailService.generateUniqueEmailId(appeal.getAppellant())).willReturn("Bloggs_123");
+
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType("appellantEvidence")
+                .documentFileName("test.jpg")
+                .documentLink(DocumentLink.builder().documentUrl("www.download.com").build())
+                .build())
+            .build());
+
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, SscsCaseData.builder().appeal(appeal).sscsDocument(documents).ccdCaseId("123").build(), null);
+
+        roboticsService.sendCaseToRobotics(caseData);
+
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(false));
+        List<EmailAttachment> attachmentResult = captor.getValue();
+
+        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
+
+        if (receivedVia.equals("Paper")) {
+            assertThat(attachmentResult.size(), is(1));
+        } else {
+            assertThat(attachmentResult.size(), is(2));
+            assertThat(attachmentResult.get(1).getFilename(), is("test.jpg"));
+        }
+
+        verify(roboticsJsonMapper).map(any());
+        verify(roboticsJsonValidator).validate(any());
+        verify(emailService).sendEmail(any());
+    }
+
+    @Test
+    public void givenAdditionalEvidenceHasEmptyFileName_doNotDownloadAdditionalEvidenceAndStillGenerateRoboticsAndSendEmail() {
 
         given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
 
@@ -148,247 +219,23 @@ public class RoboticsServiceTest {
         documents.add(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType("appellantEvidence")
-                .documentFileName("test.jpg")
+                .documentFileName(null)
                 .documentLink(DocumentLink.builder().documentUrl("www.download.com").build())
                 .build())
             .build());
 
-        SscsCaseData caseData = SscsCaseData.builder().appeal(appeal).sscsDocument(documents).ccdCaseId("123").build();
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, SscsCaseData.builder().appeal(appeal).sscsDocument(documents).ccdCaseId("123").build(), null);
 
         roboticsService.sendCaseToRobotics(caseData);
 
-        verify(emailService).sendEmail(any());
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), attachmentCaptor.capture(), eq(false));
-
-        assertEquals("Bloggs_123.txt", attachmentCaptor.getValue().get(0).getFilename());
-        assertEquals("test.jpg", attachmentCaptor.getValue().get(1).getFilename());
-    }
-
-    @Test
-    public void givenAPaperCaseWithCaseCreatedEventAndEvidenceToDownload_thenCreateRoboticsFileWithNoDownloadedEvidence() {
-
-        given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
-
-        byte[] expectedBytes = {1, 2, 3};
-        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
-
-        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
-        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
-
-        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
-            .benefitType(BenefitType.builder().code("PIP").build())
-            .receivedVia("Paper")
-            .appellant(Appellant.builder().address(
-                Address.builder().postcode("CM120HN").build())
-                .build()).build();
-
-        given(emailService.generateUniqueEmailId(appeal.getAppellant())).willReturn("Bloggs_123");
-
-        List<SscsDocument> documents = new ArrayList<>();
-        documents.add(SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .documentType("appellantEvidence")
-                .documentFileName("test.jpg")
-                .documentLink(DocumentLink.builder().documentUrl("www.download.com").build())
-                .build())
-            .build());
-
-        SscsCaseData caseData = SscsCaseData.builder().appeal(appeal).sscsDocument(documents).ccdCaseId("123").build();
-
-        roboticsService.sendCaseToRobotics(caseData);
-
-        verify(emailService).sendEmail(any());
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), attachmentCaptor.capture(), eq(false));
-
-        assertEquals("Bloggs_123.txt", attachmentCaptor.getValue().get(0).getFilename());
-        assertEquals(1, attachmentCaptor.getValue().size());
-    }
-
-    @Test
-    public void createValidRoboticsAndReturnAsJsonObject() {
-
-        RoboticsWrapper appeal =
-            RoboticsWrapper
-                .builder()
-                .sscsCaseData(buildCaseData())
-                .ccdCaseId(123L).venueName("Bromley")
-                .build();
-
-        JSONObject mappedJson = mock(JSONObject.class);
-
-        given(roboticsJsonMapper.map(appeal)).willReturn(mappedJson);
-
-        JSONObject actualRoboticsJson = roboticsService.createRobotics(appeal);
-
-        then(roboticsJsonMapper).should(times(1)).map(appeal);
-        then(roboticsJsonValidator).should(times(1)).validate(mappedJson);
-
-        assertEquals(mappedJson, actualRoboticsJson);
-    }
-
-    @Test
-    @Parameters({"CARDIFF", "GLASGOW", "", "null"})
-    public void generatingRoboticsSendsAnEmail(String rpcName) {
-
-        SscsCaseData appeal = buildCaseData().toBuilder().regionalProcessingCenter(
-            buildCaseData().getRegionalProcessingCenter().toBuilder().name(rpcName.equals("null") ? null : rpcName).build()
-        ).build();
-
-        JSONObject mappedJson = mock(JSONObject.class);
-
-        given(roboticsJsonMapper.map(any())).willReturn(mappedJson);
-
-        given(airLookupService.lookupAirVenueNameByPostCode("AB12 XYZ")).willReturn(AirlookupBenefitToVenue.builder().pipVenue("Bristol").build());
-
-        given(emailService.generateUniqueEmailId(appeal.getAppeal().getAppellant())).willReturn("Bloggs_123");
-
-        byte[] pdf = {};
-
-        roboticsService.processRobotics(appeal, 123L, "AB12 XYZ", pdf, Collections.emptyMap());
-
-        boolean isScottish = StringUtils.equalsAnyIgnoreCase(rpcName,"GLASGOW");
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(isScottish));
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(false));
         List<EmailAttachment> attachmentResult = captor.getValue();
 
-        assertThat(attachmentResult.size(), is(2));
         assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
-        assertThat(attachmentResult.get(1).getFilename(), is("Bloggs_123.pdf"));
-
-        verify(roboticsJsonMapper).map(any());
-        verify(roboticsJsonValidator).validate(mappedJson);
-        verify(emailService).sendEmail(any());
-    }
-
-    @Test
-    public void generatingRoboticsWithEmptyPdfSendsAnEmail() {
-
-        SscsCaseData appeal = buildCaseData();
-
-        JSONObject mappedJson = mock(JSONObject.class);
-
-        given(roboticsJsonMapper.map(any())).willReturn(mappedJson);
-
-        given(airLookupService.lookupAirVenueNameByPostCode("AB12 XYZ")).willReturn(AirlookupBenefitToVenue.builder().pipVenue("Bristol").build());
-
-        given(emailService.generateUniqueEmailId(appeal.getAppeal().getAppellant())).willReturn("Bloggs_123");
-
-        roboticsService.processRobotics(appeal, 123L, "AB12 XYZ", null, Collections.emptyMap());
-
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(NOT_SCOTTISH));
-        List<EmailAttachment> attachmentResult = captor.getValue();
-
         assertThat(attachmentResult.size(), is(1));
-        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
-        verify(roboticsJsonMapper).map(any());
-        verify(roboticsJsonValidator).validate(mappedJson);
-        verify(emailService).sendEmail(any());
-    }
-
-    @Test
-    public void generatingRoboticsSendsAnEmailWithAdditionalEvidence() {
-
-        SscsCaseData appeal = buildCaseData();
-
-        JSONObject mappedJson = mock(JSONObject.class);
-
-        given(roboticsJsonMapper.map(any())).willReturn(mappedJson);
-
-        given(airLookupService.lookupAirVenueNameByPostCode("AB12 XYZ")).willReturn(AirlookupBenefitToVenue.builder().pipVenue("Bristol").build());
-
-        given(emailService.generateUniqueEmailId(appeal.getAppeal().getAppellant())).willReturn("Bloggs_123");
-
-        byte[] pdf = {};
-        byte[] someFile = {};
-
-        roboticsService.processRobotics(appeal, 123L, "AB12 XYZ", pdf, Collections.singletonMap("Some Evidence.doc", someFile));
-
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(NOT_SCOTTISH));
-        List<EmailAttachment> attachmentResult = captor.getValue();
-
-        assertThat(attachmentResult.size(), is(3));
-        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
-        assertThat(attachmentResult.get(1).getFilename(), is("Bloggs_123.pdf"));
-        assertThat(attachmentResult.get(2).getFilename(), is("Some Evidence.doc"));
 
         verify(roboticsJsonMapper).map(any());
-        verify(roboticsJsonValidator).validate(mappedJson);
+        verify(roboticsJsonValidator).validate(any());
         verify(emailService).sendEmail(any());
-    }
-
-    @Test
-    public void givenAdditionalEvidenceHasEmptyFileName_doNotDownloadAdditionalEvidenceAndStillGenerateRoboticsAndSendEmail() {
-
-        SscsCaseData appeal = buildCaseData();
-
-        JSONObject mappedJson = mock(JSONObject.class);
-
-        given(roboticsJsonMapper.map(any())).willReturn(mappedJson);
-
-        given(airLookupService.lookupAirVenueNameByPostCode("AB12 XYZ")).willReturn(AirlookupBenefitToVenue.builder().pipVenue("Bristol").build());
-
-        given(emailService.generateUniqueEmailId(appeal.getAppeal().getAppellant())).willReturn("Bloggs_123");
-
-        byte[] pdf = {};
-        byte[] someFile = {};
-
-        roboticsService.processRobotics(appeal, 123L, "AB12 XYZ", pdf, Collections.singletonMap(null, someFile));
-
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(NOT_SCOTTISH));
-        List<EmailAttachment> attachmentResult = captor.getValue();
-
-        assertThat(attachmentResult.size(), is(2));
-        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
-        assertThat(attachmentResult.get(1).getFilename(), is("Bloggs_123.pdf"));
-
-        verify(roboticsJsonMapper).map(any());
-        verify(roboticsJsonValidator).validate(mappedJson);
-        verify(emailService).sendEmail(any());
-    }
-
-    @Test
-    public void givenAdditionalEvidenceFileIsEmpty_doNotDownloadAdditionalEvidenceAndStillGenerateRoboticsAndSendEmail() {
-
-        SscsCaseData appeal = buildCaseData();
-
-        JSONObject mappedJson = mock(JSONObject.class);
-
-        given(roboticsJsonMapper.map(any())).willReturn(mappedJson);
-
-        given(airLookupService.lookupAirVenueNameByPostCode("AB12 XYZ")).willReturn(AirlookupBenefitToVenue.builder().pipVenue("Bristol").build());
-
-        given(emailService.generateUniqueEmailId(appeal.getAppeal().getAppellant())).willReturn("Bloggs_123");
-
-        byte[] pdf = {};
-
-        roboticsService.processRobotics(appeal, 123L, "AB12 XYZ", pdf, Collections.singletonMap("Some Evidence.doc", null));
-
-        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(NOT_SCOTTISH));
-        List<EmailAttachment> attachmentResult = captor.getValue();
-
-        assertThat(attachmentResult.size(), is(2));
-        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
-        assertThat(attachmentResult.get(1).getFilename(), is("Bloggs_123.pdf"));
-
-        verify(roboticsJsonMapper).map(any());
-        verify(roboticsJsonValidator).validate(mappedJson);
-        verify(emailService).sendEmail(any());
-    }
-
-    @Test
-    public void generatingRoboticsReturnsTheJson() {
-
-        SscsCaseData appeal = buildCaseData();
-
-        JSONObject mappedJson = mock(JSONObject.class);
-
-        given(roboticsJsonMapper.map(any())).willReturn(mappedJson);
-
-        given(airLookupService.lookupAirVenueNameByPostCode("AB12 XYZ")).willReturn(AirlookupBenefitToVenue.builder().pipVenue("Bristol").build());
-
-        given(emailService.generateUniqueEmailId(appeal.getAppeal().getAppellant())).willReturn("Bloggs_123");
-
-        JSONObject roboticsJson = roboticsService.processRobotics(appeal, 123L, "AB12 XYZ", null, Collections.emptyMap());
-
-        assertThat(roboticsJson, is(mappedJson));
     }
 }
