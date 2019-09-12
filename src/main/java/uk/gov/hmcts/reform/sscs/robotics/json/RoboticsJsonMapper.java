@@ -7,6 +7,8 @@ import java.time.format.DateTimeFormatter;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
@@ -17,6 +19,13 @@ public class RoboticsJsonMapper {
     private static final String YES = "Yes";
     private static final String ESA_CASE_CODE = "051DD";
     private static final String PIP_CASE_CODE = "002DD";
+
+    private final boolean readyToListFeatureEnabled;
+
+    @Autowired
+    public RoboticsJsonMapper(@Value("${robotics.readyToList.feature}") boolean readyToListFeatureEnabled) {
+        this.readyToListFeatureEnabled = readyToListFeatureEnabled;
+    }
 
     public JSONObject map(RoboticsWrapper roboticsWrapper) {
 
@@ -47,6 +56,14 @@ public class RoboticsJsonMapper {
         }
 
         addRpcEmail(sscsCaseData.getRegionalProcessingCenter(), obj);
+
+        if (readyToListFeatureEnabled) {
+            String isReadyToList = "No";
+            if (roboticsWrapper.getState().equals(State.READY_TO_LIST)) {
+                isReadyToList = "Yes";
+            }
+            obj.put("isReadyToList", isReadyToList);
+        }
 
         return obj;
     }
