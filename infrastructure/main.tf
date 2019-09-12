@@ -3,9 +3,9 @@ provider "azurerm" {
 }
 
 locals {
-  ase_name               = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
-  azureVaultName         = "sscs-${var.env}"
-  s2sCnpUrl              = "http://rpe-service-auth-provider-${var.env}.service.${local.ase_name}.internal"
+  ase_name       = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  azureVaultName = "sscs-${var.env}"
+  s2sCnpUrl      = "http://rpe-service-auth-provider-${var.env}.service.${local.ase_name}.internal"
 
   shared_app_service_plan     = "${var.product}-${var.env}"
   non_shared_app_service_plan = "${var.product}-${var.component}-${var.env}"
@@ -18,11 +18,9 @@ locals {
 
 resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"
-  location = "${var.location_app}"
+  location = "${var.location}"
 
-  tags = "${merge(var.common_tags,
-    map("lastUpdated", "${timestamp()}")
-    )}"
+  tags = "${var.common_tags}"
 }
 
 data "azurerm_key_vault" "sscs_key_vault" {
@@ -102,8 +100,9 @@ data "azurerm_key_vault_secret" "smtp_port" {
 
 module "sscs-evidence-share" {
   source              = "git@github.com:hmcts/cnp-module-webapp?ref=master"
+  enable_ase          = "${var.enable_ase}"
   product             = "${var.product}-${var.component}"
-  location            = "${var.location_app}"
+  location            = "${var.location}"
   env                 = "${var.env}"
   ilbIp               = "${var.ilbIp}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -114,16 +113,15 @@ module "sscs-evidence-share" {
   appinsights_instrumentation_key = "${var.appinsights_instrumentation_key}"
 
   app_settings = {
-
     SEND_LETTER_SERVICE_BASEURL = "${local.send_letter_service_baseurl}"
     SEND_LETTER_SERVICE_ENABLED = "${var.send_letter_service_enabled}"
 
-    BUNDLE_STITCHING_ENABLED    = "${var.bundling_stitching_enabled}"
+    BUNDLE_STITCHING_ENABLED       = "${var.bundling_stitching_enabled}"
     READY_TO_LIST_ROBOTICS_ENABLED = "${var.ready_to_list_robotics_enabled}"
 
-    PDF_SERVICE_BASE_URL        = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/render"
-    PDF_SERVICE_ACCESS_KEY      = "${data.azurerm_key_vault_secret.pdf_service_access_key.value}"
-    PDF_SERVICE_HEALTH_URL      = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/status"
+    PDF_SERVICE_BASE_URL   = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/render"
+    PDF_SERVICE_ACCESS_KEY = "${data.azurerm_key_vault_secret.pdf_service_access_key.value}"
+    PDF_SERVICE_HEALTH_URL = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/status"
 
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
 
@@ -138,32 +136,32 @@ module "sscs-evidence-share" {
     IDAM_OAUTH2_CLIENT_SECRET = "${data.azurerm_key_vault_secret.idam_oauth2_client_secret.value}"
     IDAM_OAUTH2_REDIRECT_URL  = "${var.idam_redirect_url}"
 
-    AMQP_HOST         = "sscs-servicebus-${var.env}.servicebus.windows.net"
+    AMQP_HOST = "sscs-servicebus-${var.env}.servicebus.windows.net"
+
     // In Azure Service bus, rulename/key is used as username/password
     AMQP_USERNAME     = "SendAndListenSharedAccessKey"
     AMQP_PASSWORD     = "${data.azurerm_key_vault_secret.sscs_asb_primary_send_and_listen_shared_access_key.value}"
     TOPIC_NAME        = "sscs-evidenceshare-topic-${var.env}"
     SUBSCRIPTION_NAME = "sscs-evidenceshare-subscription-${var.env}"
 
-    TRUST_ALL_CERTS         = "${var.trust_all_certs}"
+    TRUST_ALL_CERTS = "${var.trust_all_certs}"
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
 
-    CORE_CASE_DATA_API_URL  = "${local.ccdApi}"
+    CORE_CASE_DATA_API_URL         = "${local.ccdApi}"
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
     CORE_CASE_DATA_CASE_TYPE_ID    = "${var.core_case_data_case_type_id}"
 
     WEBSITE_DNS_SERVER = "${data.azurerm_lb.consul_dns.private_ip_address}"
 
-    ROBOTICS_EMAIL_FROM    = "${data.azurerm_key_vault_secret.robotics_email_from.value}"
-    ROBOTICS_EMAIL_TO      = "${data.azurerm_key_vault_secret.robotics_email_to.value}"
-    ROBOTICS_EMAIL_SCOTTISH_TO      = "${data.azurerm_key_vault_secret.robotics_email_scottish_to.value}"
-    ROBOTICS_EMAIL_MESSAGE = "${var.robotics_email_message}"
+    ROBOTICS_EMAIL_FROM        = "${data.azurerm_key_vault_secret.robotics_email_from.value}"
+    ROBOTICS_EMAIL_TO          = "${data.azurerm_key_vault_secret.robotics_email_to.value}"
+    ROBOTICS_EMAIL_SCOTTISH_TO = "${data.azurerm_key_vault_secret.robotics_email_scottish_to.value}"
+    ROBOTICS_EMAIL_MESSAGE     = "${var.robotics_email_message}"
 
     EMAIL_SERVER_HOST      = "${data.azurerm_key_vault_secret.smtp_host.value}"
     EMAIL_SERVER_PORT      = "${data.azurerm_key_vault_secret.smtp_port.value}"
     EMAIL_SMTP_TLS_ENABLED = "${var.appeal_email_smtp_tls_enabled}"
     EMAIL_SMTP_SSL_TRUST   = "${var.appeal_email_smtp_ssl_trust}"
-
   }
 }

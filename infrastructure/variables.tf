@@ -1,12 +1,12 @@
 variable "product" {
-  type    = "string"
+  type = "string"
 }
 
 variable "component" {
   type = "string"
 }
 
-variable "location_app" {
+variable "location" {
   type    = "string"
   default = "UK South"
 }
@@ -93,4 +93,14 @@ variable "appeal_email_smtp_tls_enabled" {
 variable "appeal_email_smtp_ssl_trust" {
   type    = "string"
   default = "*"
+}
+
+variable "enable_ase" {
+  default = true
+}
+
+variable "appinsights_location" {
+  type        = "string"
+  default     = "West Europe"
+  description = "Location for Application Insights"
 }
