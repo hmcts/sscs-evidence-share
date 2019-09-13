@@ -51,9 +51,9 @@ public class BulkPrintService implements PrintService {
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData)
         throws BulkPrintException {
         if (sendLetterEnabled) {
-            List<String> encodedData = new ArrayList<>();
+            List<byte[]> encodedData = new ArrayList<>();
             for (Pdf pdf : pdfs) {
-                encodedData.add(getEncoder().encodeToString(pdf.getContent()));
+                encodedData.add(getEncoder().encode(pdf.getContent()));
             }
             final String authToken = idamService.generateServiceAuthorization();
             return sendLetterWithRetry(authToken, sscsCaseData, encodedData, 1);
@@ -61,7 +61,7 @@ public class BulkPrintService implements PrintService {
         return Optional.empty();
     }
 
-    private Optional<UUID> sendLetterWithRetry(String authToken, SscsCaseData sscsCaseData, List<String> encodedData,
+    private Optional<UUID> sendLetterWithRetry(String authToken, SscsCaseData sscsCaseData, List<byte[]> encodedData,
                                                Integer reTryNumber) {
         try {
             return sendLetter(authToken, sscsCaseData, encodedData);
@@ -77,7 +77,7 @@ public class BulkPrintService implements PrintService {
         }
     }
 
-    private Optional<UUID> sendLetter(String authToken, SscsCaseData sscsCaseData, List<String> encodedData) {
+    private Optional<UUID> sendLetter(String authToken, SscsCaseData sscsCaseData, List<byte[]> encodedData) {
         SendLetterResponse sendLetterResponse = sendLetterApi.sendLetter(
             authToken,
             new LetterWithPdfsRequest(
