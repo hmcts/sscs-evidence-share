@@ -1,11 +1,11 @@
 java:
   image: 'https://hmctspublic.azurecr.io/sscs/evidence-share:latest'
   applicationPort: 8091
+  aadIdentityName: sscs
   keyVaults:
     sscs:
       resourceGroup: sscs
       secrets:
-        - idam-api
         - idam-oauth-user
         - idam-redirect
         - idam-sscs-systemupdate-user
@@ -14,7 +14,6 @@ java:
         - ccd-api
         - ccd-jid
         - ccd-tid
-        - idam-s2s-api
         - sscs-s2s-secret
         - s2s-micro
         - sscs-asb-primary-send-and-listen-shared-access-key
@@ -30,18 +29,19 @@ java:
     REFORM_ENVIRONMENT: preview
     ROOT_LOGGING_LEVEL: INFO
     LOG_OUTPUT: single
+    IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     IDAM_OAUTH2_CLIENT_ID: "sscs"
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
-    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CORE_CASE_DATA_JURISDICTION_ID: SSCS
     CORE_CASE_DATA_CASE_TYPE_ID: Benefit
-    SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
+    SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     SEND_LETTER_SERVICE_ENABLED: "true"
-    DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
+    DOCUMENT_MANAGEMENT_URL: "http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     TRUST_ALL_CERTS: "true"
     SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-demo"
     TOPIC_NAME: "sscs-evidenceshare-topic-demo"
-    AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
+    AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
     MAX_RETRY_ATTEMPTS: 3
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
