@@ -40,7 +40,7 @@ java:
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     TRUST_ALL_CERTS: "true"
     SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-demo"
-    TOPIC_NAME: "sscs-evidenceshare-topic-demo"
+    TOPIC_NAME: "sscs-evidenceshare-topic-{{ .Values.global.environment }}"
     AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
     MAX_RETRY_ATTEMPTS: 3
