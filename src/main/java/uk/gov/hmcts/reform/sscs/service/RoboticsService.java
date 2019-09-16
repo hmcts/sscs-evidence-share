@@ -82,7 +82,7 @@ public class RoboticsService {
 
         AirlookupBenefitToVenue venue = airLookupService.lookupAirVenueNameByPostCode(firstHalfOfPostcode);
 
-        String venueName = caseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("esa") ? venue.getEsaVenue() : venue.getPipVenue();
+        String venueName = caseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("esa") ? venue.getEsaOrUcVenue() : venue.getPipVenue();
 
         JSONObject roboticsJson = createRobotics(RoboticsWrapper.builder().sscsCaseData(caseData)
             .ccdCaseId(caseDetails.getId()).venueName(venueName).evidencePresent(caseData.getEvidencePresent()).state(caseDetails.getState()).build());
