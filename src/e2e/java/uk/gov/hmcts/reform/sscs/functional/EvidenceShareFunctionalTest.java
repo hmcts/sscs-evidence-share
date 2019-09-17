@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP;
 
@@ -69,6 +70,8 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         SscsCaseData caseData = caseDetails.getData();
 
         List<SscsDocument> docs = caseData.getSscsDocument();
+
+        assertNotNull("docs is not null", docs);
         assertEquals(1, docs.size());
         assertEquals("dl16-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
         assertEquals("withDwp", caseDetails.getState());
