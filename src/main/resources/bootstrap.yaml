@@ -14,7 +14,7 @@ spring:
         sscs.sscs-s2s-secret: IDAM_S2S_AUTH_TOTP_SECRET
         sscs.s2s-micro: IDAM_S2S_AUTH_MICROSERVICE
         sscs.sscs-asb-primary-send-and-listen-shared-access-key: AMQP_PASSWORD
-        sscs.docmosis-endpoint: PDF_SERVICE_BASE_URL
+        docmosis-endpoint: PDF_SERVICE_BASE_URL
         sscs.docmosis-api-key: PDF_SERVICE_ACCESS_KEY
         robotics-email-to: ROBOTICS_EMAIL_TO
         robotics-email-from: ROBOTICS_EMAIL_FROM
