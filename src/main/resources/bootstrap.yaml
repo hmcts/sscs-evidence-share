@@ -4,11 +4,11 @@ spring:
       prefixed: true
       paths: /mnt/secrets/sscs
       aliases:
-        idam-oauth-user: IDAM_OAUTH2_CLIENT_ID
-        idam-redirect: IDAM_OAUTH2_REDIRECT_URL
+        sscs.idam-oauth-user: IDAM_OAUTH2_CLIENT_ID
+        sscs.idam-redirect: IDAM_OAUTH2_REDIRECT_URL
         idam-sscs-systemupdate-user: IDAM_SSCS_SYSTEMUPDATE_USER
         idam-sscs-systemupdate-password: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
-        idam-sscs-oauth2-client-secret: IDAM_OAUTH2_CLIENT_SECRET
+        sscs.idam-sscs-oauth2-client-secret: IDAM_OAUTH2_CLIENT_SECRET
         ccd-jid: CORE_CASE_DATA_JURISDICTION_ID
         ccd-tid: CORE_CASE_DATA_CASE_TYPE_ID
         sscs.sscs-s2s-secret: IDAM_S2S_AUTH_TOTP_SECRET
