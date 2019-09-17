@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
@@ -50,7 +51,7 @@ public class RoboticsServiceIt {
                 .receivedVia("paper")
                 .appellant(Appellant.builder()
                     .name(Name.builder().title("Mr").firstName("Terry").lastName("Tibbs").build())
-                    .address(Address.builder().line1("99 My Road").town("Grantham").county("Surrey").postcode("RH5 6PO").build())
+                    .address(Address.builder().line1("99 My Road").town("Grantham").county("Surrey").postcode("CV10 6PO").build())
                     .identity(Identity.builder().nino("JT0123456B").build())
                     .contact(Contact.builder().mobile(null).email(null).build())
                     .build())
@@ -92,7 +93,7 @@ public class RoboticsServiceIt {
     }
 
     @Test
-    public void givenSscsCaseDataWithoutReadyToListFeatureTrue_makeValidRoboticsJsonThatValidatesAgainstSchemaWithReadyToListField() {
+    public void givenSscsCaseDataWithReadyToListFeatureTrue_makeValidRoboticsJsonThatValidatesAgainstSchemaWithReadyToListField() {
         ReflectionTestUtils.setField(mapper, "readyToListFeatureEnabled", true);
 
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
@@ -102,6 +103,51 @@ public class RoboticsServiceIt {
         assertFalse(result.has("representative"));
         assertTrue(result.has("hearingArrangements"));
         assertTrue(result.has("isReadyToList"));
+    }
+
+    @Test
+    public void givenSscsCaseDataWithUcBenefitTypeAndReadyToListFeatureTrue_makeValidRoboticsJsonThatValidatesAgainstSchemaWithReadyToListField() {
+        ReflectionTestUtils.setField(mapper, "readyToListFeatureEnabled", true);
+        caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("UC").build());
+
+        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
+
+        assertThat(result.get("caseId"), is(1234L));
+        assertTrue(result.has("appellant"));
+        assertFalse(result.has("representative"));
+        assertTrue(result.has("hearingArrangements"));
+        assertTrue(result.has("isReadyToList"));
+        assertEquals("Coventry (CMCB)", result.get("appellantPostCode"));
+    }
+
+    @Test
+    public void givenSscsCaseDataWithEsaBenefitTypeAndReadyToListFeatureTrue_makeValidRoboticsJsonThatValidatesAgainstSchemaWithReadyToListField() {
+        ReflectionTestUtils.setField(mapper, "readyToListFeatureEnabled", true);
+        caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("ESA").build());
+
+        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
+
+        assertThat(result.get("caseId"), is(1234L));
+        assertTrue(result.has("appellant"));
+        assertFalse(result.has("representative"));
+        assertTrue(result.has("hearingArrangements"));
+        assertTrue(result.has("isReadyToList"));
+        assertEquals("Coventry (CMCB)", result.get("appellantPostCode"));
+    }
+
+    @Test
+    public void givenSscsCaseDataWithPipBenefitTypeAndReadyToListFeatureTrue_makeValidRoboticsJsonThatValidatesAgainstSchemaWithReadyToListField() {
+        ReflectionTestUtils.setField(mapper, "readyToListFeatureEnabled", true);
+        caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("Pip").build());
+
+        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
+
+        assertThat(result.get("caseId"), is(1234L));
+        assertTrue(result.has("appellant"));
+        assertFalse(result.has("representative"));
+        assertTrue(result.has("hearingArrangements"));
+        assertTrue(result.has("isReadyToList"));
+        assertEquals("Nuneaton", result.get("appellantPostCode"));
     }
 
     @Test
