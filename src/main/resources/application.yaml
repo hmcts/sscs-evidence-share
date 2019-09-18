@@ -54,7 +54,7 @@ send-letter:
 idam:
   url: ${IDAM_API_URL:http://localhost:5000}
   s2s-auth:
-    totp_secret: ${IDAM_S2S_AUTH_TOTP_SECRET:}
+    totp_secret: ${IDAM_S2S_AUTH_TOTP_SECRET:AAAAAAAAAAAAAAAC}
     microservice: ${IDAM_S2S_AUTH_MICROSERVICE:sscs}
     url: ${IDAM_S2S_AUTH:http://localhost:4502}
   oauth2:
