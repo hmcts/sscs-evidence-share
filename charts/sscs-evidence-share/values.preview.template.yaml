@@ -14,5 +14,3 @@ java:
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
     BUNDLE_STITCHING_ENABLED: "false"
     READY_TO_LIST_ROBOTICS_ENABLED: "false"
-    PDF_SERVICE_BASE_URL: https://docmosis-development.platform.hmcts.net/rs/render
-    PDF_SERVICE_HEALTH_URL: https://docmosis-development.platform.hmcts.net/rs/status

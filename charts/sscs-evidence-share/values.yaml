@@ -45,6 +45,8 @@ java:
     AMQP_HOST: "sscs-servicebus-{{ .Values.global.environment }}.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
     MAX_RETRY_ATTEMPTS: 3
+    PDF_SERVICE_BASE_URL: https://docmosis-development.platform.hmcts.net/rs/render
+    PDF_SERVICE_HEALTH_URL: https://docmosis-development.platform.hmcts.net/rs/status
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
     ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
