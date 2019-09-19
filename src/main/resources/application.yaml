@@ -33,7 +33,7 @@ service:
 amqp:
   host: ${AMQP_HOST:localhost}
   username: ${AMQP_USERNAME:guest}
-  password: ${AMQP_PASSWORD:guest}
+  password: ${AMQP_PASSWORD:}
   topic: ${TOPIC_NAME:test.topic}
   subscription: ${SUBSCRIPTION_NAME:test.queue}
   # DO NOT SET THIS 'true' IN PRODUCTION!
@@ -86,6 +86,9 @@ robotics:
     scottishTo: ${ROBOTICS_EMAIL_SCOTTISH_TO:receiver2@hmcts.net}
     message: ${ROBOTICS_EMAIL_MESSAGE:Please find attached the robotics json file \nPlease do not respond to this email}
   schema.resource.location: /schema/sscs-robotics.json
+  readyToList:
+    feature: ${READY_TO_LIST_ROBOTICS_ENABLED:true}
+    offices: 1
   englishCount: 2
   scottishCount: 1
 
@@ -106,7 +109,7 @@ evidence-share:
 
 feature:
   bundle-stitching:
-    enabled: true
+    enabled: ${BUNDLE_STITCHING_ENABLED:true}
 
 exela:
   addressLine1: HMCTS SSCS

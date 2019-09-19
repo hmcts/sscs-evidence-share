@@ -1,30 +1,21 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  aadIdentityName:
   environment:
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
     CORE_CASE_DATA_API_URL: "http://${SERVICE_NAME}-data-store-api"
     SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"
     SEND_LETTER_SERVICE_ENABLED: "true"
+    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
     SUBSCRIPTION_NAME: "sscs-evidenceshare-subscription-aat"
     TOPIC_NAME: "sscs-evidenceshare-topic-aat"
     AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
-    PDF_SERVICE_BASE_URL: ${PDF_SERVICE_BASE_URL}rs/render
-    PDF_SERVICE_ACCESS_KEY: ${PDF_SERVICE_ACCESS_KEY}
-    PDF_SERVICE_HEALTH_URL: ${PDF_SERVICE_BASE_URL}rs/status
-    IDAM_API_URL: ${IDAM_API_URL}
-    IDAM_S2S_AUTH_TOTP_SECRET: ${IDAM_S2S_AUTH_TOTP_SECRET}
-    IDAM_S2S_AUTH: ${IDAM_S2S_AUTH}
-    IDAM_S2S_AUTH_MICROSERVICE: ${IDAM_S2S_AUTH_MICROSERVICE}
-    IDAM_SSCS_SYSTEMUPDATE_USER: ${IDAM_SSCS_SYSTEMUPDATE_USER}
-    IDAM_SSCS_SYSTEMUPDATE_PASSWORD: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
-    IDAM_OAUTH2_CLIENT_ID: "sscs"
-    IDAM_OAUTH2_CLIENT_SECRET: ${IDAM_OAUTH2_CLIENT_SECRET}
-    AMQP_PASSWORD: ${AMQP_PASSWORD}
     BUNDLE_STITCHING_ENABLED: "false"
-
+    READY_TO_LIST_ROBOTICS_ENABLED: "false"
+    
 tags:
   ccd-idam-pr: true
 
@@ -109,3 +100,4 @@ ccd:
         - caseworker-sscs-teamleader
         - caseworker-sscs-panelmember
         - caseworker-sscs-bulkscan
+

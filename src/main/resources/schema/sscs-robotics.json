@@ -25,6 +25,7 @@
     "appointee": {"$ref": "#/definitions/person"},
     "representative": {"$ref": "#/definitions/person"},
     "rpcEmail": {"type": "string"},
+    "isReadyToList": {"$ref": "#/definitions/yesOrNo"},
     "hearingArrangements": {
       "type": "object",
       "properties" : {
