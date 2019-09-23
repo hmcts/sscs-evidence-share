@@ -17,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -32,7 +31,6 @@ public class RoboticsCallbackHandlerTest {
     @Mock
     private RoboticsService roboticsService;
 
-    @Autowired
     private DwpAddressLookupService dwpAddressLookupService;
 
     private RoboticsCallbackHandler handler;
@@ -195,6 +193,7 @@ public class RoboticsCallbackHandlerTest {
             .ccdCaseId("123")
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code(benefitTypeCode).build())
             .mrnDetails(MrnDetails.builder().dwpIssuingOffice(office).build()).build())
+            .createdInGapsFrom(benefitTypeCode.equalsIgnoreCase("pip") ? State.READY_TO_LIST.getId() : State.VALID_APPEAL.getId())
             .build();
 
         return new CaseDetails<>(123L, "jurisdiction", state, caseData, now);
