@@ -178,6 +178,27 @@ public class RoboticsCallbackHandlerTest {
         verify(roboticsService).sendCaseToRobotics(any());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void givenARoboticsRequestAndReadyToListFeatureFalseAndPipCase_thenDoNotSendCaseToRobotics() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, "Pip", "1");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.READY_TO_LIST);
+        handler = new RoboticsCallbackHandler(roboticsService, dwpAddressLookupService, false, offices);
+
+        handler.handle(SUBMITTED, callback);
+
+        verifyNoMoreInteractions(roboticsService);
+    }
+
+    @Test
+    public void givenARoboticsRequestAndReadyToListFeatureTrueAndPipCase_thenSendCaseToRobotics() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, "Pip", "1");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.READY_TO_LIST);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(roboticsService).sendCaseToRobotics(any());
+    }
+
     @Test
     public void givenARoboticsRequestAndReadyToListFeatureTrueAndEventIsReissuetoGaps2_thenSendCaseToRobotics() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "Pip", "1");
