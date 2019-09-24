@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -168,7 +169,7 @@ public class RoboticsJsonMapperTest {
     }
 
     @Test
-    @Parameters({"051DD, 051DD", "null, 002DD", ", 002DD"})
+    @Parameters({"051DD, 051DD", "null, 002DD", ", 002DD", "001EE, 001EE"})
     public void givenCaseCodeOnCase_shouldSetRetrieveCaseCodeAccordingly(@Nullable String caseCode, String expectedCaseCode) {
         roboticsWrapper.getSscsCaseData().setCaseCode(caseCode);
 
@@ -425,12 +426,23 @@ public class RoboticsJsonMapperTest {
     @Test
     public void givenReadyToListFeatureIsTrueAndStateIsReadyToList_thenSetReadyToListFieldToYes() {
         roboticsJsonMapper = new RoboticsJsonMapper(true);
+
+        DynamicListItem value = new DynamicListItem("ABC", "DEF");
+
         roboticsWrapper.setState(State.READY_TO_LIST);
+        roboticsWrapper.getSscsCaseData().setDwpOriginatingOffice(new DynamicList(value, Collections.singletonList(value)));
+        roboticsWrapper.getSscsCaseData().setDwpPresentingOffice(new DynamicList(value, Collections.singletonList(value)));
+        roboticsWrapper.getSscsCaseData().setDwpIsOfficerAttending("Yes");
+        roboticsWrapper.getSscsCaseData().setDwpUcb("Yes");
 
         roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertTrue(roboticsJson.has("isReadyToList"));
-        assertEquals("Yes", roboticsJson.get("isReadyToList"));
+        assertEquals(LocalDate.now().toString(), roboticsJson.get("dwpResponseDate"));
+        assertEquals("DEF", roboticsJson.get("dwpIssuingOffice"));
+        assertEquals("DEF", roboticsJson.get("dwpPresentingOffice"));
+        assertEquals("Yes", roboticsJson.get("dwpIsOfficerAttending"));
+        assertEquals("Yes", roboticsJson.get("dwpUcb"));
     }
 
 }

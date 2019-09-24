@@ -55,7 +55,7 @@ public class RoboticsJsonValidatorTest {
 
     @Test(expected = RoboticsValidationException.class)
     public void givenInvalidInputForCaseCode_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
-        jsonData = updateEmbeddedProperty(jsonData.toString(), "002CC", "caseCode");
+        jsonData = updateEmbeddedProperty(jsonData.toString(), "002CCC", "caseCode");
         roboticsJsonValidator.validate(jsonData);
     }
 

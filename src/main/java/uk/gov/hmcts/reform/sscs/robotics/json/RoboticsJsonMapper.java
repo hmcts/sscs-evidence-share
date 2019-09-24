@@ -63,6 +63,20 @@ public class RoboticsJsonMapper {
                 isReadyToList = "Yes";
             }
             obj.put("isReadyToList", isReadyToList);
+
+            obj.put("dwpResponseDate", LocalDate.now().toString());
+            if (sscsCaseData.getDwpOriginatingOffice() != null) {
+                obj.put("dwpIssuingOffice", sscsCaseData.getDwpOriginatingOffice().getValue().getLabel());
+            }
+            if (sscsCaseData.getDwpPresentingOffice() != null) {
+                obj.put("dwpPresentingOffice", sscsCaseData.getDwpPresentingOffice().getValue().getLabel());
+            }
+            if (sscsCaseData.getDwpIsOfficerAttending() != null) {
+                obj.put("dwpIsOfficerAttending", sscsCaseData.getDwpIsOfficerAttending());
+            }
+            if (sscsCaseData.getDwpUcb() != null) {
+                obj.put("dwpUcb", sscsCaseData.getDwpUcb());
+            }
         }
 
         return obj;
@@ -95,7 +109,6 @@ public class RoboticsJsonMapper {
                 obj.put("mrnReasonForBeingLate", appeal.getMrnDetails().getMrnLateReason());
             }
         }
-
 
         if (appeal.getMrnDetails().getDwpIssuingOffice() != null) {
             obj.put("pipNumber", appeal.getMrnDetails().getDwpIssuingOffice());
