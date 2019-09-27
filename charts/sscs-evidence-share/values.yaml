@@ -1,5 +1,5 @@
 java:
-  image: 'https://hmctspublic.azurecr.io/sscs/evidence-share:latest'
+  image: 'hmctspublic.azurecr.io/sscs/evidence-share:latest'
   applicationPort: 8091
   aadIdentityName: sscs
   ingressHost: sscs-evidence-share-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
