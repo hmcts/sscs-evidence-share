@@ -5,7 +5,7 @@
   "properties": {
     "caseCode": {
       "type": "string",
-      "pattern": "^\\d{3}DD$"
+      "pattern": "^\\d{3}[A-Z]{2}$"
     },
     "caseId" : {"type" : "integer"},
     "appellantNino":  {"type": "string"},
@@ -26,6 +26,11 @@
     "representative": {"$ref": "#/definitions/person"},
     "rpcEmail": {"type": "string"},
     "isReadyToList": {"$ref": "#/definitions/yesOrNo"},
+    "dwpResponseDate": {"$ref": "#/definitions/dateType"},
+    "dwpIssuingOffice": {"type": "string"},
+    "dwpPresentingOffice": {"type": "string"},
+    "dwpIsOfficerAttending": {"$ref": "#/definitions/yesOrNo"},
+    "dwpUcb": {"$ref": "#/definitions/yesOrNo"},
     "hearingArrangements": {
       "type": "object",
       "properties" : {
