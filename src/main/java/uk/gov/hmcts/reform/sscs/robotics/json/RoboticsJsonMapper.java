@@ -64,7 +64,7 @@ public class RoboticsJsonMapper {
             }
             obj.put("isReadyToList", isReadyToList);
 
-            obj.put("dwpResponseDate", LocalDate.now().toString());
+            obj.put("dwpResponseDate", sscsCaseData.getDwpResponseDate());
             if (sscsCaseData.getDwpOriginatingOffice() != null) {
                 obj.put("dwpIssuingOffice", sscsCaseData.getDwpOriginatingOffice().getValue().getLabel());
             }
