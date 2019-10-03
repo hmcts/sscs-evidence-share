@@ -15,7 +15,7 @@ spring:
         s2s-micro: IDAM_S2S_AUTH_MICROSERVICE
         sscs-asb-primary-send-and-listen-shared-access-key: AMQP_PASSWORD
         docmosis-api-key: PDF_SERVICE_ACCESS_KEY
-        robotics-email-to: ROBOTICS_EMAIL_TO
-        robotics-email-from: ROBOTICS_EMAIL_FROM
-        robotics-email-scottish-to: ROBOTICS_EMAIL_SCOTTISH_TO
+        robotics-email-to: robotics.email.to
+        robotics-email-from: robotics.email.from
+        robotics-email-scottish-to: robotics.email.scottishTo
 
