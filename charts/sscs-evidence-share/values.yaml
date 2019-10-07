@@ -48,9 +48,6 @@ java:
     MAX_RETRY_ATTEMPTS: 3
     PDF_SERVICE_BASE_URL: https://docmosis-development.platform.hmcts.net/rs/render
     PDF_SERVICE_HEALTH_URL: https://docmosis-development.platform.hmcts.net/rs/status
-    ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
-    ROBOTICS_EMAIL_TO: "fake"
-    ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
     ROBOTICS_EMAIL_MESSAGE: "Please find attached the robotics json file \nPlease do not respond to this email"
     EMAIL_SERVER_HOST: "mta.reform.hmcts.net"
     EMAIL_SERVER_PORT: "25"
