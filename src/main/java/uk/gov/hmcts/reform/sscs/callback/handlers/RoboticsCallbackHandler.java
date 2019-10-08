@@ -65,7 +65,10 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         log.info("Processing robotics for case id {} in evidence share service", callback.getCaseDetails().getId());
 
         try {
-            if (checkCaseValidToSendToRobotics(callback)) {
+            boolean isCaseValidToSendToRobotics = checkCaseValidToSendToRobotics(callback);
+            log.info("Is case valid to send to robotics {} for case id {}", isCaseValidToSendToRobotics, callback.getCaseDetails().getId());
+
+            if (isCaseValidToSendToRobotics) {
                 roboticsService.sendCaseToRobotics(callback.getCaseDetails());
             }
         } catch (Exception e) {
@@ -74,8 +77,15 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private boolean checkCaseValidToSendToRobotics(Callback<SscsCaseData> callback) {
+        log.info("The readyToListFeatureEnabled flag is {} for case id {}", readyToListFeatureEnabled, callback.getCaseDetails().getId());
+
+        log.info("The callback event is {} and the createdInGapsFrom field is {} for case id {}", callback.getEvent(), callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getId());
+
         if (readyToListFeatureEnabled && callback.getEvent() != RESEND_CASE_TO_GAPS2
             && StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), State.READY_TO_LIST.getId())) {
+
+            log.info("Checking if robotics should be sent for case that is createdInGaps from ready to list");
+
             CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
             Optional<OfficeMapping> selectedOfficeMapping = dwpAddressLookupService.getDwpMappingByOffice(caseDetails.getCaseData().getAppeal().getBenefitType().getCode(), caseDetails.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice());
 
@@ -83,6 +93,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
                 log.error("Selected DWP office {} could not be found so skipping robotics for case : {}", callback.getCaseDetails().getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice(), callback.getCaseDetails().getId());
                 return false;
             }
+
             for (String office : offices) {
                 Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice("pip", office);
                 if (selectedOfficeMapping.equals(officeMapping)) {
