@@ -77,18 +77,22 @@ public class RoboticsService {
         SscsCaseData caseData = caseDetails.getCaseData();
         String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(caseData.getAppeal().getAppellant().getAddress().getPostcode());
 
-        byte[] sscs1Form = downloadSscs1(caseData, Long.valueOf(caseData.getCcdCaseId()));
-        Map<String, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
-
         AirlookupBenefitToVenue venue = airLookupService.lookupAirVenueNameByPostCode(firstHalfOfPostcode);
 
         String venueName = caseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("pip") ? venue.getPipVenue() : venue.getEsaOrUcVenue();
 
+        log.info("Case {} Robotics JSON successfully created for benefit type {}", caseDetails.getId(),
+            caseData.getAppeal().getBenefitType().getCode());
+
+        log.info("Downloading SSCS1 for robotics for case id {} ", caseDetails.getId());
+        byte[] sscs1Form = downloadSscs1(caseData, Long.valueOf(caseData.getCcdCaseId()));
+
+        log.info("Creating robotics for case id {} ", caseDetails.getId());
         JSONObject roboticsJson = createRobotics(RoboticsWrapper.builder().sscsCaseData(caseData)
             .ccdCaseId(caseDetails.getId()).venueName(venueName).evidencePresent(caseData.getEvidencePresent()).state(caseDetails.getState()).build());
 
-        log.info("Case {} Robotics JSON successfully created for benefit type {}", caseDetails.getId(),
-            caseData.getAppeal().getBenefitType().getCode());
+        log.info("Downloading additional evidence for robotics for case id {} ", caseDetails.getId());
+        Map<String, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
 
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
         sendJsonByEmail(caseData.getAppeal().getAppellant(), roboticsJson, sscs1Form, additionalEvidence, isScottish);
