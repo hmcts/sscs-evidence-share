@@ -444,10 +444,13 @@ public class RoboticsJsonMapperTest {
         roboticsWrapper.getSscsCaseData().setDwpIsOfficerAttending("Yes");
         roboticsWrapper.getSscsCaseData().setDwpUcb("Yes");
 
+        String date = LocalDate.now().toString();
+        roboticsWrapper.getSscsCaseData().setDwpResponseDate(date);
+
         roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertTrue(roboticsJson.has("isReadyToList"));
-        assertEquals(LocalDate.now().toString(), roboticsJson.get("dwpResponseDate"));
+        assertEquals(date, roboticsJson.get("dwpResponseDate"));
         assertEquals("DEF", roboticsJson.get("dwpIssuingOffice"));
         assertEquals("DEF", roboticsJson.get("dwpPresentingOffice"));
         assertEquals("Yes", roboticsJson.get("dwpIsOfficerAttending"));
