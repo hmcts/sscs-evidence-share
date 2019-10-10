@@ -197,6 +197,15 @@ public class RoboticsJsonMapperTest {
     }
 
     @Test
+    public void skipRepWhenHasRepresentativeIsNull() {
+        roboticsWrapper.getSscsCaseData().getAppeal().getRep().setHasRepresentative(null);
+
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertFalse(roboticsJson.has("representative"));
+    }
+
+    @Test
     public void givenLanguageInterpreterIsTrue_thenSetToLanguageInterpreterType() {
         roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setLanguages("My Language");
         roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setLanguageInterpreter("Yes");
