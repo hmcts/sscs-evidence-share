@@ -197,6 +197,15 @@ public class RoboticsJsonMapperTest {
     }
 
     @Test
+    public void skipRepWhenHasRepresentativeIsNull() {
+        roboticsWrapper.getSscsCaseData().getAppeal().getRep().setHasRepresentative(null);
+
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertFalse(roboticsJson.has("representative"));
+    }
+
+    @Test
     public void givenLanguageInterpreterIsTrue_thenSetToLanguageInterpreterType() {
         roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setLanguages("My Language");
         roboticsWrapper.getSscsCaseData().getAppeal().getHearingOptions().setLanguageInterpreter("Yes");
@@ -435,10 +444,13 @@ public class RoboticsJsonMapperTest {
         roboticsWrapper.getSscsCaseData().setDwpIsOfficerAttending("Yes");
         roboticsWrapper.getSscsCaseData().setDwpUcb("Yes");
 
+        String date = LocalDate.now().toString();
+        roboticsWrapper.getSscsCaseData().setDwpResponseDate(date);
+
         roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertTrue(roboticsJson.has("isReadyToList"));
-        assertEquals(LocalDate.now().toString(), roboticsJson.get("dwpResponseDate"));
+        assertEquals(date, roboticsJson.get("dwpResponseDate"));
         assertEquals("DEF", roboticsJson.get("dwpIssuingOffice"));
         assertEquals("DEF", roboticsJson.get("dwpPresentingOffice"));
         assertEquals("Yes", roboticsJson.get("dwpIsOfficerAttending"));

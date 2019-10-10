@@ -44,7 +44,9 @@ public class RoboticsJsonMapper {
 
         obj.put("appellant", buildAppellantDetails(sscsCaseData.getAppeal().getAppellant()));
 
-        if (sscsCaseData.getAppeal().getRep() != null && sscsCaseData.getAppeal().getRep().getHasRepresentative().equals("Yes")) {
+        if (sscsCaseData.getAppeal().getRep() != null
+            && sscsCaseData.getAppeal().getRep().getHasRepresentative() != null
+            && sscsCaseData.getAppeal().getRep().getHasRepresentative().equals("Yes")) {
             obj.put("representative", buildRepresentativeDetails(sscsCaseData.getAppeal().getRep()));
         }
 
@@ -64,7 +66,7 @@ public class RoboticsJsonMapper {
             }
             obj.put("isReadyToList", isReadyToList);
 
-            obj.put("dwpResponseDate", LocalDate.now().toString());
+            obj.put("dwpResponseDate", sscsCaseData.getDwpResponseDate());
             if (sscsCaseData.getDwpOriginatingOffice() != null) {
                 obj.put("dwpIssuingOffice", sscsCaseData.getDwpOriginatingOffice().getValue().getLabel());
             }
