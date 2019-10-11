@@ -44,7 +44,9 @@ public class RoboticsJsonMapper {
 
         obj.put("appellant", buildAppellantDetails(sscsCaseData.getAppeal().getAppellant()));
 
-        if (sscsCaseData.getAppeal().getRep() != null && sscsCaseData.getAppeal().getRep().getHasRepresentative().equals("Yes")) {
+        if (sscsCaseData.getAppeal().getRep() != null
+            && sscsCaseData.getAppeal().getRep().getHasRepresentative() != null
+            && sscsCaseData.getAppeal().getRep().getHasRepresentative().equals("Yes")) {
             obj.put("representative", buildRepresentativeDetails(sscsCaseData.getAppeal().getRep()));
         }
 
@@ -63,6 +65,20 @@ public class RoboticsJsonMapper {
                 isReadyToList = "Yes";
             }
             obj.put("isReadyToList", isReadyToList);
+
+            obj.put("dwpResponseDate", sscsCaseData.getDwpResponseDate());
+            if (sscsCaseData.getDwpOriginatingOffice() != null) {
+                obj.put("dwpIssuingOffice", sscsCaseData.getDwpOriginatingOffice().getValue().getLabel());
+            }
+            if (sscsCaseData.getDwpPresentingOffice() != null) {
+                obj.put("dwpPresentingOffice", sscsCaseData.getDwpPresentingOffice().getValue().getLabel());
+            }
+            if (sscsCaseData.getDwpIsOfficerAttending() != null) {
+                obj.put("dwpIsOfficerAttending", sscsCaseData.getDwpIsOfficerAttending());
+            }
+            if (sscsCaseData.getDwpUcb() != null) {
+                obj.put("dwpUcb", sscsCaseData.getDwpUcb());
+            }
         }
 
         return obj;
@@ -95,7 +111,6 @@ public class RoboticsJsonMapper {
                 obj.put("mrnReasonForBeingLate", appeal.getMrnDetails().getMrnLateReason());
             }
         }
-
 
         if (appeal.getMrnDetails().getDwpIssuingOffice() != null) {
             obj.put("pipNumber", appeal.getMrnDetails().getDwpIssuingOffice());
