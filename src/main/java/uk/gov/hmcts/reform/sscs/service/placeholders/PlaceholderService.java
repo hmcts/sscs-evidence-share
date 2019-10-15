@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.t
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -32,7 +33,8 @@ public class PlaceholderService {
 
     public void build(SscsCaseData caseData, Map<String, Object> placeholders, Address address, LocalDateTime caseCreatedDate) {
         Appeal appeal = caseData.getAppeal();
-        placeholders.put(BENEFIT_TYPE_LITERAL, appeal.getBenefitType().getDescription().toUpperCase());
+        placeholders.put(BENEFIT_TYPE_LITERAL, (appeal.getBenefitType() != null)
+                ? appeal.getBenefitType().getDescription().toUpperCase() : StringUtils.EMPTY);
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
         placeholders.put(NINO_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getNino()));
