@@ -208,7 +208,7 @@ dependencies {
 
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '2.2.0'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '2.0.0'
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.83-6669-RC'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.83-6669-2-RC'
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.10'
 
   //Remove when our dependencies pull in this version or later
@@ -243,7 +243,7 @@ dependencyManagement {
     dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
 
     // CVE-2019-0232 - Java and Command Line injections in Windows
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.24') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.27') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
