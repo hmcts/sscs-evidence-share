@@ -4,6 +4,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
@@ -11,7 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
+import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @Component
 public class RoboticsJsonMapper {
@@ -22,9 +27,13 @@ public class RoboticsJsonMapper {
 
     private final boolean readyToListFeatureEnabled;
 
+    private DwpAddressLookupService dwpAddressLookupService;
+
     @Autowired
-    public RoboticsJsonMapper(@Value("${robotics.readyToList.feature}") boolean readyToListFeatureEnabled) {
+    public RoboticsJsonMapper(@Value("${robotics.readyToList.feature}") boolean readyToListFeatureEnabled,
+                              DwpAddressLookupService dwpAddressLookupService) {
         this.readyToListFeatureEnabled = readyToListFeatureEnabled;
+        this.dwpAddressLookupService = dwpAddressLookupService;
     }
 
     public JSONObject map(RoboticsWrapper roboticsWrapper) {
@@ -90,7 +99,7 @@ public class RoboticsJsonMapper {
         }
     }
 
-    private static JSONObject buildAppealDetails(JSONObject obj, SscsCaseData sscsCaseData, String venueName) {
+    private JSONObject buildAppealDetails(JSONObject obj, SscsCaseData sscsCaseData, String venueName) {
         Appeal appeal = sscsCaseData.getAppeal();
         obj.put("appellantNino", appeal.getAppellant().getIdentity().getNino());
         obj.put("appellantPostCode", venueName);
@@ -113,7 +122,14 @@ public class RoboticsJsonMapper {
         }
 
         if (appeal.getMrnDetails().getDwpIssuingOffice() != null) {
-            obj.put("pipNumber", appeal.getMrnDetails().getDwpIssuingOffice());
+            Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(appeal.getBenefitType().getCode(),
+                    appeal.getMrnDetails().getDwpIssuingOffice());
+            if (officeMapping.isPresent()) {
+                obj.put("pipNumber", officeMapping.get().getMapping().getGaps());
+            } else {
+                throw new DwpAddressLookupException(String.format("could not find dwp officeAddress for benefitType %s and dwpIssuingOffice %s",
+                        appeal.getBenefitType().getCode(), appeal.getMrnDetails().getDwpIssuingOffice()));
+            }
         }
 
         obj.put("hearingType", convertBooleanToPaperOral(appeal.getHearingOptions().isWantsToAttendHearing()));

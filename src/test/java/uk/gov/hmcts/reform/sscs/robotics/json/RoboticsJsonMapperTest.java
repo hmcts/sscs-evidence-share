@@ -16,7 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @RunWith(JUnitParamsRunner.class)
 public class RoboticsJsonMapperTest {
@@ -27,10 +29,12 @@ public class RoboticsJsonMapperTest {
         "/schema/sscs-robotics.json");
     private JSONObject roboticsJson;
 
+    private DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
+
     @Before
     public void setup() {
 
-        roboticsJsonMapper = new RoboticsJsonMapper(false);
+        roboticsJsonMapper = new RoboticsJsonMapper(false, dwpAddressLookupService);
 
         roboticsWrapper = RoboticsWrapper
             .builder()
@@ -58,7 +62,7 @@ public class RoboticsJsonMapperTest {
         assertEquals(LocalDate.now().toString(), roboticsJson.get("appealDate"));
         assertEquals("2018-06-29", roboticsJson.get("mrnDate"));
         assertEquals("Lost my paperwork", roboticsJson.get("mrnReasonForBeingLate"));
-        assertEquals("1", roboticsJson.get("pipNumber"));
+        assertEquals("DWP PIP (1)", roboticsJson.get("pipNumber"));
         assertEquals("Oral", roboticsJson.get("hearingType"));
         assertEquals("Mr User Test", roboticsJson.get("hearingRequestParty"));
         assertEquals("Yes", roboticsJson.get("evidencePresent"));
@@ -160,12 +164,14 @@ public class RoboticsJsonMapperTest {
 
     @Test
     @Parameters({"PIP, 002DD", "ESA, 051DD", "null, 002DD", ", 002DD"})
-    public void givenBenefitType_shouldMapCaseCodeAccordingly(String benefitCode, String expectedCaseCode) {
+    public void givenBenefitType_shouldThrowErrorIfNotMapCaseCode(String benefitCode, String expectedCaseCode) {
         roboticsWrapper.getSscsCaseData().getAppeal().getBenefitType().setCode(benefitCode);
 
-        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
-
-        assertThat(roboticsJson.get("caseCode"), is(expectedCaseCode));
+        try {
+            roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+        } catch (DwpAddressLookupException e) {
+            assertNull(roboticsJson);
+        }
     }
 
     @Test
@@ -423,7 +429,7 @@ public class RoboticsJsonMapperTest {
     @Test
     public void givenReadyToListFeatureIsTrueAndStateIsAppealCreated_thenSetReadyToListFieldToNo() {
 
-        roboticsJsonMapper = new RoboticsJsonMapper(true);
+        roboticsJsonMapper = new RoboticsJsonMapper(true, dwpAddressLookupService);
         roboticsWrapper.setState(State.APPEAL_CREATED);
 
         roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
@@ -434,7 +440,7 @@ public class RoboticsJsonMapperTest {
 
     @Test
     public void givenReadyToListFeatureIsTrueAndStateIsReadyToList_thenSetReadyToListFieldToYes() {
-        roboticsJsonMapper = new RoboticsJsonMapper(true);
+        roboticsJsonMapper = new RoboticsJsonMapper(true, dwpAddressLookupService);
 
         DynamicListItem value = new DynamicListItem("ABC", "DEF");
 

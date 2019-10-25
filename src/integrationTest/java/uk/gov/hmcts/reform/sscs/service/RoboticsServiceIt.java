@@ -124,6 +124,7 @@ public class RoboticsServiceIt {
     public void givenSscsCaseDataWithEsaBenefitTypeAndReadyToListFeatureTrue_makeValidRoboticsJsonThatValidatesAgainstSchemaWithReadyToListField() {
         ReflectionTestUtils.setField(mapper, "readyToListFeatureEnabled", true);
         caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("ESA").build());
+        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Balham DRT").build());
 
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
 
