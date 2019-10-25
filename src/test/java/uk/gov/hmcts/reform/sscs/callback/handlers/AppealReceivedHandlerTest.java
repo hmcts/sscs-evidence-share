@@ -55,13 +55,19 @@ public class AppealReceivedHandlerTest {
 
     @Test
     @Parameters({"SEND_TO_DWP", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
-    public void givenAValidAppealReceivedEvent_thenReturnTrue(EventType eventType) {
-        assertTrue(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, eventType)));
+    public void givenAValidAppealReceivedEventForDigitalCase_thenReturnTrue(EventType eventType) {
+        assertTrue(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), INTERLOCUTORY_REVIEW_STATE, eventType)));
+    }
+
+    @Test
+    @Parameters({"SEND_TO_DWP", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
+    public void givenAValidAppealReceivedEventForNonDigitalCase_thenReturnFalse(EventType eventType) {
+        assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(VALID_APPEAL.getId()).build(), INTERLOCUTORY_REVIEW_STATE, eventType)));
     }
 
     @Test
     public void givenANonAppealEvent_thenReturnFalse() {
-        assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, DECISION_ISSUED)));
+        assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), INTERLOCUTORY_REVIEW_STATE, DECISION_ISSUED)));
     }
 
     @Test(expected = NullPointerException.class)
@@ -77,10 +83,9 @@ public class AppealReceivedHandlerTest {
         verify(ccdCaseService).updateCase(any(), eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()), eq("Appeal received"), eq("Appeal received event has been triggered from Evidence Share for digital case"), any());
     }
 
-    @Test
-    @Parameters({"SEND_TO_DWP", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
-    public void givenValidEventAndNonDigitalCase_thenDoNotTriggerAppealReceivedEvent(EventType eventType) {
-        handler.handle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(VALID_APPEAL.getId()).build(), INTERLOCUTORY_REVIEW_STATE, eventType));
+    @Test(expected = IllegalStateException.class)
+    public void givenValidEventAndNonDigitalCase_thenThrowException() {
+        handler.handle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(VALID_APPEAL.getId()).build(), INTERLOCUTORY_REVIEW_STATE, EventType.SEND_TO_DWP));
 
         verify(ccdCaseService, times(0)).updateCase(any(), eq(1L), eq(EventType.APPEAL_RECEIVED.getCcdType()), eq("Appeal received"), eq("Appeal received event has been triggered from Evidence Share for digital case"), any());
     }

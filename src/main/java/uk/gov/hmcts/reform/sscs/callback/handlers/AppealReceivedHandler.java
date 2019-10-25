@@ -42,7 +42,9 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
         return callbackType.equals(CallbackType.SUBMITTED)
             && (callback.getEvent() == EventType.SEND_TO_DWP
             || callback.getEvent() == EventType.VALID_APPEAL
-            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL);
+            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL)
+            && (callback.getCaseDetails().getCaseData().getCreatedInGapsFrom() != null
+            && callback.getCaseDetails().getCaseData().getCreatedInGapsFrom().equals(READY_TO_LIST.getId()));
     }
 
     @Override
@@ -51,12 +53,8 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
-        if (caseData.getCreatedInGapsFrom() != null && caseData.getCreatedInGapsFrom().equals(READY_TO_LIST.getId())) {
-            log.info("About to update case with appealReceived event for id {}", callback.getCaseDetails().getId());
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(), APPEAL_RECEIVED.getCcdType(), "Appeal received", "Appeal received event has been triggered from Evidence Share for digital case",  idamService.getIdamTokens());
-        }
+        log.info("About to update case with appealReceived event for id {}", callback.getCaseDetails().getId());
+        ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(), APPEAL_RECEIVED.getCcdType(), "Appeal received", "Appeal received event has been triggered from Evidence Share for digital case",  idamService.getIdamTokens());
     }
 
     @Override
