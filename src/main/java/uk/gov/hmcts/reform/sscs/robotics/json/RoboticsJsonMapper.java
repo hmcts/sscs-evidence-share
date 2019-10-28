@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
@@ -13,12 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @Component
+@Slf4j
 public class RoboticsJsonMapper {
 
     private static final String YES = "Yes";
@@ -127,8 +128,8 @@ public class RoboticsJsonMapper {
             if (officeMapping.isPresent()) {
                 obj.put("pipNumber", officeMapping.get().getMapping().getGaps());
             } else {
-                throw new DwpAddressLookupException(String.format("could not find dwp officeAddress for benefitType %s and dwpIssuingOffice %s",
-                        appeal.getBenefitType().getCode(), appeal.getMrnDetails().getDwpIssuingOffice()));
+                log.warn("could not find dwp officeAddress for benefitType {} and dwpIssuingOffice {}",
+                        appeal.getBenefitType().getCode(), appeal.getMrnDetails().getDwpIssuingOffice());
             }
         }
 

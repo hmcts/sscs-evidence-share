@@ -16,7 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
@@ -164,14 +163,12 @@ public class RoboticsJsonMapperTest {
 
     @Test
     @Parameters({"PIP, 002DD", "ESA, 051DD", "null, 002DD", ", 002DD"})
-    public void givenBenefitType_shouldThrowErrorIfNotMapCaseCode(String benefitCode, String expectedCaseCode) {
+    public void givenBenefitType_shouldMapCaseCodeAccordingly(String benefitCode, String expectedCaseCode) {
         roboticsWrapper.getSscsCaseData().getAppeal().getBenefitType().setCode(benefitCode);
 
-        try {
-            roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
-        } catch (DwpAddressLookupException e) {
-            assertNull(roboticsJson);
-        }
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertThat(roboticsJson.get("caseCode"), is(expectedCaseCode));
     }
 
     @Test
