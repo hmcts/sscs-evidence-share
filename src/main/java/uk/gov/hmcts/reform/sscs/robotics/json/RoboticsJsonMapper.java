@@ -122,7 +122,7 @@ public class RoboticsJsonMapper {
             }
         }
 
-        if (appeal.getMrnDetails().getDwpIssuingOffice() != null) {
+        if (appeal.getMrnDetails() != null && appeal.getMrnDetails().getDwpIssuingOffice() != null) {
             Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(appeal.getBenefitType().getCode(),
                     appeal.getMrnDetails().getDwpIssuingOffice());
             if (officeMapping.isPresent()) {
