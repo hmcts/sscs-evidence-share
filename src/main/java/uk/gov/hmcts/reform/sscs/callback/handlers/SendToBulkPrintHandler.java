@@ -69,7 +69,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         CcdService ccdService,
         IdamService idamService
     ) {
-        this.dispatchPriority = DispatchPriority.LATEST;
+        this.dispatchPriority = DispatchPriority.LATE;
         this.documentManagementServiceWrapper = documentManagementServiceWrapper;
         this.documentRequestFactory = documentRequestFactory;
         this.evidenceManagementService = evidenceManagementService;
@@ -127,6 +127,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                                        BulkPrintInfo bulkPrintInfo) {
         if (bulkPrintInfo != null) {
             caseData.setHmctsDwpState("sentToDwp");
+            caseData.setDateSentToDwp(LocalDate.now().toString());
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
                 idamService.getIdamTokens());

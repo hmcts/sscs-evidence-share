@@ -29,7 +29,7 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
     @Autowired
     public AppealReceivedHandler(CcdService ccdService,
                                  IdamService idamService) {
-        this.dispatchPriority = DispatchPriority.LATE;
+        this.dispatchPriority = DispatchPriority.LATEST;
         this.ccdService = ccdService;
         this.idamService = idamService;
     }
