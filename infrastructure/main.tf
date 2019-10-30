@@ -58,11 +58,6 @@ data "azurerm_key_vault_secret" "pdf_service_access_key" {
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
-data "azurerm_lb" "consul_dns" {
-  name                = "consul-server_dns"
-  resource_group_name = "${var.consul_dns_resource_group_name}"
-}
-
 data "azurerm_key_vault_secret" "robotics_email_from" {
   name      = "robotics-email-from"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"

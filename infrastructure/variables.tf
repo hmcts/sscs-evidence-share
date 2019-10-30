@@ -35,6 +35,3 @@ variable "bundling_stitching_enabled" {
 variable "ready_to_list_robotics_enabled" {
   default = false
 }
-variable "consul_dns_resource_group_name" {
-  type = "string"
-}
