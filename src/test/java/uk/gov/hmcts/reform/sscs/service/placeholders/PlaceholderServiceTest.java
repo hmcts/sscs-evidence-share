@@ -16,6 +16,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.ExelaAddressConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
@@ -96,6 +97,21 @@ public class PlaceholderServiceTest {
                 .town("Lechworth")
                 .county("Bedford")
                 .postcode("L2 5UZ").build();
+
+        caseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").description(null).build());
+        service.build(caseData, placeholders, address, now);
+
+        assertEquals("PERSONAL INDEPENDENCE PAYMENT", placeholders.get(BENEFIT_TYPE_LITERAL));
+    }
+
+    @Test
+    public void givenACase_thenPopulateThePlaceholdersWithBenefitTypeDescriptionEmpty() {
+        Address address = Address.builder()
+            .line1("Unit 2")
+            .line2("156 The Road")
+            .town("Lechworth")
+            .county("Bedford")
+            .postcode("L2 5UZ").build();
 
         caseData = buildCaseDataWithoutBenefitType();
         service.build(caseData, placeholders, address, now);
