@@ -58,8 +58,9 @@ public class DocumentManagementServiceWrapper {
 
     private Boolean checkIfDlDocumentAlreadyExists(List<SscsDocument> sscsDocuments) {
         for (SscsDocument sscsDocument : sscsDocuments) {
-            if (sscsDocument.getValue().getDocumentType().equalsIgnoreCase("dl6")
-                || sscsDocument.getValue().getDocumentType().equalsIgnoreCase("dl16")) {
+            if (sscsDocument.getValue().getDocumentType() != null
+                && (sscsDocument.getValue().getDocumentType().equalsIgnoreCase("dl6")
+                || sscsDocument.getValue().getDocumentType().equalsIgnoreCase("dl16"))) {
                 return true;
             }
         }
