@@ -3,22 +3,15 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
-import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
-import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @Slf4j
@@ -26,15 +19,12 @@ import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
     private final RoboticsService roboticsService;
-    private final DwpAddressLookupService dwpAddressLookupService;
     private final DispatchPriority dispatchPriority;
 
     @Autowired
-    public RoboticsCallbackHandler(RoboticsService roboticsService,
-                                   DwpAddressLookupService dwpAddressLookupService
+    public RoboticsCallbackHandler(RoboticsService roboticsService
     ) {
         this.roboticsService = roboticsService;
-        this.dwpAddressLookupService = dwpAddressLookupService;
         this.dispatchPriority = DispatchPriority.EARLIEST;
     }
 
