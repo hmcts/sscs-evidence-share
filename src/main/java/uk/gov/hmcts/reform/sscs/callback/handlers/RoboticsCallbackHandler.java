@@ -28,19 +28,14 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
     private final RoboticsService roboticsService;
     private final DwpAddressLookupService dwpAddressLookupService;
     private final DispatchPriority dispatchPriority;
-    private final boolean readyToListFeatureEnabled;
-    private List<String> offices;
 
     @Autowired
     public RoboticsCallbackHandler(RoboticsService roboticsService,
-                                   DwpAddressLookupService dwpAddressLookupService,
-                                   @Value("${robotics.readyToList.feature}") boolean readyToListFeatureEnabled,
-                                   @Value("#{'${robotics.readyToList.offices}'.split(',')}") List<String> offices) {
+                                   DwpAddressLookupService dwpAddressLookupService
+    ) {
         this.roboticsService = roboticsService;
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.dispatchPriority = DispatchPriority.EARLIEST;
-        this.readyToListFeatureEnabled = readyToListFeatureEnabled;
-        this.offices = offices;
     }
 
     @Override
@@ -50,7 +45,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && (callback.getEvent() == SEND_TO_DWP
-            || (callback.getEvent() == READY_TO_LIST && readyToListFeatureEnabled)
+            || (callback.getEvent() == READY_TO_LIST)
             || callback.getEvent() == VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL
             || callback.getEvent() == RESEND_CASE_TO_GAPS2);
@@ -77,32 +72,12 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private boolean checkCaseValidToSendToRobotics(Callback<SscsCaseData> callback) {
-        log.info("The readyToListFeatureEnabled flag is {} for case id {}", readyToListFeatureEnabled, callback.getCaseDetails().getId());
 
         log.info("The callback event is {} and the createdInGapsFrom field is {} for case id {}", callback.getEvent(), callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getId());
 
-        if (readyToListFeatureEnabled && callback.getEvent() != RESEND_CASE_TO_GAPS2
-            && StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), State.READY_TO_LIST.getId())) {
-
-            log.info("Checking if robotics should be sent for case that is createdInGaps from ready to list");
-
-            CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-            Optional<OfficeMapping> selectedOfficeMapping = dwpAddressLookupService.getDwpMappingByOffice(caseDetails.getCaseData().getAppeal().getBenefitType().getCode(), caseDetails.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice());
-
-            if (!selectedOfficeMapping.isPresent()) {
-                log.error("Selected DWP office {} could not be found so skipping robotics for case : {}", callback.getCaseDetails().getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice(), callback.getCaseDetails().getId());
-                return false;
-            }
-
-            for (String office : offices) {
-                Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice("pip", office);
-                if (selectedOfficeMapping.equals(officeMapping)) {
-                    return caseDetails.getState().equals(State.READY_TO_LIST);
-                }
-            }
-            return !caseDetails.getState().equals(State.READY_TO_LIST);
-        }
-        return true;
+        return callback.getEvent() == RESEND_CASE_TO_GAPS2
+            || callback.getCaseDetails().getCaseData().getCreatedInGapsFrom() == null
+            || StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getState().getId()) ? true : false;
     }
 
     @Override
