@@ -27,6 +27,7 @@
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
+      "createdInGapsFrom": "CREATED_IN_GAPS_FROM",
       "hearings": [
         {
           "value": {
