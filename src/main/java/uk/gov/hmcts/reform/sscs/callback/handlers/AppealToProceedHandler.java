@@ -50,7 +50,7 @@ public class AppealToProceedHandler implements CallbackHandler<SscsCaseData> {
 
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        caseData.setInterlocReviewState(null);
+        caseData.setInterlocReviewState("none");
 
         log.info("About to update case with caseUpdated event in appeal to proceed handler for id {}", callback.getCaseDetails().getId());
         ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(), CASE_UPDATED.getCcdType(), "Appeal updated", "Appeal proceed event triggered - clearing interlocutory review state",  idamService.getIdamTokens());

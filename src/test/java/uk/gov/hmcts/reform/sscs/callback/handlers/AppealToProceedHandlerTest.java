@@ -77,6 +77,6 @@ public class AppealToProceedHandlerTest {
 
         verify(ccdCaseService).updateCase(captor.capture(), eq(1L), eq(EventType.CASE_UPDATED.getCcdType()), eq("Appeal updated"), eq("Appeal proceed event triggered - clearing interlocutory review state"), any());
 
-        assertNull((captor.getValue().getInterlocReviewState()));
+        assertEquals("none", captor.getValue().getInterlocReviewState());
     }
 }
