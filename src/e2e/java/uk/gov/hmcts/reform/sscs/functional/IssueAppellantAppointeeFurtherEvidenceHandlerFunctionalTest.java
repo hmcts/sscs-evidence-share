@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class IssueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends
 
     private String createTestData() throws IOException {
         String docUrl = uploadDocToDocMgmtStore();
-        createCaseWithValidAppealState();
+        createCaseWithValidAppealState(VALID_APPEAL_CREATED);
         String json = getJson(ISSUE_FURTHER_EVIDENCE);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
