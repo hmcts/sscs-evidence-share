@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -22,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
@@ -56,9 +56,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     private final CcdService ccdService;
 
     private final IdamService idamService;
-
-    @Value("${send-letter.enabled}")
-    private Boolean bulkPrintFeature;
 
     @Autowired
     public SendToBulkPrintHandler(DocumentManagementServiceWrapper documentManagementServiceWrapper,
@@ -204,9 +201,9 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         return nonNull(caseData)
             && nonNull(caseData.getAppeal())
             && nonNull(caseData.getAppeal().getReceivedVia())
-            && bulkPrintFeature
-            && evidenceShareConfig.getSubmitTypes().stream()
-            .anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
+            && nonNull(caseData.getCreatedInGapsFrom())
+            && !caseData.getCreatedInGapsFrom().equals(State.READY_TO_LIST.getId())
+            && evidenceShareConfig.getSubmitTypes().stream().anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase);
     }
 
     private List<SscsDocument> getSscsDocumentsToPrint(List<SscsDocument> sscsDocument) {

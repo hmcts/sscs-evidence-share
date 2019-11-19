@@ -66,6 +66,7 @@ public abstract class AbstractFunctionalTest {
     void createCaseWithValidAppealState(EventType eventType) {
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
         SscsCaseData caseData = minimalCaseData.toBuilder()
+            .createdInGapsFrom(State.VALID_APPEAL.getId())
             .appeal(minimalCaseData.getAppeal().toBuilder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")

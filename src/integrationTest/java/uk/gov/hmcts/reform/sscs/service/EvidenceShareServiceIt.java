@@ -1,29 +1,15 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import junitparams.JUnitParamsRunner;
@@ -44,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -136,7 +121,6 @@ public class EvidenceShareServiceIt {
     public void setup() {
         message = new MimeMessage(session);
         when(mailSender.createMimeMessage()).thenReturn(message);
-        ReflectionTestUtils.setField(bulkPrintHandler, "bulkPrintFeature", true);
     }
 
     @Test
@@ -225,6 +209,7 @@ public class EvidenceShareServiceIt {
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("sendToDwpCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
 
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
@@ -249,6 +234,7 @@ public class EvidenceShareServiceIt {
             .getResource("sendToDwpCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("PAPER", receivedVia);
+        json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
 
         topicConsumer.onMessage(json);
 
@@ -256,6 +242,22 @@ public class EvidenceShareServiceIt {
         verifyNoMoreInteractions(evidenceManagementService);
         verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to DWP"), any());
         verify(roboticsService).sendCaseToRobotics(any());
+    }
+
+    @Test
+    public void givenADigitalCase_shouldNotBeBulkPrintedAndStateShouldBeUpdatedAndNotSentToRobotics() throws IOException {
+        assertNotNull("SendToBulkPrintHandler must be autowired", bulkPrintHandler);
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource("sendToDwpCallback.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
+
+        topicConsumer.onMessage(json);
+
+        verifyNoMoreInteractions(restTemplate);
+        verifyNoMoreInteractions(evidenceManagementService);
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to DWP"), any());
+        verifyNoMoreInteractions(roboticsService);
     }
 
     private String updateMrnDate(String json, String updatedDate) {
