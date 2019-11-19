@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -22,7 +23,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws IOException {
 
-        createCaseWithValidAppealState();
+        createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
         String json = getJson(SEND_TO_DWP);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -42,7 +43,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
     @Test
     public void processAnAppealWithNoValidMrnDate_shouldNoTBeSentToDwpAndShouldBeUpdatedToFlagError() throws IOException {
-        createCaseWithValidAppealState();
+        createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
         String json = getJson(SEND_TO_DWP);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -59,7 +60,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws IOException {
 
-        createCaseWithValidAppealState();
+        createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
         String json = getJson(SEND_TO_DWP);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);

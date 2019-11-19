@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,27 +44,9 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    public void givenASendToDwpEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(SUBMITTED, callback));
-    }
-
-    @Test
-    public void givenAValidAppealEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL);
-
-        assertTrue(handler.canHandle(SUBMITTED, callback));
-    }
-
-    @Test
-    public void givenAInterlocValidAppealEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.INTERLOC_VALID_APPEAL);
-
-        assertTrue(handler.canHandle(SUBMITTED, callback));
-    }
-
-    @Test
-    public void givenAResendCaseToGaps2Event_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.RESEND_CASE_TO_GAPS2);
+    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "READY_TO_LIST", "SEND_TO_DWP", "RESEND_CASE_TO_GAPS2", "APPEAL_TO_PROCEED"})
+    public void givenAValidRoboticsEvent_thenReturnTrue(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
 
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }

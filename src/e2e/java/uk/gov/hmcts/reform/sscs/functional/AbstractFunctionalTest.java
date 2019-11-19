@@ -22,10 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.ProfileValueSourceConfiguration;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -66,9 +63,10 @@ public abstract class AbstractFunctionalTest {
         idamTokens = idamService.getIdamTokens();
     }
 
-    void createCaseWithValidAppealState() {
+    void createCaseWithValidAppealState(EventType eventType) {
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
         SscsCaseData caseData = minimalCaseData.toBuilder()
+            .createdInGapsFrom(State.VALID_APPEAL.getId())
             .appeal(minimalCaseData.getAppeal().toBuilder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")
@@ -77,7 +75,7 @@ public abstract class AbstractFunctionalTest {
                 .receivedVia("Paper")
                 .build())
             .build();
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData, "validAppealCreated",
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service send to DWP test",
             "Evidence share service send to DWP case created", idamTokens);
         ccdCaseId = String.valueOf(caseDetails.getId());

@@ -8,9 +8,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -41,6 +42,7 @@ public class AppealReceivedHandlerTest {
 
     private AppealReceivedHandler handler;
 
+
     @Before
     public void setUp() {
         handler = new AppealReceivedHandler(ccdCaseService, idamService);
@@ -50,7 +52,7 @@ public class AppealReceivedHandlerTest {
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
         handler.handle(callbackType,
-            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, INTERLOC_VALID_APPEAL));
     }
 
     @Test
