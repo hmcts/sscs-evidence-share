@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
 import static junit.framework.TestCase.assertNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -16,10 +15,11 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
         super();
     }
 
+    // Need tribunals running to pass this functional test
     @Test
     public void processAnIssueDirectionEvent_shouldUpdateInterlocReviewState() throws IOException {
 
-        createCaseWithValidAppealState(INTERLOC_VALID_APPEAL);
+        createCaseWithValidAppealState(NON_COMPLIANT);
 
         String json = getJson(DIRECTION_ISSUED);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);

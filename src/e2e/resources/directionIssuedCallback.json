@@ -2,7 +2,7 @@
   "case_details": {
     "id": "CASE_ID_TO_BE_REPLACED",
     "jurisdiction": "SSCS",
-    "state": "validAppeal",
+    "state": "validAppealCreated",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
@@ -27,7 +27,7 @@
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
-      "interlocReviewState": "appealToProceed",
+      "directionType": "appealToProceed",
       "hearings": [
         {
           "value": {
@@ -601,5 +601,5 @@
     }
   },
   "case_details_before": null,
-  "event_id": "appealToProceed"
+  "event_id": "directionIssued"
 }
