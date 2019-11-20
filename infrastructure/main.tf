@@ -3,16 +3,16 @@ provider "azurerm" {
 }
 
 locals {
-  ase_name       = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  local_ase = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
   azureVaultName = "sscs-${var.env}"
-  s2sCnpUrl      = "http://rpe-service-auth-provider-${var.env}.service.${local.ase_name}.internal"
+  s2sCnpUrl      = "http://rpe-service-auth-provider-${var.env}.service.${local.local_ase}.internal"
 
   shared_app_service_plan     = "${var.product}-${var.env}"
   non_shared_app_service_plan = "${var.product}-${var.component}-${var.env}"
   app_service_plan            = "${(var.env == "saat" || var.env == "sandbox") ?  local.shared_app_service_plan : local.non_shared_app_service_plan}"
 
-  documentStore               = "http://dm-store-${var.env}.service.${local.ase_name}.internal"
-  ccdApi                      = "http://ccd-data-store-api-${var.env}.service.${local.ase_name}.internal"
+  documentStore               = "http://dm-store-${var.env}.service.${local.local_ase}.internal"
+  ccdApi                      = "http://ccd-data-store-api-${var.env}.service.${local.local_ase}.internal"
   send_letter_service_baseurl = "http://rpe-send-letter-service-${var.env}.service.core-compute-${var.env}.internal"
 
 }
@@ -96,7 +96,6 @@ data "azurerm_key_vault_secret" "smtp_port" {
 
 module "sscs-evidence-share" {
   source              = "git@github.com:hmcts/cnp-module-webapp?ref=master"
-  enable_ase          = "${var.enable_ase}"
   product             = "${var.product}-${var.component}"
   location            = "${var.location}"
   env                 = "${var.env}"

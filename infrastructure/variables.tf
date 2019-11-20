@@ -91,10 +91,6 @@ variable "appeal_email_smtp_ssl_trust" {
   default = "*"
 }
 
-variable "enable_ase" {
-  default = true
-}
-
 variable "appinsights_location" {
   type        = "string"
   default     = "West Europe"
