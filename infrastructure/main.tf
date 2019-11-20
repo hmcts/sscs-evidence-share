@@ -148,8 +148,6 @@ module "sscs-evidence-share" {
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
     CORE_CASE_DATA_CASE_TYPE_ID    = "${var.core_case_data_case_type_id}"
 
-    WEBSITE_DNS_SERVER = "${data.azurerm_lb.consul_dns.private_ip_address}"
-
     ROBOTICS_EMAIL_FROM        = "${data.azurerm_key_vault_secret.robotics_email_from.value}"
     ROBOTICS_EMAIL_TO          = "${data.azurerm_key_vault_secret.robotics_email_to.value}"
     ROBOTICS_EMAIL_SCOTTISH_TO = "${data.azurerm_key_vault_secret.robotics_email_scottish_to.value}"
