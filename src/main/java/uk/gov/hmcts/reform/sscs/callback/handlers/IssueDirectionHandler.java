@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -41,6 +42,7 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.DIRECTION_ISSUED
+            && callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
             && DirectionType.APPEAL_TO_PROCEED.equals(callback.getCaseDetails().getCaseData().getDirectionType());
     }
 
@@ -55,7 +57,7 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
         caseData.setDirectionType(null);
 
         log.info("About to update case with appealToProceed event for id {}", callback.getCaseDetails().getId());
-        ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(), APPEAL_TO_PROCEED.getCcdType(), "Appeal to proceed", "Appeal proceed event triggered",  idamService.getIdamTokens());
+        ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(), APPEAL_TO_PROCEED.getCcdType(), "Appeal to proceed", "Appeal proceed event triggered", idamService.getIdamTokens());
     }
 
     @Override

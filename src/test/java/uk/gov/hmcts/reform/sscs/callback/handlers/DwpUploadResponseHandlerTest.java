@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -46,7 +47,7 @@ public class DwpUploadResponseHandlerTest {
 
     @Before
     public void setup() {
-        handler = new DwpUploadResponseHandler(true, ccdService, idamService);
+        handler = new DwpUploadResponseHandler(ccdService, idamService);
     }
 
     @Test(expected = NullPointerException.class)
@@ -81,19 +82,19 @@ public class DwpUploadResponseHandlerTest {
 
     @Test
     public void givenCallbackIsOkay_thenCanHandleIsTrue() {
-        assertTrue(handler.canHandle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
+        assertTrue(handler.canHandle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(State.READY_TO_LIST.getId()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
     }
 
     @Test
-    public void givenCallbackIsOkay_butFlagIsNotSet_thenCanHandleIsFalse() {
-        handler = new DwpUploadResponseHandler(false, ccdService, idamService);
-        assertFalse(handler.canHandle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
+    public void givenCallbackIsOkay_butCreatedInGapsIsValidAppeal_thenCanHandleIsFalse() {
+        handler = new DwpUploadResponseHandler(ccdService, idamService);
+        assertFalse(handler.canHandle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(State.VALID_APPEAL.getId()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
     }
 
     @Test
     public void givenADwpUploadResponseEventWithDwpFurtherInfoIsNo_runReadyToListEvent() {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
-            SscsCaseData.builder().ccdCaseId("1").dwpFurtherInfo("No").build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
+            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No").build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
