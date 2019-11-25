@@ -4,6 +4,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
@@ -11,9 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @Component
+@Slf4j
 public class RoboticsJsonMapper {
 
     private static final String YES = "Yes";
@@ -22,9 +27,13 @@ public class RoboticsJsonMapper {
 
     private final boolean readyToListFeatureEnabled;
 
+    private DwpAddressLookupService dwpAddressLookupService;
+
     @Autowired
-    public RoboticsJsonMapper(@Value("${robotics.readyToList.feature}") boolean readyToListFeatureEnabled) {
+    public RoboticsJsonMapper(@Value("${robotics.readyToList.feature}") boolean readyToListFeatureEnabled,
+                              DwpAddressLookupService dwpAddressLookupService) {
         this.readyToListFeatureEnabled = readyToListFeatureEnabled;
+        this.dwpAddressLookupService = dwpAddressLookupService;
     }
 
     public JSONObject map(RoboticsWrapper roboticsWrapper) {
@@ -67,18 +76,36 @@ public class RoboticsJsonMapper {
             obj.put("isReadyToList", isReadyToList);
 
             obj.put("dwpResponseDate", sscsCaseData.getDwpResponseDate());
-            if (sscsCaseData.getDwpOriginatingOffice() != null) {
-                obj.put("dwpIssuingOffice", sscsCaseData.getDwpOriginatingOffice().getValue().getLabel());
+
+            Optional<OfficeMapping> officeMapping = buildOffice(obj, sscsCaseData.getAppeal());
+
+            String dwpIssuingOffice = "";
+            String dwpPresentingOffice = "";
+
+            if (!officeMapping.isPresent()) {
+                log.error("could not find dwp officeAddress for benefitType {} and dwpIssuingOffice {} so could not set dwp offices in robotics",
+                    sscsCaseData.getAppeal().getBenefitType().getCode(), sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
             }
-            if (sscsCaseData.getDwpPresentingOffice() != null) {
-                obj.put("dwpPresentingOffice", sscsCaseData.getDwpPresentingOffice().getValue().getLabel());
+
+            if (sscsCaseData.getDwpOriginatingOffice() != null && sscsCaseData.getDwpOriginatingOffice().getValue().getLabel() != null) {
+                dwpIssuingOffice = sscsCaseData.getDwpOriginatingOffice().getValue().getLabel();
+            } else if (officeMapping.isPresent()) {
+                dwpIssuingOffice = officeMapping.get().getMapping().getGaps();
             }
-            if (sscsCaseData.getDwpIsOfficerAttending() != null) {
-                obj.put("dwpIsOfficerAttending", sscsCaseData.getDwpIsOfficerAttending());
+
+            if (sscsCaseData.getDwpPresentingOffice() != null && sscsCaseData.getDwpPresentingOffice().getValue().getLabel() != null) {
+                dwpPresentingOffice = sscsCaseData.getDwpPresentingOffice().getValue().getLabel();
+            } else if (officeMapping.isPresent()) {
+                dwpPresentingOffice = officeMapping.get().getMapping().getGaps();
             }
-            if (sscsCaseData.getDwpUcb() != null) {
-                obj.put("dwpUcb", sscsCaseData.getDwpUcb());
-            }
+
+            String dwpIsOfficerAttending = sscsCaseData.getDwpIsOfficerAttending() != null ? sscsCaseData.getDwpIsOfficerAttending() : "No";
+            String dwpUcb = sscsCaseData.getDwpUcb() != null ? sscsCaseData.getDwpUcb() : "No";
+
+            obj.put("dwpIssuingOffice", dwpIssuingOffice);
+            obj.put("dwpPresentingOffice", dwpPresentingOffice);
+            obj.put("dwpIsOfficerAttending", dwpIsOfficerAttending);
+            obj.put("dwpUcb", dwpUcb);
         }
 
         return obj;
@@ -90,7 +117,7 @@ public class RoboticsJsonMapper {
         }
     }
 
-    private static JSONObject buildAppealDetails(JSONObject obj, SscsCaseData sscsCaseData, String venueName) {
+    private JSONObject buildAppealDetails(JSONObject obj, SscsCaseData sscsCaseData, String venueName) {
         Appeal appeal = sscsCaseData.getAppeal();
         obj.put("appellantNino", appeal.getAppellant().getIdentity().getNino());
         obj.put("appellantPostCode", venueName);
@@ -112,8 +139,13 @@ public class RoboticsJsonMapper {
             }
         }
 
-        if (appeal.getMrnDetails().getDwpIssuingOffice() != null) {
-            obj.put("pipNumber", appeal.getMrnDetails().getDwpIssuingOffice());
+        Optional<OfficeMapping> officeMapping = buildOffice(obj, appeal);
+
+        if (officeMapping.isPresent()) {
+            obj.put("pipNumber", officeMapping.get().getMapping().getGaps());
+        } else {
+            log.error("could not find dwp officeAddress for benefitType {} and dwpIssuingOffice {}",
+                appeal.getBenefitType().getCode(), appeal.getMrnDetails().getDwpIssuingOffice());
         }
 
         obj.put("hearingType", convertBooleanToPaperOral(appeal.getHearingOptions().isWantsToAttendHearing()));
@@ -123,6 +155,11 @@ public class RoboticsJsonMapper {
         }
 
         return obj;
+    }
+
+    private Optional<OfficeMapping> buildOffice(JSONObject obj, Appeal appeal) {
+        return dwpAddressLookupService.getDwpMappingByOffice(appeal.getBenefitType().getCode(),
+            appeal.getMrnDetails().getDwpIssuingOffice());
     }
 
     private static String getCaseCode(SscsCaseData sscsCaseData) {

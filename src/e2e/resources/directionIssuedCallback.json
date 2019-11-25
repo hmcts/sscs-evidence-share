@@ -1,8 +1,8 @@
 {
   "case_details": {
-    "id": 12345656789,
+    "id": "CASE_ID_TO_BE_REPLACED",
     "jurisdiction": "SSCS",
-    "state": "validAppeal",
+    "state": "validAppealCreated",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
@@ -27,7 +27,7 @@
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
-      "createdInGapsFrom": "validAppeal",
+      "directionType": "appealToProceed",
       "hearings": [
         {
           "value": {
@@ -69,38 +69,6 @@
           "tya": ""
         }
       },
-      "sscsDocument" : [
-        {
-          "value" : {
-            "documentLink" : {
-              "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
-            },
-            "documentDateAdded" : "2019-05-01",
-            "documentFileName" : "filename1.pdf",
-            "documentType" : "appellantEvidence"
-          }
-        },
-        {
-          "value" : {
-            "documentLink" : {
-              "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
-            },
-            "documentDateAdded" : "2019-05-01",
-            "documentFileName" : "filename2.doc",
-            "documentType" : "appellantEvidence"
-          }
-        },
-        {
-          "value" : {
-            "documentLink" : {
-              "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
-            },
-            "documentDateAdded" : "2019-05-01",
-            "documentFileName" : "sscs1.pdf",
-            "documentType" : "sscs1"
-          }
-        }
-      ],
       "evidence": {
         "documents": [
         ]
@@ -116,14 +84,13 @@
         "address2": "Social Security & Child Support Appeals",
         "address3": "Administrative Support Centre",
         "postcode": "B16 6FR",
-        "city": "BIRMINGHAM"
+        "city": "BIRMINGHAM",
+        "email":"Birmingham-SYA-Receipts@justice.gov.uk"
       },
       "appeal": {
         "mrnDetails": {
-          "mrnDate": "MRN_DATE_TO_BE_REPLACED",
-          "mrnLateReason": "Lost my paperwork",
-          "dwpIssuingOffice": "2",
-          "mrnMissingReason": null
+          "dwpIssuingOffice": "test-hmcts-address",
+          "mrnDate": "MRN_DATE_TO_BE_REPLACED"
         },
         "appellant": {
           "name": {
@@ -153,7 +120,7 @@
           "code": "PIP",
           "description": "Personal Independence Payment"
         },
-        "receivedVia": "PAPER",
+        "receivedVia": "Paper",
         "hearingOptions": {
           "wantsToAttend": "No",
           "other": "No"
@@ -634,5 +601,5 @@
     }
   },
   "case_details_before": null,
-  "event_id": "sendToDwp"
+  "event_id": "directionIssued"
 }
