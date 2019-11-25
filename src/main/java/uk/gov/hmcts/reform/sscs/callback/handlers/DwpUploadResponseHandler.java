@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -18,13 +18,11 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @Service
 public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
-    private final boolean readyToListFeatureEnabled;
     private CcdService ccdService;
     private IdamService idamService;
 
     @Autowired
-    public DwpUploadResponseHandler(@Value("${robotics.readyToList.feature}") boolean readyToListFeatureEnabled, CcdService ccdService, IdamService idamService) {
-        this.readyToListFeatureEnabled = readyToListFeatureEnabled;
+    public DwpUploadResponseHandler(CcdService ccdService, IdamService idamService) {
         this.ccdService = ccdService;
         this.idamService = idamService;
     }
@@ -32,8 +30,9 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        return readyToListFeatureEnabled && callbackType.equals(CallbackType.SUBMITTED)
-            && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
+        return callbackType.equals(CallbackType.SUBMITTED)
+            && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE
+            && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
     }
 
     @Override
