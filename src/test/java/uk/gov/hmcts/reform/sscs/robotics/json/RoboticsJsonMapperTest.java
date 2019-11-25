@@ -436,7 +436,7 @@ public class RoboticsJsonMapperTest {
     }
 
     @Test
-    public void givenReadyToListFeatureIsTrueAndStateIsReadyToList_thenSetReadyToListFieldToYes() {
+    public void givenReadyToListFeatureIsTrueAndStateIsReadyToList_thenSetReadyToListFields() {
         roboticsJsonMapper = new RoboticsJsonMapper(true, dwpAddressLookupService);
 
         DynamicListItem value = new DynamicListItem("ABC", "DEF");
@@ -458,6 +458,27 @@ public class RoboticsJsonMapperTest {
         assertEquals("DEF", roboticsJson.get("dwpPresentingOffice"));
         assertEquals("Yes", roboticsJson.get("dwpIsOfficerAttending"));
         assertEquals("Yes", roboticsJson.get("dwpUcb"));
+    }
+
+    @Test
+    public void givenReadyToListFeatureIsTrueAndStateIsReadyToListAndDwpOfficesAreNotSet_thenSetDefaultReadyToListFields() {
+        roboticsJsonMapper = new RoboticsJsonMapper(true, dwpAddressLookupService);
+
+        DynamicListItem value = new DynamicListItem("ABC", "DEF");
+
+        roboticsWrapper.setState(State.READY_TO_LIST);
+
+        String date = LocalDate.now().toString();
+        roboticsWrapper.getSscsCaseData().setDwpResponseDate(date);
+
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertTrue(roboticsJson.has("isReadyToList"));
+        assertEquals(date, roboticsJson.get("dwpResponseDate"));
+        assertEquals("DWP PIP (1)", roboticsJson.get("dwpIssuingOffice"));
+        assertEquals("DWP PIP (1)", roboticsJson.get("dwpPresentingOffice"));
+        assertEquals("No", roboticsJson.get("dwpIsOfficerAttending"));
+        assertEquals("No", roboticsJson.get("dwpUcb"));
     }
 
 }
