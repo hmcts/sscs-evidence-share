@@ -44,11 +44,11 @@ public class FurtherEvidenceServiceTest {
     private SscsCaseData caseData;
     private final List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some doc name"));
 
-    String furtherEvidenceOriginalSenderTemplateName = "TB-SCS-GNO-ENG-00068.doc";
-    String furtherEvidenceOriginalSenderDocName = "609-97-template (original sender)";
-    String furtherEvidenceOtherPartiesTemplateName = "TB-SCS-GNO-ENG-00069.doc";
-    String furtherEvidenceOtherPartiesDocName = "609-98-template (other parties)";
-    String furtherEvidenceOtherPartiesDwpDocName = "609-98-template (DWP)";
+    private String furtherEvidenceOriginalSenderTemplateName = "TB-SCS-GNO-ENG-00068.doc";
+    private String furtherEvidenceOriginalSenderDocName = "609-97-template (original sender)";
+    private String furtherEvidenceOtherPartiesTemplateName = "TB-SCS-GNO-ENG-00069.doc";
+    private String furtherEvidenceOtherPartiesDocName = "609-98-template (other parties)";
+    private String furtherEvidenceOtherPartiesDwpDocName = "609-98-template (DWP)";
 
     @Before
     public void setup() {
@@ -60,7 +60,8 @@ public class FurtherEvidenceServiceTest {
     public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndNoRep_shouldGenerateCoverLetterOriginalSenderAndOtherPartyDwpAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock();
 
-        furtherEvidenceService.issue(caseData, APPELLANT_EVIDENCE);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE,
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
@@ -75,7 +76,8 @@ public class FurtherEvidenceServiceTest {
         createTestDataAndConfigureSscsDocumentServiceMock();
         withRep();
 
-        furtherEvidenceService.issue(caseData, APPELLANT_EVIDENCE);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE,
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
@@ -92,7 +94,8 @@ public class FurtherEvidenceServiceTest {
         createTestDataAndConfigureSscsDocumentServiceMock();
         withRep();
 
-        furtherEvidenceService.issue(caseData, REPRESENTATIVE_EVIDENCE);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, REPRESENTATIVE_EVIDENCE,
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
@@ -108,7 +111,8 @@ public class FurtherEvidenceServiceTest {
     public void givenDwpIssueFurtherEvidenceCallbackWithAppellant_shouldGenerateCoverLetterOriginalSenderAndOtherPartyAppellantAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock();
 
-        furtherEvidenceService.issue(caseData, DWP_EVIDENCE);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
@@ -123,7 +127,8 @@ public class FurtherEvidenceServiceTest {
         createTestDataAndConfigureSscsDocumentServiceMock();
         withRep();
 
-        furtherEvidenceService.issue(caseData, DWP_EVIDENCE);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));

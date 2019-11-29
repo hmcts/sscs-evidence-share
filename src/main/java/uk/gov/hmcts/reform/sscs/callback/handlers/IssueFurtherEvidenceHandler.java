@@ -2,7 +2,11 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,12 +18,15 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
 @Service
 public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
 
+    private static final List<FurtherEvidenceLetterType> ALLOWED_LETTER_TYPES = Arrays.asList(APPELLANT_LETTER,
+        REPRESENTATIVE_LETTER, DWP_LETTER);
     private FurtherEvidenceService furtherEvidenceService;
     private CcdService ccdService;
     private IdamService idamService;
@@ -35,7 +42,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         return callbackType.equals(CallbackType.SUBMITTED)
-            && callback.getEvent() == EventType.ISSUE_FURTHER_EVIDENCE && furtherEvidenceService.canHandleAnyDocument(callback.getCaseDetails().getCaseData().getSscsDocument());
+            && callback.getEvent() == EventType.ISSUE_FURTHER_EVIDENCE
+            && furtherEvidenceService.canHandleAnyDocument(callback.getCaseDetails().getCaseData().getSscsDocument());
     }
 
     @Override
@@ -44,12 +52,12 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), APPELLANT_EVIDENCE);
-        furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), REPRESENTATIVE_EVIDENCE);
-        furtherEvidenceService.issue(callback.getCaseDetails().getCaseData(), DWP_EVIDENCE);
-
-        setEvidenceIssuedFlagToYes(callback.getCaseDetails().getCaseData().getSscsDocument());
-        updateCase(callback.getCaseDetails().getCaseData());
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData,  REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData,  DWP_EVIDENCE, ALLOWED_LETTER_TYPES);
+        setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
+        updateCase(caseData);
     }
 
     private void setEvidenceIssuedFlagToYes(List<SscsDocument> sscsDocuments) {
