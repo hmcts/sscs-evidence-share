@@ -3,8 +3,6 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;

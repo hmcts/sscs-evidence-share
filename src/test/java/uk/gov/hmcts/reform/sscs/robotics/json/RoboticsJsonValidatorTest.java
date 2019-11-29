@@ -92,14 +92,14 @@ public class RoboticsJsonValidatorTest {
     @Test(expected = RoboticsValidationException.class)
     public void givenOralInputForLanguageInterpreterWithNoHearingRequestParty_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData = updateEmbeddedProperty(jsonData.toString(), "Oral", "hearingType");
-        jsonData = removeProperty(jsonData.toString(), "hearingRequestParty");
+        jsonData = removeProperty(jsonData.toString());
         roboticsJsonValidator.validate(jsonData);
     }
 
     @Test
     public void givenPaperInputForLanguageInterpreterWithNoHearingRequestParty_doesNotThrowExceptionWhenValidatingAgainstSchema() throws IOException {
         jsonData = updateEmbeddedProperty(jsonData.toString(), "Paper", "hearingType");
-        jsonData = removeProperty(jsonData.toString(), "hearingRequestParty");
+        jsonData = removeProperty(jsonData.toString());
         roboticsJsonValidator.validate(jsonData);
     }
 
@@ -136,31 +136,29 @@ public class RoboticsJsonValidatorTest {
     private static JSONObject updateEmbeddedProperty(String json, String value, String... keys) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        Map<Object, String> map = objectMapper.readValue(json, Map.class);
+        Map map = objectMapper.readValue(json, Map.class);
 
         Map t = map;
         for (int i = 0; i < keys.length - 1; i++) {
             t = (Map) t.get(keys[i]);
         }
 
+        //noinspection unchecked
         t.put(keys[keys.length - 1], value);
 
-        JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(map));
-
-        return jsonObject;
+        return new JSONObject(objectMapper.writeValueAsString(map));
     }
 
-    private static JSONObject removeProperty(String json, String key) throws IOException {
+    private static JSONObject removeProperty(String json) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map map = objectMapper.readValue(json, Map.class);
 
-        map.remove(key);
+        map.remove("hearingRequestParty");
 
         String jsonString = objectMapper.writeValueAsString(map);
-        JSONObject jsonObject = new JSONObject(jsonString);
 
-        return jsonObject;
+        return new JSONObject(jsonString);
     }
 
 }

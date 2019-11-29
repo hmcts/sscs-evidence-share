@@ -4,7 +4,7 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -20,7 +20,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -88,8 +92,8 @@ public class BulkPrintServiceTest {
     public void sendLetterNotEnabledWillNotSendToBulkPrint() {
         BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, false, 1);
         notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
-        verifyZeroInteractions(idamService);
-        verifyZeroInteractions(sendLetterApi);
+        verifyNoInteractions(idamService);
+        verifyNoInteractions(sendLetterApi);
     }
 
 

@@ -30,6 +30,7 @@ public class TopicConsumer {
                          CallbackDispatcher dispatcher,
                          SscsCaseCallbackDeserializer sscsDeserializer) {
         this.maxRetryAttempts = maxRetryAttempts;
+        //noinspection unchecked
         this.dispatcher = dispatcher;
         this.sscsDeserializer = sscsDeserializer;
     }
