@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -27,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.exception.NoDl6DocumentException;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -98,9 +100,12 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
         try {
             bulkPrintInfo = bulkPrintCase(callback);
+        } catch (NoDl6DocumentException e) {
+            log.info("Error when bulk-printing caseId: {}", callback.getCaseDetails().getId(), e);
+            updateCaseToFlagError(caseData, "Triggered from Evidence Share – no DL6/16 present, please validate");
         } catch (Exception e) {
             log.info("Error when bulk-printing caseId: {}", callback.getCaseDetails().getId(), e);
-            updateCaseToFlagError(caseData);
+            updateCaseToFlagError(caseData, "Send to DWP Error event has been triggered from Evidence Share service");
         }
         updateCaseToSentToDwp(callback, caseData, bulkPrintInfo);
     }
@@ -110,13 +115,13 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         return this.dispatchPriority;
     }
 
-    private void updateCaseToFlagError(SscsCaseData caseData) {
+    private void updateCaseToFlagError(SscsCaseData caseData, String description) {
         caseData.setHmctsDwpState("failedSending");
         ccdService.updateCase(caseData,
             Long.valueOf(caseData.getCcdCaseId()),
             EventType.SENT_TO_DWP_ERROR.getCcdType(),
             "Send to DWP Error",
-            "Send to DWP Error event has been triggered from Evidence Share service",
+            description,
             idamService.getIdamTokens());
     }
 
@@ -150,6 +155,12 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                 IdamTokens idamTokens = idamService.getIdamTokens();
                 documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
                 List<SscsDocument> sscsDocuments = getSscsDocumentsToPrint(caseData.getSscsDocument());
+                if (CollectionUtils.isEmpty(sscsDocuments)
+                        || !documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(sscsDocuments)) {
+                    throw new NoDl6DocumentException(
+                            format("No documents to send for bulk print for case id {}",
+                                    caseData.getCcdCaseId()));
+                }
                 List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
 
                 log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
