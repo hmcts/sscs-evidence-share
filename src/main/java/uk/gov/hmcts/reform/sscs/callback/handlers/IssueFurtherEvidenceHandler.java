@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
@@ -64,8 +65,9 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
             updateCase(caseData);
         } catch (Exception e) {
-            log.info("Failed sending further evidence...");
-            e.printStackTrace();
+            String errorMsg = "Failed sending further evidence for case(%s)...";
+            throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
+        } finally {
             caseData.setHmctsDwpState("failedSendingFurtherEvidence");
         }
     }

@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
@@ -120,7 +121,7 @@ public class IssueFurtherEvidenceHandlerTest {
             buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
     }
 
-    @Test
+    @Test(expected = IssueFurtherEvidenceException.class)
     public void givenExceptionWhenIssuingFurtherEvidence_shouldHandleItAppropriately() {
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
         doThrow(RuntimeException.class).when(furtherEvidenceService).issue(any(), any(), any(), any());
