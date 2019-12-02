@@ -53,18 +53,23 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
-        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData,  REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES);
-        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData,  DWP_EVIDENCE, ALLOWED_LETTER_TYPES);
-        setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
-        updateCase(caseData);
+        try {
+            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
+            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData,  REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES);
+            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData,  DWP_EVIDENCE, ALLOWED_LETTER_TYPES);
+            setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
+            updateCase(caseData);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void setEvidenceIssuedFlagToYes(List<SscsDocument> sscsDocuments) {
 
         if (sscsDocuments != null) {
             for (SscsDocument doc : sscsDocuments) {
-                if (doc.getValue().getEvidenceIssued() != null && doc.getValue().getEvidenceIssued().equals("No")) {
+                if (doc.getValue().getEvidenceIssued() != null
+                    && "No".equalsIgnoreCase(doc.getValue().getEvidenceIssued())) {
                     doc.getValue().setEvidenceIssued("Yes");
                 }
             }
