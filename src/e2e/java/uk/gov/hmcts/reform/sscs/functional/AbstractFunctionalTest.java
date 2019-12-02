@@ -8,6 +8,7 @@ import io.restassured.RestAssured;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -86,9 +87,9 @@ public abstract class AbstractFunctionalTest {
         return ccdService.getByCaseId(Long.valueOf(ccdCaseId), idamTokens);
     }
 
-    String getJson(EventType eventType) throws IOException {
-        String resource = eventType.getCcdType() + "Callback.json";
-        String file = getClass().getClassLoader().getResource(resource).getFile();
+    String getJson(String fileName) throws IOException {
+        String resource = fileName + "Callback.json";
+        String file = Objects.requireNonNull(getClass().getClassLoader().getResource(resource)).getFile();
         return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
     }
 

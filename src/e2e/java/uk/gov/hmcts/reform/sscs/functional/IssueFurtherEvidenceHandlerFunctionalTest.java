@@ -31,9 +31,27 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     @Test
     public void givenIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
-        String issueFurtherEvidenceCallback = createTestData();
+        String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType());
         simulateCcdCallback(issueFurtherEvidenceCallback);
         verifyEvidenceIssued();
+    }
+
+    @Test
+    public void givenIssueFurtherEvidenceFails_shouldHandleException() throws IOException {
+        String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "Faulty");
+        simulateCcdCallback(issueFurtherEvidenceCallback);
+        verifyEvidenceIsNotIssued();
+    }
+
+    private void verifyEvidenceIsNotIssued() {
+        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+        SscsCaseData caseData = caseDetails.getData();
+        assertThat(caseData.getHmctsDwpState(), is("failedSendingFurtherEvidence"));
+        List<SscsDocument> docs = caseData.getSscsDocument();
+        assertNull(docs.get(0).getValue().getEvidenceIssued());
+        assertThat(docs.get(1).getValue().getEvidenceIssued(), is("No"));
+        assertThat(docs.get(2).getValue().getEvidenceIssued(), is("No"));
+        assertThat(docs.get(3).getValue().getEvidenceIssued(), is("No"));
     }
 
     private void verifyEvidenceIssued() {
@@ -47,10 +65,10 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         assertThat(docs.get(3).getValue().getEvidenceIssued(), is("Yes"));
     }
 
-    private String createTestData() throws IOException {
+    private String createTestData(String fileName) throws IOException {
         String docUrl = uploadDocToDocMgmtStore();
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
-        String json = getJson(ISSUE_FURTHER_EVIDENCE);
+        String json = getJson(fileName);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
         return json.replace("EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");

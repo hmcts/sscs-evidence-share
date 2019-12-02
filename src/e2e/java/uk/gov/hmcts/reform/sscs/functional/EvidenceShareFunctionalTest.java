@@ -25,7 +25,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
-        String json = getJson(SEND_TO_DWP);
+        String json = getJson(SEND_TO_DWP.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
 
@@ -45,7 +45,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     public void processAnAppealWithNoValidMrnDate_shouldNoTBeSentToDwpAndShouldBeUpdatedToFlagError() throws IOException {
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
-        String json = getJson(SEND_TO_DWP);
+        String json = getJson(SEND_TO_DWP.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", "");
 
@@ -62,7 +62,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
-        String json = getJson(SEND_TO_DWP);
+        String json = getJson(SEND_TO_DWP.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
 

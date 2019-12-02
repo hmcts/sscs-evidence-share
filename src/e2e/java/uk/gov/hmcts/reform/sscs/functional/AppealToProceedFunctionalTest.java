@@ -21,7 +21,7 @@ public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
 
         createCaseWithValidAppealState(NON_COMPLIANT);
 
-        String json = getJson(APPEAL_TO_PROCEED);
+        String json = getJson(APPEAL_TO_PROCEED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
 
