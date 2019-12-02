@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -25,6 +29,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -50,6 +55,12 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    @Rule
+    public ExpectedException exceptionRule = ExpectedException.none();
 
     @Mock
     private FurtherEvidenceService furtherEvidenceService;
@@ -122,17 +133,26 @@ public class IssueFurtherEvidenceHandlerTest {
             buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
     }
 
-    @Test(expected = IssueFurtherEvidenceException.class)
+    @Test
     public void givenExceptionWhenIssuingFurtherEvidence_shouldHandleItAppropriately() {
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
         doThrow(RuntimeException.class).when(furtherEvidenceService).issue(any(), any(), any(), any());
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData,
-            INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
-
+        int retries = 0;
+        do {
+            try {
+                issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData,
+                    INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+                fail("exception was not thrown");
+            } catch (IssueFurtherEvidenceException e) {
+                assertThat(e, isA(IssueFurtherEvidenceException.class));
+                assertThat(e.getMessage(), is("Failed sending further evidence for case(1563382899630221)..."));
+                retries++;
+            }
+        } while (retries < 3);
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
             eq(EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType()), any(), any(), any(IdamTokens.class));
-
         assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence",
             captor.getValue().getHmctsDwpState());
     }

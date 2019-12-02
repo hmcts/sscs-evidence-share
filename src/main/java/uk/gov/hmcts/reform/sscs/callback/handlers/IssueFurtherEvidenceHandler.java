@@ -35,6 +35,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private FurtherEvidenceService furtherEvidenceService;
     private CcdService ccdService;
     private IdamService idamService;
+    private boolean onlyOnce = true;
 
     @Autowired
     public IssueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService, CcdService ccdService, IdamService idamService) {
@@ -60,7 +61,10 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         try {
             issueFurtherEvidence(caseData);
         } catch (Exception e) {
-            handleIssueFurtherEvidenceException(caseData);
+            if (onlyOnce) {
+                handleIssueFurtherEvidenceException(caseData);
+                onlyOnce = false;
+            }
             String errorMsg = "Failed sending further evidence for case(%s)...";
             throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
