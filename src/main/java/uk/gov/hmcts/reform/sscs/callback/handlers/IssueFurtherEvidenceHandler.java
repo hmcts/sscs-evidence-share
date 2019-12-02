@@ -56,29 +56,37 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
-
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         try {
-            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
-            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES);
-            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, DWP_EVIDENCE, ALLOWED_LETTER_TYPES);
-            setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
-            updateCase(caseData);
+            issueFurtherEvidence(caseData);
         } catch (Exception e) {
             String errorMsg = "Failed sending further evidence for case(%s)...";
             throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         } finally {
-            caseData.setHmctsDwpState("failedSendingFurtherEvidence");
-            ccdService.updateCase(
-                caseData,
-                Long.valueOf(caseData.getCcdCaseId()),
-                EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(), "Custom summary",
-                "Custom description", idamService.getIdamTokens());
+            handleIssueFurtherEvidenceException(caseData);
         }
     }
 
-    private void setEvidenceIssuedFlagToYes(List<SscsDocument> sscsDocuments) {
+    private void issueFurtherEvidence(SscsCaseData caseData) {
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, DWP_EVIDENCE, ALLOWED_LETTER_TYPES);
+        setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
+        ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.UPDATE_CASE_ONLY.getCcdType(),
+            "Update case data only",
+            "Update document evidence issued flags after issuing further evidence to DWP",
+            idamService.getIdamTokens());
+    }
 
+    private void handleIssueFurtherEvidenceException(SscsCaseData caseData) {
+        caseData.setHmctsDwpState("failedSendingFurtherEvidence");
+        ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
+            EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(),
+            "Custom summary", "Custom summary",
+            idamService.getIdamTokens());
+    }
+
+    private void setEvidenceIssuedFlagToYes(List<SscsDocument> sscsDocuments) {
         if (sscsDocuments != null) {
             for (SscsDocument doc : sscsDocuments) {
                 if (doc.getValue().getEvidenceIssued() != null
@@ -87,16 +95,6 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
                 }
             }
         }
-    }
-
-    protected void updateCase(SscsCaseData caseData) {
-        ccdService.updateCase(
-            caseData,
-            Long.valueOf(caseData.getCcdCaseId()),
-            EventType.UPDATE_CASE_ONLY.getCcdType(),
-            "Update case data only",
-            "Update document evidence issued flags after issuing further evidence to DWP",
-            idamService.getIdamTokens());
     }
 
     @Override
