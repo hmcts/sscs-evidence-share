@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
+import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
 
@@ -49,7 +50,7 @@ public class TopicConsumer {
             log.info("Message received from the service bus by evidence share service");
             processMessage(message);
         } catch (Exception e) {
-            if (retry > maxRetryAttempts) {
+            if (retry > maxRetryAttempts || e instanceof IssueFurtherEvidenceException) {
                 log.error(format("Caught unknown unrecoverable error %s", e.getMessage()), e);
             } else {
                 log.info(String.format("Caught recoverable error %s, retrying %s out of %s",

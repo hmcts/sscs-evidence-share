@@ -56,12 +56,6 @@ public class IssueFurtherEvidenceHandlerTest {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
-    @Rule
-    public ExpectedException exceptionRule = ExpectedException.none();
-
     @Mock
     private FurtherEvidenceService furtherEvidenceService;
 
@@ -139,18 +133,15 @@ public class IssueFurtherEvidenceHandlerTest {
         doThrow(RuntimeException.class).when(furtherEvidenceService).issue(any(), any(), any(), any());
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
-        int retries = 0;
-        do {
-            try {
-                issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData,
-                    INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
-                fail("exception was not thrown");
-            } catch (IssueFurtherEvidenceException e) {
-                assertThat(e, isA(IssueFurtherEvidenceException.class));
-                assertThat(e.getMessage(), is("Failed sending further evidence for case(1563382899630221)..."));
-                retries++;
-            }
-        } while (retries < 3);
+        try {
+            issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData,
+                INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+            fail("no exception thrown");
+        } catch (IssueFurtherEvidenceException e) {
+            assertThat(e, isA(IssueFurtherEvidenceException.class));
+            assertThat(e.getMessage(), is("Failed sending further evidence for case(1563382899630221)..."));
+        }
+
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
             eq(EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType()), any(), any(), any(IdamTokens.class));
         assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence",
