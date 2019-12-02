@@ -60,10 +60,9 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         try {
             issueFurtherEvidence(caseData);
         } catch (Exception e) {
+            handleIssueFurtherEvidenceException(caseData);
             String errorMsg = "Failed sending further evidence for case(%s)...";
             throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
-        } finally {
-            handleIssueFurtherEvidenceException(caseData);
         }
     }
 

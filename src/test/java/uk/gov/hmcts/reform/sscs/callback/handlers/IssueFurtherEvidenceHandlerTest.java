@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
@@ -153,9 +154,11 @@ public class IssueFurtherEvidenceHandlerTest {
         verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(DWP_EVIDENCE),
             eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER)));
 
-        verify(ccdService).updateCase(captor.capture(), any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
-            any(), any(), any(IdamTokens.class));
+        verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
+            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
 
         assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+
+        verifyNoMoreInteractions(ccdService);
     }
 }
