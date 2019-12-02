@@ -29,7 +29,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -66,14 +65,14 @@ public class IssueFurtherEvidenceHandlerTest {
 
     private SscsDocument sscsDocumentNotIssued = SscsDocument.builder()
         .value(SscsDocumentDetails.builder()
-                .documentType(APPELLANT_EVIDENCE.getValue())
-        .evidenceIssued("No")
-                .build())
+            .documentType(APPELLANT_EVIDENCE.getValue())
+            .evidenceIssued("No")
+            .build())
         .build();
 
     private SscsCaseData caseData = SscsCaseData.builder()
         .ccdCaseId("1563382899630221")
-            .sscsDocument(Collections.singletonList(sscsDocumentNotIssued))
+        .sscsDocument(Collections.singletonList(sscsDocumentNotIssued))
         .appeal(Appeal.builder().build())
         .build();
 
@@ -130,6 +129,8 @@ public class IssueFurtherEvidenceHandlerTest {
             INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
 
         verifyNoInteractions(ccdService);
+        assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence",
+            caseData.getHmctsDwpState());
     }
 
     @Test

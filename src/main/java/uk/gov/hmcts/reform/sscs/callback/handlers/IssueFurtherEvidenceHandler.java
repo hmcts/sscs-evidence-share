@@ -1,13 +1,16 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 
 import java.util.Arrays;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
@@ -23,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
 @Service
+@Slf4j
 public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
 
     private static final List<FurtherEvidenceLetterType> ALLOWED_LETTER_TYPES = Arrays.asList(APPELLANT_LETTER,
@@ -55,12 +59,14 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         try {
             furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
-            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData,  REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES);
-            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData,  DWP_EVIDENCE, ALLOWED_LETTER_TYPES);
+            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES);
+            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, DWP_EVIDENCE, ALLOWED_LETTER_TYPES);
             setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
             updateCase(caseData);
         } catch (Exception e) {
+            log.info("Failed sending further evidence...");
             e.printStackTrace();
+            caseData.setHmctsDwpState("failedSendingFurtherEvidence");
         }
     }
 
