@@ -8,12 +8,10 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.t
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.ExelaAddressConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 
@@ -32,7 +30,18 @@ public class PlaceholderService {
 
     public void build(SscsCaseData caseData, Map<String, Object> placeholders, Address address, LocalDateTime caseCreatedDate) {
         Appeal appeal = caseData.getAppeal();
-        placeholders.put(BENEFIT_TYPE_LITERAL, appeal.getBenefitType().getDescription().toUpperCase());
+        String description = appeal.getBenefitType() != null ? appeal.getBenefitType().getDescription() : null;
+
+        if (description == null && appeal.getBenefitType() != null && appeal.getBenefitType().getCode() != null) {
+            description = Benefit.getBenefitByCode(appeal.getBenefitType().getCode()).getDescription();
+        }
+        if (description != null) {
+            description = description.toUpperCase();
+        } else {
+            description = StringUtils.EMPTY;
+        }
+
+        placeholders.put(BENEFIT_TYPE_LITERAL, description);
         placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
         placeholders.put(NINO_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getNino()));
