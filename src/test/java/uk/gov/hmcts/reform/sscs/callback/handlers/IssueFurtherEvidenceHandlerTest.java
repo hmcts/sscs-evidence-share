@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -129,9 +130,11 @@ public class IssueFurtherEvidenceHandlerTest {
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData,
             INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
 
-        verifyNoInteractions(ccdService);
+        verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
+            eq(EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType()), any(), any(), any(IdamTokens.class));
+
         assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence",
-            caseData.getHmctsDwpState());
+            captor.getValue().getHmctsDwpState());
     }
 
     @Test

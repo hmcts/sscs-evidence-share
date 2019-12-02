@@ -69,6 +69,11 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         } finally {
             caseData.setHmctsDwpState("failedSendingFurtherEvidence");
+            ccdService.updateCase(
+                caseData,
+                Long.valueOf(caseData.getCcdCaseId()),
+                EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(), "Custom summary",
+                "Custom description", idamService.getIdamTokens());
         }
     }
 
