@@ -6,8 +6,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -66,13 +68,18 @@ public class IssueDirectionHandlerTest {
         assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionType(DirectionType.APPEAL_TO_PROCEED).build(), INTERLOCUTORY_REVIEW_STATE, APPEAL_RECEIVED)));
     }
 
+    @Test
+    public void givenAnIssueDirectionEventForPostValidCase_thenDoNotTriggerAppealToProceedEvent() {
+        assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionType(DirectionType.APPEAL_TO_PROCEED).build(), WITH_DWP, DIRECTION_ISSUED)));
+    }
+
     @Test(expected = NullPointerException.class)
     public void givenCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
         handler.canHandle(SUBMITTED, null);
     }
 
     @Test
-    public void givenAnIssueDirectionEvent_thenTriggerAppealToProceedEvent() {
+    public void givenAnIssueDirectionEventForInterlocCase_thenTriggerAppealToProceedEvent() {
         handler.handle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionType(DirectionType.APPEAL_TO_PROCEED).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED));
 
         verify(ccdCaseService).updateCase(captor.capture(), eq(1L), eq(EventType.APPEAL_TO_PROCEED.getCcdType()), eq("Appeal to proceed"), eq("Appeal proceed event triggered"), any());

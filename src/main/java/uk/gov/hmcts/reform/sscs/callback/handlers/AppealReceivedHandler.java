@@ -43,8 +43,7 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             && (callback.getEvent() == EventType.SEND_TO_DWP
             || callback.getEvent() == EventType.VALID_APPEAL
             || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL)
-            && (callback.getCaseDetails().getCaseData().getCreatedInGapsFrom() != null
-            && callback.getCaseDetails().getCaseData().getCreatedInGapsFrom().equals(READY_TO_LIST.getId()));
+            && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
     }
 
     @Override
