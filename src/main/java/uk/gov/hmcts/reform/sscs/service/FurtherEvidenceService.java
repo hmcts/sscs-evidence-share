@@ -9,10 +9,12 @@ import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESEN
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
@@ -95,8 +97,8 @@ public class FurtherEvidenceService {
     }
 
     private boolean checkRepExists(SscsCaseData caseData) {
-        return null != caseData.getAppeal().getRep()
-            && caseData.getAppeal().getRep().getHasRepresentative().toLowerCase().equals("yes");
+        Representative rep = caseData.getAppeal().getRep();
+        return null != rep && "yes".equalsIgnoreCase(rep.getHasRepresentative());
     }
 
     private FurtherEvidenceLetterType findLetterType(DocumentType documentType) {
