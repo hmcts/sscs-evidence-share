@@ -100,6 +100,9 @@ public class SendToBulkPrintHandlerTest {
 
     @Test
     public void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint() {
+        Map<String, Object> placeholders = new HashMap<>();
+        placeholders.put("Test", "Value");
+        Template template = new Template("bla", "bla2");
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
             SscsDocument.builder().value(SscsDocumentDetails.builder()
@@ -126,11 +129,7 @@ public class SendToBulkPrintHandlerTest {
                 .build()).build()), APPEAL_CREATED);
 
         when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenReturn(docPdf.getContent());
-
-        Map<String, Object> placeholders = new HashMap<>();
-        placeholders.put("Test", "Value");
-
-        Template template = new Template("bla", "bla2");
+        when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(true);
 
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
 
@@ -175,6 +174,41 @@ public class SendToBulkPrintHandlerTest {
         then(ccdCaseService)
             .should(times(1))
             .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
+
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
+
+        List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
+        assertEquals("No", docs.get(0).getValue().getEvidenceIssued());
+    }
+
+    @Test
+    public void givenAnErrorIfDlDocumentsNotPresentWhenSendToBulkPrint_shouldUpdateCaseInCcdToFlagError() {
+        Map<String, Object> placeholders = new HashMap<>();
+        placeholders.put("Test", "Value");
+        Template template = new Template("bla", "bla2");
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
+                SscsDocument.builder().value(SscsDocumentDetails.builder()
+                        .documentFileName(docPdf.getName())
+                        .documentType("sscs1")
+                        .evidenceIssued("No")
+                        .documentLink(DocumentLink.builder().documentUrl(docUrl)
+                                .documentFilename(docPdf.getName()).build())
+                        .build()).build()), APPEAL_CREATED);
+
+        when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenReturn(docPdf.getContent());
+        when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+
+        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
+
+        when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
+        ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+        then(ccdCaseService)
+                .should(times(1))
+                .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
 
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
 
