@@ -75,9 +75,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes);
         } catch (Exception e) {
             handleIssueFurtherEvidenceException(caseData, documentType);
-            String errorMsg = "Failed sending further evidence for case(%s) and documentType(%s)...";
-            throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId(),
-                documentType.getValue()), e);
+            String errorMsg = "Failed sending further evidence for case(%s)...";
+            throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
     }
 
@@ -109,9 +108,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private void handleIssueFurtherEvidenceException(SscsCaseData caseData, DocumentType documentType) {
         caseData.setHmctsDwpState("failedSendingFurtherEvidence");
         ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
-            EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(),
-            "Failed to issue documentType",
-            String.format("Failed to issue the %s documentType", documentType.getValue()),
+            EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(), "Failed to issue further evidence",
+            "Trigger the 'Reissue further evidence' event to fix this case, please",
             idamService.getIdamTokens());
     }
 
