@@ -51,4 +51,31 @@ public class PlaceholderHelper {
                 .build())
             .build();
     }
+
+    public static SscsCaseData buildCaseDataWithoutBenefitType() {
+
+        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
+                .name("Liverpool").address1(RPC_ADDRESS1).address2(RPC_ADDRESS2).address3(RPC_ADDRESS3)
+                .address4(RPC_ADDRESS4).city(RPC_CITY).postcode(POSTCODE).build();
+
+        return SscsCaseData.builder()
+                .ccdCaseId("123456")
+                .caseReference("SC123/12/1234")
+                .regionalProcessingCenter(rpc)
+                .appeal(Appeal.builder()
+                        .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
+                        .appellant(Appellant.builder()
+                                .name(Name.builder().title("Mr").firstName("Terry").lastName("Tibbs").build())
+                                .identity(Identity.builder().nino("JT0123456B").build())
+                                .address(Address.builder()
+                                        .line1("HM Courts & Tribunals Service")
+                                        .line2("Down the road")
+                                        .town("Social Security & Child Support Appeals")
+                                        .county("Prudential Buildings")
+                                        .postcode("L2 5UZ")
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+    }
 }
