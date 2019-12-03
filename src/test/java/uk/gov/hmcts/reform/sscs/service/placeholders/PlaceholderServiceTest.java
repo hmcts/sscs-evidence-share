@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseData;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseDataWithoutBenefitType;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.ExelaAddressConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
@@ -73,6 +75,57 @@ public class PlaceholderServiceTest {
         assertEquals(now.toLocalDate().toString(), placeholders.get(CASE_CREATED_DATE_LITERAL));
         assertEquals("Mr T Tibbs", placeholders.get(APPELLANT_FULL_NAME_LITERAL));
         assertEquals("PERSONAL INDEPENDENCE PAYMENT", placeholders.get(BENEFIT_TYPE_LITERAL));
+        assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
+        assertEquals("JT0123456B", placeholders.get(NINO_LITERAL));
+        assertEquals("https://www.gov.uk/appeal-benefit-decision", placeholders.get(SSCS_URL_LITERAL));
+        assertEquals("Line 1", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
+        assertEquals("Line 2", placeholders.get(EXELA_ADDRESS_LINE2_LITERAL));
+        assertEquals("Line 3", placeholders.get(EXELA_ADDRESS_LINE3_LITERAL));
+        assertEquals("Unit 2", placeholders.get(RECIPIENT_ADDRESS_LINE_1_LITERAL));
+        assertEquals("156 The Road", placeholders.get(RECIPIENT_ADDRESS_LINE_2_LITERAL));
+        assertEquals("Lechworth", placeholders.get(RECIPIENT_ADDRESS_LINE_3_LITERAL));
+        assertEquals("Bedford", placeholders.get(RECIPIENT_ADDRESS_LINE_4_LITERAL));
+        assertEquals("L2 5UZ", placeholders.get(RECIPIENT_ADDRESS_LINE_5_LITERAL));
+        assertEquals("SC123/12/1234", placeholders.get(SC_NUMBER_LITERAL));
+    }
+
+    @Test
+    public void givenACase_thenPopulateThePlaceholdersWithBenefitTypeEmpty() {
+        Address address = Address.builder()
+                .line1("Unit 2")
+                .line2("156 The Road")
+                .town("Lechworth")
+                .county("Bedford")
+                .postcode("L2 5UZ").build();
+
+        caseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").description(null).build());
+        service.build(caseData, placeholders, address, now);
+
+        assertEquals("PERSONAL INDEPENDENCE PAYMENT", placeholders.get(BENEFIT_TYPE_LITERAL));
+    }
+
+    @Test
+    public void givenACase_thenPopulateThePlaceholdersWithBenefitTypeDescriptionEmpty() {
+        Address address = Address.builder()
+            .line1("Unit 2")
+            .line2("156 The Road")
+            .town("Lechworth")
+            .county("Bedford")
+            .postcode("L2 5UZ").build();
+
+        caseData = buildCaseDataWithoutBenefitType();
+        service.build(caseData, placeholders, address, now);
+
+        assertEquals("HM Courts & Tribunals Service", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
+        assertEquals("Social Security & Child Support Appeals", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL));
+        assertEquals("Prudential Buildings", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL));
+        assertEquals("36 Dale Street", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL));
+        assertEquals("LIVERPOOL", placeholders.get(REGIONAL_OFFICE_COUNTY_LITERAL));
+        assertEquals("L2 5UZ", placeholders.get(REGIONAL_OFFICE_POSTCODE_LITERAL));
+        assertEquals(now.toLocalDate().toString(), placeholders.get(GENERATED_DATE_LITERAL));
+        assertEquals(now.toLocalDate().toString(), placeholders.get(CASE_CREATED_DATE_LITERAL));
+        assertEquals("Mr T Tibbs", placeholders.get(APPELLANT_FULL_NAME_LITERAL));
+        assertEquals("", placeholders.get(BENEFIT_TYPE_LITERAL));
         assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
         assertEquals("JT0123456B", placeholders.get(NINO_LITERAL));
         assertEquals("https://www.gov.uk/appeal-benefit-decision", placeholders.get(SSCS_URL_LITERAL));
