@@ -50,7 +50,7 @@ public class FurtherEvidenceService {
     }
 
     public void issue(SscsCaseData caseData, DocumentType documentType) {
-        issue(caseData.getSscsDocument(), caseData, documentType, Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
+        issue(caseData.getSscsDocument(), caseData, documentType, Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER));
     }
 
     private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs, List<FurtherEvidenceLetterType> allowedLetterTypes) {
@@ -66,7 +66,7 @@ public class FurtherEvidenceService {
 
         List<FurtherEvidenceLetterType> otherPartiesList = buildOtherPartiesList(caseData, documentType);
 
-        for (FurtherEvidenceLetterType letterType: otherPartiesList) {
+        for (FurtherEvidenceLetterType letterType : otherPartiesList) {
             String docName = letterType == DWP_LETTER ? "609-98-template (DWP)" : "609-98-template (other parties)";
 
             if (allowedLetterTypes.contains(letterType)) {
@@ -86,9 +86,6 @@ public class FurtherEvidenceService {
         }
         if (documentType != REPRESENTATIVE_EVIDENCE && checkRepExists(caseData)) {
             otherPartiesList.add(REPRESENTATIVE_LETTER);
-        }
-        if (documentType != DWP_EVIDENCE) {
-            otherPartiesList.add(DWP_LETTER);
         }
 
         return otherPartiesList;

@@ -63,9 +63,7 @@ public class FurtherEvidencePlaceholderService {
     }
 
     private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
-        if (FurtherEvidenceLetterType.DWP_LETTER.getValue().equals(letterType.getValue())) {
-            return dwpAddressLookupService.lookupDwpAddress(caseData);
-        } else if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
+        if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
             return getAppellantAddress(caseData);
         }
         return getRepsAddress(caseData);

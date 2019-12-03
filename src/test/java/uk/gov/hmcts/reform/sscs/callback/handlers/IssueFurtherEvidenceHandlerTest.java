@@ -4,8 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
@@ -97,7 +96,7 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     @Test
-    public void givenIssueFurtherEvidenceCallback_shouldIssueEvidenceForAppellantAndRepAndDwp() {
+    public void givenIssueFurtherEvidenceCallback_shouldIssueEvidenceForAppellantAndRep() {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
