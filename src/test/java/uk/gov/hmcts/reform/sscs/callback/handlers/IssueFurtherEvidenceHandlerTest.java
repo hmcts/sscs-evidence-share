@@ -138,11 +138,14 @@ public class IssueFurtherEvidenceHandlerTest {
             fail("no exception thrown");
         } catch (IssueFurtherEvidenceException e) {
             assertThat(e, isA(IssueFurtherEvidenceException.class));
-            assertThat(e.getMessage(), is("Failed sending further evidence for case(1563382899630221)..."));
+            assertThat(e.getMessage(), is("Failed sending further evidence for case(1563382899630221) "
+                + "and documentType(appellantEvidence)..."));
         }
 
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
-            eq(EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType()), any(), any(), any(IdamTokens.class));
+            eq(EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType()),
+            eq("Failed to issue documentType"), eq("Failed to issue the appellantEvidence documentType"),
+            any(IdamTokens.class));
         assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence",
             captor.getValue().getHmctsDwpState());
     }

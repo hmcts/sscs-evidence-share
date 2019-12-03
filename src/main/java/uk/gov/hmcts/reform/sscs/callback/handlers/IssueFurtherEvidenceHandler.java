@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -30,8 +31,6 @@ import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 @Slf4j
 public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
 
-    private static final List<FurtherEvidenceLetterType> ALLOWED_LETTER_TYPES = Arrays.asList(APPELLANT_LETTER,
-        REPRESENTATIVE_LETTER, DWP_LETTER);
     private FurtherEvidenceService furtherEvidenceService;
     private CcdService ccdService;
     private IdamService idamService;
@@ -57,19 +56,30 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        try {
-            issueFurtherEvidence(caseData);
-        } catch (Exception e) {
-            handleIssueFurtherEvidenceException(caseData);
-            String errorMsg = "Failed sending further evidence for case(%s)...";
-            throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
-        }
+        issueFurtherEvidence(caseData);
+        postIssueFurtherEvidenceTasks(caseData);
     }
 
     private void issueFurtherEvidence(SscsCaseData caseData) {
-        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
-        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES);
-        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, DWP_EVIDENCE, ALLOWED_LETTER_TYPES);
+        List<DocumentType> documentTypes = Arrays.asList(APPELLANT_EVIDENCE, REPRESENTATIVE_EVIDENCE, DWP_EVIDENCE);
+        List<FurtherEvidenceLetterType> allowedLetterTypes = Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER,
+            DWP_LETTER);
+        documentTypes.forEach(documentType -> doIssuePerDocumentType(caseData, allowedLetterTypes, documentType));
+    }
+
+    private void doIssuePerDocumentType(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes,
+                                        DocumentType documentType) {
+        try {
+            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes);
+        } catch (Exception e) {
+            handleIssueFurtherEvidenceException(caseData, documentType);
+            String errorMsg = "Failed sending further evidence for case(%s) and documentType(%s)...";
+            throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId(),
+                documentType.getValue()), e);
+        }
+    }
+
+    private void postIssueFurtherEvidenceTasks(SscsCaseData caseData) {
         setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
         ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.UPDATE_CASE_ONLY.getCcdType(),
             "Update case data only",
@@ -77,11 +87,12 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             idamService.getIdamTokens());
     }
 
-    private void handleIssueFurtherEvidenceException(SscsCaseData caseData) {
+    private void handleIssueFurtherEvidenceException(SscsCaseData caseData, DocumentType documentType) {
         caseData.setHmctsDwpState("failedSendingFurtherEvidence");
         ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
             EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(),
-            "Custom summary", "Custom summary",
+            "Failed to issue documentType",
+            String.format("Failed to issue the %s documentType", documentType.getValue()),
             idamService.getIdamTokens());
     }
 
