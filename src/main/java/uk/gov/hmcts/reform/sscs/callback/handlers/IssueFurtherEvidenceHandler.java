@@ -85,8 +85,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.UPDATE_CASE_ONLY.getCcdType(),
-                "Update case data only",
-                "Update document evidence issued flags after issuing further evidence to DWP",
+                "Update case data",
+                "Update issued evidence document flags after issuing further evidence",
                 idamService.getIdamTokens());
         } catch (Exception e) {
             handlePostIssueFurtherEvidenceTaskException(caseData);
@@ -100,8 +100,10 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         caseData.setHmctsDwpState("failedSendingFurtherEvidence");
         ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
             EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(),
-            "Failure when updating case data ",
-            "Failure when updating case data with the issued evidence document",
+            "Failed to update case data",
+            "Failed to update issued evidence document flags after issuing further evidence.\n"
+                + "Evidence should have been issued if you find they are not then trigger the "
+                + "'Reissue further evidence' event, please",
             idamService.getIdamTokens());
     }
 
