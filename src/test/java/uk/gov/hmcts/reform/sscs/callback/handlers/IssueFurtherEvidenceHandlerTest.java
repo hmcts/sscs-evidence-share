@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
+import uk.gov.hmcts.reform.sscs.exception.PostIssueFurtherEvidenceTasksException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
@@ -124,6 +125,17 @@ public class IssueFurtherEvidenceHandlerTest {
 
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+    }
+
+    @Test(expected = PostIssueFurtherEvidenceTasksException.class)
+    public void givenExceptionWhenPostIssueFurtherEvidenceTasks_shouldHandleIt() {
+        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
+        doThrow(RuntimeException.class).when(ccdService).updateCase(any(), any(),
+            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any());
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData,
+            INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
     }
 
     @Test

@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
+import uk.gov.hmcts.reform.sscs.exception.PostIssueFurtherEvidenceTasksException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
@@ -36,7 +37,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private IdamService idamService;
 
     @Autowired
-    public IssueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService, CcdService ccdService, IdamService idamService) {
+    public IssueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService, CcdService ccdService,
+                                       IdamService idamService) {
         this.furtherEvidenceService = furtherEvidenceService;
         this.ccdService = ccdService;
         this.idamService = idamService;
@@ -80,10 +82,27 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     }
 
     private void postIssueFurtherEvidenceTasks(SscsCaseData caseData) {
-        setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
-        ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()), EventType.UPDATE_CASE_ONLY.getCcdType(),
-            "Update case data only",
-            "Update document evidence issued flags after issuing further evidence to DWP",
+        try {
+            setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
+            ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
+                EventType.UPDATE_CASE_ONLY.getCcdType(),
+                "Update case data only",
+                "Update document evidence issued flags after issuing further evidence to DWP",
+                idamService.getIdamTokens());
+        } catch (Exception e) {
+            handlePostIssueFurtherEvidenceTaskException(caseData);
+            String errorMsg = "Failed to update document evidence issued flags after issuing further evidence "
+                + "for case(%s)";
+            throw new PostIssueFurtherEvidenceTasksException(String.format(errorMsg, caseData.getCcdCaseId()), e);
+        }
+    }
+
+    private void handlePostIssueFurtherEvidenceTaskException(SscsCaseData caseData) {
+        caseData.setHmctsDwpState("failedSendingFurtherEvidence");
+        ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
+            EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(),
+            "Failure when updating case data ",
+            "Failure when updating case data with the issued evidence document",
             idamService.getIdamTokens());
     }
 

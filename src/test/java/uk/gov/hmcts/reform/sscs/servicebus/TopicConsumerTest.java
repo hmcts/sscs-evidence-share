@@ -53,6 +53,13 @@ public class TopicConsumerTest {
     }
 
     @Test
+    public void givenPostIssueFurtherEvidenceTaskException_shouldNotRetry() {
+        doThrow(PostIssueFurtherEvidenceTasksException.class).when(dispatcher).handle(any(), any());
+        topicConsumer.onMessage(MESSAGE);
+        verify(dispatcher, times(1)).handle(any(), any());
+    }
+
+    @Test
     public void pdfStoreExceptionWillBeCaught() {
         exception = new PdfStoreException(MESSAGE, EXCEPTION);
         doThrow(exception).when(dispatcher).handle(any(), any());
