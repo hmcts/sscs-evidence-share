@@ -156,7 +156,8 @@ public class IssueFurtherEvidenceHandlerTest {
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
             eq(EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType()),
             eq("Failed to issue further evidence"),
-            eq("Trigger the 'Reissue further evidence' event to fix this case, please"),
+            eq("Review document tab to see document(s) that haven't been issued, then use the"
+                + " \"Reissue further evidence\" within next step and select affected document(s) to re-send"),
             any(IdamTokens.class));
         assertEquals("hmctsDwpState has incorrect value", "failedSendingFurtherEvidence",
             captor.getValue().getHmctsDwpState());

@@ -111,7 +111,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         caseData.setHmctsDwpState("failedSendingFurtherEvidence");
         ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
             EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(), "Failed to issue further evidence",
-            "Trigger the 'Reissue further evidence' event to fix this case, please",
+            "Review document tab to see document(s) that haven't been issued, then use the"
+                + " \"Reissue further evidence\" within next step and select affected document(s) to re-send",
             idamService.getIdamTokens());
     }
 
