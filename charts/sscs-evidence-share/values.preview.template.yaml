@@ -13,7 +13,7 @@ java:
     AMQP_HOST: "sscs-servicebus-aat.servicebus.windows.net"
     AMQP_USERNAME: "SendAndListenSharedAccessKey"
     BUNDLE_STITCHING_ENABLED: "false"
-    READY_TO_LIST_ROBOTICS_ENABLED: "false"
+    READY_TO_LIST_ROBOTICS_ENABLED: "true"
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
     ROBOTICS_EMAIL_SCOTTISH_TO: "fake2"
