@@ -105,16 +105,14 @@ public class ReissueFurtherEvidenceHandlerTest {
     }
 
     @Test
-    @Parameters({"APPELLANT_EVIDENCE, true, true, true",
-        "REPRESENTATIVE_EVIDENCE, false, false, false",
-        "DWP_EVIDENCE, true, true, false",
-        "APPELLANT_EVIDENCE, true, false, false",
-        "APPELLANT_EVIDENCE, false, true, false",
-        "REPRESENTATIVE_EVIDENCE, false, false, true"})
+    @Parameters({"APPELLANT_EVIDENCE, true, true",
+        "REPRESENTATIVE_EVIDENCE, false, false",
+        "DWP_EVIDENCE, true, true",
+        "APPELLANT_EVIDENCE, true, false",
+        "APPELLANT_EVIDENCE, false, true"})
     public void givenIssueFurtherEvidenceCallback_shouldReissueEvidenceForAppellantAndRepAndDwp(DocumentType documentType, boolean resendToAppellant,
-                                                                                                boolean resendToRepresentative,
-                                                                                                boolean resendToDwp) {
-        if (resendToAppellant || resendToDwp || resendToRepresentative) {
+                                                                                                boolean resendToRepresentative) {
+        if (resendToAppellant || resendToRepresentative) {
             when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         }
 
@@ -138,7 +136,6 @@ public class ReissueFurtherEvidenceHandlerTest {
             .reissueFurtherEvidenceDocument(dynamicList)
             .resendToAppellant(resendToAppellant ? "yes" : "no")
             .resendToRepresentative(resendToRepresentative ? "yes" : "no")
-            .resendToDwp(resendToDwp ? "yes" : "no")
             .build();
 
         handler.handle(CallbackType.SUBMITTED,
@@ -153,19 +150,17 @@ public class ReissueFurtherEvidenceHandlerTest {
         if (resendToRepresentative) {
             allowedLetterTypes.add(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
         }
-        if (resendToDwp) {
-            allowedLetterTypes.add(FurtherEvidenceLetterType.DWP_LETTER);
-        }
+
         verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(documentType), eq(allowedLetterTypes));
 
         verifyNoMoreInteractions(furtherEvidenceService);
 
-        if (resendToAppellant || resendToDwp || resendToRepresentative) {
+        if (resendToAppellant || resendToRepresentative) {
             verify(ccdService).updateCase(captor.capture(), any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
                 any(), any(), any(IdamTokens.class));
             assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
         } else {
-            verifyZeroInteractions(ccdService);
+            verifyNoInteractions(ccdService);
         }
 
     }

@@ -62,7 +62,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
     private List<FurtherEvidenceLetterType> getAllowedFurtherEvidenceLetterTypes(SscsCaseData caseData) {
         final boolean resendToAppellant = caseData.isResendToAppellant();
         boolean resendToRepresentative = caseData.isResendToRepresentative();
-        final boolean resendToDwp = caseData.isResendToDwp();
+
         List<FurtherEvidenceLetterType> allowedLetterTypes = new ArrayList<>();
         if (resendToAppellant) {
             allowedLetterTypes.add(FurtherEvidenceLetterType.APPELLANT_LETTER);
@@ -70,9 +70,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         if (resendToRepresentative) {
             allowedLetterTypes.add(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
         }
-        if (resendToDwp) {
-            allowedLetterTypes.add(FurtherEvidenceLetterType.DWP_LETTER);
-        }
+
         return allowedLetterTypes;
     }
 
