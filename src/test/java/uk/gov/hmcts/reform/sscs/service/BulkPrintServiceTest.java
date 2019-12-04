@@ -4,8 +4,7 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -88,8 +87,8 @@ public class BulkPrintServiceTest {
     public void sendLetterNotEnabledWillNotSendToBulkPrint() {
         BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, false, 1);
         notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
-        verifyZeroInteractions(idamService);
-        verifyZeroInteractions(sendLetterApi);
+        verifyNoInteractions(idamService);
+        verifyNoInteractions(sendLetterApi);
     }
 
 

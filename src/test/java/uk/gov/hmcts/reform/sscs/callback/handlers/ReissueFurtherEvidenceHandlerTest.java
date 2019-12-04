@@ -160,7 +160,7 @@ public class ReissueFurtherEvidenceHandlerTest {
                 any(), any(), any(IdamTokens.class));
             assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
         } else {
-            verifyZeroInteractions(ccdService);
+            verifyNoInteractions(ccdService);
         }
 
     }

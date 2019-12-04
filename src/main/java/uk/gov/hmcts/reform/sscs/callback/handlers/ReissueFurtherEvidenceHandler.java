@@ -63,8 +63,6 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         final boolean resendToAppellant = caseData.isResendToAppellant();
         boolean resendToRepresentative = caseData.isResendToRepresentative();
 
-        //FIXME: Check where resendToDwp field gets set and remove
-
         List<FurtherEvidenceLetterType> allowedLetterTypes = new ArrayList<>();
         if (resendToAppellant) {
             allowedLetterTypes.add(FurtherEvidenceLetterType.APPELLANT_LETTER);

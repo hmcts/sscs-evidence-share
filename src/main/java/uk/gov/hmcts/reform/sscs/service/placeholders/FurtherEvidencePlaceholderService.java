@@ -13,20 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
-import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @Service
 @Slf4j
 public class FurtherEvidencePlaceholderService {
 
     private final PlaceholderService placeholderService;
-    private final DwpAddressLookupService dwpAddressLookupService;
 
     @Autowired
-    public FurtherEvidencePlaceholderService(PlaceholderService placeholderService,
-                                             DwpAddressLookupService dwpAddressLookupService) {
+    public FurtherEvidencePlaceholderService(PlaceholderService placeholderService) {
         this.placeholderService = placeholderService;
-        this.dwpAddressLookupService = dwpAddressLookupService;
     }
 
     public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
