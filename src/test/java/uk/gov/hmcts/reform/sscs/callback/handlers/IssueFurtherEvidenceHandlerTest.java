@@ -127,17 +127,6 @@ public class IssueFurtherEvidenceHandlerTest {
             buildTestCallbackForGivenData(SscsCaseData.builder().build(), INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
     }
 
-    @Test(expected = PostIssueFurtherEvidenceTasksException.class)
-    public void givenExceptionWhenPostIssueFurtherEvidenceTasks_shouldHandleIt() {
-        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
-        doThrow(RuntimeException.class).when(ccdService).updateCase(any(), any(),
-            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any());
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-
-        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData,
-            INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
-    }
-
     @Test
     public void givenExceptionWhenIssuingFurtherEvidence_shouldHandleItAppropriately() {
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
