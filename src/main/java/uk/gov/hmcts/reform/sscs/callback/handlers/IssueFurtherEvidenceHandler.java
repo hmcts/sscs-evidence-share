@@ -105,7 +105,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private void setEvidenceIssuedFlagToYes(List<SscsDocument> sscsDocuments) {
         if (sscsDocuments != null) {
             for (SscsDocument doc : sscsDocuments) {
-                if (doc.getValue().getEvidenceIssued() != null
+                if (doc.getValue() !=null && doc.getValue().getEvidenceIssued() != null
                     && "No".equalsIgnoreCase(doc.getValue().getEvidenceIssued())) {
                     doc.getValue().setEvidenceIssued("Yes");
                 }
