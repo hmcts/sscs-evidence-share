@@ -42,7 +42,6 @@ public class FurtherEvidenceService {
         this.coverLetterService = coverLetterService;
         this.sscsDocumentService = sscsDocumentService;
         this.bulkPrintService = bulkPrintService;
-
     }
 
     public void issue(List<SscsDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
@@ -54,7 +53,8 @@ public class FurtherEvidenceService {
         }
     }
 
-    private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs, List<FurtherEvidenceLetterType> allowedLetterTypes) {
+    private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
+                                           List<FurtherEvidenceLetterType> allowedLetterTypes) {
         String docName = "609-97-template (original sender)";
         final FurtherEvidenceLetterType letterType = findLetterType(documentType);
         if (allowedLetterTypes.contains(letterType)) {
@@ -63,7 +63,8 @@ public class FurtherEvidenceService {
         }
     }
 
-    private void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs, List<FurtherEvidenceLetterType> allowedLetterTypes) {
+    private void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
+                                       List<FurtherEvidenceLetterType> allowedLetterTypes) {
 
         List<FurtherEvidenceLetterType> otherPartiesList = buildOtherPartiesList(caseData, documentType);
 
