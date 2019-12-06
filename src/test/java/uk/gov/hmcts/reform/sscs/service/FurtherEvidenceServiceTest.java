@@ -1,12 +1,18 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,7 +28,11 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 
@@ -112,7 +122,7 @@ public class FurtherEvidenceServiceTest {
         createTestDataAndConfigureSscsDocumentServiceMock();
 
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
-            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER));
 
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
@@ -128,7 +138,7 @@ public class FurtherEvidenceServiceTest {
         withRep();
 
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
-            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER));
 
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));

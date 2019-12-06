@@ -20,7 +20,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 
 import java.util.Arrays;
@@ -173,11 +172,11 @@ public class IssueFurtherEvidenceHandlerTest {
             buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
 
         verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(APPELLANT_EVIDENCE),
-            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER)));
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER)));
         verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(REPRESENTATIVE_EVIDENCE),
-            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER)));
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER)));
         verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()),
-            eq(caseData), eq(DWP_EVIDENCE), eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER)));
+            eq(caseData), eq(DWP_EVIDENCE), eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER)));
 
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
             eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
