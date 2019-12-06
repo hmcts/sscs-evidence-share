@@ -86,7 +86,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         return callbackType.equals(CallbackType.SUBMITTED)
             && (callback.getEvent() == EventType.SEND_TO_DWP
             || callback.getEvent() == EventType.VALID_APPEAL
-            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL);
+            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL
+            || callback.getEvent() == EventType.RESEND_TO_DWP);
     }
 
     @Override

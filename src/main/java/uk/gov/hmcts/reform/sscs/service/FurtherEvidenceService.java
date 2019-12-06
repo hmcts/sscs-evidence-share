@@ -38,7 +38,6 @@ public class FurtherEvidenceService {
         this.coverLetterService = coverLetterService;
         this.sscsDocumentService = sscsDocumentService;
         this.bulkPrintService = bulkPrintService;
-
     }
 
     public void issue(List<SscsDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType, List<FurtherEvidenceLetterType> allowedLetterTypes) {
