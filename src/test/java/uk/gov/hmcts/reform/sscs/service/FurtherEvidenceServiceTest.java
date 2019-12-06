@@ -65,10 +65,10 @@ public class FurtherEvidenceServiceTest {
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
-        then(coverLetterService).should(times(1))
+        then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName));
-        then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
     }
 
     @Test
@@ -83,10 +83,10 @@ public class FurtherEvidenceServiceTest {
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
-        then(coverLetterService).should(times(1))
+        then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName));
-        then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(3)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
     }
 
     @Test
@@ -101,10 +101,10 @@ public class FurtherEvidenceServiceTest {
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
-        then(coverLetterService).should(times(1))
+        then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName));
-        then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(3)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
     }
 
     @Test
@@ -114,12 +114,12 @@ public class FurtherEvidenceServiceTest {
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
             Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
 
-        then(coverLetterService).should(times(1))
+        then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
-        then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
     }
 
     @Test
@@ -130,14 +130,14 @@ public class FurtherEvidenceServiceTest {
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
             Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
 
-        then(coverLetterService).should(times(1))
+        then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
-        then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(3)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
     }
 
     @Test

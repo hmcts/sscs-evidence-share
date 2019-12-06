@@ -164,7 +164,7 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     @Test
-    public void givenIssueFurtherEvidenceCallback_shouldIssueEvidenceForAppellantAndRepAndDwp() {
+    public void givenIssueFurtherEvidenceCallback_shouldIssueEvidenceForAppellantAndRep() {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
@@ -176,8 +176,8 @@ public class IssueFurtherEvidenceHandlerTest {
             eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER)));
         verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(REPRESENTATIVE_EVIDENCE),
             eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER)));
-        verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(DWP_EVIDENCE),
-            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER)));
+        verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()),
+            eq(caseData), eq(DWP_EVIDENCE), eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER)));
 
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
             eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
@@ -68,7 +67,7 @@ public class FurtherEvidenceService {
 
         List<FurtherEvidenceLetterType> otherPartiesList = buildOtherPartiesList(caseData, documentType);
 
-        for (FurtherEvidenceLetterType letterType: otherPartiesList) {
+        for (FurtherEvidenceLetterType letterType : otherPartiesList) {
             String docName = letterType == DWP_LETTER ? "609-98-template (DWP)" : "609-98-template (other parties)";
 
             if (allowedLetterTypes.contains(letterType)) {
@@ -88,9 +87,6 @@ public class FurtherEvidenceService {
         }
         if (documentType != REPRESENTATIVE_EVIDENCE && checkRepExists(caseData)) {
             otherPartiesList.add(REPRESENTATIVE_LETTER);
-        }
-        if (documentType != DWP_EVIDENCE) {
-            otherPartiesList.add(DWP_LETTER);
         }
 
         return otherPartiesList;
