@@ -92,14 +92,14 @@ public class RoboticsJsonValidatorTest {
     @Test(expected = RoboticsValidationException.class)
     public void givenOralInputForLanguageInterpreterWithNoHearingRequestParty_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData = updateEmbeddedProperty(jsonData.toString(), "Oral", "hearingType");
-        jsonData = removeProperty(jsonData.toString());
+        jsonData = removeProperty(jsonData.toString(), "hearingRequestParty");
         roboticsJsonValidator.validate(jsonData);
     }
 
     @Test
     public void givenPaperInputForLanguageInterpreterWithNoHearingRequestParty_doesNotThrowExceptionWhenValidatingAgainstSchema() throws IOException {
         jsonData = updateEmbeddedProperty(jsonData.toString(), "Paper", "hearingType");
-        jsonData = removeProperty(jsonData.toString());
+        jsonData = removeProperty(jsonData.toString(), "hearingRequestParty");
         roboticsJsonValidator.validate(jsonData);
     }
 
@@ -149,12 +149,12 @@ public class RoboticsJsonValidatorTest {
         return new JSONObject(objectMapper.writeValueAsString(map));
     }
 
-    private static JSONObject removeProperty(String json) throws IOException {
+    private static JSONObject removeProperty(String json, String key) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
         Map map = objectMapper.readValue(json, Map.class);
 
-        map.remove("hearingRequestParty");
+        map.remove(key);
 
         String jsonString = objectMapper.writeValueAsString(map);
 
