@@ -88,7 +88,7 @@ robotics:
   schema.resource.location: /schema/sscs-robotics.json
   readyToList:
     feature: ${READY_TO_LIST_ROBOTICS_ENABLED:true}
-  englishCount: 2
+  englishCount: 3
   scottishCount: 1
 
 docmosis:
