@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -19,6 +18,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -30,6 +31,12 @@ public class RoboticsCallbackHandlerTest {
     @Mock
     private RoboticsService roboticsService;
 
+    @Mock
+    private CcdService ccdService;
+
+    @Mock
+    private IdamService idamService;
+
     private RoboticsCallbackHandler handler;
 
     private LocalDateTime now = LocalDateTime.now();
@@ -39,8 +46,7 @@ public class RoboticsCallbackHandlerTest {
         initMocks(this);
         when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
 
-        handler = new RoboticsCallbackHandler(roboticsService);
-
+        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService);
     }
 
     @Test
@@ -59,18 +65,36 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    public void givenARoboticsRequestAndCreatedInGapsMatchesState_thenSendCaseToRobotics() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, "readyToList");
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "SEND_TO_DWP"})
+    public void givenARoboticsRequestAndCreatedInGapsMatchesState_thenSendCaseToRoboticsAndSetSentToGapsDateAndDoNotTriggerUpdateCaseEvent(EventType eventType) {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, READY_TO_LIST.getId());
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType);
 
         handler.handle(SUBMITTED, callback);
 
         verify(roboticsService).sendCaseToRobotics(any());
+
+        assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
+        verifyNoInteractions(ccdService);
+    }
+
+    @Test
+    @Parameters({"READY_TO_LIST", "RESEND_CASE_TO_GAPS2", "APPEAL_TO_PROCEED"})
+    public void givenARoboticsRequestAndCreatedInGapsMatchesState_thenSendCaseToRoboticsAndSetSentToGapsDateAndTriggerUpdateCaseEvent(EventType eventType) {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, READY_TO_LIST.getId());
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(roboticsService).sendCaseToRobotics(any());
+
+        assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
+        verify(ccdService).updateCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
     public void givenARoboticsRequestAndCreatedInGapsDoesNotMatchState_thenDoNotSendCaseToRobotics() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, "validAppeal");
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, VALID_APPEAL.getId());
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
         handler.handle(SUBMITTED, callback);
@@ -80,7 +104,7 @@ public class RoboticsCallbackHandlerTest {
 
     @Test
     public void givenARoboticsRequestAndEventIsReissuetoGaps2_thenSendCaseToRobotics() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, "readyToList");
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, READY_TO_LIST.getId());
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.RESEND_CASE_TO_GAPS2);
 
         handler.handle(SUBMITTED, callback);

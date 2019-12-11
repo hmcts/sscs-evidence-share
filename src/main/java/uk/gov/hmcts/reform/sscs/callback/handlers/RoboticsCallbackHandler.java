@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
+import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @Slf4j
@@ -19,12 +22,21 @@ import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
     private final RoboticsService roboticsService;
+
     private final DispatchPriority dispatchPriority;
 
+    private final CcdService ccdService;
+
+    private final IdamService idamService;
+
     @Autowired
-    public RoboticsCallbackHandler(RoboticsService roboticsService
+    public RoboticsCallbackHandler(RoboticsService roboticsService,
+                                   CcdService ccdService,
+                                   IdamService idamService
     ) {
         this.roboticsService = roboticsService;
+        this.ccdService = ccdService;
+        this.idamService = idamService;
         this.dispatchPriority = DispatchPriority.EARLIEST;
     }
 
@@ -56,6 +68,22 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
             if (isCaseValidToSendToRobotics) {
                 roboticsService.sendCaseToRobotics(callback.getCaseDetails());
+
+                // As part of ticket SSCS-6869, a new field was required to let the caseworker know when a case had been sent to GAPS2 via Robotics. However, if this was done as part of this handler it would need to be updated
+                // as part of a separate event. Some of the events handled in this class are handled in the SendToBulkPrintHandler, which also triggers an update to CCD. If both these events occur at the same time then we would
+                // end up with a concurrent case modification error from CCD. Therefore, this is an attempt to safely update the case. For events not handled in SendToBulkPrintHandler then trigger a separate updateCase event.
+                // For events that are handled in the SendToBulkPrintHandler then just update the case data here, as the case would be saved to CCD further down the chain as part of the sentToDwp event in SendToBulkPrintHandler.
+
+                callback.getCaseDetails().getCaseData().setDateCaseSentToGaps(LocalDate.now().toString());
+
+                if (callback.getEvent() == READY_TO_LIST
+                    || callback.getEvent() == RESEND_CASE_TO_GAPS2
+                    || callback.getEvent() == APPEAL_TO_PROCEED) {
+
+                    ccdService.updateCase(callback.getCaseDetails().getCaseData(), Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
+                        CASE_UPDATED.getCcdType(), "Case sent to robotics", "Updated case with date sent to robotics",
+                        idamService.getIdamTokens());
+                }
             }
         } catch (Exception e) {
             log.error("Error when sending to robotics: {}", callback.getCaseDetails().getId(), e);
