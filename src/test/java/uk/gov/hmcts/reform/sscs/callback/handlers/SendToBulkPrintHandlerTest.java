@@ -99,6 +99,21 @@ public class SendToBulkPrintHandlerTest {
     }
 
     @Test
+    @Parameters({"SEND_TO_DWP", "VALID_APPEAL", "INTERLOC_VALID_APPEAL", "RESEND_TO_DWP"})
+    public void givenAValidSendToBulkPrintEvent_thenReturnTrue(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+
+        assertTrue(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenANonSendToBulkPrintEvent_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+
+        assertFalse(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
     public void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint() {
         Map<String, Object> placeholders = new HashMap<>();
         placeholders.put("Test", "Value");
