@@ -106,11 +106,7 @@
         },
         "signer": "Sarah Smith",
         "appellant": {
-          "name": {
-            "title": "Mrs",
-            "lastName": "Smith",
-            "firstName": "Sarah"
-          },
+          "name": null,
           "address": {
             "town": "Brentwood",
             "line1": "109 Drake Close",
