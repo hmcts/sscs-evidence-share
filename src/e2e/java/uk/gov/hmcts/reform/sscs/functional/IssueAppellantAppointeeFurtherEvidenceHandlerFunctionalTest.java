@@ -35,7 +35,6 @@ public class IssueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends
     public void givenIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
         String issueFurtherEvidenceCallback = createTestData();
-        log.info("issueFurtherEvidenceCallback" + issueFurtherEvidenceCallback);
         simulateCcdCallback(issueFurtherEvidenceCallback);
         verifyEvidenceIssued();
     }
