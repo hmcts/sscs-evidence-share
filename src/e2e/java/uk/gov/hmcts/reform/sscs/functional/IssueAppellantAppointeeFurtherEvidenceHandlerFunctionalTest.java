@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
+@Slf4j
 public class IssueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
     @Autowired
@@ -32,6 +35,7 @@ public class IssueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends
     public void givenIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
         String issueFurtherEvidenceCallback = createTestData();
+        log.info("issueFurtherEvidenceCallback" + issueFurtherEvidenceCallback);
         simulateCcdCallback(issueFurtherEvidenceCallback);
         verifyEvidenceIssued();
     }
