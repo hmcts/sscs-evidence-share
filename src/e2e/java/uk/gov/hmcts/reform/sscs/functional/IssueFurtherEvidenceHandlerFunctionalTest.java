@@ -38,6 +38,7 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
 
     @Test
     public void givenIssueFurtherEvidenceFails_shouldHandleException() throws IOException {
+        // we are able to cause the issue further evidence to fail by setting to null the Appellant.Name in the callback.json
         String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "Faulty");
         simulateCcdCallback(issueFurtherEvidenceCallback);
         verifyEvidenceIsNotIssued();
