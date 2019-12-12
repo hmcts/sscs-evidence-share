@@ -12,8 +12,8 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 
 @Service("bulkPrintService")
 @ConditionalOnProperty(prefix = "send-letter", name = "url", havingValue = "false")
-public class DummyBulkPrintService implements PrintService {
-    private static final Logger logger = LoggerFactory.getLogger(DummyBulkPrintService.class);
+public class MockBulkPrintService implements PrintService {
+    private static final Logger logger = LoggerFactory.getLogger(MockBulkPrintService.class);
 
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData) {
 

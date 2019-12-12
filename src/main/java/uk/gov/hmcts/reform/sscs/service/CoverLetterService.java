@@ -41,17 +41,21 @@ public class CoverLetterService {
      *
      * @param coverLetterContent this is the content in bytes of the cover letter from docmosis
      */
-    private void printCoverLetterToPdfLocallyForDebuggingPurpose(byte[] coverLetterContent, FurtherEvidenceLetterType letterType, String hmctsDocName) {
+    private void printCoverLetterToPdfLocallyForDebuggingPurpose(byte[] coverLetterContent,
+                                                                 FurtherEvidenceLetterType letterType,
+                                                                 String hmctsDocName) {
         if (log.isDebugEnabled()) {
             try {
-                FileUtils.writeByteArrayToFile(new File(hmctsDocName + letterType.getValue() + "CoverLetter" + ".pdf"), coverLetterContent);
+                FileUtils.writeByteArrayToFile(new File(hmctsDocName + letterType.getValue()
+                    + "CoverLetter" + ".pdf"), coverLetterContent);
             } catch (Exception e) {
                 log.info("CoverLetter fails to be created", e);
             }
         }
     }
 
-    public byte[] generateCoverLetter(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String templateName, String hmctsDocName) {
+    public byte[] generateCoverLetter(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String templateName,
+                                      String hmctsDocName) {
         requireNonNull(caseData, "caseData must not be null");
         byte[] coverLetterContent = pdfGenerationService.generatePdf(DocumentHolder.builder()
             .template(new Template(templateName, hmctsDocName))

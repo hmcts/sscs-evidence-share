@@ -8,15 +8,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
-public class HandlerHelper {
+public final class HandlerHelper {
 
     private HandlerHelper() {
-
     }
 
     public static Callback<SscsCaseData> buildTestCallbackForGivenData(SscsCaseData sscsCaseData, State state, EventType eventType) {
-        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "SSCS",
-            state, sscsCaseData,
+        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "SSCS", state, sscsCaseData,
             LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), eventType);
     }

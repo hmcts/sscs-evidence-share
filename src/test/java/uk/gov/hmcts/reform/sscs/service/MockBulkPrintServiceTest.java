@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
@@ -14,22 +13,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 
 @RunWith(MockitoJUnitRunner.class)
-public class DummyBulkPrintServiceTest {
+public class MockBulkPrintServiceTest {
 
-    private static final List<Pdf> PDF_LIST = singletonList(new Pdf("myData".getBytes(), "file.pdf"));
-
-    private static final SscsCaseData SSCS_CASE_DATA = SscsCaseData.builder().build();
-
-    private DummyBulkPrintService dummyBulkPrintService;
+    private MockBulkPrintService mockBulkPrintService;
 
     @Before
     public void setUp() {
-        this.dummyBulkPrintService = new DummyBulkPrintService();
+        this.mockBulkPrintService = new MockBulkPrintService();
     }
 
     @Test
-    public void willDummySendToBulkPrint() {
-        Optional<UUID> letterIdOptional = dummyBulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+    public void sendToMockBulkPrint() {
+        Optional<UUID> letterIdOptional = mockBulkPrintService.sendToBulkPrint(
+            singletonList(new Pdf("myData".getBytes(), "file.pdf")),
+            SscsCaseData.builder().build());
         assertEquals(Optional.of(UUID.fromString("abc123ca-c336-11e9-9cb5-123456789abc")), letterIdOptional);
     }
 }

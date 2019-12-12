@@ -69,7 +69,7 @@ public class FurtherEvidencePlaceholderService {
         return Optional.of(caseData.getAppeal())
             .map(Appeal::getRep)
             .map(Representative::getAddress)
-            .orElseGet(() -> getEmptyAddress());
+            .orElseGet(this::getEmptyAddress);
     }
 
     private Address getAppellantAddress(SscsCaseData caseData) {
@@ -85,7 +85,7 @@ public class FurtherEvidencePlaceholderService {
         return Optional.of(appeal)
             .map(Appeal::getAppellant)
             .map(Appellant::getAddress)
-            .orElseGet(() -> getEmptyAddress());
+            .orElseGet(this::getEmptyAddress);
     }
 
     private Address getEmptyAddress() {

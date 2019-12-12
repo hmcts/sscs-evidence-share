@@ -21,7 +21,7 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
 
         createCaseWithValidAppealState(NON_COMPLIANT);
 
-        String json = getJson(DIRECTION_ISSUED);
+        String json = getJson(DIRECTION_ISSUED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
 

@@ -1,12 +1,18 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,7 +28,11 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 
@@ -44,11 +54,11 @@ public class FurtherEvidenceServiceTest {
     private SscsCaseData caseData;
     private final List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some doc name"));
 
-    String furtherEvidenceOriginalSenderTemplateName = "TB-SCS-GNO-ENG-00068.doc";
-    String furtherEvidenceOriginalSenderDocName = "609-97-template (original sender)";
-    String furtherEvidenceOtherPartiesTemplateName = "TB-SCS-GNO-ENG-00069.doc";
-    String furtherEvidenceOtherPartiesDocName = "609-98-template (other parties)";
-    String furtherEvidenceOtherPartiesDwpDocName = "609-98-template (DWP)";
+    private String furtherEvidenceOriginalSenderTemplateName = "TB-SCS-GNO-ENG-00068.doc";
+    private String furtherEvidenceOriginalSenderDocName = "609-97-template (original sender)";
+    private String furtherEvidenceOtherPartiesTemplateName = "TB-SCS-GNO-ENG-00069.doc";
+    private String furtherEvidenceOtherPartiesDocName = "609-98-template (other parties)";
+    private String furtherEvidenceOtherPartiesDwpDocName = "609-98-template (DWP)";
 
     @Before
     public void setup() {
@@ -60,7 +70,8 @@ public class FurtherEvidenceServiceTest {
     public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndNoRep_shouldGenerateCoverLetterOriginalSenderAndOtherPartyDwpAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock();
 
-        furtherEvidenceService.issue(caseData, APPELLANT_EVIDENCE);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE,
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
@@ -75,7 +86,8 @@ public class FurtherEvidenceServiceTest {
         createTestDataAndConfigureSscsDocumentServiceMock();
         withRep();
 
-        furtherEvidenceService.issue(caseData, APPELLANT_EVIDENCE);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE,
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
@@ -92,7 +104,8 @@ public class FurtherEvidenceServiceTest {
         createTestDataAndConfigureSscsDocumentServiceMock();
         withRep();
 
-        furtherEvidenceService.issue(caseData, REPRESENTATIVE_EVIDENCE);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, REPRESENTATIVE_EVIDENCE,
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, DWP_LETTER));
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
@@ -108,7 +121,8 @@ public class FurtherEvidenceServiceTest {
     public void givenDwpIssueFurtherEvidenceCallbackWithAppellant_shouldGenerateCoverLetterOriginalSenderAndOtherPartyAppellantAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock();
 
-        furtherEvidenceService.issue(caseData, DWP_EVIDENCE);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER));
 
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
@@ -123,7 +137,8 @@ public class FurtherEvidenceServiceTest {
         createTestDataAndConfigureSscsDocumentServiceMock();
         withRep();
 
-        furtherEvidenceService.issue(caseData, DWP_EVIDENCE);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER));
 
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));

@@ -14,8 +14,10 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
+import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
 import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
+import uk.gov.hmcts.reform.sscs.exception.PostIssueFurtherEvidenceTasksException;
 
 @Slf4j
 @Component
@@ -30,6 +32,7 @@ public class TopicConsumer {
                          CallbackDispatcher dispatcher,
                          SscsCaseCallbackDeserializer sscsDeserializer) {
         this.maxRetryAttempts = maxRetryAttempts;
+        //noinspection unchecked
         this.dispatcher = dispatcher;
         this.sscsDeserializer = sscsDeserializer;
     }
@@ -48,7 +51,7 @@ public class TopicConsumer {
             log.info("Message received from the service bus by evidence share service");
             processMessage(message);
         } catch (Exception e) {
-            if (retry > maxRetryAttempts) {
+            if (retry > maxRetryAttempts || isException(e)) {
                 log.error(format("Caught unknown unrecoverable error %s", e.getMessage()), e);
             } else {
                 log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
@@ -56,6 +59,10 @@ public class TopicConsumer {
                 processMessageWithRetry(message, retry + 1);
             }
         }
+    }
+
+    private boolean isException(Exception e) {
+        return e instanceof IssueFurtherEvidenceException || e instanceof PostIssueFurtherEvidenceTasksException;
     }
 
     private void processMessage(String message) {
