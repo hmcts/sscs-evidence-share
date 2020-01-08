@@ -107,7 +107,7 @@ jacocoTestReport {
   }
 }
 
-project.tasks['sonarqube'].dependsOn test, integration
+project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
 check.dependsOn integration
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
@@ -128,8 +128,7 @@ sonarqube {
       "src/main/java/uk/gov/hmcts/reform/sscs/SscsEvidenceShareApplication.java,"
     property "sonar.projectName", "Reform :: sscs-evidence-share"
     property "sonar.projectKey", "uk.gov.hmcts.reform:sscs-evidence-share"
-    property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
-    property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
+    property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     property "sonar.pitest.mode", "reuseReport"
     property "sonar.pitest.reportsDirectory", "build/reports/pitest"
   }
