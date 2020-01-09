@@ -120,6 +120,7 @@ module "sscs-evidence-share" {
     PDF_SERVICE_HEALTH_URL = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/status"
 
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
+    IDAM_API_JWK_URL = "${data.azurerm_key_vault_secret.idam_api.value}/jwks"
 
     IDAM_S2S_AUTH_TOTP_SECRET  = "${data.azurerm_key_vault_secret.sscs_s2s_secret.value}"
     IDAM_S2S_AUTH              = "${local.s2sCnpUrl}"
