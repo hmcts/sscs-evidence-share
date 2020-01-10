@@ -24,6 +24,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -60,17 +61,17 @@ public class IssueDirectionHandlerTest {
 
     @Test
     public void givenAValidDirectionIssuedEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionType(DirectionType.APPEAL_TO_PROCEED).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED)));
+        assertTrue(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED)));
     }
 
     @Test
     public void givenANonDirectionIssuedEvent_thenReturnFalse() {
-        assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionType(DirectionType.APPEAL_TO_PROCEED).build(), INTERLOCUTORY_REVIEW_STATE, APPEAL_RECEIVED)));
+        assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build(), INTERLOCUTORY_REVIEW_STATE, APPEAL_RECEIVED)));
     }
 
     @Test
     public void givenAnIssueDirectionEventForPostValidCase_thenDoNotTriggerAppealToProceedEvent() {
-        assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionType(DirectionType.APPEAL_TO_PROCEED).build(), WITH_DWP, DIRECTION_ISSUED)));
+        assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build(), WITH_DWP, DIRECTION_ISSUED)));
     }
 
     @Test(expected = NullPointerException.class)
@@ -80,10 +81,10 @@ public class IssueDirectionHandlerTest {
 
     @Test
     public void givenAnIssueDirectionEventForInterlocCase_thenTriggerAppealToProceedEvent() {
-        handler.handle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionType(DirectionType.APPEAL_TO_PROCEED).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED));
+        handler.handle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED));
 
         verify(ccdCaseService).updateCase(captor.capture(), eq(1L), eq(EventType.APPEAL_TO_PROCEED.getCcdType()), eq("Appeal to proceed"), eq("Appeal proceed event triggered"), any());
 
-        assertNull((captor.getValue().getDirectionType()));
+        assertNull((captor.getValue().getDirectionTypeDl()));
     }
 }

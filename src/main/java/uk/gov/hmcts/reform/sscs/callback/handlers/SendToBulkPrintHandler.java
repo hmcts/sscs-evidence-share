@@ -19,10 +19,7 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
@@ -129,6 +126,9 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     private void updateCaseToSentToDwp(Callback<SscsCaseData> sscsCaseDataCallback, SscsCaseData caseData,
                                        BulkPrintInfo bulkPrintInfo) {
         if (bulkPrintInfo != null) {
+            if (State.READY_TO_LIST.getId().equals(caseData.getCreatedInGapsFrom())) {
+                caseData.setDwpState(DwpState.UNREGISTERED.getId());
+            }
             caseData.setHmctsDwpState("sentToDwp");
             caseData.setDateSentToDwp(LocalDate.now().toString());
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),

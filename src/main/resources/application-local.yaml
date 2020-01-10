@@ -1,11 +1,11 @@
 #logging.level.root: DEBUG
 
 logging.level:
-  org.springframework.web: ${LOG_LEVEL_SPRING_WEB:debug}
-  uk.gov.hmcts.reform.sscs: ${LOG_LEVEL_SSCS:debug}
-  uk.gov.hmcts.reform.sscs.idam.IdamApiClient: DEBUG
-  uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi: DEBUG
-  uk.gov.hmcts.reform.ccd.document.EvidenceMetadataDownloadClientApi: DEBUG
+  org.springframework.web: ${LOG_LEVEL_SPRING_WEB:info}
+  uk.gov.hmcts.reform.sscs: ${LOG_LEVEL_SSCS:info}
+  uk.gov.hmcts.reform.sscs.idam.IdamApiClient: info
+  uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi: info
+  uk.gov.hmcts.reform.ccd.document.EvidenceMetadataDownloadClientApi: info
 
 feign:
   client:

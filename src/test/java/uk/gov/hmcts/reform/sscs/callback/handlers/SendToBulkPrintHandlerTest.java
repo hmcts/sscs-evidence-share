@@ -168,6 +168,7 @@ public class SendToBulkPrintHandlerTest {
         List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
         assertNull(docs.get(0).getValue().getEvidenceIssued());
         assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
+        assertNull(caseDataCaptor.getValue().getDwpState());
     }
 
     @Test
@@ -322,6 +323,12 @@ public class SendToBulkPrintHandlerTest {
         handler.handle(CallbackType.SUBMITTED, callback);
 
         verifyNoMoreInteractions(documentManagementServiceWrapper);
+
+        verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case state is now sent to DWP"), any());
+
+        List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
+        assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
+        assertEquals(DwpState.UNREGISTERED.getId(), caseDataCaptor.getValue().getDwpState());
     }
 
     private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments, State state) {

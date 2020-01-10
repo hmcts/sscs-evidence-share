@@ -30,6 +30,6 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
 
-        assertNull(caseData.getDirectionType());
+        assertNull(caseData.getDirectionTypeDl());
     }
 }
