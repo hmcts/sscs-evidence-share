@@ -43,7 +43,7 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.DIRECTION_ISSUED
             && callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
-            && DirectionType.APPEAL_TO_PROCEED.equals(callback.getCaseDetails().getCaseData().getDirectionType());
+            && DirectionType.APPEAL_TO_PROCEED.toString().equals(callback.getCaseDetails().getCaseData().getDirectionTypeDl().getValue().getCode());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
 
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        caseData.setDirectionType(null);
+        caseData.setDirectionTypeDl(null);
 
         log.info("About to update case with appealToProceed event for id {}", callback.getCaseDetails().getId());
         ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(), APPEAL_TO_PROCEED.getCcdType(), "Appeal to proceed", "Appeal proceed event triggered", idamService.getIdamTokens());
