@@ -84,6 +84,11 @@ data "azurerm_key_vault_secret" "robotics_email_scottish_to" {
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
+data "azurerm_key_vault_secret" "robotics_email_pip_ae_to" {
+  name      = "robotics-email-pip-ae-to"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
 data "azurerm_key_vault_secret" "smtp_host" {
   name      = "smtp-host"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
@@ -152,6 +157,7 @@ module "sscs-evidence-share" {
     ROBOTICS_EMAIL_FROM        = "${data.azurerm_key_vault_secret.robotics_email_from.value}"
     ROBOTICS_EMAIL_TO          = "${data.azurerm_key_vault_secret.robotics_email_to.value}"
     ROBOTICS_EMAIL_SCOTTISH_TO = "${data.azurerm_key_vault_secret.robotics_email_scottish_to.value}"
+    ROBOTICS_EMAIL_PIP_AE_TO   = "${data.azurerm_key_vault_secret.robotics_email_pip_ae_to.value}"
     ROBOTICS_EMAIL_MESSAGE     = "${var.robotics_email_message}"
 
     EMAIL_SERVER_HOST      = "${data.azurerm_key_vault_secret.smtp_host.value}"
