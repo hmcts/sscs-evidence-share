@@ -32,7 +32,7 @@ public class RoboticsEmailTemplate {
                                boolean isPipAeTo) {
         return new Email(
                 from,
-                isPipAeTo ? pipAeTo : isScottish ? scottishTo : to,
+                isScottish ? scottishTo : isPipAeTo ? pipAeTo : to,
                 subject,
                 message,
                 attachments
