@@ -98,8 +98,8 @@ public class RoboticsService {
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
         boolean isPipAeTo = Optional.ofNullable(caseData.getAppeal().getMrnDetails()).map(m -> equalsIgnoreCase(m.getDwpIssuingOffice(), PIP_AE)).orElse(false);
         sendJsonByEmail(caseData.getAppeal().getAppellant(), roboticsJson, sscs1Form, additionalEvidence, isScottish, isPipAeTo);
-        log.info("Case {} Robotics JSON email sent successfully for benefit type {} isScottish {}", caseDetails.getId(),
-            caseData.getAppeal().getBenefitType().getCode(), isScottish);
+        log.info("Case {} Robotics JSON email sent successfully for benefit type {} isScottish {} isPipAe {}", caseDetails.getId(),
+            caseData.getAppeal().getBenefitType().getCode(), isScottish, isPipAeTo);
 
         return roboticsJson;
     }
