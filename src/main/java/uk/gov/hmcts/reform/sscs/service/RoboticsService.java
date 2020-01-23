@@ -34,6 +34,7 @@ public class RoboticsService {
     private final EvidenceManagementService evidenceManagementService;
 
     private static final String GLASGOW = "GLASGOW";
+    private static final String PIP_AE = "DWP PIP (AE)";
     private final AirLookupService airLookupService;
     private final EmailService emailService;
     private final RoboticsJsonMapper roboticsJsonMapper;
@@ -95,9 +96,10 @@ public class RoboticsService {
         Map<String, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
 
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
-        sendJsonByEmail(caseData.getAppeal().getAppellant(), roboticsJson, sscs1Form, additionalEvidence, isScottish);
-        log.info("Case {} Robotics JSON email sent successfully for benefit type {} isScottish {}", caseDetails.getId(),
-            caseData.getAppeal().getBenefitType().getCode(), isScottish);
+        boolean isPipAeTo = Optional.ofNullable(caseData.getAppeal().getMrnDetails()).map(m -> equalsIgnoreCase(m.getDwpIssuingOffice(), PIP_AE)).orElse(false);
+        sendJsonByEmail(caseData.getAppeal().getAppellant(), roboticsJson, sscs1Form, additionalEvidence, isScottish, isPipAeTo);
+        log.info("Case {} Robotics JSON email sent successfully for benefit type {} isScottish {} isPipAe {}", caseDetails.getId(),
+            caseData.getAppeal().getBenefitType().getCode(), isScottish, isPipAeTo);
 
         return roboticsJson;
     }
@@ -157,7 +159,7 @@ public class RoboticsService {
         return roboticsAppeal;
     }
 
-    private void sendJsonByEmail(Appellant appellant, JSONObject json, byte[] pdf, Map<String, byte[]> additionalEvidence, boolean isScottish) {
+    private void sendJsonByEmail(Appellant appellant, JSONObject json, byte[] pdf, Map<String, byte[]> additionalEvidence, boolean isScottish, boolean isPipAeTo) {
         log.info("Generating unique email id");
         String appellantUniqueId = emailService.generateUniqueEmailId(appellant);
         log.info("Add default attachments");
@@ -171,7 +173,8 @@ public class RoboticsService {
             roboticsEmailTemplate.generateEmail(
                 subject,
                 attachments,
-                isScottish
+                isScottish,
+                isPipAeTo
             )
         );
     }
