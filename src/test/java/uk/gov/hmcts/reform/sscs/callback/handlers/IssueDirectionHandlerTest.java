@@ -74,6 +74,11 @@ public class IssueDirectionHandlerTest {
         assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build(), WITH_DWP, DIRECTION_ISSUED)));
     }
 
+    @Test
+    public void handleEmptyDirectionTypeDlValue() {
+        assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(null).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED)));
+    }
+
     @Test(expected = NullPointerException.class)
     public void givenCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {
         handler.canHandle(SUBMITTED, null);
