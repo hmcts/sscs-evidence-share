@@ -43,6 +43,7 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.DIRECTION_ISSUED
             && callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
+            && callback.getCaseDetails().getCaseData().getDirectionTypeDl() != null
             && DirectionType.APPEAL_TO_PROCEED.toString().equals(callback.getCaseDetails().getCaseData().getDirectionTypeDl().getValue().getCode());
     }
 
