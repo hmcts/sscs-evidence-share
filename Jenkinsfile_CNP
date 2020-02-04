@@ -31,7 +31,7 @@ def secrets = [
     secret('robotics-email-from', 'ROBOTICS_EMAIL_FROM'),
     secret('robotics-email-to', 'ROBOTICS_EMAIL_TO'),
     secret('robotics-email-scottish-to', 'ROBOTICS_EMAIL_SCOTTISH_TO'),
-    secret('robotics_email_pip_ae_to', 'ROBOTICS_EMAIL_PIP_AE_TO'),
+    secret('robotics-email-pip-ae-to', 'ROBOTICS_EMAIL_PIP_AE_TO'),
 
   ]
 ]
