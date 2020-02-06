@@ -32,7 +32,7 @@ def secrets = [
     secret('robotics-email-to', 'ROBOTICS_EMAIL_TO'),
     secret('robotics-email-scottish-to', 'ROBOTICS_EMAIL_SCOTTISH_TO'),
     secret('robotics-email-pip-ae-to', 'ROBOTICS_EMAIL_PIP_AE_TO'),
-
+    secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
   ]
 ]
 
