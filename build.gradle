@@ -201,7 +201,7 @@ dependencies {
 
   compile group: 'org.springframework', name: 'spring-jms'
   compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.48.0'
-  compileOnly 'org.projectlombok:lombok:1.18.10'
+  compileOnly 'org.projectlombok:lombok:1.18.12'
 
   annotationProcessor "org.projectlombok:lombok:1.18.10"
 
@@ -223,7 +223,7 @@ dependencies {
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testCompile group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
 
-  compile 'org.projectlombok:lombok:1.18.8'
+  compile 'org.projectlombok:lombok:1.18.12'
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   testCompileOnly 'org.projectlombok:lombok:1.18.8'
