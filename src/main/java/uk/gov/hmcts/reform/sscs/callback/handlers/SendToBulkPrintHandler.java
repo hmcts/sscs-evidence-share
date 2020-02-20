@@ -148,7 +148,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             log.info("Processing bulk print tasks for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
 
             DocumentHolder holder = documentRequestFactory.create(sscsCaseDataCallback.getCaseDetails().getCaseData(),
-                sscsCaseDataCallback.getCaseDetails().getCreatedDate());
+                sscsCaseDataCallback.getCaseDetails().getCaseData().getCaseCreated());
 
             if (holder.getTemplate() != null) {
                 log.info("Generating DL document for case id {}", sscsCaseDataCallback.getCaseDetails().getId());

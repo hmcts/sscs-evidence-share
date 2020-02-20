@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.bu
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseDataWithoutBenefitType;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import org.joda.time.DateTimeUtils;
@@ -28,7 +29,7 @@ public class PlaceholderServiceTest {
 
     private SscsCaseData caseData;
 
-    private LocalDateTime now;
+    private String now;
 
     @Mock
     private PdfDocumentConfig pdfDocumentConfig;
@@ -42,7 +43,9 @@ public class PlaceholderServiceTest {
     public void setup() {
         initMocks(this);
         DateTimeUtils.setCurrentMillisFixed(1550000000000L);
-        now = LocalDateTime.now();
+
+        now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());
+
         caseData = buildCaseData();
         service = new PlaceholderService(pdfDocumentConfig, exelaAddressConfig);
         placeholders = new HashMap<>();
@@ -63,7 +66,7 @@ public class PlaceholderServiceTest {
             .county("Bedford")
             .postcode("L2 5UZ").build();
 
-        service.build(caseData, placeholders, address, now);
+        service.build(caseData, placeholders, address, now.toString());
 
         assertEquals("HM Courts & Tribunals Service", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
         assertEquals("Social Security & Child Support Appeals", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL));
@@ -71,8 +74,8 @@ public class PlaceholderServiceTest {
         assertEquals("36 Dale Street", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL));
         assertEquals("LIVERPOOL", placeholders.get(REGIONAL_OFFICE_COUNTY_LITERAL));
         assertEquals("L2 5UZ", placeholders.get(REGIONAL_OFFICE_POSTCODE_LITERAL));
-        assertEquals(now.toLocalDate().toString(), placeholders.get(GENERATED_DATE_LITERAL));
-        assertEquals(now.toLocalDate().toString(), placeholders.get(CASE_CREATED_DATE_LITERAL));
+        assertEquals(now, placeholders.get(GENERATED_DATE_LITERAL));
+        assertEquals(now, placeholders.get(CASE_CREATED_DATE_LITERAL));
         assertEquals("Mr T Tibbs", placeholders.get(APPELLANT_FULL_NAME_LITERAL));
         assertEquals("PERSONAL INDEPENDENCE PAYMENT", placeholders.get(BENEFIT_TYPE_LITERAL));
         assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
@@ -114,7 +117,7 @@ public class PlaceholderServiceTest {
             .postcode("L2 5UZ").build();
 
         caseData = buildCaseDataWithoutBenefitType();
-        service.build(caseData, placeholders, address, now);
+        service.build(caseData, placeholders, address, now.toString());
 
         assertEquals("HM Courts & Tribunals Service", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
         assertEquals("Social Security & Child Support Appeals", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL));
@@ -122,8 +125,8 @@ public class PlaceholderServiceTest {
         assertEquals("36 Dale Street", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL));
         assertEquals("LIVERPOOL", placeholders.get(REGIONAL_OFFICE_COUNTY_LITERAL));
         assertEquals("L2 5UZ", placeholders.get(REGIONAL_OFFICE_POSTCODE_LITERAL));
-        assertEquals(now.toLocalDate().toString(), placeholders.get(GENERATED_DATE_LITERAL));
-        assertEquals(now.toLocalDate().toString(), placeholders.get(CASE_CREATED_DATE_LITERAL));
+        assertEquals(now, placeholders.get(GENERATED_DATE_LITERAL));
+        assertEquals(now, placeholders.get(CASE_CREATED_DATE_LITERAL));
         assertEquals("Mr T Tibbs", placeholders.get(APPELLANT_FULL_NAME_LITERAL));
         assertEquals("", placeholders.get(BENEFIT_TYPE_LITERAL));
         assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
@@ -148,7 +151,7 @@ public class PlaceholderServiceTest {
             .county("Bedford")
             .postcode("L2 5UZ").build();
 
-        service.build(caseData, placeholders, address, LocalDateTime.now());
+        service.build(caseData, placeholders, address, now);
 
         assertEquals("Unit 2", placeholders.get(RECIPIENT_ADDRESS_LINE_1_LITERAL));
         assertEquals("Lechworth", placeholders.get(RECIPIENT_ADDRESS_LINE_2_LITERAL));
@@ -165,7 +168,7 @@ public class PlaceholderServiceTest {
                 .county("MyCountyVeryVeryLongAddressLineWithLotsOfCharacters")
                 .postcode("L2 5UZ").build();
 
-        service.build(caseData, placeholders, address, LocalDateTime.now());
+        service.build(caseData, placeholders, address, now);
 
         assertEquals("MyFirstVeryVeryLongAddressLineWithLotsOfChara", placeholders.get(RECIPIENT_ADDRESS_LINE_1_LITERAL));
         assertEquals("MySecondVeryVeryLongAddressLineWithLotsOfChar", placeholders.get(RECIPIENT_ADDRESS_LINE_2_LITERAL));
@@ -182,7 +185,7 @@ public class PlaceholderServiceTest {
             .county("Bedford")
             .postcode("L2 5UZ").build();
 
-        service.build(caseData, placeholders, address, LocalDateTime.now());
+        service.build(caseData, placeholders, address, now);
 
         assertEquals("Unit 2", placeholders.get(RECIPIENT_ADDRESS_LINE_1_LITERAL));
         assertEquals("Bedford", placeholders.get(RECIPIENT_ADDRESS_LINE_2_LITERAL));

@@ -28,7 +28,7 @@ public class PlaceholderService {
         this.exelaAddressConfig = exelaAddressConfig;
     }
 
-    public void build(SscsCaseData caseData, Map<String, Object> placeholders, Address address, LocalDateTime caseCreatedDate) {
+    public void build(SscsCaseData caseData, Map<String, Object> placeholders, Address address, String caseCreatedDate) {
         Appeal appeal = caseData.getAppeal();
         String description = appeal.getBenefitType() != null ? appeal.getBenefitType().getDescription() : null;
 
@@ -51,7 +51,7 @@ public class PlaceholderService {
         placeholders.put(SC_NUMBER_LITERAL, defaultToEmptyStringIfNull(caseData.getCaseReference()));
 
         if (caseCreatedDate != null) {
-            placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate.toLocalDate().toString());
+            placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate);
         }
 
         placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getAddressLine1());

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import org.joda.time.DateTimeUtils;
@@ -29,7 +30,7 @@ public class PlaceholderServiceIt {
     private static final String PHONE = "0123456789";
 
     private SscsCaseData caseData;
-    private LocalDateTime now;
+    private String now;
 
     @Autowired
     private PlaceholderService placeholderService;
@@ -38,7 +39,7 @@ public class PlaceholderServiceIt {
     @Before
     public void setup() {
         DateTimeUtils.setCurrentMillisFixed(1550000000000L);
-        now = LocalDateTime.now();
+        now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());
     }
 
     @Test
@@ -53,7 +54,7 @@ public class PlaceholderServiceIt {
         caseData = buildCaseData(rpc);
         placeholderService.build(caseData, placeholders, address, now);
 
-        assertEquals(now.toLocalDate().toString(), placeholders.get(CASE_CREATED_DATE_LITERAL));
+        assertEquals(now, placeholders.get(CASE_CREATED_DATE_LITERAL));
         assertEquals(RPC_ADDRESS1, placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
         assertEquals(RPC_ADDRESS2, placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL));
         assertEquals(RPC_ADDRESS3, placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL));
@@ -64,7 +65,7 @@ public class PlaceholderServiceIt {
         assertEquals("123 The Road", placeholders.get(RECIPIENT_ADDRESS_LINE_1_LITERAL));
         assertEquals("Brentwood", placeholders.get(RECIPIENT_ADDRESS_LINE_2_LITERAL));
         assertEquals("CM12 1TH", placeholders.get(RECIPIENT_ADDRESS_LINE_3_LITERAL));
-        assertEquals(now.toLocalDate().toString(), placeholders.get(GENERATED_DATE_LITERAL));
+        assertEquals(now, placeholders.get(GENERATED_DATE_LITERAL));
         assertEquals("Mr T Tibbs", placeholders.get(APPELLANT_FULL_NAME_LITERAL));
         assertEquals("PERSONAL INDEPENDENCE PAYMENT", placeholders.get(BENEFIT_TYPE_LITERAL));
         assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
@@ -84,7 +85,7 @@ public class PlaceholderServiceIt {
 
         placeholderService.build(caseData, placeholders, address, now);
 
-        assertEquals(now.toLocalDate().toString(), placeholders.get(CASE_CREATED_DATE_LITERAL));
+        assertEquals(now, placeholders.get(CASE_CREATED_DATE_LITERAL));
         assertNull(placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
         assertNull(placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL));
         assertNull(placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL));

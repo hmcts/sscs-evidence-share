@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -69,6 +70,8 @@ public class SendToBulkPrintHandlerTest {
     private SendToBulkPrintHandler handler;
 
     private LocalDateTime now = LocalDateTime.now();
+
+    private String nowString = (DateTimeFormatter.ISO_LOCAL_DATE).format(now);
 
     @Captor
     private ArgumentCaptor<SscsCaseData> caseDataCaptor;
@@ -148,7 +151,7 @@ public class SendToBulkPrintHandlerTest {
 
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
 
-        when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
+        when(documentRequestFactory.create(caseDetails.getCaseData(), nowString)).thenReturn(holder);
 
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
 
@@ -218,7 +221,7 @@ public class SendToBulkPrintHandlerTest {
 
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
 
-        when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
+        when(documentRequestFactory.create(caseDetails.getCaseData(), nowString)).thenReturn(holder);
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
         handler.handle(CallbackType.SUBMITTED, callback);
@@ -238,7 +241,7 @@ public class SendToBulkPrintHandlerTest {
             null, APPEAL_CREATED);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
 
-        when(documentRequestFactory.create(caseDetails.getCaseData(), now))
+        when(documentRequestFactory.create(caseDetails.getCaseData(), nowString))
             .thenReturn(DocumentHolder.builder()
                 .template(null)
                 .build());
@@ -270,7 +273,7 @@ public class SendToBulkPrintHandlerTest {
 
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
 
-        when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
+        when(documentRequestFactory.create(caseDetails.getCaseData(), nowString)).thenReturn(holder);
 
         when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
             .thenReturn(Optional.empty());
@@ -296,7 +299,7 @@ public class SendToBulkPrintHandlerTest {
 
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(null).build();
 
-        when(documentRequestFactory.create(caseDetails.getCaseData(), now)).thenReturn(holder);
+        when(documentRequestFactory.create(caseDetails.getCaseData(), nowString)).thenReturn(holder);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -335,6 +338,7 @@ public class SendToBulkPrintHandlerTest {
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("123")
             .createdInGapsFrom("validAppeal")
+            .caseCreated(nowString)
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code(benefitType).build())
                 .receivedVia(receivedVia)
