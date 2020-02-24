@@ -80,6 +80,10 @@ public class SendToBulkPrintHandlerTest {
     Pdf docPdf = new Pdf(docUrl.getBytes(), "evidence1.pdf");
     Pdf docPdf2 = new Pdf(docUrl.getBytes(), "evidence2.pdf");
 
+    Map<String, Object> placeholders = new HashMap<>();
+
+    Template template = new Template("bla", "bla2");
+
     @Before
     public void setUp() {
         when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
@@ -87,6 +91,8 @@ public class SendToBulkPrintHandlerTest {
             documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig,
             ccdCaseService, idamService);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(Collections.singletonList("paper"));
+
+        placeholders.put("Test", "Value");
     }
 
     @Test
@@ -118,9 +124,6 @@ public class SendToBulkPrintHandlerTest {
 
     @Test
     public void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint() {
-        Map<String, Object> placeholders = new HashMap<>();
-        placeholders.put("Test", "Value");
-        Template template = new Template("bla", "bla2");
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
             SscsDocument.builder().value(SscsDocumentDetails.builder()
@@ -332,6 +335,37 @@ public class SendToBulkPrintHandlerTest {
         List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
         assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
         assertEquals(DwpState.UNREGISTERED.getId(), caseDataCaptor.getValue().getDwpState());
+    }
+
+    @Test
+    public void givenNoUuiIdReturnedFromBulkPrint_thenFlagHmctsDwpStateToFailedSending() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
+            SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName(docPdf.getName())
+                .documentType("sscs1")
+                .documentLink(DocumentLink.builder().documentUrl(docUrl)
+                    .documentFilename(docPdf.getName()).build())
+                .build()).build()
+            ), APPEAL_CREATED);
+
+        when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenReturn(docPdf.getContent());
+        when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(true);
+
+        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
+
+        when(documentRequestFactory.create(caseDetails.getCaseData(), nowString)).thenReturn(holder);
+
+        Optional<UUID> expectedOptionalUuid = Optional.empty();
+
+        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
+
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP_ERROR.getCcdType()), eq("Send to DWP Error"), eq("Send to DWP Error event has been triggered from Evidence Share service"), any());
+
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
     private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments, State state) {
