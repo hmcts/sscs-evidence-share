@@ -180,7 +180,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                 } else {
                     throw new BulkPrintException(
                         format("Failed to send to bulk print for case %s. No print id returned",
-                            caseData.getCcdCaseId()));                }
+                            caseData.getCcdCaseId()));
+                }
             }
             throw new BulkPrintException(
                 format("Failed to send to bulk print for case %s because no template was found",
