@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 import static java.util.Objects.requireNonNull;
 
 import java.util.*;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
