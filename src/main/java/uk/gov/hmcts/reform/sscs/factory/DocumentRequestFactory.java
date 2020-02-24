@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.factory;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,7 @@ public class DocumentRequestFactory {
     @Autowired
     private TemplateService templateService;
 
-    public <E extends SscsCaseData> DocumentHolder create(E caseData, LocalDateTime caseCreatedDate) {
+    public <E extends SscsCaseData> DocumentHolder create(E caseData, String caseCreatedDate) {
         Template template = templateService.findTemplate(caseData);
         Map<String, Object> placeholders = new ConcurrentHashMap<>();
 

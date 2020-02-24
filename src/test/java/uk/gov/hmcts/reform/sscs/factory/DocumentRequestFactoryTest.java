@@ -5,6 +5,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
@@ -43,7 +44,8 @@ public class DocumentRequestFactoryTest {
         SscsCaseData caseData = SscsCaseData.builder().build();
         Map<String, Object> placeholders = new HashMap<>();
         placeholders.put("Test", "Value");
-        LocalDateTime now = LocalDateTime.now();
+        String now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());
+
         Template template = new Template("bla", "bla2");
         Address address = Address.builder().build();
         given(templateService.findTemplate(caseData)).willReturn(template);
