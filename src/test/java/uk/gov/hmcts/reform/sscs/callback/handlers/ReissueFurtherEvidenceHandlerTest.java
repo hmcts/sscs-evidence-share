@@ -15,7 +15,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STA
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Rule;

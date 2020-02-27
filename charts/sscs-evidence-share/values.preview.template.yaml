@@ -1,7 +1,6 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  aadIdentityName:
   environment:
     SEND_LETTER_SERVICE_ENABLED: "true"
     SEND_LETTER_SERVICE_BASEURL: "http://rpe-send-letter-service-aat.service.core-compute-aat.internal"

@@ -148,7 +148,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             log.info("Processing bulk print tasks for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
 
             DocumentHolder holder = documentRequestFactory.create(sscsCaseDataCallback.getCaseDetails().getCaseData(),
-                sscsCaseDataCallback.getCaseDetails().getCreatedDate());
+                sscsCaseDataCallback.getCaseDetails().getCaseData().getCaseCreated());
 
             if (holder.getTemplate() != null) {
                 log.info("Generating DL document for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
@@ -180,7 +180,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                 } else {
                     throw new BulkPrintException(
                         format("Failed to send to bulk print for case %s. No print id returned",
-                            caseData.getCcdCaseId()));                }
+                            caseData.getCcdCaseId()));
+                }
             }
             throw new BulkPrintException(
                 format("Failed to send to bulk print for case %s because no template was found",
