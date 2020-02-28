@@ -42,7 +42,7 @@ amqp:
 document:
   pdf:
     hmctsImgKey: hmcts2
-    hmctsImgVal: "[userImage:hmcts-2.png]"
+    hmctsImgVal: "[userImage:hmcts.png]"
 
 document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:5005}
 
