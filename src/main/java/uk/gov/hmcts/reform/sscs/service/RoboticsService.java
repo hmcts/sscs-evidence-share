@@ -12,10 +12,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
@@ -97,9 +94,8 @@ public class RoboticsService {
 
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
         boolean isPipAeTo = Optional.ofNullable(caseData.getAppeal().getMrnDetails()).map(m -> equalsIgnoreCase(m.getDwpIssuingOffice(), PIP_AE)).orElse(false);
-        sendJsonByEmail(caseData.getAppeal().getAppellant(), roboticsJson, sscs1Form, additionalEvidence, isScottish, isPipAeTo);
-        log.info("Case {} Robotics JSON email sent successfully for benefit type {} isScottish {} isPipAe {}", caseDetails.getId(),
-            caseData.getAppeal().getBenefitType().getCode(), isScottish, isPipAeTo);
+
+        sendJsonByEmail(caseDetails.getId(), caseData.getAppeal(), roboticsJson, sscs1Form, additionalEvidence, isScottish, isPipAeTo);
 
         return roboticsJson;
     }
@@ -159,17 +155,20 @@ public class RoboticsService {
         return roboticsAppeal;
     }
 
-    private void sendJsonByEmail(Appellant appellant, JSONObject json, byte[] pdf, Map<String, byte[]> additionalEvidence, boolean isScottish, boolean isPipAeTo) {
-        log.info("Generating unique email id");
+    private void sendJsonByEmail(long caseId, Appeal appeal, JSONObject json, byte[] pdf, Map<String, byte[]> additionalEvidence, boolean isScottish, boolean isPipAeTo) {
+        Appellant appellant = appeal.getAppellant();
+
         String appellantUniqueId = emailService.generateUniqueEmailId(appellant);
-        log.info("Add default attachments");
+
+        log.info("Add robotics default attachments for case id {}", caseId);
         List<EmailAttachment> attachments = addDefaultAttachment(json, pdf, appellantUniqueId);
-        log.info("Add additional evidence");
+
+        log.info("Add robotics additional evidence for case id {}", caseId);
         addAdditionalEvidenceAttachments(additionalEvidence, attachments);
-        log.info("Generating subject for robotics email");
+
         String subject = buildSubject(appellantUniqueId, isScottish);
-        log.info("Send email");
-        emailService.sendEmail(
+
+        emailService.sendEmail(caseId,
             roboticsEmailTemplate.generateEmail(
                 subject,
                 attachments,
@@ -177,6 +176,9 @@ public class RoboticsService {
                 isPipAeTo
             )
         );
+
+        log.info("Case {} robotics JSON email with subject '{}' sent successfully for benefit type {} isScottish {} isPipAe {}",
+            caseId, subject, appeal.getBenefitType().getCode(), isScottish, isPipAeTo);
     }
 
     private String buildSubject(String appellantUniqueId, boolean isScottish) {
