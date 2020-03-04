@@ -156,7 +156,6 @@ public class RoboticsService {
     }
 
     private void sendJsonByEmail(long caseId, Appeal appeal, JSONObject json, byte[] pdf, Map<String, byte[]> additionalEvidence, boolean isScottish, boolean isPipAeTo) {
-        String benefitCode = appeal.getBenefitType().getCode();
         Appellant appellant = appeal.getAppellant();
 
         String appellantUniqueId = emailService.generateUniqueEmailId(appellant);
@@ -177,8 +176,9 @@ public class RoboticsService {
                 isPipAeTo
             )
         );
+
         log.info("Case {} robotics JSON email with subject '{}' sent successfully for benefit type {} isScottish {} isPipAe {}",
-            caseId, subject, benefitCode, isScottish, isPipAeTo);
+            caseId, subject, appeal.getBenefitType().getCode(), isScottish, isPipAeTo);
     }
 
     private String buildSubject(String appellantUniqueId, boolean isScottish) {
