@@ -141,7 +141,7 @@ public class RoboticsServiceTest {
 
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any());
-        verify(emailService).sendEmail(any());
+        verify(emailService).sendEmail(eq(1L), any());
     }
 
     @Test
@@ -192,7 +192,7 @@ public class RoboticsServiceTest {
 
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any());
-        verify(emailService).sendEmail(any());
+        verify(emailService).sendEmail(eq(1L), any());
     }
 
     @Test
@@ -236,7 +236,7 @@ public class RoboticsServiceTest {
 
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any());
-        verify(emailService).sendEmail(any());
+        verify(emailService).sendEmail(eq(1L), any());
     }
 
     @Test
@@ -280,6 +280,6 @@ public class RoboticsServiceTest {
 
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any());
-        verify(emailService).sendEmail(any());
+        verify(emailService).sendEmail(eq(1L), any());
     }
 }

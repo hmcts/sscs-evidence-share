@@ -169,7 +169,7 @@ public class RoboticsService {
 
         String subject = buildSubject(appellantUniqueId, isScottish);
 
-        emailService.sendEmail(
+        emailService.sendEmail(caseId,
             roboticsEmailTemplate.generateEmail(
                 subject,
                 attachments,
