@@ -90,7 +90,7 @@ public class RoboticsService {
             .ccdCaseId(caseDetails.getId()).venueName(venueName).evidencePresent(caseData.getEvidencePresent()).state(caseDetails.getState()).build());
 
         log.info("Downloading additional evidence for robotics for case id {} ", caseDetails.getId());
-        Map<String, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
+        Map<SscsDocument, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
 
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
         boolean isPipAeTo = Optional.ofNullable(caseData.getAppeal().getMrnDetails()).map(m -> equalsIgnoreCase(m.getDwpIssuingOffice(), PIP_AE)).orElse(false);
@@ -111,12 +111,12 @@ public class RoboticsService {
         return null;
     }
 
-    private Map<String, byte[]> downloadEvidence(SscsCaseData sscsCaseData, Long caseId) {
+    private Map<SscsDocument, byte[]> downloadEvidence(SscsCaseData sscsCaseData, Long caseId) {
         if (hasEvidence(sscsCaseData) && !isEvidenceSentForBulkPrint(sscsCaseData)) {
-            Map<String, byte[]> map = new LinkedHashMap<>();
+            Map<SscsDocument, byte[]> map = new LinkedHashMap<>();
             for (SscsDocument doc : sscsCaseData.getSscsDocument()) {
                 if (doc.getValue().getDocumentType() == null || doc.getValue().getDocumentType().equalsIgnoreCase("appellantEvidence")) {
-                    map.put(doc.getValue().getDocumentFileName(), downloadBinary(doc, caseId));
+                    map.put(doc, downloadBinary(doc, caseId));
                 }
             }
             return map;
@@ -155,7 +155,7 @@ public class RoboticsService {
         return roboticsAppeal;
     }
 
-    private void sendJsonByEmail(long caseId, Appeal appeal, JSONObject json, byte[] pdf, Map<String, byte[]> additionalEvidence, boolean isScottish, boolean isPipAeTo) {
+    private void sendJsonByEmail(long caseId, Appeal appeal, JSONObject json, byte[] pdf, Map<SscsDocument, byte[]> additionalEvidence, boolean isScottish, boolean isPipAeTo) {
         Appellant appellant = appeal.getAppellant();
 
         String appellantUniqueId = emailService.generateUniqueEmailId(appellant);
@@ -188,12 +188,14 @@ public class RoboticsService {
         return appellantUniqueId + " for Robot [" + randomNumber + "]";
     }
 
-    private void addAdditionalEvidenceAttachments(Map<String, byte[]> additionalEvidence, List<EmailAttachment> attachments) {
-        for (String filename : additionalEvidence.keySet()) {
-            if (filename != null) {
-                byte[] content = additionalEvidence.get(filename);
-                if (content != null) {
-                    attachments.add(file(content, filename));
+    private void addAdditionalEvidenceAttachments(Map<SscsDocument, byte[]> additionalEvidence, List<EmailAttachment> attachments) {
+        for (SscsDocument sscsDocument : additionalEvidence.keySet()) {
+            if (sscsDocument != null) {
+                if (sscsDocument.getValue().getDocumentLink().getDocumentFilename() != null) {
+                    byte[] content = additionalEvidence.get(sscsDocument);
+                    if (content != null) {
+                        attachments.add(file(content, sscsDocument.getValue().getDocumentLink().getDocumentFilename()));
+                    }
                 }
             }
         }
