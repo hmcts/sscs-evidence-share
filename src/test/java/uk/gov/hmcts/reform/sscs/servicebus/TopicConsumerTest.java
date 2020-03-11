@@ -108,7 +108,7 @@ public class TopicConsumerTest {
             SscsCaseData.builder().build(),
             null
         );
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED, false);
         when(deserializer.deserialize(any())).thenReturn(callback);
         topicConsumer.onMessage(MESSAGE);
         verify(dispatcher).handle(any(), any());
