@@ -68,7 +68,7 @@ public class RoboticsCallbackHandlerTest {
     @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "SEND_TO_DWP"})
     public void givenARoboticsRequestAndCreatedInGapsMatchesState_thenSendCaseToRoboticsAndSetSentToGapsDateAndDoNotTriggerUpdateCaseEvent(EventType eventType) {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, READY_TO_LIST.getId());
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
 
         handler.handle(SUBMITTED, callback);
 
@@ -82,7 +82,7 @@ public class RoboticsCallbackHandlerTest {
     @Parameters({"READY_TO_LIST", "RESEND_CASE_TO_GAPS2", "APPEAL_TO_PROCEED"})
     public void givenARoboticsRequestAndCreatedInGapsMatchesState_thenSendCaseToRoboticsAndSetSentToGapsDateAndTriggerUpdateCaseEvent(EventType eventType) {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, READY_TO_LIST.getId());
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
 
         handler.handle(SUBMITTED, callback);
 
@@ -95,7 +95,7 @@ public class RoboticsCallbackHandlerTest {
     @Test
     public void givenARoboticsRequestAndCreatedInGapsDoesNotMatchState_thenDoNotSendCaseToRobotics() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, VALID_APPEAL.getId());
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
 
         handler.handle(SUBMITTED, callback);
 
@@ -105,7 +105,7 @@ public class RoboticsCallbackHandlerTest {
     @Test
     public void givenARoboticsRequestAndEventIsReissuetoGaps2_thenSendCaseToRobotics() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, READY_TO_LIST.getId());
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.RESEND_CASE_TO_GAPS2);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.RESEND_CASE_TO_GAPS2, false);
 
         handler.handle(SUBMITTED, callback);
 
@@ -115,7 +115,7 @@ public class RoboticsCallbackHandlerTest {
     @Test
     public void givenARoboticsRequestAndCreatedInGapsFieldIsBlank_thenSendCaseToRobotics() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, null);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
 
         handler.handle(SUBMITTED, callback);
 

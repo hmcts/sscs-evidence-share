@@ -16,6 +16,6 @@ public final class HandlerHelper {
     public static Callback<SscsCaseData> buildTestCallbackForGivenData(SscsCaseData sscsCaseData, State state, EventType eventType) {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "SSCS", state, sscsCaseData,
             LocalDateTime.now());
-        return new Callback<>(caseDetails, Optional.empty(), eventType);
+        return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 }
