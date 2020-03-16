@@ -153,9 +153,6 @@ public class RoboticsServiceTest {
         byte[] expectedBytes = {1, 2, 3};
         given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
 
-        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
-        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
-
         Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
             .benefitType(BenefitType.builder().code("PIP").build())
             .receivedVia(receivedVia)
@@ -170,7 +167,7 @@ public class RoboticsServiceTest {
             .value(SscsDocumentDetails.builder()
                 .documentType("appellantEvidence")
                 .documentFileName("test.jpg")
-                .documentLink(DocumentLink.builder().documentUrl("www.download.com").build())
+                .documentLink(DocumentLink.builder().documentUrl("www.download.com").documentFilename("fileName.pdf").build())
                 .build())
             .build());
 
@@ -187,7 +184,7 @@ public class RoboticsServiceTest {
             assertThat(attachmentResult.size(), is(1));
         } else {
             assertThat(attachmentResult.size(), is(2));
-            assertThat(attachmentResult.get(1).getFilename(), is("test.jpg"));
+            assertThat(attachmentResult.get(1).getFilename(), is("fileName.pdf"));
         }
 
         verify(roboticsJsonMapper).map(any());
