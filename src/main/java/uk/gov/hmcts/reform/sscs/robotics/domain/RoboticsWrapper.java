@@ -13,8 +13,6 @@ public class RoboticsWrapper {
 
     private Long ccdCaseId;
 
-    private String venueName;
-
     private String evidencePresent;
 
     private State state;

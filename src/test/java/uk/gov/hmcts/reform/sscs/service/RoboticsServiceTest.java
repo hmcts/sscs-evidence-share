@@ -26,29 +26,24 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
-import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.model.dwp.Mapping;
+import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator;
 
 @RunWith(JUnitParamsRunner.class)
 public class RoboticsServiceTest {
 
-    private static final boolean NOT_SCOTTISH = false;
-
     RoboticsService roboticsService;
 
     @Mock
     EvidenceManagementService evidenceManagementService;
-
-    @Mock
-    RegionalProcessingCenterService regionalProcessingCenterService;
-
-    @Mock
-    AirLookupService airLookupService;
 
     @Mock
     EmailService emailService;
@@ -65,6 +60,15 @@ public class RoboticsServiceTest {
     @Mock
     EvidenceShareConfig evidenceShareConfig;
 
+    @Mock
+    DwpAddressLookupService dwpAddressLookupService;
+
+    @Mock
+    CcdService ccdService;
+
+    @Mock
+    IdamService idamService;
+
     SscsCcdConvertService convertService;
 
     LocalDate localDate;
@@ -75,7 +79,7 @@ public class RoboticsServiceTest {
     private ArgumentCaptor<List<EmailAttachment>> captor;
 
     @Captor
-    private ArgumentCaptor<List<EmailAttachment>> attachmentCaptor;
+    private ArgumentCaptor<SscsCaseData> caseDataCaptor;
 
     private SscsCaseData appeal;
 
@@ -87,20 +91,20 @@ public class RoboticsServiceTest {
 
         convertService = new SscsCcdConvertService();
 
-        roboticsService = new RoboticsService(regionalProcessingCenterService,
+        roboticsService = new RoboticsService(
             evidenceManagementService,
-            airLookupService,
             emailService,
             roboticsJsonMapper,
             roboticsJsonValidator,
             roboticsEmailTemplate,
             evidenceShareConfig,
+            dwpAddressLookupService,
+            ccdService,
+            idamService,
             1,
             1);
 
         localDate = LocalDate.now();
-
-        given(airLookupService.lookupAirVenueNameByPostCode("CM12")).willReturn(AirlookupBenefitToVenue.builder().pipVenue("Bristol").build());
 
         JSONObject mappedJson = mock(JSONObject.class);
         given(roboticsJsonMapper.map(any())).willReturn(mappedJson);
@@ -127,8 +131,6 @@ public class RoboticsServiceTest {
 
         given(emailService.generateUniqueEmailId(appeal.getAppellant())).willReturn("Bloggs_123");
 
-        given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
-
         CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -147,8 +149,6 @@ public class RoboticsServiceTest {
     @Test
     @Parameters({"Paper", "Online"})
     public void givenACaseWithEvidenceToDownload_thenCreateRoboticsFileWithDownloadedEvidence(String receivedVia) {
-
-        given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
 
         byte[] expectedBytes = {1, 2, 3};
         given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
@@ -195,8 +195,6 @@ public class RoboticsServiceTest {
     @Test
     public void givenAdditionalEvidenceHasEmptyFileName_doNotDownloadAdditionalEvidenceAndStillGenerateRoboticsAndSendEmail() {
 
-        given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
-
         byte[] expectedBytes = {1, 2, 3};
         given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
 
@@ -239,8 +237,6 @@ public class RoboticsServiceTest {
     @Test
     public void givenAdditionalEvidenceHasEmptyFileNameAndIsPipAeTrue_doNotDownloadAdditionalEvidenceAndStillGenerateRoboticsAndSendEmail() {
 
-        given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
-
         byte[] expectedBytes = {1, 2, 3};
         given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
 
@@ -278,5 +274,94 @@ public class RoboticsServiceTest {
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any());
         verify(emailService).sendEmail(eq(1L), any());
+    }
+
+    @Test
+    @Parameters({"ESA, Balham DRT, Watford DRT", "PIP, DWP PIP (1), DWP PIP (2)", "PIP, PIP (AE), DWP PIP (AE)"})
+    public void givenACaseAndDwpIssuingOfficeIsClosed_thenFindNewIssuingOfficeAndUpdateCaseInCcdAndRobotics(String benefitType, String existingOffice, String newOffice) {
+        given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
+            OfficeMapping.builder().code(existingOffice).mapping(Mapping.builder().ccd(newOffice).build()).build()));
+
+        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice(existingOffice).mrnDate(localDate.format(formatter)).build())
+            .benefitType(BenefitType.builder().code(benefitType).build())
+            .appellant(Appellant.builder().address(Address.builder().postcode("CM120HN").build()).build()).build();
+
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, SscsCaseData.builder().appeal(appeal).ccdCaseId("123").build(), null);
+
+        roboticsService.sendCaseToRobotics(caseData);
+
+        assertThat(caseData.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice(), is(newOffice));
+        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
+
+        assertThat(caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice(), is(newOffice));
+    }
+
+    @Test
+    @Parameters({"ESA, Balham DRT, Watford DRT", "PIP, DWP PIP (1), DWP PIP (2)", "PIP, PIP (AE), DWP PIP (AE)"})
+    public void givenACaseAndDwpOriginatingOfficeIsClosed_thenFindNewOriginatingOfficeAndUpdateCaseInCcdAndRobotics(String benefitType, String existingOffice, String newOffice) {
+        given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
+            OfficeMapping.builder().code(existingOffice).mapping(Mapping.builder().ccd(newOffice).build()).build()));
+
+        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
+            .benefitType(BenefitType.builder().code(benefitType).build())
+            .appellant(Appellant.builder().address(Address.builder().postcode("CM120HN").build()).build()).build();
+
+        DynamicListItem value = new DynamicListItem(existingOffice, existingOffice);
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, SscsCaseData.builder().dwpOriginatingOffice(new DynamicList(value, Collections.singletonList(value))).appeal(appeal).ccdCaseId("123").build(), null);
+
+        roboticsService.sendCaseToRobotics(caseData);
+
+        assertThat(caseData.getCaseData().getDwpOriginatingOffice().getValue().getCode(), is(newOffice));
+        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
+
+        assertThat(caseDataCaptor.getValue().getDwpOriginatingOffice().getValue().getCode(), is(newOffice));
+    }
+
+    @Test
+    @Parameters({"ESA, Balham DRT, Watford DRT", "PIP, DWP PIP (1), DWP PIP (2)", "PIP, PIP (AE), DWP PIP (AE)"})
+    public void givenACaseAndDwpPresentingOfficeIsClosed_thenFindNewPresentingOfficeAndUpdateCaseInCcdAndRobotics(String benefitType, String existingOffice, String newOffice) {
+        given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
+            OfficeMapping.builder().code(existingOffice).mapping(Mapping.builder().ccd(newOffice).build()).build()));
+
+        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
+            .benefitType(BenefitType.builder().code(benefitType).build())
+            .appellant(Appellant.builder().address(Address.builder().postcode("CM120HN").build()).build()).build();
+
+        DynamicListItem value = new DynamicListItem(existingOffice, existingOffice);
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, SscsCaseData.builder().dwpPresentingOffice(new DynamicList(value, Collections.singletonList(value))).appeal(appeal).ccdCaseId("123").build(), null);
+
+        roboticsService.sendCaseToRobotics(caseData);
+
+        assertThat(caseData.getCaseData().getDwpPresentingOffice().getValue().getCode(), is(newOffice));
+        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
+
+        assertThat(caseDataCaptor.getValue().getDwpPresentingOffice().getValue().getCode(), is(newOffice));
+    }
+
+    @Test
+    @Parameters({"ESA, Balham DRT, Watford DRT", "PIP, DWP PIP (1), DWP PIP (2)", "PIP, PIP (AE), DWP PIP (AE)"})
+    public void givenACaseAndOfficeUsedInAllOfficeFieldsIsClosed_thenFindNewOfficeAndUpdateAllOfficesForCaseInCcdAndRobotics(String benefitType, String existingOffice, String newOffice) {
+        given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
+            OfficeMapping.builder().code(existingOffice).mapping(Mapping.builder().ccd(newOffice).build()).build()));
+
+        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice(existingOffice).mrnDate(localDate.format(formatter)).build())
+            .benefitType(BenefitType.builder().code(benefitType).build())
+            .appellant(Appellant.builder().address(Address.builder().postcode("CM120HN").build()).build()).build();
+
+        DynamicListItem value = new DynamicListItem(existingOffice, existingOffice);
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED,
+            SscsCaseData.builder().dwpOriginatingOffice(new DynamicList(value, Collections.singletonList(value)))
+                .dwpPresentingOffice(new DynamicList(value, Collections.singletonList(value))).appeal(appeal).ccdCaseId("123").build(), null);
+
+        roboticsService.sendCaseToRobotics(caseData);
+
+        assertThat(caseData.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice(), is(newOffice));
+        assertThat(caseData.getCaseData().getDwpOriginatingOffice().getValue().getCode(), is(newOffice));
+        assertThat(caseData.getCaseData().getDwpPresentingOffice().getValue().getCode(), is(newOffice));
+        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
+
+        assertThat(caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice(), is(newOffice));
+        assertThat(caseData.getCaseData().getDwpOriginatingOffice().getValue().getCode(), is(newOffice));
+        assertThat(caseDataCaptor.getValue().getDwpPresentingOffice().getValue().getCode(), is(newOffice));
     }
 }

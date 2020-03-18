@@ -10,12 +10,14 @@ import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @Component
 @Slf4j
@@ -25,22 +27,29 @@ public class RoboticsJsonMapper {
     private static final String ESA_CASE_CODE = "051DD";
     private static final String PIP_CASE_CODE = "002DD";
 
-    private final boolean readyToListFeatureEnabled;
-
-    private DwpAddressLookupService dwpAddressLookupService;
+    private final DwpAddressLookupService dwpAddressLookupService;
+    private final RegionalProcessingCenterService regionalProcessingCenterService;
+    private final AirLookupService airLookupService;
 
     @Autowired
-    public RoboticsJsonMapper(@Value("${robotics.readyToList.feature}") boolean readyToListFeatureEnabled,
-                              DwpAddressLookupService dwpAddressLookupService) {
-        this.readyToListFeatureEnabled = readyToListFeatureEnabled;
+    public RoboticsJsonMapper(DwpAddressLookupService dwpAddressLookupService,
+                              RegionalProcessingCenterService regionalProcessingCenterService,
+                              AirLookupService airLookupService) {
         this.dwpAddressLookupService = dwpAddressLookupService;
+        this.regionalProcessingCenterService = regionalProcessingCenterService;
+        this.airLookupService = airLookupService;
     }
 
     public JSONObject map(RoboticsWrapper roboticsWrapper) {
 
         SscsCaseData sscsCaseData = roboticsWrapper.getSscsCaseData();
 
-        JSONObject obj = buildAppealDetails(new JSONObject(), sscsCaseData, roboticsWrapper.getVenueName());
+        String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+
+        AirlookupBenefitToVenue venue = airLookupService.lookupAirVenueNameByPostCode(firstHalfOfPostcode);
+        String venueName = sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("pip") ? venue.getPipVenue() : venue.getEsaOrUcVenue();
+
+        JSONObject obj = buildAppealDetails(new JSONObject(), sscsCaseData, venueName);
 
         obj.put("caseId", roboticsWrapper.getCcdCaseId());
         obj.put("evidencePresent", roboticsWrapper.getEvidencePresent());
@@ -68,45 +77,43 @@ public class RoboticsJsonMapper {
 
         addRpcEmail(sscsCaseData.getRegionalProcessingCenter(), obj);
 
-        if (readyToListFeatureEnabled) {
-            String isReadyToList = "No";
-            if (roboticsWrapper.getState().equals(State.READY_TO_LIST)) {
-                isReadyToList = "Yes";
-            }
-            obj.put("isReadyToList", isReadyToList);
-
-            obj.put("dwpResponseDate", sscsCaseData.getDwpResponseDate());
-
-            Optional<OfficeMapping> officeMapping = buildOffice(obj, sscsCaseData.getAppeal());
-
-            String dwpIssuingOffice = "";
-            String dwpPresentingOffice = "";
-
-            if (!officeMapping.isPresent()) {
-                log.error("could not find dwp officeAddress for benefitType {} and dwpIssuingOffice {} so could not set dwp offices in robotics",
-                    sscsCaseData.getAppeal().getBenefitType().getCode(), sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
-            }
-
-            if (sscsCaseData.getDwpOriginatingOffice() != null && sscsCaseData.getDwpOriginatingOffice().getValue().getLabel() != null) {
-                dwpIssuingOffice = sscsCaseData.getDwpOriginatingOffice().getValue().getLabel();
-            } else if (officeMapping.isPresent()) {
-                dwpIssuingOffice = officeMapping.get().getMapping().getGaps();
-            }
-
-            if (sscsCaseData.getDwpPresentingOffice() != null && sscsCaseData.getDwpPresentingOffice().getValue().getLabel() != null) {
-                dwpPresentingOffice = sscsCaseData.getDwpPresentingOffice().getValue().getLabel();
-            } else if (officeMapping.isPresent()) {
-                dwpPresentingOffice = officeMapping.get().getMapping().getGaps();
-            }
-
-            String dwpIsOfficerAttending = sscsCaseData.getDwpIsOfficerAttending() != null ? sscsCaseData.getDwpIsOfficerAttending() : "No";
-            String dwpUcb = sscsCaseData.getDwpUcb() != null ? sscsCaseData.getDwpUcb() : "No";
-
-            obj.put("dwpIssuingOffice", dwpIssuingOffice);
-            obj.put("dwpPresentingOffice", dwpPresentingOffice);
-            obj.put("dwpIsOfficerAttending", dwpIsOfficerAttending);
-            obj.put("dwpUcb", dwpUcb);
+        String isReadyToList = "No";
+        if (roboticsWrapper.getState().equals(State.READY_TO_LIST)) {
+            isReadyToList = "Yes";
         }
+        obj.put("isReadyToList", isReadyToList);
+
+        obj.put("dwpResponseDate", sscsCaseData.getDwpResponseDate());
+
+        Optional<OfficeMapping> officeMapping = buildOffice(obj, sscsCaseData.getAppeal());
+
+        String dwpIssuingOffice = "";
+        String dwpPresentingOffice = "";
+
+        if (!officeMapping.isPresent()) {
+            log.error("could not find dwp officeAddress for benefitType {} and dwpIssuingOffice {} so could not set dwp offices in robotics",
+                sscsCaseData.getAppeal().getBenefitType().getCode(), sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        }
+
+        if (sscsCaseData.getDwpOriginatingOffice() != null && sscsCaseData.getDwpOriginatingOffice().getValue().getLabel() != null) {
+            dwpIssuingOffice = sscsCaseData.getDwpOriginatingOffice().getValue().getLabel();
+        } else if (officeMapping.isPresent()) {
+            dwpIssuingOffice = officeMapping.get().getMapping().getGaps();
+        }
+
+        if (sscsCaseData.getDwpPresentingOffice() != null && sscsCaseData.getDwpPresentingOffice().getValue().getLabel() != null) {
+            dwpPresentingOffice = sscsCaseData.getDwpPresentingOffice().getValue().getLabel();
+        } else if (officeMapping.isPresent()) {
+            dwpPresentingOffice = officeMapping.get().getMapping().getGaps();
+        }
+
+        String dwpIsOfficerAttending = sscsCaseData.getDwpIsOfficerAttending() != null ? sscsCaseData.getDwpIsOfficerAttending() : "No";
+        String dwpUcb = sscsCaseData.getDwpUcb() != null ? sscsCaseData.getDwpUcb() : "No";
+
+        obj.put("dwpIssuingOffice", dwpIssuingOffice);
+        obj.put("dwpPresentingOffice", dwpPresentingOffice);
+        obj.put("dwpIsOfficerAttending", dwpIsOfficerAttending);
+        obj.put("dwpUcb", dwpUcb);
 
         return obj;
     }
