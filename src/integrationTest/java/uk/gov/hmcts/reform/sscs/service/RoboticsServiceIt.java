@@ -164,6 +164,34 @@ public class RoboticsServiceIt {
     }
 
     @Test
+    public void givenSscsCaseDataWithAppointeeAndPipBenefitType_makeValidRoboticsJsonThatValidatesAgainstSchemaWithAppointeePostcode() {
+        caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("Pip").build());
+
+        caseDetails.getCaseData().getAppeal().setAppellant(Appellant.builder()
+            .name(Name.builder().title("Mr").firstName("Terry").lastName("Tibbs").build())
+            .address(Address.builder().line1("99 My Road").town("Grantham").county("Surrey").postcode("CV10 6PO").build())
+            .identity(Identity.builder().nino("JT0123456B").build())
+            .contact(Contact.builder().mobile(null).email(null).build())
+            .isAppointee("Yes").appointee(
+                Appointee.builder().name(Name.builder().title("Mr").firstName("Terry").lastName("Tibbs").build())
+                    .identity(Identity.builder().nino("JT0123456B").build())
+                    .address(Address.builder().line1("99 My Road").town("Chelmsford").county("Essex").postcode("CM12 0NS").build())
+                    .contact(Contact.builder().mobile(null).email(null).build())
+                    .build()).build());
+
+        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
+
+        assertThat(result.get("caseId"), is(1234L));
+        assertTrue(result.has("appellant"));
+        assertFalse(result.has("representative"));
+        assertTrue(result.has("hearingArrangements"));
+        assertTrue(result.has("isReadyToList"));
+        assertEquals("Basildon Combined Court", result.get("appellantPostCode"));
+
+        verifyNoMoreInteractions(ccdService);
+    }
+
+    @Test
     public void givenSscsCaseDataWithoutHearingArrangements_makeValidRoboticsJsonThatValidatesAgainstSchema() {
         caseData.getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").build());
 

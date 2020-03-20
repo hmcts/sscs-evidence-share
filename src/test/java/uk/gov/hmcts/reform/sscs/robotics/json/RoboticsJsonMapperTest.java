@@ -369,12 +369,17 @@ public class RoboticsJsonMapperTest {
     }
 
     @Test
-    public void givenAnAppointee_thenProcessRobotics() {
+    public void givenAnAppointee_thenProcessRoboticsWithAppellantPostCodeSetToVenueForAppointeePostcode() {
+        given(regionalProcessingCenterService.getFirstHalfOfPostcode("TS1ABC")).willReturn("TS1");
+        given(airLookupService.lookupAirVenueNameByPostCode("TS1")).willReturn(AirlookupBenefitToVenue.builder().pipVenue("Pip venue").build());
+
         Name appointeeName = Name.builder().title("Mrs").firstName("Ap").lastName("Pointee").build();
+        Address address = roboticsWrapper.getSscsCaseData().getAppeal().getAppellant().getAddress();
+        address.setPostcode("TS1ABC");
 
         Appointee appointee = Appointee.builder()
             .name(appointeeName)
-            .address(roboticsWrapper.getSscsCaseData().getAppeal().getAppellant().getAddress())
+            .address(address)
             .contact(roboticsWrapper.getSscsCaseData().getAppeal().getAppellant().getContact())
             .build();
 
@@ -386,6 +391,7 @@ public class RoboticsJsonMapperTest {
 
         assertTrue(roboticsJson.has("appointee"));
         assertEquals("Yes", roboticsJson.getJSONObject("appointee").getString("sameAddressAsAppellant"));
+        assertEquals("Pip venue", roboticsJson.get("appellantPostCode"));
     }
 
     @Test

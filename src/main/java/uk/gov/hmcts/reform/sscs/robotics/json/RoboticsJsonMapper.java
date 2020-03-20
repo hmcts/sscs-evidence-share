@@ -44,12 +44,7 @@ public class RoboticsJsonMapper {
 
         SscsCaseData sscsCaseData = roboticsWrapper.getSscsCaseData();
 
-        String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
-
-        AirlookupBenefitToVenue venue = airLookupService.lookupAirVenueNameByPostCode(firstHalfOfPostcode);
-        String venueName = sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("pip") ? venue.getPipVenue() : venue.getEsaOrUcVenue();
-
-        JSONObject obj = buildAppealDetails(new JSONObject(), sscsCaseData, venueName);
+        JSONObject obj = buildAppealDetails(new JSONObject(), sscsCaseData);
 
         obj.put("caseId", roboticsWrapper.getCcdCaseId());
         obj.put("evidencePresent", roboticsWrapper.getEvidencePresent());
@@ -124,10 +119,11 @@ public class RoboticsJsonMapper {
         }
     }
 
-    private JSONObject buildAppealDetails(JSONObject obj, SscsCaseData sscsCaseData, String venueName) {
+    private JSONObject buildAppealDetails(JSONObject obj, SscsCaseData sscsCaseData) {
         Appeal appeal = sscsCaseData.getAppeal();
         obj.put("appellantNino", appeal.getAppellant().getIdentity().getNino());
-        obj.put("appellantPostCode", venueName);
+
+        obj.put("appellantPostCode", findVenueName(sscsCaseData));
 
         if (sscsCaseData.getCaseCreated() != null) {
             obj.put("appealDate", sscsCaseData.getCaseCreated());
@@ -162,6 +158,17 @@ public class RoboticsJsonMapper {
         }
 
         return obj;
+    }
+
+    private String findVenueName(SscsCaseData sscsCaseData) {
+        String postcodeToUse = "yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())
+            ? sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress().getPostcode()
+            : sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
+
+        String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(postcodeToUse);
+
+        AirlookupBenefitToVenue venue = airLookupService.lookupAirVenueNameByPostCode(firstHalfOfPostcode);
+        return sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("pip") ? venue.getPipVenue() : venue.getEsaOrUcVenue();
     }
 
     private Optional<OfficeMapping> buildOffice(JSONObject obj, Appeal appeal) {
