@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
-import java.util.ArrayList;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +23,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonMapper;
@@ -118,6 +116,7 @@ public class RoboticsServiceIt {
     @Test
     public void givenSscsCaseDataWithUcBenefitType_makeValidRoboticsJsonThatValidatesAgainstSchema() {
         caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("UC").build());
+        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Universal Credit").build());
 
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
 
@@ -134,7 +133,7 @@ public class RoboticsServiceIt {
     @Test
     public void givenSscsCaseDataWithEsaBenefitType_makeValidRoboticsJsonThatValidatesAgainstSchema() {
         caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("ESA").build());
-        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Balham DRT").build());
+        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Birkenhead LM DRT").build());
 
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
 
@@ -185,6 +184,6 @@ public class RoboticsServiceIt {
 
         verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
 
-        assertEquals("DWP PIP(1)", caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertEquals("DWP PIP (1)", caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 }
