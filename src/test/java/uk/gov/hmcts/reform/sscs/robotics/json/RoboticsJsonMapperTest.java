@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.sscs.robotics.json;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.time.LocalDate;
@@ -15,9 +18,13 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @RunWith(JUnitParamsRunner.class)
 public class RoboticsJsonMapperTest {
@@ -30,27 +37,39 @@ public class RoboticsJsonMapperTest {
 
     private DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
 
+    @Mock
+    private RegionalProcessingCenterService regionalProcessingCenterService;
+
+    @Mock
+    private AirLookupService airLookupService;
+
     @Before
     public void setup() {
-
-        roboticsJsonMapper = new RoboticsJsonMapper(false, dwpAddressLookupService);
+        initMocks(this);
+        roboticsJsonMapper = new RoboticsJsonMapper(dwpAddressLookupService, regionalProcessingCenterService, airLookupService);
 
         roboticsWrapper = RoboticsWrapper
             .builder()
             .sscsCaseData(buildCaseData())
-            .ccdCaseId(123L).venueName("Bromley").evidencePresent("Yes")
+            .ccdCaseId(123L).evidencePresent("Yes")
             .state(State.APPEAL_CREATED)
             .build();
+
+        given(airLookupService.lookupAirVenueNameByPostCode(any())).willReturn(AirlookupBenefitToVenue.builder().pipVenue("Bromley").esaOrUcVenue("Bath").build());
+        given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
     }
 
     @Test
     public void mapsAppealToRoboticsJson() {
+        String date = LocalDate.now().toString();
+        roboticsWrapper.getSscsCaseData().setDwpResponseDate(date);
+
         roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         roboticsJsonValidator.validate(roboticsJson);
 
         assertEquals(
-            "If this fails, add an assertion below, do not just increment the number :)", 17,
+            "If this fails, add an assertion below, do not just increment the number :)", 23,
             roboticsJson.length()
         );
 
@@ -58,7 +77,7 @@ public class RoboticsJsonMapperTest {
         assertEquals(123L, roboticsJson.get("caseId"));
         assertEquals("AB 22 55 66 B", roboticsJson.get("appellantNino"));
         assertEquals("Bromley", roboticsJson.get("appellantPostCode"));
-        assertEquals(LocalDate.now().toString(), roboticsJson.get("appealDate"));
+        assertEquals(date, roboticsJson.get("appealDate"));
         assertEquals("2018-06-29", roboticsJson.get("mrnDate"));
         assertEquals("Lost my paperwork", roboticsJson.get("mrnReasonForBeingLate"));
         assertEquals("DWP PIP (1)", roboticsJson.get("pipNumber"));
@@ -67,7 +86,12 @@ public class RoboticsJsonMapperTest {
         assertEquals("Yes", roboticsJson.get("evidencePresent"));
         assertEquals("Online", roboticsJson.get("receivedVia"));
         assertTrue(roboticsJson.has("rpcEmail"));
-        assertEquals("Cardiff_SYA_Respon@justice.gov.uk", roboticsJson.get("rpcEmail"));
+        assertTrue(roboticsJson.has("isReadyToList"));
+        assertEquals(date, roboticsJson.get("dwpResponseDate"));
+        assertEquals("DWP PIP (1)", roboticsJson.get("dwpIssuingOffice"));
+        assertEquals("DWP PIP (1)", roboticsJson.get("dwpPresentingOffice"));
+        assertEquals("No", roboticsJson.get("dwpIsOfficerAttending"));
+        assertEquals("No", roboticsJson.get("dwpUcb"));
 
         assertEquals(
             "If this fails, add an assertion below, do not just increment the number :)", 11,
@@ -417,16 +441,8 @@ public class RoboticsJsonMapperTest {
     }
 
     @Test
-    public void givenReadyToListFeatureIsFalse_thenDoNotSetReadyToListField() {
-        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+    public void givenStateIsAppealCreated_thenSetReadyToListFieldToNo() {
 
-        assertFalse(roboticsJson.has("isReadyToList"));
-    }
-
-    @Test
-    public void givenReadyToListFeatureIsTrueAndStateIsAppealCreated_thenSetReadyToListFieldToNo() {
-
-        roboticsJsonMapper = new RoboticsJsonMapper(true, dwpAddressLookupService);
         roboticsWrapper.setState(State.APPEAL_CREATED);
 
         roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
@@ -436,9 +452,7 @@ public class RoboticsJsonMapperTest {
     }
 
     @Test
-    public void givenReadyToListFeatureIsTrueAndStateIsReadyToList_thenSetReadyToListFields() {
-        roboticsJsonMapper = new RoboticsJsonMapper(true, dwpAddressLookupService);
-
+    public void givenStateIsReadyToList_thenSetReadyToListFields() {
         DynamicListItem value = new DynamicListItem("ABC", "DEF");
 
         roboticsWrapper.setState(State.READY_TO_LIST);
@@ -461,9 +475,7 @@ public class RoboticsJsonMapperTest {
     }
 
     @Test
-    public void givenReadyToListFeatureIsTrueAndStateIsReadyToListAndDwpOfficesAreNotSet_thenSetDefaultReadyToListFields() {
-        roboticsJsonMapper = new RoboticsJsonMapper(true, dwpAddressLookupService);
-
+    public void givenStateIsReadyToListAndDwpOfficesAreNotSet_thenSetDefaultReadyToListFields() {
         DynamicListItem value = new DynamicListItem("ABC", "DEF");
 
         roboticsWrapper.setState(State.READY_TO_LIST);

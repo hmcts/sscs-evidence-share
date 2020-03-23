@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.*;
 
 import java.net.URI;
@@ -13,10 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
-import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator;
@@ -25,19 +28,17 @@ import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator;
 @Slf4j
 public class RoboticsService {
 
-
-    private final RegionalProcessingCenterService regionalProcessingCenterService;
-
-    private final EvidenceManagementService evidenceManagementService;
-
     private static final String GLASGOW = "GLASGOW";
     private static final String PIP_AE = "DWP PIP (AE)";
-    private final AirLookupService airLookupService;
+    private final EvidenceManagementService evidenceManagementService;
     private final EmailService emailService;
     private final RoboticsJsonMapper roboticsJsonMapper;
     private final RoboticsJsonValidator roboticsJsonValidator;
     private final RoboticsEmailTemplate roboticsEmailTemplate;
     private final EvidenceShareConfig evidenceShareConfig;
+    private final DwpAddressLookupService dwpAddressLookupService;
+    private final CcdService ccdService;
+    private final IdamService idamService;
 
     private final int englishRoboticCount;
     private final int scottishRoboticCount;
@@ -46,48 +47,41 @@ public class RoboticsService {
 
     @Autowired
     public RoboticsService(
-        RegionalProcessingCenterService regionalProcessingCenterService,
         EvidenceManagementService evidenceManagementService,
-        AirLookupService airLookupService,
         EmailService emailService,
         RoboticsJsonMapper roboticsJsonMapper,
         RoboticsJsonValidator roboticsJsonValidator,
         RoboticsEmailTemplate roboticsEmailTemplate,
         EvidenceShareConfig evidenceShareConfig,
+        DwpAddressLookupService dwpAddressLookupService,
+        CcdService ccdService,
+        IdamService idamService,
         @Value("${robotics.englishCount}") int englishRoboticCount,
         @Value("${robotics.scottishCount}") int scottishRoboticCount
     ) {
-        this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.evidenceManagementService = evidenceManagementService;
-        this.airLookupService = airLookupService;
         this.emailService = emailService;
         this.roboticsJsonMapper = roboticsJsonMapper;
         this.roboticsJsonValidator = roboticsJsonValidator;
         this.roboticsEmailTemplate = roboticsEmailTemplate;
         this.evidenceShareConfig = evidenceShareConfig;
+        this.dwpAddressLookupService = dwpAddressLookupService;
+        this.ccdService = ccdService;
+        this.idamService = idamService;
         this.englishRoboticCount = englishRoboticCount;
         this.scottishRoboticCount = scottishRoboticCount;
         rn = new Random();
     }
 
     public JSONObject sendCaseToRobotics(CaseDetails<SscsCaseData> caseDetails) {
+        log.info("Case sent to robotics service for case id {} ", caseDetails.getId());
 
         SscsCaseData caseData = caseDetails.getCaseData();
-        String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(caseData.getAppeal().getAppellant().getAddress().getPostcode());
 
-        AirlookupBenefitToVenue venue = airLookupService.lookupAirVenueNameByPostCode(firstHalfOfPostcode);
-
-        String venueName = caseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("pip") ? venue.getPipVenue() : venue.getEsaOrUcVenue();
-
-        log.info("Case {} Robotics JSON successfully created for benefit type {}", caseDetails.getId(),
-            caseData.getAppeal().getBenefitType().getCode());
-
-        log.info("Downloading SSCS1 for robotics for case id {} ", caseDetails.getId());
-        byte[] sscs1Form = downloadSscs1(caseData, Long.valueOf(caseData.getCcdCaseId()));
-
+        updateClosedOffices(caseData);
         log.info("Creating robotics for case id {} ", caseDetails.getId());
         JSONObject roboticsJson = createRobotics(RoboticsWrapper.builder().sscsCaseData(caseData)
-            .ccdCaseId(caseDetails.getId()).venueName(venueName).evidencePresent(caseData.getEvidencePresent()).state(caseDetails.getState()).build());
+            .ccdCaseId(caseDetails.getId()).evidencePresent(caseData.getEvidencePresent()).state(caseDetails.getState()).build());
 
         log.info("Downloading additional evidence for robotics for case id {} ", caseDetails.getId());
         Map<SscsDocument, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
@@ -95,9 +89,79 @@ public class RoboticsService {
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
         boolean isPipAeTo = Optional.ofNullable(caseData.getAppeal().getMrnDetails()).map(m -> equalsIgnoreCase(m.getDwpIssuingOffice(), PIP_AE)).orElse(false);
 
+        log.info("Downloading SSCS1 for robotics for case id {} ", caseDetails.getId());
+        byte[] sscs1Form = downloadSscs1(caseData, Long.valueOf(caseData.getCcdCaseId()));
+
         sendJsonByEmail(caseDetails.getId(), caseData.getAppeal(), roboticsJson, sscs1Form, additionalEvidence, isScottish, isPipAeTo);
 
+        log.info("Case {} Robotics JSON successfully sent for benefit type {}", caseDetails.getId(),
+            caseData.getAppeal().getBenefitType().getCode());
+
         return roboticsJson;
+    }
+
+    private void updateClosedOffices(SscsCaseData sscsCaseData) {
+
+        boolean issuingOfficeChanged = hasIssuingOfficeChanged(sscsCaseData);
+        boolean originatingOfficeChanged = hasOriginatingOfficeChanged(sscsCaseData);
+        boolean presentingOfficeChanged = hasPresentingOfficeChanged(sscsCaseData);
+
+        if (issuingOfficeChanged || originatingOfficeChanged || presentingOfficeChanged) {
+            log.info("Case {} automatically updating DWP office probably due to office closure", sscsCaseData.getCcdCaseId());
+
+            ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()),
+                CASE_UPDATED.getCcdType(), "Case updated", "Case updated with new DWP office", idamService.getIdamTokens());
+        }
+    }
+
+    private boolean hasIssuingOfficeChanged(SscsCaseData sscsCaseData) {
+        String issuingOffice = sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice();
+
+        if (issuingOffice != null) {
+            Optional<OfficeMapping> dwpIssuingOfficeMapping = dwpAddressLookupService.getDwpMappingByOffice(sscsCaseData.getAppeal().getBenefitType().getCode(), issuingOffice);
+
+            if (dwpIssuingOfficeMapping.isPresent()) {
+                if (!dwpIssuingOfficeMapping.get().getMapping().getCcd().equals(issuingOffice)) {
+                    sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice(dwpIssuingOfficeMapping.get().getMapping().getCcd());
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasOriginatingOfficeChanged(SscsCaseData sscsCaseData) {
+        DynamicList originatingOffice = sscsCaseData.getDwpOriginatingOffice();
+
+        if (originatingOffice != null && originatingOffice.getValue().getCode() != null) {
+            Optional<OfficeMapping> dwpOriginatingOfficeMapping = dwpAddressLookupService.getDwpMappingByOffice(sscsCaseData.getAppeal().getBenefitType().getCode(), originatingOffice.getValue().getCode());
+
+            if (dwpOriginatingOfficeMapping.isPresent()) {
+                if (!dwpOriginatingOfficeMapping.get().getMapping().getCcd().equals(originatingOffice.getValue().getCode())) {
+                    originatingOffice.setValue(new DynamicListItem(dwpOriginatingOfficeMapping.get().getMapping().getCcd(), dwpOriginatingOfficeMapping.get().getMapping().getCcd()));
+                    sscsCaseData.setDwpOriginatingOffice(originatingOffice);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasPresentingOfficeChanged(SscsCaseData sscsCaseData) {
+        DynamicList presentingOffice = sscsCaseData.getDwpPresentingOffice();
+
+        if (presentingOffice != null && presentingOffice.getValue().getCode() != null) {
+            Optional<OfficeMapping> dwpPresentingOfficeMapping = dwpAddressLookupService.getDwpMappingByOffice(sscsCaseData.getAppeal().getBenefitType().getCode(), presentingOffice.getValue().getCode());
+
+            if (dwpPresentingOfficeMapping.isPresent()) {
+                if (!dwpPresentingOfficeMapping.get().getMapping().getCcd().equals(presentingOffice.getValue().getCode())) {
+                    presentingOffice.setValue(new DynamicListItem(dwpPresentingOfficeMapping.get().getMapping().getCcd(), dwpPresentingOfficeMapping.get().getMapping().getCcd()));
+                    sscsCaseData.setDwpPresentingOffice(presentingOffice);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private byte[] downloadSscs1(SscsCaseData sscsCaseData, Long caseId) {

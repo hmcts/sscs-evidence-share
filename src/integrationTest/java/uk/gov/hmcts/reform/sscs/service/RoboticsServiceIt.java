@@ -5,18 +5,25 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonMapper;
 
@@ -26,6 +33,15 @@ public class RoboticsServiceIt {
 
     @Autowired
     private RoboticsService roboticsService;
+
+    @MockBean
+    private IdamService idamService;
+
+    @MockBean
+    private CcdClient ccdClient;
+
+    @MockBean
+    private CcdService ccdService;
 
     @Autowired
     private RoboticsJsonMapper mapper;
@@ -39,6 +55,9 @@ public class RoboticsServiceIt {
     @MockBean
     private EmailService emailService;
 
+    @Captor
+    private ArgumentCaptor<SscsCaseData> caseDataCaptor;
+
     @Before
     public void setup() {
         caseData = SscsCaseData.builder()
@@ -46,7 +65,7 @@ public class RoboticsServiceIt {
             .regionalProcessingCenter(null)
             .evidencePresent("Yes")
             .appeal(Appeal.builder()
-                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
+                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("DWP PIP (1)").build())
                 .benefitType(BenefitType.builder().code("PIP").description("Personal Independence Payment").build())
                 .receivedVia("paper")
                 .appellant(Appellant.builder()
@@ -77,25 +96,12 @@ public class RoboticsServiceIt {
         assertTrue(result.has("appellant"));
         assertTrue(result.has("representative"));
         assertTrue(result.has("hearingArrangements"));
+
+        verifyNoMoreInteractions(ccdService);
     }
 
     @Test
-    public void givenSscsCaseDataWithoutRepresentativeWithReadyToListFeatureFalse_makeValidRoboticsJsonThatValidatesAgainstSchema() {
-        ReflectionTestUtils.setField(mapper, "readyToListFeatureEnabled", false);
-
-        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
-
-        assertThat(result.get("caseId"), is(1234L));
-        assertTrue(result.has("appellant"));
-        assertFalse(result.has("representative"));
-        assertTrue(result.has("hearingArrangements"));
-        assertFalse(result.has("isReadyToList"));
-    }
-
-    @Test
-    public void givenSscsCaseDataWithReadyToListFeatureTrue_makeValidRoboticsJsonThatValidatesAgainstSchemaWithReadyToListField() {
-        ReflectionTestUtils.setField(mapper, "readyToListFeatureEnabled", true);
-
+    public void givenSscsCaseDataWithoutRepresentative_makeValidRoboticsJsonThatValidatesAgainstSchema() {
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
 
         assertThat(result.get("caseId"), is(1234L));
@@ -103,12 +109,14 @@ public class RoboticsServiceIt {
         assertFalse(result.has("representative"));
         assertTrue(result.has("hearingArrangements"));
         assertTrue(result.has("isReadyToList"));
+
+        verifyNoMoreInteractions(ccdService);
     }
 
     @Test
-    public void givenSscsCaseDataWithUcBenefitTypeAndReadyToListFeatureTrue_makeValidRoboticsJsonThatValidatesAgainstSchemaWithReadyToListField() {
-        ReflectionTestUtils.setField(mapper, "readyToListFeatureEnabled", true);
+    public void givenSscsCaseDataWithUcBenefitType_makeValidRoboticsJsonThatValidatesAgainstSchema() {
         caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("UC").build());
+        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Universal Credit").build());
 
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
 
@@ -118,13 +126,14 @@ public class RoboticsServiceIt {
         assertTrue(result.has("hearingArrangements"));
         assertTrue(result.has("isReadyToList"));
         assertEquals("Coventry (CMCB)", result.get("appellantPostCode"));
+
+        verifyNoMoreInteractions(ccdService);
     }
 
     @Test
-    public void givenSscsCaseDataWithEsaBenefitTypeAndReadyToListFeatureTrue_makeValidRoboticsJsonThatValidatesAgainstSchemaWithReadyToListField() {
-        ReflectionTestUtils.setField(mapper, "readyToListFeatureEnabled", true);
+    public void givenSscsCaseDataWithEsaBenefitType_makeValidRoboticsJsonThatValidatesAgainstSchema() {
         caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("ESA").build());
-        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Balham DRT").build());
+        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Birkenhead LM DRT").build());
 
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
 
@@ -134,11 +143,12 @@ public class RoboticsServiceIt {
         assertTrue(result.has("hearingArrangements"));
         assertTrue(result.has("isReadyToList"));
         assertEquals("Coventry (CMCB)", result.get("appellantPostCode"));
+
+        verifyNoMoreInteractions(ccdService);
     }
 
     @Test
-    public void givenSscsCaseDataWithPipBenefitTypeAndReadyToListFeatureTrue_makeValidRoboticsJsonThatValidatesAgainstSchemaWithReadyToListField() {
-        ReflectionTestUtils.setField(mapper, "readyToListFeatureEnabled", true);
+    public void givenSscsCaseDataWithPipBenefitType_makeValidRoboticsJsonThatValidatesAgainstSchema() {
         caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("Pip").build());
 
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
@@ -149,6 +159,8 @@ public class RoboticsServiceIt {
         assertTrue(result.has("hearingArrangements"));
         assertTrue(result.has("isReadyToList"));
         assertEquals("Nuneaton", result.get("appellantPostCode"));
+
+        verifyNoMoreInteractions(ccdService);
     }
 
     @Test
@@ -161,5 +173,17 @@ public class RoboticsServiceIt {
         assertTrue(result.has("appellant"));
         assertFalse(result.has("representative"));
         assertFalse(result.has("hearingArrangements"));
+
+        verifyNoMoreInteractions(ccdService);
+    }
+
+    @Test
+    public void givenDwpOfficeIsClosed_thenSaveNewOfficeToCaseWhenRoboticsIsProcessed() {
+        caseDetails.getCaseData().getAppeal().getMrnDetails().setDwpIssuingOffice("1");
+        roboticsService.sendCaseToRobotics(caseDetails);
+
+        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
+
+        assertEquals("DWP PIP (1)", caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 }
