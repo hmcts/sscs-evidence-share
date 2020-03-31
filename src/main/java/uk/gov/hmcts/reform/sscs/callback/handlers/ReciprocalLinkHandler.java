@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
@@ -58,8 +59,7 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
         IdamTokens idamTokens = idamService.getIdamTokens();
 
         if (callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIdentity() != null
-            && callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIdentity().getNino() != null
-            && !callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIdentity().getNino().equals("")) {
+            && !StringUtils.isEmpty(callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIdentity().getNino())) {
 
             String nino = callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIdentity().getNino();
 
