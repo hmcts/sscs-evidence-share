@@ -82,20 +82,22 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void backLinkAssociatedCases(Long caseId, List<SscsCaseDetails> matchedByNinoCases, IdamTokens idamTokens) {
-        if (matchedByNinoCases.size() > 0 && matchedByNinoCases.size() < 10) {
+        if (matchedByNinoCases.size() > 0 && matchedByNinoCases.size() < 11) {
             CaseLink caseLink = CaseLink.builder().value(
                 CaseLinkDetails.builder().caseReference(caseId.toString()).build()).build();
 
             for (SscsCaseDetails matchedCase : matchedByNinoCases) {
-                List<CaseLink> caseLinks = matchedCase.getData().getAssociatedCase() != null ?  matchedCase.getData().getAssociatedCase() : new ArrayList<>();
+                if (!matchedCase.getId().equals(caseId)) {
+                    List<CaseLink> caseLinks = matchedCase.getData().getAssociatedCase() != null ? matchedCase.getData().getAssociatedCase() : new ArrayList<>();
 
-                caseLinks.add(caseLink);
-                matchedCase.getData().setAssociatedCase(caseLinks);
-                matchedCase.getData().setLinkedCasesBoolean("Yes");
+                    caseLinks.add(caseLink);
+                    matchedCase.getData().setAssociatedCase(caseLinks);
+                    matchedCase.getData().setLinkedCasesBoolean("Yes");
 
-                log.info("Back linking case id {} to case id {}", caseId, matchedCase.getId().toString());
+                    log.info("Back linking case id {} to case id {}", caseId, matchedCase.getId().toString());
 
-                ccdService.updateCase(matchedCase.getData(), matchedCase.getId(), ASSOCIATE_CASE.getCcdType(), "Associate case", "Associated case added", idamTokens);
+                    ccdService.updateCase(matchedCase.getData(), matchedCase.getId(), ASSOCIATE_CASE.getCcdType(), "Associate case", "Associated case added", idamTokens);
+                }
             }
         }
     }

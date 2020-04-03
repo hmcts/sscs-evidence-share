@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -96,9 +95,11 @@ public class ReciprocalLinkHandlerTest {
 
     @Test
     public void givenAssociatedCase_thenAddReciprocalLinkToAssociatedCase() {
-        given(ccdService.findCaseBy(eq(map), any())).willReturn(Collections.singletonList(
-            SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build()
-        ));
+        List<SscsCaseDetails> associatedCaseList = new ArrayList<>();
+        associatedCaseList.add(SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build());
+        associatedCaseList.add(SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build());
+
+        given(ccdService.findCaseBy(eq(map), any())).willReturn(associatedCaseList);
 
         handler.handle(SUBMITTED, callback);
 
@@ -111,9 +112,11 @@ public class ReciprocalLinkHandlerTest {
         List<CaseLink> caseLinks = new ArrayList<>();
         caseLinks.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("1").build()).build());
 
-        given(ccdService.findCaseBy(eq(map), any())).willReturn(Collections.singletonList(
-            SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().associatedCase(caseLinks).build()).build()
-        ));
+        List<SscsCaseDetails> associatedCaseList = new ArrayList<>();
+        associatedCaseList.add(SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().associatedCase(caseLinks).build()).build());
+        associatedCaseList.add(SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build());
+
+        given(ccdService.findCaseBy(eq(map), any())).willReturn(associatedCaseList);
 
         handler.handle(SUBMITTED, callback);
 
@@ -127,11 +130,13 @@ public class ReciprocalLinkHandlerTest {
         List<SscsCaseDetails> associatedCaseList = new ArrayList<>();
         associatedCaseList.add(SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build());
         associatedCaseList.add(SscsCaseDetails.builder().id(34343434L).data(SscsCaseData.builder().build()).build());
+        associatedCaseList.add(SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build());
 
         given(ccdService.findCaseBy(eq(map), any())).willReturn(associatedCaseList);
 
         handler.handle(SUBMITTED, callback);
 
+        verify(ccdService, times(2)).updateCase(any(), any(), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
         verify(ccdService).updateCase(capture.capture(), eq(12345678L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
         verify(ccdService).updateCase(capture.capture(), eq(34343434L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
         assertEquals("7656765", capture.getAllValues().get(0).getAssociatedCase().get(0).getValue().getCaseReference());
@@ -151,7 +156,7 @@ public class ReciprocalLinkHandlerTest {
         associatedCaseList.add(SscsCaseDetails.builder().id(56765677L).data(SscsCaseData.builder().build()).build());
         associatedCaseList.add(SscsCaseDetails.builder().id(56765678L).data(SscsCaseData.builder().build()).build());
         associatedCaseList.add(SscsCaseDetails.builder().id(56765679L).data(SscsCaseData.builder().build()).build());
-        associatedCaseList.add(SscsCaseDetails.builder().id(567656710L).data(SscsCaseData.builder().build()).build());
+        associatedCaseList.add(SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build());
 
         given(ccdService.findCaseBy(eq(map), any())).willReturn(associatedCaseList);
 
