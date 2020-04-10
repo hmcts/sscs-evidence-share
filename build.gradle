@@ -221,7 +221,7 @@ dependencies {
 
   testCompile 'pl.pragmatists:JUnitParams:1.1.1'
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.3.0'
+  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
 
   compile 'org.projectlombok:lombok:1.18.12'
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
