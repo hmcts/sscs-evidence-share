@@ -112,3 +112,5 @@ exela:
   addressLine3: Harlow
   addressPostcode: CM20 9QF
 
+feature:
+  bulk-scan.migrated: ${BULK_SCAN_MIGRATED:false}

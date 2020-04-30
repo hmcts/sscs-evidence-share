@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.web.client.RestTemplate;
@@ -40,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
+@TestPropertySource(locations = "classpath:config/application_it.properties")
 public class IssueFurtherEvidenceServiceIt {
 
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
