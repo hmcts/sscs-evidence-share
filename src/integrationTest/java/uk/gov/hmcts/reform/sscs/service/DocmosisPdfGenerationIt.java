@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.HttpClientErrorException;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = SscsEvidenceShareApplication.class)
+@TestPropertySource(locations = "classpath:config/application_it.properties")
 public class DocmosisPdfGenerationIt {
 
     public static final String FILE_CONTENT = "Welcome to PDF document service";
