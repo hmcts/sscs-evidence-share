@@ -66,7 +66,7 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
             List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamTokens);
 
             if (matchedByNinoCases.size() > 0) {
-                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + callback.getCaseDetails().getCaseData().getGeneratedNino());
+                log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
 
                 backLinkAssociatedCases(callback.getCaseDetails().getId(), matchedByNinoCases, idamTokens);
             }
