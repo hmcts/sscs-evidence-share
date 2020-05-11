@@ -45,10 +45,16 @@ public class SendToDwpHandler implements CallbackHandler<SscsCaseData> {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return bulkScanMigrated
-            && callbackType.equals(CallbackType.SUBMITTED)
-            && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
-            || callback.getEvent() == EventType.SYA_APPEAL_CREATED);
+        return
+            callbackType.equals(CallbackType.SUBMITTED)
+                && checkReceivedViaValid(callback)
+                && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
+                || callback.getEvent() == EventType.SYA_APPEAL_CREATED);
+    }
+
+    private boolean checkReceivedViaValid(Callback<SscsCaseData> callback) {
+        return (!"Paper".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getReceivedVia())
+            || (bulkScanMigrated && "Paper".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getReceivedVia())));
     }
 
     @Override
