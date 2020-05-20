@@ -26,33 +26,50 @@ public class FurtherEvidencePlaceholderService {
     }
 
     public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
+
+
         requireNonNull(caseData, "caseData must not be null");
+
         Map<String, Object> placeholders = new ConcurrentHashMap<>();
+
         Address address = getAddress(caseData, letterType);
 
         placeholderService.build(caseData, placeholders, address, null);
 
-        Name name = getName(caseData, letterType);
+        String name = getName(caseData, letterType);
+
         if (name != null) {
-            placeholders.put(NAME, truncateAddressLine(name.getFullNameNoTitle()));
+            placeholders.put(NAME, truncateAddressLine(name));
         }
 
         return placeholders;
     }
 
-    private Name getName(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
+    private String getName(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
+
         if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
             return Optional.of(caseData.getAppeal())
                 .map(Appeal::getAppellant)
                 .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
                 .map(Appellant::getAppointee)
                 .map(Appointee::getName)
+                .map(Name::getFullNameNoTitle)
                 .orElseGet(() -> Optional.of(caseData.getAppeal())
                     .map(Appeal::getAppellant)
                     .map(Appellant::getName)
-                    .orElse(null));
+                    .map(Name::getFullNameNoTitle)
+                    .orElse("Sir/Madam"));
+
         } else if (FurtherEvidenceLetterType.REPRESENTATIVE_LETTER.getValue().equals(letterType.getValue())) {
-            return caseData.getAppeal().getRep().getName();
+
+            return Optional.of(caseData.getAppeal())
+                .map(Appeal::getRep)
+                .map(Representative::getName)
+                .map(Name::getFullNameNoTitle)
+                .orElseGet(() -> Optional.of(caseData.getAppeal())
+                        .map(Appeal::getRep)
+                        .map(Representative::getOrganisation)
+                        .orElse("Sir/Madam"));
         } else {
             return null;
         }
