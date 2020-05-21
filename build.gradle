@@ -255,6 +255,9 @@ dependencyManagement {
       entry 'tomcat-embed-websocket'
     }
 
+    // resolves: CVE-2020-9489
+    dependency group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
+
     // solves CVE-2019-12086
     // remove once spring manager incorporates this changes
     dependencySet(group: 'com.fasterxml.jackson.core', version: '2.10.3') {
