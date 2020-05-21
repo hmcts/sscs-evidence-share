@@ -48,31 +48,41 @@ public class FurtherEvidencePlaceholderService {
     private String getName(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
 
         if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
-            return Optional.of(caseData.getAppeal())
-                .map(Appeal::getAppellant)
-                .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
-                .map(Appellant::getAppointee)
-                .map(Appointee::getName)
-                .map(Name::getFullNameNoTitle)
-                .orElseGet(() -> Optional.of(caseData.getAppeal())
-                    .map(Appeal::getAppellant)
-                    .map(Appellant::getName)
-                    .map(Name::getFullNameNoTitle)
-                    .orElse("Sir/Madam"));
+
+            return extractNameAppellant(caseData);
 
         } else if (FurtherEvidenceLetterType.REPRESENTATIVE_LETTER.getValue().equals(letterType.getValue())) {
 
-            return Optional.of(caseData.getAppeal())
-                .map(Appeal::getRep)
-                .map(Representative::getName)
-                .map(Name::getFullNameNoTitle)
-                .orElseGet(() -> Optional.of(caseData.getAppeal())
-                        .map(Appeal::getRep)
-                        .map(Representative::getOrganisation)
-                        .orElse("Sir/Madam"));
+            return extraceNameRep(caseData);
+            
         } else {
             return null;
         }
+    }
+
+    private String extractNameAppellant(SscsCaseData caseData) {
+        return Optional.of(caseData.getAppeal())
+            .map(Appeal::getAppellant)
+            .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
+            .map(Appellant::getAppointee)
+            .map(Appointee::getName)
+            .map(Name::getFullNameNoTitle)
+            .orElseGet(() -> Optional.of(caseData.getAppeal())
+                .map(Appeal::getAppellant)
+                .map(Appellant::getName)
+                .map(Name::getFullNameNoTitle)
+                .orElse("Sir/Madam"));
+    }
+
+    private String extraceNameRep(SscsCaseData caseData) {
+        return Optional.of(caseData.getAppeal())
+            .map(Appeal::getRep)
+            .map(Representative::getName)
+            .map(Name::getFullNameNoTitle)
+            .orElseGet(() -> Optional.of(caseData.getAppeal())
+                .map(Appeal::getRep)
+                .map(Representative::getOrganisation)
+                .orElse("Sir/Madam"));
     }
 
     private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
