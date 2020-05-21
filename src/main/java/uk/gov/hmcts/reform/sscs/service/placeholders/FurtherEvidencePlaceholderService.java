@@ -54,7 +54,7 @@ public class FurtherEvidencePlaceholderService {
         } else if (FurtherEvidenceLetterType.REPRESENTATIVE_LETTER.getValue().equals(letterType.getValue())) {
 
             return extraceNameRep(caseData);
-            
+
         } else {
             return null;
         }
