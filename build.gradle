@@ -180,7 +180,8 @@ def versions = [
   reformLogging: '5.1.0',
   springBoot: springBoot.class.package.implementationVersion,
   springfoxSwagger: '2.9.2',
-  lombok: '1.18.6'
+  lombok: '1.18.6',
+  restAssured: '4.2.0'
 ]
 
 dependencies {
@@ -191,8 +192,11 @@ dependencies {
 
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-  compile group: 'io.rest-assured', name: 'rest-assured', version: '4.3.0'
+  compile group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
+  compile group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
+  compile group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
 
+  compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version:'0.0.5'
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.0.4'
   compile group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
