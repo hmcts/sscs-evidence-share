@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
+import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.dwp.Mapping;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
@@ -47,6 +48,8 @@ public class RoboticsServiceTest {
 
     @Mock
     EmailService emailService;
+
+    EmailHelper emailHelper;
 
     @Mock
     RoboticsJsonMapper roboticsJsonMapper;
@@ -81,7 +84,7 @@ public class RoboticsServiceTest {
     @Captor
     private ArgumentCaptor<SscsCaseData> caseDataCaptor;
 
-    private SscsCaseData appeal;
+    private SscsCaseData sscsCaseData;
 
     private CaseDetails<SscsCaseData> caseData;
 
@@ -89,11 +92,13 @@ public class RoboticsServiceTest {
     public void setup() {
         initMocks(this);
 
+        emailHelper = new EmailHelper();
         convertService = new SscsCcdConvertService();
 
         roboticsService = new RoboticsService(
             evidenceManagementService,
             emailService,
+            emailHelper,
             roboticsJsonMapper,
             roboticsJsonValidator,
             roboticsEmailTemplate,
@@ -110,26 +115,19 @@ public class RoboticsServiceTest {
         given(roboticsJsonMapper.map(any())).willReturn(mappedJson);
         given(evidenceShareConfig.getSubmitTypes()).willReturn(Collections.singletonList("paper"));
 
-        appeal = buildCaseData();
-        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, appeal, null);
+        sscsCaseData = buildCaseData("Bloggs");
+        sscsCaseData.setCcdCaseId("1");
+        sscsCaseData.getAppeal().getAppellant().getIdentity().setNino("789123");
+        caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
     }
 
     @Test
     @Parameters({"CARDIFF", "GLASGOW", "", "null"})
     public void generatingRoboticsSendsAnEmail(String rpcName) {
 
-        Appeal appeal = Appeal.builder()
-            .mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
-            .benefitType(BenefitType.builder().code("PIP").build())
-            .appellant(Appellant.builder().address(
-                Address.builder().postcode("CM120HN").build())
-            .build()).build();
-
-        SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(appeal).regionalProcessingCenter(RegionalProcessingCenter.builder().name(rpcName).build()).ccdCaseId("123").build();
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name(rpcName).build());
 
         given(evidenceManagementService.download(any(), eq(null))).willReturn(null);
-
-        given(emailService.generateUniqueEmailId(appeal.getAppellant())).willReturn("Bloggs_123");
 
         CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
         roboticsService.sendCaseToRobotics(caseData);
@@ -153,15 +151,6 @@ public class RoboticsServiceTest {
         byte[] expectedBytes = {1, 2, 3};
         given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
 
-        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
-            .benefitType(BenefitType.builder().code("PIP").build())
-            .receivedVia(receivedVia)
-            .appellant(Appellant.builder().address(
-                Address.builder().postcode("CM120HN").build())
-                .build()).build();
-
-        given(emailService.generateUniqueEmailId(appeal.getAppellant())).willReturn("Bloggs_123");
-
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
@@ -171,7 +160,9 @@ public class RoboticsServiceTest {
                 .build())
             .build());
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, SscsCaseData.builder().appeal(appeal).sscsDocument(documents).ccdCaseId("123").build(), null);
+        sscsCaseData.getAppeal().setReceivedVia(receivedVia);
+        sscsCaseData.setSscsDocument(documents);
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -201,15 +192,6 @@ public class RoboticsServiceTest {
         Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
         expectedAdditionalEvidence.put("test.jpg", expectedBytes);
 
-        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
-            .benefitType(BenefitType.builder().code("PIP").build())
-            .receivedVia("Online")
-            .appellant(Appellant.builder().address(
-                Address.builder().postcode("CM120HN").build())
-                .build()).build();
-
-        given(emailService.generateUniqueEmailId(appeal.getAppellant())).willReturn("Bloggs_123");
-
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
@@ -219,7 +201,9 @@ public class RoboticsServiceTest {
                 .build())
             .build());
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, SscsCaseData.builder().appeal(appeal).sscsDocument(documents).ccdCaseId("123").build(), null);
+        sscsCaseData.setSscsDocument(documents);
+
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -243,15 +227,6 @@ public class RoboticsServiceTest {
         Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
         expectedAdditionalEvidence.put("test.jpg", expectedBytes);
 
-        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).dwpIssuingOffice("DWP PIP (AE)").build())
-                .benefitType(BenefitType.builder().code("PIP").build())
-                .receivedVia("Online")
-                .appellant(Appellant.builder().address(
-                        Address.builder().postcode("CM120HN").build())
-                        .build()).build();
-
-        given(emailService.generateUniqueEmailId(appeal.getAppellant())).willReturn("Bloggs_123");
-
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
@@ -261,7 +236,10 @@ public class RoboticsServiceTest {
                         .build())
                 .build());
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, SscsCaseData.builder().appeal(appeal).sscsDocument(documents).ccdCaseId("123").build(), null);
+        sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice("DWP PIP (AE)");
+        sscsCaseData.setSscsDocument(documents);
+
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -282,11 +260,10 @@ public class RoboticsServiceTest {
         given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
             OfficeMapping.builder().code(existingOffice).mapping(Mapping.builder().ccd(newOffice).build()).build()));
 
-        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice(existingOffice).mrnDate(localDate.format(formatter)).build())
-            .benefitType(BenefitType.builder().code(benefitType).build())
-            .appellant(Appellant.builder().address(Address.builder().postcode("CM120HN").build()).build()).build();
+        sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice(existingOffice);
+        sscsCaseData.getAppeal().getBenefitType().setCode(benefitType);
 
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, SscsCaseData.builder().appeal(appeal).ccdCaseId("123").build(), null);
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -302,12 +279,12 @@ public class RoboticsServiceTest {
         given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
             OfficeMapping.builder().code(existingOffice).mapping(Mapping.builder().ccd(newOffice).build()).build()));
 
-        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
-            .benefitType(BenefitType.builder().code(benefitType).build())
-            .appellant(Appellant.builder().address(Address.builder().postcode("CM120HN").build()).build()).build();
+        sscsCaseData.getAppeal().getBenefitType().setCode(benefitType);
 
         DynamicListItem value = new DynamicListItem(existingOffice, existingOffice);
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, SscsCaseData.builder().dwpOriginatingOffice(new DynamicList(value, Collections.singletonList(value))).appeal(appeal).ccdCaseId("123").build(), null);
+        sscsCaseData.setDwpOriginatingOffice(new DynamicList(value, Collections.singletonList(value)));
+
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -323,12 +300,12 @@ public class RoboticsServiceTest {
         given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
             OfficeMapping.builder().code(existingOffice).mapping(Mapping.builder().ccd(newOffice).build()).build()));
 
-        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().mrnDate(localDate.format(formatter)).build())
-            .benefitType(BenefitType.builder().code(benefitType).build())
-            .appellant(Appellant.builder().address(Address.builder().postcode("CM120HN").build()).build()).build();
+        sscsCaseData.getAppeal().getBenefitType().setCode(benefitType);
 
         DynamicListItem value = new DynamicListItem(existingOffice, existingOffice);
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, SscsCaseData.builder().dwpPresentingOffice(new DynamicList(value, Collections.singletonList(value))).appeal(appeal).ccdCaseId("123").build(), null);
+        sscsCaseData.setDwpPresentingOffice(new DynamicList(value, Collections.singletonList(value)));
+
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
 
         roboticsService.sendCaseToRobotics(caseData);
 
@@ -344,14 +321,14 @@ public class RoboticsServiceTest {
         given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
             OfficeMapping.builder().code(existingOffice).mapping(Mapping.builder().ccd(newOffice).build()).build()));
 
-        Appeal appeal = Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice(existingOffice).mrnDate(localDate.format(formatter)).build())
-            .benefitType(BenefitType.builder().code(benefitType).build())
-            .appellant(Appellant.builder().address(Address.builder().postcode("CM120HN").build()).build()).build();
+        sscsCaseData.getAppeal().getBenefitType().setCode(benefitType);
+        sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice(existingOffice);
 
         DynamicListItem value = new DynamicListItem(existingOffice, existingOffice);
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED,
-            SscsCaseData.builder().dwpOriginatingOffice(new DynamicList(value, Collections.singletonList(value)))
-                .dwpPresentingOffice(new DynamicList(value, Collections.singletonList(value))).appeal(appeal).ccdCaseId("123").build(), null);
+        sscsCaseData.setDwpOriginatingOffice(new DynamicList(value, Collections.singletonList(value)));
+        sscsCaseData.setDwpPresentingOffice(new DynamicList(value, Collections.singletonList(value)));
+
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
 
         roboticsService.sendCaseToRobotics(caseData);
 
