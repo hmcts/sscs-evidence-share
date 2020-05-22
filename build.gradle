@@ -244,7 +244,7 @@ dependencies {
 dependencyManagement {
   dependencies {
     dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
-    dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.2'
+    dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
     dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.13.3'
 
     // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103
