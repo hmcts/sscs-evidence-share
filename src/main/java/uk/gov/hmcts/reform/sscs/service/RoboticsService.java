@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
+import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
@@ -32,6 +33,7 @@ public class RoboticsService {
     private static final String PIP_AE = "DWP PIP (AE)";
     private final EvidenceManagementService evidenceManagementService;
     private final EmailService emailService;
+    private final EmailHelper emailHelper;
     private final RoboticsJsonMapper roboticsJsonMapper;
     private final RoboticsJsonValidator roboticsJsonValidator;
     private final RoboticsEmailTemplate roboticsEmailTemplate;
@@ -49,6 +51,7 @@ public class RoboticsService {
     public RoboticsService(
         EvidenceManagementService evidenceManagementService,
         EmailService emailService,
+        EmailHelper emailHelper,
         RoboticsJsonMapper roboticsJsonMapper,
         RoboticsJsonValidator roboticsJsonValidator,
         RoboticsEmailTemplate roboticsEmailTemplate,
@@ -61,6 +64,7 @@ public class RoboticsService {
     ) {
         this.evidenceManagementService = evidenceManagementService;
         this.emailService = emailService;
+        this.emailHelper = emailHelper;
         this.roboticsJsonMapper = roboticsJsonMapper;
         this.roboticsJsonValidator = roboticsJsonValidator;
         this.roboticsEmailTemplate = roboticsEmailTemplate;
@@ -222,7 +226,7 @@ public class RoboticsService {
     private void sendJsonByEmail(long caseId, Appeal appeal, JSONObject json, byte[] pdf, Map<SscsDocument, byte[]> additionalEvidence, boolean isScottish, boolean isPipAeTo) {
         Appellant appellant = appeal.getAppellant();
 
-        String appellantUniqueId = emailService.generateUniqueEmailId(appellant);
+        String appellantUniqueId = emailHelper.generateUniqueEmailId(appellant);
 
         log.info("Add robotics default attachments for case id {}", caseId);
         List<EmailAttachment> attachments = addDefaultAttachment(json, pdf, appellantUniqueId);
