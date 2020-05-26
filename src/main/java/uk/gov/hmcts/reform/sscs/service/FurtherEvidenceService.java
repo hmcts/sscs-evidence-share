@@ -55,7 +55,6 @@ public class FurtherEvidenceService {
     private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                            List<FurtherEvidenceLetterType> allowedLetterTypes) {
 
-
         String docName = "609-97-template (original sender)";
         final FurtherEvidenceLetterType letterType = findLetterType(documentType);
 

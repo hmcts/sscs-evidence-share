@@ -59,7 +59,6 @@ public class CoverLetterService {
 
         requireNonNull(caseData, "caseData must not be null");
 
-
         byte[] coverLetterContent = pdfGenerationService.generatePdf(DocumentHolder.builder()
             .template(new Template(templateName, hmctsDocName))
             .placeholders(furtherEvidencePlaceholderService.populatePlaceholders(caseData, letterType))

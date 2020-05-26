@@ -83,7 +83,6 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
 
     private void backLinkAssociatedCases(Long caseId, List<SscsCaseDetails> matchedByNinoCases, IdamTokens idamTokens) {
 
-
         if (matchedByNinoCases.size() > 0 && matchedByNinoCases.size() < 11) {
 
             CaseLink caseLink = CaseLink.builder().value(

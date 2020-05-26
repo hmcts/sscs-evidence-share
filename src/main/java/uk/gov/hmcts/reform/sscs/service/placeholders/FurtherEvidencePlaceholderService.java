@@ -85,16 +85,12 @@ public class FurtherEvidencePlaceholderService {
             .orElseGet(() -> Optional.of(caseData.getAppeal())
                 .map(Appeal::getRep)
                 .map(Representative::getOrganisation)
-                .filter(org -> isNonEmptyNotNull(org))
+                .filter(org -> StringUtils.isNoneBlank(org))
                 .orElse("Sir/Madam"));
     }
 
     private Boolean isValidName(Name name) {
-        return (isNonEmptyNotNull(name.getFirstName()) && isNonEmptyNotNull(name.getLastName())) ? true : false;
-    }
-
-    private Boolean isNonEmptyNotNull(String field) {
-        return (field != null && !field.isEmpty()) ? true : false;
+        return (StringUtils.isNoneBlank(name.getFirstName()) && StringUtils.isNoneBlank(name.getLastName())) ? true : false;
     }
 
     private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
