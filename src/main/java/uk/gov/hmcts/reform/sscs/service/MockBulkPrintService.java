@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,18 +18,6 @@ public class MockBulkPrintService implements PrintService {
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData) {
 
         logger.info("No bulk print operation needs to be performed as 'Bulk print url' is switched off.");
-
-        for (Pdf pdf : pdfs) {
-
-            try {
-                FileOutputStream out = new FileOutputStream(pdf.getName() + ".pdf");
-                out.write(pdf.getContent());
-                out.flush();
-                out.close();
-            } catch (Exception e) {
-                logger.debug("Error saving pdf file");
-            }
-        }
         return Optional.of(UUID.fromString("abc123ca-c336-11e9-9cb5-123456789abc"));
     }
 
