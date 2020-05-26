@@ -1,6 +1,7 @@
 java:
   image: 'hmctspublic.azurecr.io/sscs/evidence-share:latest'
   applicationPort: 8091
+  readinessPath: '/health/readiness'
   aadIdentityName: sscs
   ingressHost: sscs-evidence-share-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   keyVaults:
