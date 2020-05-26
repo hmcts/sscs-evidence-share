@@ -66,10 +66,12 @@ public class FurtherEvidencePlaceholderService {
             .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
             .map(Appellant::getAppointee)
             .map(Appointee::getName)
+            .filter(name -> isValidName(name))
             .map(Name::getFullNameNoTitle)
             .orElseGet(() -> Optional.of(caseData.getAppeal())
                 .map(Appeal::getAppellant)
                 .map(Appellant::getName)
+                .filter(name -> isValidName(name))
                 .map(Name::getFullNameNoTitle)
                 .orElse("Sir/Madam"));
     }
@@ -78,11 +80,21 @@ public class FurtherEvidencePlaceholderService {
         return Optional.of(caseData.getAppeal())
             .map(Appeal::getRep)
             .map(Representative::getName)
+            .filter(name -> isValidName(name))
             .map(Name::getFullNameNoTitle)
             .orElseGet(() -> Optional.of(caseData.getAppeal())
                 .map(Appeal::getRep)
                 .map(Representative::getOrganisation)
+                .filter(org -> isNonEmptyNotNull(org))
                 .orElse("Sir/Madam"));
+    }
+
+    private Boolean isValidName(Name name) {
+        return (isNonEmptyNotNull(name.getFirstName()) && isNonEmptyNotNull(name.getLastName())) ? true : false;
+    }
+
+    private Boolean isNonEmptyNotNull(String field) {
+        return (field != null && !field.isEmpty()) ? true : false;
     }
 
     private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
