@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -37,6 +38,9 @@ public class RoboticsCallbackHandlerTest {
     @Mock
     private IdamService idamService;
 
+    @Mock
+    private RegionalProcessingCenterService regionalProcessingCenterService;
+
     private RoboticsCallbackHandler handler;
 
     private LocalDateTime now = LocalDateTime.now();
@@ -46,7 +50,7 @@ public class RoboticsCallbackHandlerTest {
         initMocks(this);
         when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
 
-        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService);
+        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService);
     }
 
     @Test
