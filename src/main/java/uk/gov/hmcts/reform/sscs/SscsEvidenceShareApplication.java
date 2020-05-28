@@ -9,13 +9,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import uk.gov.hmcts.reform.authorisation.healthcheck.ServiceAuthHealthIndicator;
-import uk.gov.hmcts.reform.sendletter.SendLetterAutoConfiguration;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 
 @SpringBootApplication(
-    scanBasePackages = {"uk.gov.hmcts.reform.sscs"},
-    exclude = {ServiceAuthHealthIndicator.class, SendLetterAutoConfiguration.class})
+    scanBasePackages = {"uk.gov.hmcts.reform.sscs"})
 @EnableCircuitBreaker
 @EnableFeignClients(basePackages =
     {

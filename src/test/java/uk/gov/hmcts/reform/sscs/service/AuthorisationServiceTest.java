@@ -55,7 +55,7 @@ public class AuthorisationServiceTest {
 
     private class CustomFeignException extends FeignException {
         public CustomFeignException(int status, String message) {
-            super(status, message, null);
+            super(status, message);
         }
     }
 
