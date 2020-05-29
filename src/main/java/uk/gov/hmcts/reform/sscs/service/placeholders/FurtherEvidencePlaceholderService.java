@@ -26,36 +26,71 @@ public class FurtherEvidencePlaceholderService {
     }
 
     public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
+
+
         requireNonNull(caseData, "caseData must not be null");
+
         Map<String, Object> placeholders = new ConcurrentHashMap<>();
+
         Address address = getAddress(caseData, letterType);
 
         placeholderService.build(caseData, placeholders, address, null);
 
-        Name name = getName(caseData, letterType);
+        String name = getName(caseData, letterType);
+
         if (name != null) {
-            placeholders.put(NAME, truncateAddressLine(name.getFullNameNoTitle()));
+            placeholders.put(NAME, truncateAddressLine(name));
         }
 
         return placeholders;
     }
 
-    private Name getName(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
+    private String getName(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
+
         if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
-            return Optional.of(caseData.getAppeal())
-                .map(Appeal::getAppellant)
-                .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
-                .map(Appellant::getAppointee)
-                .map(Appointee::getName)
-                .orElseGet(() -> Optional.of(caseData.getAppeal())
-                    .map(Appeal::getAppellant)
-                    .map(Appellant::getName)
-                    .orElse(null));
+
+            return extractNameAppellant(caseData);
+
         } else if (FurtherEvidenceLetterType.REPRESENTATIVE_LETTER.getValue().equals(letterType.getValue())) {
-            return caseData.getAppeal().getRep().getName();
+
+            return extraceNameRep(caseData);
+
         } else {
             return null;
         }
+    }
+
+    private String extractNameAppellant(SscsCaseData caseData) {
+        return Optional.of(caseData.getAppeal())
+            .map(Appeal::getAppellant)
+            .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
+            .map(Appellant::getAppointee)
+            .map(Appointee::getName)
+            .filter(name -> isValidName(name))
+            .map(Name::getFullNameNoTitle)
+            .orElseGet(() -> Optional.of(caseData.getAppeal())
+                .map(Appeal::getAppellant)
+                .map(Appellant::getName)
+                .filter(name -> isValidName(name))
+                .map(Name::getFullNameNoTitle)
+                .orElse("Sir/Madam"));
+    }
+
+    private String extraceNameRep(SscsCaseData caseData) {
+        return Optional.of(caseData.getAppeal())
+            .map(Appeal::getRep)
+            .map(Representative::getName)
+            .filter(name -> isValidName(name))
+            .map(Name::getFullNameNoTitle)
+            .orElseGet(() -> Optional.of(caseData.getAppeal())
+                .map(Appeal::getRep)
+                .map(Representative::getOrganisation)
+                .filter(org -> StringUtils.isNoneBlank(org))
+                .orElse("Sir/Madam"));
+    }
+
+    private Boolean isValidName(Name name) {
+        return (StringUtils.isNoneBlank(name.getFirstName()) && StringUtils.isNoneBlank(name.getLastName())) ? true : false;
     }
 
     private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {

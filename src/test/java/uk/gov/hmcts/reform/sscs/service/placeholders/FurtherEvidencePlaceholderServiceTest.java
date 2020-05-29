@@ -42,6 +42,18 @@ public class FurtherEvidencePlaceholderServiceTest {
 
     SscsCaseData sscsCaseDataWithRep;
 
+    SscsCaseData sscsCaseDataWithRepNoName;
+
+    SscsCaseData sscsCaseDataWithRepNullName;
+
+    SscsCaseData sscsCaseDataWithRepEmptyName;
+
+    SscsCaseData sscsCaseDataWithRepNoNameNoOrg;
+
+    SscsCaseData sscsCaseDataWithRepNoNameEmptyOrg;
+
+    SscsCaseData sscsCaseDataWithRepNoNameNullOrg;
+
     @Captor
     ArgumentCaptor<Address> captor;
 
@@ -82,6 +94,104 @@ public class FurtherEvidencePlaceholderServiceTest {
                     .build())
                 .build())
             .build();
+
+        sscsCaseDataWithRepNoName = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
+                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
+                .rep(Representative.builder()
+                    .organisation("Nandos")
+                    .address(Address.builder()
+                        .line1("HM Courts & Tribunals Service Reps")
+                        .town("Social Security & Child Support Appeals Reps")
+                        .county("Prudential Buildings Reps")
+                        .postcode("L2 5UZ")
+                        .build())
+                    .build())
+                .build())
+            .build();
+
+        sscsCaseDataWithRepNullName = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
+                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
+                .rep(Representative.builder()
+                    .name(Name.builder().title(null).firstName(null).lastName(null).build())
+                    .organisation("Nandos")
+                    .address(Address.builder()
+                        .line1("HM Courts & Tribunals Service Reps")
+                        .town("Social Security & Child Support Appeals Reps")
+                        .county("Prudential Buildings Reps")
+                        .postcode("L2 5UZ")
+                        .build())
+                    .build())
+                .build())
+            .build();
+
+        sscsCaseDataWithRepEmptyName = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
+                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
+                .rep(Representative.builder()
+                    .name(Name.builder().title("").firstName("").lastName("").build())
+                    .organisation("Nandos")
+                    .address(Address.builder()
+                        .line1("HM Courts & Tribunals Service Reps")
+                        .town("Social Security & Child Support Appeals Reps")
+                        .county("Prudential Buildings Reps")
+                        .postcode("L2 5UZ")
+                        .build())
+                    .build())
+                .build())
+            .build();
+
+        sscsCaseDataWithRepNoNameNoOrg = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
+                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
+                .rep(Representative.builder()
+                    .address(Address.builder()
+                        .line1("HM Courts & Tribunals Service Reps")
+                        .town("Social Security & Child Support Appeals Reps")
+                        .county("Prudential Buildings Reps")
+                        .postcode("L2 5UZ")
+                        .build())
+                    .build())
+                .build())
+            .build();
+
+        sscsCaseDataWithRepNoNameEmptyOrg = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
+                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
+                .rep(Representative.builder()
+                    .organisation("")
+                    .address(Address.builder()
+                        .line1("HM Courts & Tribunals Service Reps")
+                        .town("Social Security & Child Support Appeals Reps")
+                        .county("Prudential Buildings Reps")
+                        .postcode("L2 5UZ")
+                        .build())
+                    .build())
+                .build())
+            .build();
+
+        sscsCaseDataWithRepNoNameNullOrg = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
+                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
+                .rep(Representative.builder()
+                    .organisation(null)
+                    .address(Address.builder()
+                        .line1("HM Courts & Tribunals Service Reps")
+                        .town("Social Security & Child Support Appeals Reps")
+                        .county("Prudential Buildings Reps")
+                        .postcode("L2 5UZ")
+                        .build())
+                    .build())
+                .build())
+            .build();
+
     }
 
     @Test
@@ -129,5 +239,53 @@ public class FurtherEvidencePlaceholderServiceTest {
         assertEquals("Social Security & Child Support Appeals Reps", captor.getValue().getTown());
         assertEquals("Prudential Buildings Reps", captor.getValue().getCounty());
         assertEquals("L2 5UZ", captor.getValue().getPostcode());
+    }
+
+    @Test
+    public void givenARepWithNoNameButOrg_thenGenerateThePlaceholders() {
+        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(sscsCaseDataWithRepNoName, REPRESENTATIVE_LETTER);
+        verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
+
+        assertEquals("Nandos", actual.get("name"));
+    }
+
+    @Test
+    public void givenARepWithEmptyNameButOrg_thenGenerateThePlaceholders() {
+        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(sscsCaseDataWithRepEmptyName, REPRESENTATIVE_LETTER);
+        verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
+
+        assertEquals("Nandos", actual.get("name"));
+    }
+
+    @Test
+    public void givenARepWithNullNameButOrg_thenGenerateThePlaceholders() {
+        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(sscsCaseDataWithRepNullName, REPRESENTATIVE_LETTER);
+        verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
+
+        assertEquals("Nandos", actual.get("name"));
+    }
+
+    @Test
+    public void givenARepWithNoNameNoOrg_thenGenerateThePlaceholders() {
+        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(sscsCaseDataWithRepNoNameNoOrg, REPRESENTATIVE_LETTER);
+        verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
+
+        assertEquals("Sir/Madam", actual.get("name"));
+    }
+
+    @Test
+    public void givenARepWithNoNameEmptyOrg_thenGenerateThePlaceholders() {
+        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(sscsCaseDataWithRepNoNameEmptyOrg, REPRESENTATIVE_LETTER);
+        verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
+
+        assertEquals("Sir/Madam", actual.get("name"));
+    }
+
+    @Test
+    public void givenARepWithNoNameNullOrg_thenGenerateThePlaceholders() {
+        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(sscsCaseDataWithRepNoNameNullOrg, REPRESENTATIVE_LETTER);
+        verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
+
+        assertEquals("Sir/Madam", actual.get("name"));
     }
 }
