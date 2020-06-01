@@ -12,9 +12,11 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @Slf4j
@@ -29,14 +31,18 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
 
+    private final RegionalProcessingCenterService regionalProcessingCenterService;
+
     @Autowired
     public RoboticsCallbackHandler(RoboticsService roboticsService,
                                    CcdService ccdService,
-                                   IdamService idamService
+                                   IdamService idamService,
+                                   RegionalProcessingCenterService regionalProcessingCenterService
     ) {
         this.roboticsService = roboticsService;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.dispatchPriority = DispatchPriority.EARLIEST;
     }
 
@@ -67,6 +73,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             log.info("Is case valid to send to robotics {} for case id {}", isCaseValidToSendToRobotics, callback.getCaseDetails().getId());
 
             if (isCaseValidToSendToRobotics) {
+                updateRpc(callback);
                 roboticsService.sendCaseToRobotics(callback.getCaseDetails());
 
                 // As part of ticket SSCS-6869, a new field was required to let the caseworker know when a case had been sent to GAPS2 via Robotics. However, if this was done as part of this handler it would need to be updated
@@ -87,6 +94,20 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             }
         } catch (Exception e) {
             log.error("Error when sending to robotics: {}", callback.getCaseDetails().getId(), e);
+        }
+    }
+
+    private void updateRpc(final Callback<SscsCaseData> callback) {
+        // Updating the RPC also done on CASE_UPDATED in tribunals-api.
+        // We should update the case details before sending robotics.
+        final SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        if (sscsCaseData.getAppeal().getAppellant() != null && sscsCaseData.getAppeal().getAppellant().getAddress() != null && sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null) {
+            RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+            sscsCaseData.setRegionalProcessingCenter(rpc);
+
+            if (rpc != null) {
+                sscsCaseData.setRegion(rpc.getName());
+            }
         }
     }
 
