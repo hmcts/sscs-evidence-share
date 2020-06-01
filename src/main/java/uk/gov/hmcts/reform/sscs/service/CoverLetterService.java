@@ -56,12 +56,16 @@ public class CoverLetterService {
 
     public byte[] generateCoverLetter(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String templateName,
                                       String hmctsDocName) {
+
         requireNonNull(caseData, "caseData must not be null");
+
         byte[] coverLetterContent = pdfGenerationService.generatePdf(DocumentHolder.builder()
             .template(new Template(templateName, hmctsDocName))
             .placeholders(furtherEvidencePlaceholderService.populatePlaceholders(caseData, letterType))
             .pdfArchiveMode(true)
             .build());
+
+
         printCoverLetterToPdfLocallyForDebuggingPurpose(coverLetterContent, letterType, hmctsDocName);
         return coverLetterContent;
     }

@@ -95,6 +95,7 @@ public class ReciprocalLinkHandlerTest {
 
     @Test
     public void givenAssociatedCase_thenAddReciprocalLinkToAssociatedCase() {
+
         List<SscsCaseDetails> associatedCaseList = new ArrayList<>();
         associatedCaseList.add(SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build());
         associatedCaseList.add(SscsCaseDetails.builder().id(7656765L).data(sscsCaseData).build());
@@ -104,6 +105,7 @@ public class ReciprocalLinkHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(ccdService).updateCase(capture.capture(), eq(12345678L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
+
         assertEquals("7656765", capture.getValue().getAssociatedCase().get(0).getValue().getCaseReference());
     }
 

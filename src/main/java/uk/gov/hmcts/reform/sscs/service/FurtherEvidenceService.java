@@ -54,8 +54,10 @@ public class FurtherEvidenceService {
 
     private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                            List<FurtherEvidenceLetterType> allowedLetterTypes) {
+
         String docName = "609-97-template (original sender)";
         final FurtherEvidenceLetterType letterType = findLetterType(documentType);
+
         if (allowedLetterTypes.contains(letterType)) {
             byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, letterType, docName);
             bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData);
