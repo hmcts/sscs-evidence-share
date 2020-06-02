@@ -56,8 +56,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             || callback.getEvent() == READY_TO_LIST
             || callback.getEvent() == VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL
-            || callback.getEvent() == RESEND_CASE_TO_GAPS2
-            || callback.getEvent() == APPEAL_TO_PROCEED);
+            || callback.getEvent() == RESEND_CASE_TO_GAPS2);
     }
 
     @Override
