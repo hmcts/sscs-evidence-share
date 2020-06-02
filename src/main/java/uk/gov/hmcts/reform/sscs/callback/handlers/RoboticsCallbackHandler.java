@@ -52,7 +52,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-            && (callback.getEvent() == SEND_TO_DWP
+            && (callback.getEvent() == VALID_APPEAL_CREATED
             || callback.getEvent() == READY_TO_LIST
             || callback.getEvent() == VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL

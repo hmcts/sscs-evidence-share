@@ -48,13 +48,13 @@ public class RoboticsCallbackHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
+        when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
 
         handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService);
     }
 
     @Test
-    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "READY_TO_LIST", "SEND_TO_DWP", "RESEND_CASE_TO_GAPS2", "APPEAL_TO_PROCEED"})
+    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "READY_TO_LIST", "VALID_APPEAL_CREATED", "RESEND_CASE_TO_GAPS2", "APPEAL_TO_PROCEED"})
     public void givenAValidRoboticsEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
@@ -69,7 +69,7 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "SEND_TO_DWP"})
+    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "VALID_APPEAL_CREATED"})
     public void givenARoboticsRequestAndCreatedInGapsMatchesState_thenSendCaseToRoboticsAndSetSentToGapsDateAndDoNotTriggerUpdateCaseEvent(EventType eventType) {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, READY_TO_LIST.getId());
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
@@ -99,7 +99,7 @@ public class RoboticsCallbackHandlerTest {
     @Test
     public void givenARoboticsRequestAndCreatedInGapsDoesNotMatchState_thenDoNotSendCaseToRobotics() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, VALID_APPEAL.getId());
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         handler.handle(SUBMITTED, callback);
 
@@ -119,7 +119,7 @@ public class RoboticsCallbackHandlerTest {
     @Test
     public void givenARoboticsRequestAndCreatedInGapsFieldIsBlank_thenSendCaseToRobotics() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, null);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         handler.handle(SUBMITTED, callback);
 

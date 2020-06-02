@@ -86,7 +86,7 @@ public class SendToBulkPrintHandlerTest {
 
     @Before
     public void setUp() {
-        when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
+        when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
         handler = new SendToBulkPrintHandler(documentManagementServiceWrapper,
             documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig,
             ccdCaseService, idamService);
@@ -96,7 +96,7 @@ public class SendToBulkPrintHandlerTest {
     }
 
     @Test
-    public void givenASendToDwpEvent_thenReturnTrue() {
+    public void givenAValidAppealCreatedEvent_thenReturnTrue() {
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
@@ -108,7 +108,7 @@ public class SendToBulkPrintHandlerTest {
     }
 
     @Test
-    @Parameters({"SEND_TO_DWP", "VALID_APPEAL", "INTERLOC_VALID_APPEAL", "RESEND_TO_DWP"})
+    @Parameters({"VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL", "RESEND_TO_DWP"})
     public void givenAValidSendToBulkPrintEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
@@ -161,7 +161,7 @@ public class SendToBulkPrintHandlerTest {
         when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
             .thenReturn(expectedOptionalUuid);
 
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -188,7 +188,7 @@ public class SendToBulkPrintHandlerTest {
                     .documentFilename(docPdf.getName()).build())
                 .build()).build()), APPEAL_CREATED);
 
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
@@ -220,7 +220,7 @@ public class SendToBulkPrintHandlerTest {
 
         when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenReturn(docPdf.getContent());
         when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(false);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
 
@@ -242,7 +242,7 @@ public class SendToBulkPrintHandlerTest {
     public void givenNoTemplates_shouldThrowAnExceptionAndFlagError() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper",
             null, APPEAL_CREATED);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         when(documentRequestFactory.create(caseDetails.getCaseData(), nowString))
             .thenReturn(DocumentHolder.builder()
@@ -281,7 +281,7 @@ public class SendToBulkPrintHandlerTest {
         when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
             .thenReturn(Optional.empty());
 
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -295,7 +295,7 @@ public class SendToBulkPrintHandlerTest {
     public void givenAMessageWhichCannotFindATemplate_thenConvertToSscsCaseDataAndDoNotAddPdfToCase() {
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null, APPEAL_CREATED);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         Map<String, Object> placeholders = new HashMap<>();
         placeholders.put("Test", "Value");
@@ -313,7 +313,7 @@ public class SendToBulkPrintHandlerTest {
     @Parameters({"Online", "COR"})
     public void nonReceivedViaPaperCases_doesNotGetSentToBulkPrint(String receivedVia) {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", receivedVia, null, APPEAL_CREATED);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -324,7 +324,7 @@ public class SendToBulkPrintHandlerTest {
     public void givenADigitalCase_doesNotGetSentToBulkPrint() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", null, APPEAL_CREATED);
         caseDetails.getCaseData().setCreatedInGapsFrom("readyToList");
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -332,7 +332,6 @@ public class SendToBulkPrintHandlerTest {
 
         verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case state is now sent to DWP"), any());
 
-        List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
         assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
         assertEquals(DwpState.UNREGISTERED.getId(), caseDataCaptor.getValue().getDwpState());
     }
@@ -359,7 +358,7 @@ public class SendToBulkPrintHandlerTest {
 
         when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
 
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.SEND_TO_DWP, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 

@@ -40,7 +40,7 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-            && (callback.getEvent() == EventType.SEND_TO_DWP
+            && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.VALID_APPEAL
             || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL)
             && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
