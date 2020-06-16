@@ -56,8 +56,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             || callback.getEvent() == READY_TO_LIST
             || callback.getEvent() == VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL
-            || callback.getEvent() == RESEND_CASE_TO_GAPS2
-            || callback.getEvent() == APPEAL_TO_PROCEED);
+            || callback.getEvent() == RESEND_CASE_TO_GAPS2);
     }
 
     @Override
@@ -84,8 +83,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
                 callback.getCaseDetails().getCaseData().setDateCaseSentToGaps(LocalDate.now().toString());
 
                 if (callback.getEvent() == READY_TO_LIST
-                    || callback.getEvent() == RESEND_CASE_TO_GAPS2
-                    || callback.getEvent() == APPEAL_TO_PROCEED) {
+                    || callback.getEvent() == RESEND_CASE_TO_GAPS2) {
 
                     ccdService.updateCase(callback.getCaseDetails().getCaseData(), Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
                         CASE_UPDATED.getCcdType(), "Case sent to robotics", "Updated case with date sent to robotics",

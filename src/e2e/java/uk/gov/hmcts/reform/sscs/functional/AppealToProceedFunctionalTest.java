@@ -30,6 +30,6 @@ public class AppealToProceedFunctionalTest extends AbstractFunctionalTest {
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
 
-        assertEquals("none", caseData.getInterlocReviewState());
+        assertEquals("reviewByTcw", caseData.getInterlocReviewState());
     }
 }

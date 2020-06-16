@@ -54,7 +54,7 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "READY_TO_LIST", "VALID_APPEAL_CREATED", "RESEND_CASE_TO_GAPS2", "APPEAL_TO_PROCEED"})
+    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "READY_TO_LIST", "VALID_APPEAL_CREATED", "RESEND_CASE_TO_GAPS2"})
     public void givenAValidRoboticsEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
@@ -83,7 +83,7 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    @Parameters({"READY_TO_LIST", "RESEND_CASE_TO_GAPS2", "APPEAL_TO_PROCEED"})
+    @Parameters({"READY_TO_LIST", "RESEND_CASE_TO_GAPS2"})
     public void givenARoboticsRequestAndCreatedInGapsMatchesState_thenSendCaseToRoboticsAndSetSentToGapsDateAndTriggerUpdateCaseEvent(EventType eventType) {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, READY_TO_LIST.getId());
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
