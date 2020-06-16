@@ -108,7 +108,7 @@ public class SendToBulkPrintHandlerTest {
     }
 
     @Test
-    @Parameters({"SEND_TO_DWP", "VALID_APPEAL", "INTERLOC_VALID_APPEAL", "RESEND_TO_DWP"})
+    @Parameters({"SEND_TO_DWP", "VALID_APPEAL", "INTERLOC_VALID_APPEAL", "RESEND_TO_DWP", "APPEAL_TO_PROCEED"})
     public void givenAValidSendToBulkPrintEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
