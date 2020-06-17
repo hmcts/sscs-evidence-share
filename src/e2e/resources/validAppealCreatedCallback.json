@@ -601,5 +601,5 @@
     }
   },
   "case_details_before": null,
-  "event_id": "sendToDwp"
+  "event_id": "validAppealCreated"
 }

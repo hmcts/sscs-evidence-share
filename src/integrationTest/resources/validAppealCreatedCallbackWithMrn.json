@@ -27,7 +27,7 @@
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
-      "createdInGapsFrom": "CREATED_IN_GAPS_FROM",
+      "createdInGapsFrom": "validAppeal",
       "hearings": [
         {
           "value": {
@@ -69,6 +69,38 @@
           "tya": ""
         }
       },
+      "sscsDocument" : [
+        {
+          "value" : {
+            "documentLink" : {
+              "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
+            },
+            "documentDateAdded" : "2019-05-01",
+            "documentFileName" : "filename1.pdf",
+            "documentType" : "appellantEvidence"
+          }
+        },
+        {
+          "value" : {
+            "documentLink" : {
+              "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
+            },
+            "documentDateAdded" : "2019-05-01",
+            "documentFileName" : "filename2.doc",
+            "documentType" : "appellantEvidence"
+          }
+        },
+        {
+          "value" : {
+            "documentLink" : {
+              "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
+            },
+            "documentDateAdded" : "2019-05-01",
+            "documentFileName" : "sscs1.pdf",
+            "documentType" : "sscs1"
+          }
+        }
+      ],
       "evidence": {
         "documents": [
         ]
@@ -87,7 +119,12 @@
         "city": "BIRMINGHAM"
       },
       "appeal": {
-        "mrnDetails": {},
+        "mrnDetails": {
+          "mrnDate": "MRN_DATE_TO_BE_REPLACED",
+          "mrnLateReason": "Lost my paperwork",
+          "dwpIssuingOffice": "2",
+          "mrnMissingReason": null
+        },
         "appellant": {
           "name": {
             "title": "Miss",
@@ -110,12 +147,11 @@
             "dob": "1900-01-01",
             "nino": "JT 12 34 56 D"
           },
-          "appointee": null,
-          "isAddressSameAsAppointee" : null
+          "isAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "PIP",
+          "description": "Personal Independence Payment"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {
@@ -598,5 +634,5 @@
     }
   },
   "case_details_before": null,
-  "event_id": "sendToDwp"
+  "event_id": "validAppealCreated"
 }
