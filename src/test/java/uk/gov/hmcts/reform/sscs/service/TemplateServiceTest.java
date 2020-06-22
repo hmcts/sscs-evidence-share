@@ -20,7 +20,8 @@ public class TemplateServiceTest {
 
     @Before
     public void setup() {
-        service = new TemplateService("dl6TemplateName", "dl16TemplateName");
+        service = new TemplateService("dl6TemplateName", "dl16TemplateName","dl6WelshTemplateName",
+            "dl16WelshTemplateName");
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
@@ -40,6 +41,23 @@ public class TemplateServiceTest {
     }
 
     @Test
+    public void givenACaseDataWithMrnWithin30Days_whenLanguageIsWelsh_thenGenerateTheWelshPlaceholderMappingsForDl6() {
+        LocalDate date = LocalDate.now();
+        String dateAsString = date.format(formatter);
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .mrnDetails(MrnDetails.builder().mrnDate(dateAsString).build())
+                .build())
+            .languagePreferenceWelsh("Yes")
+            .build();
+
+        Template result = service.findTemplate(caseData);
+
+        assertEquals("dl6-welsh", result.getHmctsDocName());
+    }
+
+    @Test
     public void givenACaseDataWithMrnEqualTo30Days_thenGenerateThePlaceholderMappings() {
         LocalDate date = LocalDate.now().minusDays(30);
         String dateAsString = date.format(formatter);
@@ -48,11 +66,29 @@ public class TemplateServiceTest {
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().mrnDate(dateAsString).build())
                 .build())
+            .languagePreferenceWelsh("No")
             .build();
 
         Template result = service.findTemplate(caseData);
 
         assertEquals("dl6", result.getHmctsDocName());
+    }
+
+    @Test
+    public void givenACaseDataWithMrnEqualTo30Days_whenLanguageIsWelsh_thenGenerateTheWelshPlaceholderMappings() {
+        LocalDate date = LocalDate.now().minusDays(30);
+        String dateAsString = date.format(formatter);
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .mrnDetails(MrnDetails.builder().mrnDate(dateAsString).build())
+                .build())
+            .languagePreferenceWelsh("Yes")
+            .build();
+
+        Template result = service.findTemplate(caseData);
+
+        assertEquals("dl6-welsh", result.getHmctsDocName());
     }
 
     @Test
@@ -64,12 +100,31 @@ public class TemplateServiceTest {
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().mrnDate(dateAsString).build())
                 .build())
+            .languagePreferenceWelsh("No")
             .build();
 
         Template result = service.findTemplate(caseData);
 
         assertEquals("dl16", result.getHmctsDocName());
     }
+
+    @Test
+    public void givenACaseDataWithMrnGreaterThan30Days_whenLanguageIsWelsh_thenGenerateTheWelshPlaceholderMappingsForDl16() {
+        LocalDate date = LocalDate.now().minusDays(31);
+        String dateAsString = date.format(formatter);
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .mrnDetails(MrnDetails.builder().mrnDate(dateAsString).build())
+                .build())
+            .languagePreferenceWelsh("Yes")
+            .build();
+
+        Template result = service.findTemplate(caseData);
+
+        assertEquals("dl16-welsh", result.getHmctsDocName());
+    }
+
 
     @Test
     public void givenACaseDataWithMrnMissing_thenGenerateThePlaceholderMappings() {

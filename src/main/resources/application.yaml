@@ -43,6 +43,8 @@ document:
   pdf:
     hmctsImgKey: hmcts2
     hmctsImgVal: "[userImage:hmcts.png]"
+    hmctsWelshImgKey: welshhmcts2
+    hmctsWelshImgVal: "[userImage:welshhmcts.png]"
 
 document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:5005}
 
@@ -108,6 +110,14 @@ docmosis:
       name: TB-SCS-GNO-ENG-00068.doc
     609-98:
       name: TB-SCS-GNO-ENG-00069.doc
+    dl6-welsh:
+      name: TB-SCS-GNO-WEL-00459.docx
+    dl16-welsh:
+      name: TB-SCS-GNO-WEL-00461.docx
+    609-97-welsh:
+      name: TB-SCS-GNO-WEL-00469.docx
+    609-98-welsh:
+      name: TB-SCS-GNO-WEL-00470.docx
 
 evidence-share:
   submit-types:
@@ -121,3 +131,17 @@ exela:
 
 feature:
   bulk-scan.migrated: ${BULK_SCAN_MIGRATED:false}
+
+welsh-months:
+    1: "Ionawr"
+    2: "Chwefror"
+    3: "Mawrth"
+    4: "Ebrill"
+    5: "Mai"
+    6: "Mehefin"
+    7: "Gorffennaf"
+    8: "Awst"
+    9: "Medi"
+    10: "Hydref"
+    11: "Tachwedd"
+    12: "Rhagfyr"

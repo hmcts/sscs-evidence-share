@@ -31,13 +31,21 @@ public class FurtherEvidenceService {
 
     private final String furtherEvidenceOtherPartiesTemplateName;
 
+    private final String furtherEvidenceOriginalSenderWelshTemplateName;
+
+    private final String furtherEvidenceOtherPartiesWelshTemplateName;
+
     public FurtherEvidenceService(@Value("${docmosis.template.609-97.name}") String furtherEvidenceOriginalSenderTemplateName,
                                   @Value("${docmosis.template.609-98.name}") String furtherEvidenceOtherPartiesTemplateName,
+                                  @Value("${docmosis.template.609-97-welsh.name}") String furtherEvidenceOriginalSenderWelshTemplateName,
+                                  @Value("${docmosis.template.609-98-welsh.name}") String furtherEvidenceOtherPartiesWelshTemplateName,
                                   @Autowired CoverLetterService coverLetterService,
                                   @Autowired SscsDocumentService sscsDocumentService,
                                   @Autowired PrintService bulkPrintService) {
         this.furtherEvidenceOriginalSenderTemplateName = furtherEvidenceOriginalSenderTemplateName;
         this.furtherEvidenceOtherPartiesTemplateName = furtherEvidenceOtherPartiesTemplateName;
+        this.furtherEvidenceOriginalSenderWelshTemplateName = furtherEvidenceOriginalSenderWelshTemplateName;
+        this.furtherEvidenceOtherPartiesWelshTemplateName = furtherEvidenceOtherPartiesWelshTemplateName;
         this.coverLetterService = coverLetterService;
         this.sscsDocumentService = sscsDocumentService;
         this.bulkPrintService = bulkPrintService;
@@ -116,11 +124,15 @@ public class FurtherEvidenceService {
     }
 
     private byte[] buildPdfsFor609_97(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName) {
-        return coverLetterService.generateCoverLetter(caseData, letterType, furtherEvidenceOriginalSenderTemplateName, pdfName);
+        return coverLetterService.generateCoverLetter(caseData, letterType,
+            getTemplateNameBasedOnLanguagePreference(caseData,furtherEvidenceOriginalSenderTemplateName,
+                furtherEvidenceOriginalSenderWelshTemplateName), pdfName);
     }
 
     private byte[] buildPdfsFor609_98(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName) {
-        return coverLetterService.generateCoverLetter(caseData, letterType, furtherEvidenceOtherPartiesTemplateName, pdfName);
+        return coverLetterService.generateCoverLetter(caseData, letterType,
+            getTemplateNameBasedOnLanguagePreference(caseData, furtherEvidenceOtherPartiesTemplateName,
+                furtherEvidenceOtherPartiesWelshTemplateName), pdfName);
     }
 
     public boolean canHandleAnyDocument(List<SscsDocument> sscsDocumentList) {
@@ -132,5 +144,10 @@ public class FurtherEvidenceService {
         return sscsDocument != null && sscsDocument.getValue() != null
             && "No".equals(sscsDocument.getValue().getEvidenceIssued())
             && null != sscsDocument.getValue().getDocumentType();
+    }
+
+    private String getTemplateNameBasedOnLanguagePreference(SscsCaseData caseData, String englishTemplate,
+                                                            String welshTemplate) {
+        return caseData.isLanguagePreferenceWelsh() ? welshTemplate : englishTemplate;
     }
 }

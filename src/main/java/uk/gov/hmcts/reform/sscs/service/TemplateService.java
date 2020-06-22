@@ -15,10 +15,18 @@ public class TemplateService {
 
     private final String dl16TemplateName;
 
+    private final String dl6WelshTemplateName;
+
+    private final String dl16WelshTemplateName;
+
     public TemplateService(@Value("${docmosis.template.dl6.name}") String dl6TemplateName,
-                           @Value("${docmosis.template.dl16.name}") String dl16TemplateName) {
+                           @Value("${docmosis.template.dl16.name}") String dl16TemplateName,
+                           @Value("${docmosis.template.dl6-welsh.name}") String dl6WelshTemplateName,
+                           @Value("${docmosis.template.dl16-welsh.name}") String dl16WelshTemplateName) {
         this.dl6TemplateName = dl6TemplateName;
         this.dl16TemplateName = dl16TemplateName;
+        this.dl6WelshTemplateName = dl6WelshTemplateName;
+        this.dl16WelshTemplateName =  dl16WelshTemplateName;
     }
 
     public Template findTemplate(SscsCaseData caseData) {
@@ -26,11 +34,22 @@ public class TemplateService {
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
             if (mrnDate.plusDays(30).isBefore(LocalDate.now())) {
-                return new Template(dl16TemplateName, "dl16");
+                return getTemplateByLanguagePreference(caseData, dl16TemplateName, dl16WelshTemplateName,"dl16",
+                    "dl16-welsh");
             } else {
-                return new Template(dl6TemplateName, "dl6");
+                return getTemplateByLanguagePreference(caseData, dl6TemplateName, dl6WelshTemplateName,"dl6",
+                    "dl6-welsh");
             }
         }
         return null;
+    }
+
+    private Template getTemplateByLanguagePreference(SscsCaseData caseData, String englishTemplate,
+                                                     String welshTemplate,
+                                                     String hmctsEnDocName, String hmctsCyDocName) {
+        if (caseData.isLanguagePreferenceWelsh()) {
+            return new Template(welshTemplate,hmctsCyDocName);
+        }
+        return new Template(englishTemplate,hmctsEnDocName);
     }
 }
