@@ -131,17 +131,3 @@ exela:
 
 feature:
   bulk-scan.migrated: ${BULK_SCAN_MIGRATED:false}
-
-welsh-months:
-    1: "Ionawr"
-    2: "Chwefror"
-    3: "Mawrth"
-    4: "Ebrill"
-    5: "Mai"
-    6: "Mehefin"
-    7: "Gorffennaf"
-    8: "Awst"
-    9: "Medi"
-    10: "Hydref"
-    11: "Tachwedd"
-    12: "Rhagfyr"
