@@ -32,7 +32,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
-
+        caseData.setLanguagePreferenceWelsh("No");
         List<SscsDocument> docs = caseData.getSscsDocument();
         assertEquals(1, docs.size());
         assertEquals("dl6-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
@@ -51,8 +51,9 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
         simulateCcdCallback(json);
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-
-        assertNull(caseDetails.getData().getSscsDocument());
+        SscsCaseData caseData = caseDetails.getData();
+        caseData.setLanguagePreferenceWelsh("No");
+        assertNull(caseData.getSscsDocument());
         assertEquals("validAppeal", caseDetails.getState());
         assertEquals("failedSending", caseDetails.getData().getHmctsDwpState());
     }
@@ -69,7 +70,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         simulateCcdCallback(json);
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
-
+        caseData.setLanguagePreferenceWelsh("No");
         List<SscsDocument> docs = caseData.getSscsDocument();
 
         assertNotNull("docs is not null", docs);
