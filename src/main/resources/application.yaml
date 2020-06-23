@@ -102,22 +102,24 @@ robotics:
 
 docmosis:
   template:
-    dl6:
-      name: TB-SCS-GNO-ENG-00010.doc
-    dl16:
-      name: TB-SCS-GNO-ENG-00011.doc
-    609-97:
-      name: TB-SCS-GNO-ENG-00068.doc
-    609-98:
-      name: TB-SCS-GNO-ENG-00069.doc
-    dl6-welsh:
-      name: TB-SCS-GNO-WEL-00459.docx
-    dl16-welsh:
-      name: TB-SCS-GNO-WEL-00461.docx
-    609-97-welsh:
-      name: TB-SCS-GNO-WEL-00469.docx
-    609-98-welsh:
-      name: TB-SCS-GNO-WEL-00470.docx
+    english:
+      dl6:
+        name: TB-SCS-GNO-ENG-00010.doc
+      dl16:
+        name: TB-SCS-GNO-ENG-00011.doc
+      d609-97:
+        name: TB-SCS-GNO-ENG-00068.doc
+      d609-98:
+        name: TB-SCS-GNO-ENG-00069.doc
+    welsh:
+      dl6:
+        name: TB-SCS-GNO-WEL-00459.docx
+      dl16:
+        name: TB-SCS-GNO-WEL-00461.docx
+      d609-97:
+        name: TB-SCS-GNO-WEL-00469.docx
+      d609-98:
+        name: TB-SCS-GNO-WEL-00470.docx
 
 evidence-share:
   submit-types:

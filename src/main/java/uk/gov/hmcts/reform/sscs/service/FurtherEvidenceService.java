@@ -9,17 +9,20 @@ import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESEN
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 
 @Service
 public class FurtherEvidenceService {
+
+    private DocmosisTemplateConfig docmosisTemplateConfig;
 
     private CoverLetterService coverLetterService;
 
@@ -27,28 +30,14 @@ public class FurtherEvidenceService {
 
     private PrintService bulkPrintService;
 
-    private final String furtherEvidenceOriginalSenderTemplateName;
-
-    private final String furtherEvidenceOtherPartiesTemplateName;
-
-    private final String furtherEvidenceOriginalSenderWelshTemplateName;
-
-    private final String furtherEvidenceOtherPartiesWelshTemplateName;
-
-    public FurtherEvidenceService(@Value("${docmosis.template.609-97.name}") String furtherEvidenceOriginalSenderTemplateName,
-                                  @Value("${docmosis.template.609-98.name}") String furtherEvidenceOtherPartiesTemplateName,
-                                  @Value("${docmosis.template.609-97-welsh.name}") String furtherEvidenceOriginalSenderWelshTemplateName,
-                                  @Value("${docmosis.template.609-98-welsh.name}") String furtherEvidenceOtherPartiesWelshTemplateName,
-                                  @Autowired CoverLetterService coverLetterService,
+    public FurtherEvidenceService(@Autowired CoverLetterService coverLetterService,
                                   @Autowired SscsDocumentService sscsDocumentService,
-                                  @Autowired PrintService bulkPrintService) {
-        this.furtherEvidenceOriginalSenderTemplateName = furtherEvidenceOriginalSenderTemplateName;
-        this.furtherEvidenceOtherPartiesTemplateName = furtherEvidenceOtherPartiesTemplateName;
-        this.furtherEvidenceOriginalSenderWelshTemplateName = furtherEvidenceOriginalSenderWelshTemplateName;
-        this.furtherEvidenceOtherPartiesWelshTemplateName = furtherEvidenceOtherPartiesWelshTemplateName;
+                                  @Autowired PrintService bulkPrintService,
+                                  @Autowired DocmosisTemplateConfig docmosisTemplateConfig) {
         this.coverLetterService = coverLetterService;
         this.sscsDocumentService = sscsDocumentService;
         this.bulkPrintService = bulkPrintService;
+        this.docmosisTemplateConfig =  docmosisTemplateConfig;
     }
 
     public void issue(List<SscsDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
@@ -125,14 +114,12 @@ public class FurtherEvidenceService {
 
     private byte[] buildPdfsFor609_97(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName) {
         return coverLetterService.generateCoverLetter(caseData, letterType,
-            getTemplateNameBasedOnLanguagePreference(caseData,furtherEvidenceOriginalSenderTemplateName,
-                furtherEvidenceOriginalSenderWelshTemplateName), pdfName);
+            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), DocumentType.D609_97), pdfName);
     }
 
     private byte[] buildPdfsFor609_98(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName) {
         return coverLetterService.generateCoverLetter(caseData, letterType,
-            getTemplateNameBasedOnLanguagePreference(caseData, furtherEvidenceOtherPartiesTemplateName,
-                furtherEvidenceOtherPartiesWelshTemplateName), pdfName);
+            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), DocumentType.D609_98), pdfName);
     }
 
     public boolean canHandleAnyDocument(List<SscsDocument> sscsDocumentList) {
@@ -146,8 +133,8 @@ public class FurtherEvidenceService {
             && null != sscsDocument.getValue().getDocumentType();
     }
 
-    private String getTemplateNameBasedOnLanguagePreference(SscsCaseData caseData, String englishTemplate,
-                                                            String welshTemplate) {
-        return caseData.isLanguagePreferenceWelsh() ? welshTemplate : englishTemplate;
+    private String getTemplateNameBasedOnLanguagePreference(LanguagePreference languagePreference, DocumentType documentType) {
+        return docmosisTemplateConfig.getTemplate().get(languagePreference)
+                .get(documentType).get("name");
     }
 }

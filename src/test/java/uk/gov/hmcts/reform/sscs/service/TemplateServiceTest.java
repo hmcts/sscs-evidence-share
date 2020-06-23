@@ -7,21 +7,26 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 
+@SpringBootTest
+@RunWith(SpringRunner.class)
 public class TemplateServiceTest {
 
+    @Autowired
     private TemplateService service;
 
     private DateTimeFormatter formatter;
 
     @Before
     public void setup() {
-        service = new TemplateService("dl6TemplateName", "dl16TemplateName","dl6WelshTemplateName",
-            "dl16WelshTemplateName");
         formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     }
 
@@ -54,7 +59,7 @@ public class TemplateServiceTest {
 
         Template result = service.findTemplate(caseData);
 
-        assertEquals("dl6-welsh", result.getHmctsDocName());
+        assertEquals("dl6", result.getHmctsDocName());
     }
 
     @Test
@@ -88,7 +93,7 @@ public class TemplateServiceTest {
 
         Template result = service.findTemplate(caseData);
 
-        assertEquals("dl6-welsh", result.getHmctsDocName());
+        assertEquals("dl6", result.getHmctsDocName());
     }
 
     @Test
@@ -122,7 +127,7 @@ public class TemplateServiceTest {
 
         Template result = service.findTemplate(caseData);
 
-        assertEquals("dl16-welsh", result.getHmctsDocName());
+        assertEquals("dl16", result.getHmctsDocName());
     }
 
 
