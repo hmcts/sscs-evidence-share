@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_TO_PROCEED;
@@ -63,7 +64,7 @@ public class IssueDirectionHandler implements CallbackHandler<SscsCaseData> {
         try {
             ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(), APPEAL_TO_PROCEED.getCcdType(), "Appeal to proceed", "Appeal proceed event triggered", idamService.getIdamTokens());
         } catch (FeignException.UnprocessableEntity e) {
-            log.error(getRootCauseMessage(e), e);
+            log.error(format("appealToProceed event failed for caseId %s, root cause is %s", callback.getCaseDetails().getId(), getRootCauseMessage(e)), e);
             throw e;
         }
     }
