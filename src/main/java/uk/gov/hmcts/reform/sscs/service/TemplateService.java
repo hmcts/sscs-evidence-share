@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
@@ -33,11 +32,7 @@ public class TemplateService {
     }
 
     private Template getTemplateByLanguagePreference(final SscsCaseData caseData, final DocumentType documentType) {
-        if (caseData.isLanguagePreferenceWelsh()) {
-            return new Template(docmosisTemplateConfig.getTemplate().get(LanguagePreference.WELSH)
-                    .get(documentType).get("name"),documentType.getValue());
-        }
-        return new Template(docmosisTemplateConfig.getTemplate().get(LanguagePreference.ENGLISH)
+        return new Template(docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference())
                 .get(documentType).get("name"),documentType.getValue());
     }
 }
