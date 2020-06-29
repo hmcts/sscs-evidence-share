@@ -20,9 +20,13 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         super();
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
-    public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws IOException {
+    public void beforeEach() {
+        ccdCaseId = null;
+    }
 
+    @RepeatedIfExceptionsTest(repeats = 3)
+    public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
+        Thread.sleep(5000);
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
@@ -42,8 +46,9 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         assertEquals(LocalDate.now().toString(), caseData.getDateCaseSentToGaps());
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
-    public void processAnAppealWithNoValidMrnDate_shouldNoTBeSentToDwpAndShouldBeUpdatedToFlagError() throws IOException {
+    @RepeatedIfExceptionsTest(repeats = 3)
+    public void processAnAppealWithNoValidMrnDate_shouldNoTBeSentToDwpAndShouldBeUpdatedToFlagError() throws Exception {
+        Thread.sleep(5000);
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
@@ -59,8 +64,8 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
-    public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws IOException {
-
+    public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws Exception {
+        Thread.sleep(5000);
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());

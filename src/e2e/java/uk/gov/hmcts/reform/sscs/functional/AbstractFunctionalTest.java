@@ -66,6 +66,7 @@ public abstract class AbstractFunctionalTest {
 
     void createCaseWithValidAppealState(EventType eventType) {
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
+
         SscsCaseData caseData = minimalCaseData.toBuilder()
             .createdInGapsFrom(State.VALID_APPEAL.getId())
             .appeal(minimalCaseData.getAppeal().toBuilder()
@@ -76,6 +77,8 @@ public abstract class AbstractFunctionalTest {
                 .receivedVia("Paper")
                 .build())
             .build();
+
+
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service send to DWP test",
             "Evidence share service send to DWP case created", idamTokens);
