@@ -54,6 +54,7 @@ test {
 
 task functional(type: Test) {
   useJUnitPlatform()
+  maxParallelForks = 1
   group = 'verification'
   description = 'Executes non-destructive functional tests in AAT against a running CCD and evidence share service'
   setTestClassesDirs(sourceSets.e2e.output.classesDirs)
