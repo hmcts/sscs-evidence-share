@@ -49,6 +49,7 @@ tasks.withType(JavaCompile) {
 }
 
 task functional(type: Test) {
+  useJUnitPlatform()
   group = 'verification'
   description = 'Executes non-destructive functional tests in AAT against a running CCD and evidence share service'
   setTestClassesDirs(sourceSets.e2e.output.classesDirs)
@@ -215,6 +216,7 @@ dependencies {
   testCompile 'pl.pragmatists:JUnitParams:1.1.1'
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testCompile group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
+  testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.5'
 
   compile 'org.projectlombok:lombok:1.18.12'
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
