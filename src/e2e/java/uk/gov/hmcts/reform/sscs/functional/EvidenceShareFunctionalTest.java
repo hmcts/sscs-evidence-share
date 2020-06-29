@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import io.github.artsok.RepeatedIfExceptionsTest;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.Test;
