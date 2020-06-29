@@ -42,7 +42,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         assertEquals(LocalDate.now().toString(), caseData.getDateCaseSentToGaps());
     }
 
-    @Test
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void processAnAppealWithNoValidMrnDate_shouldNoTBeSentToDwpAndShouldBeUpdatedToFlagError() throws IOException {
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 

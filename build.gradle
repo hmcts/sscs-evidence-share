@@ -48,6 +48,10 @@ tasks.withType(JavaCompile) {
   options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked"
 }
 
+test {
+  useJUnitPlatform()
+}
+
 task functional(type: Test) {
   useJUnitPlatform()
   group = 'verification'
