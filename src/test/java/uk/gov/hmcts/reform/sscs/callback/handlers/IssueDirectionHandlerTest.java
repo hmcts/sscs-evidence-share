@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
@@ -11,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
 
+import feign.FeignException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -91,5 +93,12 @@ public class IssueDirectionHandlerTest {
         verify(ccdCaseService).updateCase(captor.capture(), eq(1L), eq(EventType.APPEAL_TO_PROCEED.getCcdType()), eq("Appeal to proceed"), eq("Appeal proceed event triggered"), any());
 
         assertNull((captor.getValue().getDirectionTypeDl()));
+    }
+
+    @Test(expected = FeignException.UnprocessableEntity.class)
+    public void unprocessableEntityErrorIsReThrown() {
+        when(ccdCaseService.updateCase(any(), eq(1L), eq(EventType.APPEAL_TO_PROCEED.getCcdType()), eq("Appeal to proceed"), eq("Appeal proceed event triggered"), any())).thenThrow(FeignException.UnprocessableEntity.UnprocessableEntity.class);
+
+        handler.handle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString())).build(), INTERLOCUTORY_REVIEW_STATE, DIRECTION_ISSUED));
     }
 }
