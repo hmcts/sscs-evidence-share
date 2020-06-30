@@ -58,12 +58,6 @@ public abstract class AbstractFunctionalTest {
     private final String tcaInstance = System.getenv("TEST_URL");
     private final String localInstance = "http://localhost:8091";
 
-    @Before
-    public void setup() {
-        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
-        idamTokens = idamService.getIdamTokens();
-    }
-
     void createCaseWithValidAppealState(EventType eventType) {
         idamTokens = idamService.getIdamTokens();
 
