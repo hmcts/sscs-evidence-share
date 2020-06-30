@@ -99,6 +99,9 @@ public abstract class AbstractFunctionalTest {
     }
 
     public void simulateCcdCallback(String json) throws IOException {
+
+        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
+
         final String callbackUrl = baseURI + "/send";
 
         RestAssured.useRelaxedHTTPSValidation();
