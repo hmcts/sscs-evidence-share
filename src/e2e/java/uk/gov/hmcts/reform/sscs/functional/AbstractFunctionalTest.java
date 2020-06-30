@@ -83,7 +83,7 @@ public abstract class AbstractFunctionalTest {
 
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service send to DWP test",
-            "Evidence share service send to DWP case created", idamTok);
+            "Evidence share service send to DWP case created", idamTokens);
         ccdCaseId = String.valueOf(caseDetails.getId());
     }
 
