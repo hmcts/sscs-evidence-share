@@ -65,6 +65,8 @@ public abstract class AbstractFunctionalTest {
     }
 
     void createCaseWithValidAppealState(EventType eventType) {
+        IdamTokens idamTok = idamService.getIdamTokens();
+
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
 
         SscsCaseData caseData = minimalCaseData.toBuilder()
@@ -81,7 +83,7 @@ public abstract class AbstractFunctionalTest {
 
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service send to DWP test",
-            "Evidence share service send to DWP case created", idamTokens);
+            "Evidence share service send to DWP case created", idamTok);
         ccdCaseId = String.valueOf(caseDetails.getId());
     }
 
