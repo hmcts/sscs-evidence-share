@@ -28,6 +28,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         Thread.sleep(5000);
 
         System.out.println("Test 1 Case Id pre" + ccdCaseId);
+        System.out.println(idamTokens.getIdamOauth2Token());
 
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
