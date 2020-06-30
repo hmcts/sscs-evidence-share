@@ -6,6 +6,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED
 import io.github.artsok.RepeatedIfExceptionsTest;
 import java.time.LocalDate;
 import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -16,6 +18,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         super();
     }
 
+    @BeforeEach
     public void beforeEach() {
         ccdCaseId = null;
     }
@@ -23,7 +26,12 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     @RepeatedIfExceptionsTest(repeats = 3)
     public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
         Thread.sleep(5000);
+
+        System.out.println("Test 1 Case Id pre" + ccdCaseId);
+
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
+
+        System.out.println("Test 1 Case Id post" + ccdCaseId);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -32,6 +40,9 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         simulateCcdCallback(json);
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+
+        System.out.println("Test 1 Found case" + caseDetails.toString());
+
         SscsCaseData caseData = caseDetails.getData();
 
         List<SscsDocument> docs = caseData.getSscsDocument();

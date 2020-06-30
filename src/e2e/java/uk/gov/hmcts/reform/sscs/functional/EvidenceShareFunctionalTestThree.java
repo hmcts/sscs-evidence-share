@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -16,6 +17,7 @@ public class EvidenceShareFunctionalTestThree extends AbstractFunctionalTest {
         super();
     }
 
+    @BeforeEach
     public void beforeEach() {
         ccdCaseId = null;
     }
@@ -24,6 +26,8 @@ public class EvidenceShareFunctionalTestThree extends AbstractFunctionalTest {
     public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws Exception {
         Thread.sleep(5000);
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
+
+        System.out.println("Test 3 Case Id" + ccdCaseId);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
