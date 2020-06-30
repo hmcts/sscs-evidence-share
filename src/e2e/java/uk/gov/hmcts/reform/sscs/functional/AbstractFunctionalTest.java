@@ -48,7 +48,7 @@ public abstract class AbstractFunctionalTest {
     @Autowired
     protected IdamService idamService;
 
-        protected IdamTokens idamTokens;
+    protected IdamTokens idamTokens;
 
     @Autowired
     private CcdService ccdService;
