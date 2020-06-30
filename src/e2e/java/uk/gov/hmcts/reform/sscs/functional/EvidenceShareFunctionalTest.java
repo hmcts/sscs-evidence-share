@@ -24,18 +24,10 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         ccdCaseId = null;
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3)
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
-        Thread.sleep(5000);
-
-        System.out.println("Test 1 Case Id pre " + ccdCaseId);
-
-        IdamTokens idamToks = idamService.getIdamTokens();
-        System.out.println("idam token  is " + idamToks.getIdamOauth2Token());
 
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
-
-        System.out.println("Test 1 Case Id post" + ccdCaseId);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -44,8 +36,6 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         simulateCcdCallback(json);
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-
-        System.out.println("Test 1 Found case" + caseDetails.toString());
 
         SscsCaseData caseData = caseDetails.getData();
 

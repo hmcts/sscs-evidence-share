@@ -18,12 +18,10 @@ public class EvidenceShareFunctionalTestTwo extends AbstractFunctionalTest {
         ccdCaseId = null;
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3)
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000)
     public void processAnAppealWithNoValidMrnDate_shouldNoTBeSentToDwpAndShouldBeUpdatedToFlagError() throws Exception {
-        Thread.sleep(5000);
+        
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
-
-        System.out.println("Test 3 Case Id" + ccdCaseId);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);

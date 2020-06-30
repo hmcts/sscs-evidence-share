@@ -45,9 +45,9 @@ public abstract class AbstractFunctionalTest {
     //end of rules needed for junitParamsRunner
 
     @Autowired
-    protected IdamService idamService;
+    private IdamService idamService;
 
-    protected IdamTokens idamTokens;
+    private IdamTokens idamTokens;
 
     @Autowired
     private CcdService ccdService;

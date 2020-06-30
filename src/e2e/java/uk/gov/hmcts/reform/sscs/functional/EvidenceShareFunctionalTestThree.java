@@ -24,10 +24,7 @@ public class EvidenceShareFunctionalTestThree extends AbstractFunctionalTest {
 
     @Test
     public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws Exception {
-        Thread.sleep(5000);
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
-
-        System.out.println("Test 3 Case Id" + ccdCaseId);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
