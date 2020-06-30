@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
@@ -28,8 +29,9 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         Thread.sleep(5000);
 
         System.out.println("Test 1 Case Id pre " + ccdCaseId);
-        
-        System.out.println("idam token  is " + idamTokens.getIdamOauth2Token());
+
+        IdamTokens idamToks = idamService.getIdamTokens();
+        System.out.println("idam token  is " + idamToks.getIdamOauth2Token());
 
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
