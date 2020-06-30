@@ -27,8 +27,8 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
         Thread.sleep(5000);
 
-        System.out.println("Test 1 Case Id pre" + ccdCaseId);
-        System.out.println(idamTokens.getIdamOauth2Token());
+        System.out.println("Test 1 Case Id pre " + ccdCaseId);
+        System.out.println("idam token  is " + idamTokens.getIdamOauth2Token());
 
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
