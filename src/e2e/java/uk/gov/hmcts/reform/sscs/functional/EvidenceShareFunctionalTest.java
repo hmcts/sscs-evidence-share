@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 

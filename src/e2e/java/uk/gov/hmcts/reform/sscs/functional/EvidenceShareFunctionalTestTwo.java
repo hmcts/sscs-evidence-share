@@ -20,7 +20,7 @@ public class EvidenceShareFunctionalTestTwo extends AbstractFunctionalTest {
 
     @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000)
     public void processAnAppealWithNoValidMrnDate_shouldNoTBeSentToDwpAndShouldBeUpdatedToFlagError() throws Exception {
-        
+
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
