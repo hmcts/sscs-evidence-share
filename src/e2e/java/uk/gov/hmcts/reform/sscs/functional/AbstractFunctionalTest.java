@@ -65,7 +65,7 @@ public abstract class AbstractFunctionalTest {
     }
 
     void createCaseWithValidAppealState(EventType eventType) {
-        IdamTokens idamTok = idamService.getIdamTokens();
+        idamTokens = idamService.getIdamTokens();
 
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
 
