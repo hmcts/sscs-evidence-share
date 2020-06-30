@@ -12,7 +12,6 @@ import java.util.Objects;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
@@ -58,14 +57,11 @@ public abstract class AbstractFunctionalTest {
     private final String tcaInstance = System.getenv("TEST_URL");
     private final String localInstance = "http://localhost:8091";
 
-    @Before
-    public void setup() {
-        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
-        idamTokens = idamService.getIdamTokens();
-    }
-
     void createCaseWithValidAppealState(EventType eventType) {
+        idamTokens = idamService.getIdamTokens();
+
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
+
         SscsCaseData caseData = minimalCaseData.toBuilder()
             .createdInGapsFrom(State.VALID_APPEAL.getId())
             .appeal(minimalCaseData.getAppeal().toBuilder()
@@ -76,6 +72,8 @@ public abstract class AbstractFunctionalTest {
                 .receivedVia("Paper")
                 .build())
             .build();
+
+
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service send to DWP test",
             "Evidence share service send to DWP case created", idamTokens);
@@ -94,6 +92,9 @@ public abstract class AbstractFunctionalTest {
     }
 
     public void simulateCcdCallback(String json) throws IOException {
+
+        baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
+
         final String callbackUrl = baseURI + "/send";
 
         RestAssured.useRelaxedHTTPSValidation();

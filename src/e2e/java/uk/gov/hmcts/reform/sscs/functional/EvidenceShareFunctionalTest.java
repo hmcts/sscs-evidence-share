@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
-import java.io.IOException;
+import io.github.artsok.RepeatedIfExceptionsTest;
 import java.time.LocalDate;
 import java.util.List;
+
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -19,8 +19,13 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         super();
     }
 
-    @Test
-    public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws IOException {
+    @BeforeEach
+    public void beforeEach() {
+        ccdCaseId = null;
+    }
+
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
+    public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
 
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
@@ -31,6 +36,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         simulateCcdCallback(json);
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+
         SscsCaseData caseData = caseDetails.getData();
 
         List<SscsDocument> docs = caseData.getSscsDocument();
@@ -41,8 +47,9 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         assertEquals(LocalDate.now().toString(), caseData.getDateCaseSentToGaps());
     }
 
-    @Test
-    public void processAnAppealWithNoValidMrnDate_shouldNoTBeSentToDwpAndShouldBeUpdatedToFlagError() throws IOException {
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000)
+    public void processAnAppealWithNoValidMrnDate_shouldNoTBeSentToDwpAndShouldBeUpdatedToFlagError() throws Exception {
+
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
@@ -58,8 +65,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     }
 
     @Test
-    public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws IOException {
-
+    public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws Exception {
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
