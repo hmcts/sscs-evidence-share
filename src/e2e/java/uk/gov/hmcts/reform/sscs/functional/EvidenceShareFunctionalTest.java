@@ -64,7 +64,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         assertEquals("failedSending", caseDetails.getData().getHmctsDwpState());
     }
 
-    @Test
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000)
     public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws Exception {
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
