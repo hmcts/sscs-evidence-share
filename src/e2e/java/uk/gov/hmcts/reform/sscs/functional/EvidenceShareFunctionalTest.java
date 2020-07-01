@@ -6,8 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED
 import io.github.artsok.RepeatedIfExceptionsTest;
 import java.time.LocalDate;
 import java.util.List;
-
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -64,7 +62,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         assertEquals("failedSending", caseDetails.getData().getHmctsDwpState());
     }
 
-    @Test
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000)
     public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws Exception {
         createCaseWithValidAppealState(VALID_APPEAL_CREATED);
 
