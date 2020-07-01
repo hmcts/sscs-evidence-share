@@ -48,9 +48,11 @@ public class RoboticsJsonMapperTest {
         initMocks(this);
         roboticsJsonMapper = new RoboticsJsonMapper(dwpAddressLookupService, regionalProcessingCenterService, airLookupService);
 
+        SscsCaseData sscsCaseData = buildCaseData();
+        sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         roboticsWrapper = RoboticsWrapper
             .builder()
-            .sscsCaseData(buildCaseData())
+            .sscsCaseData(sscsCaseData)
             .ccdCaseId(123L).evidencePresent("Yes")
             .state(State.APPEAL_CREATED)
             .build();
@@ -416,6 +418,7 @@ public class RoboticsJsonMapperTest {
     @Test
     public void givenNoAppointee_thenProcessRobotics() {
         roboticsWrapper.getSscsCaseData().getAppeal().getAppellant().setAppointee(null);
+        roboticsWrapper.getSscsCaseData().getAppeal().getAppellant().setIsAppointee("No");
 
         roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 

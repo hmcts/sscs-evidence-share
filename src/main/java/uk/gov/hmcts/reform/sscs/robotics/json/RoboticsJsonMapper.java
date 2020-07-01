@@ -50,7 +50,7 @@ public class RoboticsJsonMapper {
         obj.put("evidencePresent", roboticsWrapper.getEvidencePresent());
         obj.put("caseCode", getCaseCode(sscsCaseData));
 
-        if (!isAppointeeDetailsEmpty(sscsCaseData.getAppeal().getAppellant().getAppointee())) {
+        if (!isAppointeeDetailsEmpty(sscsCaseData.getAppeal().getAppellant().getAppointee()) && "yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())) {
             boolean sameAddressAsAppointee = "Yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());
             obj.put("appointee", buildAppointeeDetails(sscsCaseData.getAppeal().getAppellant().getAppointee(), sameAddressAsAppointee));
         }
