@@ -234,7 +234,7 @@ public class RoboticsService {
         List<EmailAttachment> attachments = addDefaultAttachment(json, pdf, appellantUniqueId);
 
         if (!isDigitalCase) {
-            log.info("Add robotics additional evidence for digital case {} and case id {}", isDigitalCase, caseId);
+            log.info("Add robotics additional evidence for non digital case and case id {}", caseId);
             addAdditionalEvidenceAttachments(additionalEvidence, attachments);
         }
 
