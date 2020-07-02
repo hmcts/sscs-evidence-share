@@ -53,14 +53,11 @@ public class PlaceholderService {
 
     private final PdfDocumentConfig pdfDocumentConfig;
     private final ExelaAddressConfig exelaAddressConfig;
-    private final LocalDateToWelshStringConverter localDateToWelshStringConverter;
 
     @Autowired
-    public PlaceholderService(PdfDocumentConfig pdfDocumentConfig, ExelaAddressConfig exelaAddressConfig,
-                              LocalDateToWelshStringConverter localDateToWelshStringConverter) {
+    public PlaceholderService(PdfDocumentConfig pdfDocumentConfig, ExelaAddressConfig exelaAddressConfig) {
         this.pdfDocumentConfig = pdfDocumentConfig;
         this.exelaAddressConfig = exelaAddressConfig;
-        this.localDateToWelshStringConverter = localDateToWelshStringConverter;
     }
 
     public void build(SscsCaseData caseData, Map<String, Object> placeholders, Address address, String caseCreatedDate) {
@@ -86,10 +83,10 @@ public class PlaceholderService {
         if (caseData.isLanguagePreferenceWelsh()) {
             if (caseCreatedDate != null) {
                 placeholders.put(WELSH_CASE_CREATED_DATE_LITERAL,
-                    localDateToWelshStringConverter.convert(caseCreatedDate));
+                    LocalDateToWelshStringConverter.convert(caseCreatedDate));
             }
             placeholders.put(WELSH_GENERATED_DATE_LITERAL,
-                localDateToWelshStringConverter.convert(LocalDateTime.now().toLocalDate()));
+                LocalDateToWelshStringConverter.convert(LocalDateTime.now().toLocalDate()));
             placeholders.put(pdfDocumentConfig.getHmctsWelshImgKey(), pdfDocumentConfig.getHmctsWelshImgVal());
         }
         placeholders.put(SC_NUMBER_LITERAL, defaultToEmptyStringIfNull(caseData.getCaseReference()));
