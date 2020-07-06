@@ -248,8 +248,8 @@ dependencyManagement {
       entry 'kotlin-stdlib'
     }
 
-    // CVE-2019-0232 - Java and Command Line injections in Windows
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.35') {
+    // CVE-2019-0232 and CVE-2020-11996 Java and Command Line injections in Windows
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.36') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
