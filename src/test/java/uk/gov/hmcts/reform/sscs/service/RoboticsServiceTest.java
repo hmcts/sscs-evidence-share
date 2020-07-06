@@ -8,7 +8,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.net.URI;
@@ -240,6 +240,79 @@ public class RoboticsServiceTest {
         sscsCaseData.setSscsDocument(documents);
 
         CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
+
+        roboticsService.sendCaseToRobotics(caseData);
+
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(false), eq(true));
+        List<EmailAttachment> attachmentResult = captor.getValue();
+
+        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
+        assertThat(attachmentResult.size(), is(1));
+
+        verify(roboticsJsonMapper).map(any());
+        verify(roboticsJsonValidator).validate(any());
+        verify(emailService).sendEmail(eq(1L), any());
+    }
+
+    @Test
+    public void givenNonDigitalCaseAndHasAdditionalEvidenceAndIsPipAeTrue_DownloadAdditionalEvidenceAndGenerateRoboticsAndSendEmail() {
+
+        byte[] expectedBytes = {1, 2, 3};
+        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
+
+        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
+        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
+
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentType("appellantEvidence")
+                        .documentFileName("test.jpg")
+                        .documentLink(DocumentLink.builder().documentUrl("www.download.com").build())
+                        .build())
+                .build());
+
+        sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice("DWP PIP (AE)");
+        sscsCaseData.setSscsDocument(documents);
+
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
+
+        roboticsService.sendCaseToRobotics(caseData);
+
+        verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(false), eq(true));
+        List<EmailAttachment> attachmentResult = captor.getValue();
+
+        assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
+        assertThat(attachmentResult.size(), is(1));
+
+        verify(roboticsJsonMapper).map(any());
+        verify(roboticsJsonValidator).validate(any());
+        verify(emailService).sendEmail(eq(1L), any());
+    }
+
+    @Test
+    public void givenCaseIsDigitalAndHasAdditionalEvidenceAndIsPipAeTrue_doNotDownloadAdditionalEvidenceAndStillGenerateRoboticsAndSendEmail() {
+
+        byte[] expectedBytes = {1, 2, 3};
+        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
+
+        Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
+        expectedAdditionalEvidence.put("test.jpg", expectedBytes);
+
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentType("appellantEvidence")
+                        .documentFileName(null)
+                        .documentLink(DocumentLink.builder().documentUrl("www.download.com").build())
+                        .build())
+                .build());
+
+        sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice("DWP PIP (AE)");
+        sscsCaseData.setSscsDocument(documents);
+
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
+        caseData.getCaseData().setCreatedInGapsFrom(READY_TO_LIST.getId());
 
         roboticsService.sendCaseToRobotics(caseData);
 

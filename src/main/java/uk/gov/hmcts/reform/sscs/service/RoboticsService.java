@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.*;
 
 import java.net.URI;
@@ -90,13 +91,10 @@ public class RoboticsService {
         log.info("Downloading additional evidence for robotics for case id {} ", caseDetails.getId());
         Map<SscsDocument, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
 
-        boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
-        boolean isPipAeTo = Optional.ofNullable(caseData.getAppeal().getMrnDetails()).map(m -> equalsIgnoreCase(m.getDwpIssuingOffice(), PIP_AE)).orElse(false);
-
         log.info("Downloading SSCS1 for robotics for case id {} ", caseDetails.getId());
         byte[] sscs1Form = downloadSscs1(caseData, Long.valueOf(caseData.getCcdCaseId()));
 
-        sendJsonByEmail(caseDetails.getId(), caseData.getAppeal(), roboticsJson, sscs1Form, additionalEvidence, isScottish, isPipAeTo);
+        sendJsonByEmail(caseDetails.getId(), caseData, roboticsJson, sscs1Form, additionalEvidence);
 
         log.info("Case {} Robotics JSON successfully sent for benefit type {}", caseDetails.getId(),
             caseData.getAppeal().getBenefitType().getCode());
@@ -223,16 +221,23 @@ public class RoboticsService {
         return roboticsAppeal;
     }
 
-    private void sendJsonByEmail(long caseId, Appeal appeal, JSONObject json, byte[] pdf, Map<SscsDocument, byte[]> additionalEvidence, boolean isScottish, boolean isPipAeTo) {
-        Appellant appellant = appeal.getAppellant();
+    private void sendJsonByEmail(long caseId, SscsCaseData caseData, JSONObject json, byte[] pdf, Map<SscsDocument, byte[]> additionalEvidence) {
+
+        boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
+        boolean isPipAeTo = Optional.ofNullable(caseData.getAppeal().getMrnDetails()).map(m -> equalsIgnoreCase(m.getDwpIssuingOffice(), PIP_AE)).orElse(false);
+        boolean isDigitalCase = Optional.ofNullable(caseData.getCreatedInGapsFrom()).map(d -> equalsIgnoreCase(d, READY_TO_LIST.getId())).orElse(false);
+
+        Appellant appellant = caseData.getAppeal().getAppellant();
 
         String appellantUniqueId = emailHelper.generateUniqueEmailId(appellant);
 
         log.info("Add robotics default attachments for case id {}", caseId);
         List<EmailAttachment> attachments = addDefaultAttachment(json, pdf, appellantUniqueId);
 
-        log.info("Add robotics additional evidence for case id {}", caseId);
-        addAdditionalEvidenceAttachments(additionalEvidence, attachments);
+        if (!isDigitalCase) {
+            log.info("Add robotics additional evidence for non digital case and case id {}", caseId);
+            addAdditionalEvidenceAttachments(additionalEvidence, attachments);
+        }
 
         String subject = buildSubject(appellantUniqueId, isScottish);
 
@@ -246,7 +251,7 @@ public class RoboticsService {
         );
 
         log.info("Case {} robotics JSON email with subject '{}' sent successfully for benefit type {} isScottish {} isPipAe {}",
-            caseId, subject, appeal.getBenefitType().getCode(), isScottish, isPipAeTo);
+            caseId, subject, caseData.getAppeal().getBenefitType().getCode(), isScottish, isPipAeTo);
     }
 
     private String buildSubject(String appellantUniqueId, boolean isScottish) {
