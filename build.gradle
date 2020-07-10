@@ -268,7 +268,7 @@ dependencyManagement {
     dependency group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
 
     // CVE-2019-16869 - brought in by qpid-jms-client
-    dependencySet(group: 'io.netty', version: '4.1.50.Final') {
+    dependencySet(group: 'io.netty', version: '4.1.51.Final') {
       entry 'netty-handler'
       entry 'netty-transport-native-epoll'
       entry 'netty-transport-native-kqueue'
