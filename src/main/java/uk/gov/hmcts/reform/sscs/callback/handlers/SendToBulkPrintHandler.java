@@ -99,13 +99,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
         try {
             bulkPrintInfo = bulkPrintCase(callback);
-        } catch (NoDl6DocumentException e) {
-            log.info("Error when bulk-printing caseId: {}. No DL6/16 present", callback.getCaseDetails().getId(), e);
-            updateCaseToFlagError(caseData, "Triggered from Evidence Share – no DL6/16 present, please validate");
-        } catch (NonPdfBulkPrintException e) {
-            log.info(format("Error when bulk-printing caseId: %s. %s", callback.getCaseDetails().getId(), e.getMessage()), e);
-            updateCaseToFlagError(caseData, e.getMessage());
-        } catch (UnableToContactThirdPartyException e) {
+        } catch (NonPdfBulkPrintException | UnableToContactThirdPartyException | NoDl6DocumentException e) {
             log.info(format("Error when bulk-printing caseId: %s. %s", callback.getCaseDetails().getId(), e.getMessage()), e);
             updateCaseToFlagError(caseData, e.getMessage());
         } catch (Exception e) {
@@ -174,9 +168,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             List<SscsDocument> sscsDocuments = getSscsDocumentsToPrint(caseData.getSscsDocument());
             if (CollectionUtils.isEmpty(sscsDocuments)
                     || !documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(sscsDocuments)) {
-                throw new NoDl6DocumentException(
-                        format("No documents to send for bulk print for case id %s",
-                                caseData.getCcdCaseId()));
+                throw new NoDl6DocumentException();
             }
             List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
 

@@ -232,7 +232,7 @@ public class SendToBulkPrintHandlerTest {
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
         then(ccdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Triggered from Evidence Share – no DL6/16 present, please validate"), any());
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Triggered from Evidence Share – no DL6/16 present, please validate."), any());
 
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
 
