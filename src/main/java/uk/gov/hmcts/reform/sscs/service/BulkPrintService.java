@@ -14,12 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.exception.NonPdfBulkPrintException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
@@ -65,6 +67,10 @@ public class BulkPrintService implements PrintService {
                                                Integer reTryNumber) {
         try {
             return sendLetter(authToken, sscsCaseData, encodedData);
+        } catch (HttpClientErrorException e) {
+            log.info(format("Failed to send to bulk print for case %s with error %s. Non-pdf's/broken pdf's seen in list of documents, please correct.",
+                sscsCaseData.getCcdCaseId(), e.getMessage()));
+            throw new NonPdfBulkPrintException(e);
         } catch (Exception e) {
             if (reTryNumber > maxRetryAttempts) {
                 String message = format("Failed to send to bulk print for case %s with error %s.",

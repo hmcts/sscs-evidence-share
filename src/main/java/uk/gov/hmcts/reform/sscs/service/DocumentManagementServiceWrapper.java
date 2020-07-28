@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
+import uk.gov.hmcts.reform.sscs.exception.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Slf4j
@@ -21,7 +23,7 @@ public class DocumentManagementServiceWrapper {
 
     private final DocumentManagementService documentManagementService;
     private final CcdService ccdService;
-    private Integer maxRetryAttempts;
+    private final Integer maxRetryAttempts;
 
     @Autowired
     public DocumentManagementServiceWrapper(DocumentManagementService documentManagementService,
@@ -44,8 +46,8 @@ public class DocumentManagementServiceWrapper {
                 || !checkIfDlDocumentAlreadyExists(caseDetails.getData().getSscsDocument())) {
                 documentManagementService.generateDocumentAndAddToCcd(holder, caseData);
             }
-        } catch (PdfGenerationException e) {
-            throw new PdfStoreException(e.getMessage(), e);
+        } catch (PdfGenerationException | ResourceAccessException e) {
+            throw new UnableToContactThirdPartyException("docmosis", e);
         } catch (Exception e) {
             if (reTryNumber > maxRetryAttempts) {
                 throw new PdfStoreException(e.getMessage(), e);

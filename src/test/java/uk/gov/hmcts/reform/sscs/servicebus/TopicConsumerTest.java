@@ -2,12 +2,13 @@ package uk.gov.hmcts.reform.sscs.servicebus;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.exception.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TopicConsumerTest {
 
     private static final String MESSAGE = "message";
@@ -33,7 +35,6 @@ public class TopicConsumerTest {
 
     @Before
     public void setup() {
-        initMocks(this);
         topicConsumer = new TopicConsumer(RETRY_THREE_TIMES, dispatcher, deserializer);
     }
 
@@ -78,6 +79,14 @@ public class TopicConsumerTest {
     @Test
     public void noMrnDetailsExceptionWillBeCaught() {
         exception = new NoMrnDetailsException(SscsCaseData.builder().ccdCaseId("123").build());
+        doThrow(exception).when(dispatcher).handle(any(), any());
+        topicConsumer.onMessage(MESSAGE);
+        verify(dispatcher, atLeastOnce()).handle(any(), any());
+    }
+
+    @Test
+    public void unableToContactThirdPartyExceptionWillBeCaught() {
+        exception = new UnableToContactThirdPartyException("dm-store", new RuntimeException());
         doThrow(exception).when(dispatcher).handle(any(), any());
         topicConsumer.onMessage(MESSAGE);
         verify(dispatcher, atLeastOnce()).handle(any(), any());
