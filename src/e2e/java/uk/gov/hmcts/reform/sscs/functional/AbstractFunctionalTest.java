@@ -64,6 +64,7 @@ public abstract class AbstractFunctionalTest {
 
         SscsCaseData caseData = minimalCaseData.toBuilder()
             .createdInGapsFrom(State.VALID_APPEAL.getId())
+            .languagePreferenceWelsh("No")
             .appeal(minimalCaseData.getAppeal().toBuilder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")
