@@ -23,16 +23,13 @@ public class TemplateService {
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
             if (mrnDate.plusDays(30).isBefore(LocalDate.now())) {
-                return getTemplateByLanguagePreference(caseData, DocumentType.DL16);
+                return new Template(docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference())
+                        .get(DocumentType.DL16.getValue()).get("name"), DocumentType.DL16.getValue());
             } else {
-                return getTemplateByLanguagePreference(caseData, DocumentType.DL6);
+                return new Template(docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference())
+                        .get(DocumentType.DL6.getValue()).get("name"), DocumentType.DL6.getValue());
             }
         }
         return null;
-    }
-
-    private Template getTemplateByLanguagePreference(final SscsCaseData caseData, final DocumentType documentType) {
-        return new Template(docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference())
-                .get(documentType).get("name"),documentType.getValue());
     }
 }

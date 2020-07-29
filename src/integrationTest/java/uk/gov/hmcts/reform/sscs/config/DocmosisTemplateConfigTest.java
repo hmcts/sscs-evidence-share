@@ -33,9 +33,9 @@ public class DocmosisTemplateConfigTest {
     @Test
     public void docmosisTemplate() {
         assertEquals("TB-SCS-GNO-ENG-00010.doc",
-                docmosisTemplateConfig.getTemplate().get(LanguagePreference.ENGLISH).get(DocumentType.DL6).get("name"));
+                docmosisTemplateConfig.getTemplate().get(LanguagePreference.ENGLISH).get(DocumentType.DL6.getValue()).get("name"));
         assertEquals("TB-SCS-GNO-WEL-00469.docx",
-                docmosisTemplateConfig.getTemplate().get(LanguagePreference.WELSH).get(DocumentType.D609_97).get(
+                docmosisTemplateConfig.getTemplate().get(LanguagePreference.WELSH).get("d609-97").get(
                         "name"));
 
     }

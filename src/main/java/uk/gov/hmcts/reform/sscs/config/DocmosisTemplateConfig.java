@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 
 @Configuration
@@ -13,5 +12,5 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 @Getter
 @Setter
 public class DocmosisTemplateConfig {
-    Map<LanguagePreference, Map<DocumentType, Map<String, String>>> template;
+    Map<LanguagePreference, Map<String, Map<String, String>>> template;
 }

@@ -70,38 +70,38 @@ public class FurtherEvidenceServiceTest {
     private String furtherEvidenceOtherPartiesWelshTemplateName = "TB-SCS-GNO-WEL-00470.docx";
     private String furtherEvidenceOtherPartiesDocName = "609-98-template (other parties)";
     private String furtherEvidenceOtherPartiesDwpDocName = "609-98-template (DWP)";
-    Map<LanguagePreference, Map<DocumentType, Map<String, String>>> template =  new HashMap<>();
+    Map<LanguagePreference, Map<String, Map<String, String>>> template =  new HashMap<>();
 
     @Before
     public void setup() {
         Map<String, String> nameMap;
-        Map<DocumentType, Map<String, String>> englishDocs = new HashMap<>();
+        Map<String, Map<String, String>> englishDocs = new HashMap<>();
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-ENG-00010.doc");
-        englishDocs.put(DocumentType.DL6, nameMap);
+        englishDocs.put(DocumentType.DL6.getValue(), nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-ENG-00011.doc");
-        englishDocs.put(DocumentType.DL16, nameMap);
+        englishDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-ENG-00068.doc");
-        englishDocs.put(DocumentType.D609_97, nameMap);
+        englishDocs.put("d609_97", nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-ENG-00069.doc");
-        englishDocs.put(DocumentType.D609_98, nameMap);
+        englishDocs.put("d609_98", nameMap);
 
-        Map<DocumentType, Map<String, String>> welshDocs = new HashMap<>();
+        Map<String, Map<String, String>> welshDocs = new HashMap<>();
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-WEL-00459.docx");
-        welshDocs.put(DocumentType.DL6, nameMap);
+        welshDocs.put(DocumentType.DL6.getValue(), nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-WEL-00461.docx");
-        welshDocs.put(DocumentType.DL16, nameMap);
+        welshDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-WEL-00469.docx");
-        welshDocs.put(DocumentType.D609_97, nameMap);
+        welshDocs.put("d609_97", nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-WEL-00470.docx");
-        welshDocs.put(DocumentType.D609_98, nameMap);
+        welshDocs.put("d609_98", nameMap);
 
         template.put(LanguagePreference.ENGLISH, englishDocs);
         template.put(LanguagePreference.WELSH, welshDocs);
