@@ -53,6 +53,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && (callback.getEvent() == VALID_APPEAL_CREATED
+            || callback.getEvent() == APPEAL_TO_PROCEED
             || callback.getEvent() == READY_TO_LIST
             || callback.getEvent() == VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL
