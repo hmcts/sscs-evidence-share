@@ -140,7 +140,7 @@ public class FurtherEvidenceService {
         if (docmosisTemplateConfig == null) {
             log.info("docmosisTemplateConfig is null");
         } else {
-            log.info("docmosisTemplateConfig is not null" +languagePreference);
+            log.info("docmosisTemplateConfig is not null {}", languagePreference);
         }
 
         return docmosisTemplateConfig.getTemplate().get(languagePreference)
