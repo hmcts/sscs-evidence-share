@@ -8,6 +8,8 @@ import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESEN
 
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -20,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 
 @Service
+@Slf4j
 public class FurtherEvidenceService {
 
     private DocmosisTemplateConfig docmosisTemplateConfig;
@@ -134,6 +137,12 @@ public class FurtherEvidenceService {
     }
 
     private String getTemplateNameBasedOnLanguagePreference(LanguagePreference languagePreference, String documentType) {
+        if (docmosisTemplateConfig == null) {
+            log.info("docmosisTemplateConfig is null");
+        } else {
+            log.info("docmosisTemplateConfig is not null" +languagePreference);
+        }
+
         return docmosisTemplateConfig.getTemplate().get(languagePreference)
                 .get(documentType).get("name");
     }
