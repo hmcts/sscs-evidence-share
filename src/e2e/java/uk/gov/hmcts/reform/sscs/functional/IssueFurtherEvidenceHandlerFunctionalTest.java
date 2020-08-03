@@ -31,21 +31,24 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     @Test
     public void givenIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
-        String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType());
+        String caseId = createCaseWithTestData();
+        String issueFurtherEvidenceCallback = uploadDocAndUpdateJson(ISSUE_FURTHER_EVIDENCE.getCcdType(), caseId);
+
         simulateCcdCallback(issueFurtherEvidenceCallback);
-        verifyEvidenceIssued();
+        verifyEvidenceIssued(caseId);
     }
 
     @Test
     public void givenIssueFurtherEvidenceFails_shouldHandleException() throws IOException {
         // we are able to cause the issue further evidence to fail by setting to null the Appellant.Name in the callback.json
-        String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "Faulty");
+        String caseId = createCaseWithTestData();
+        String issueFurtherEvidenceCallback = uploadDocAndUpdateJson(ISSUE_FURTHER_EVIDENCE.getCcdType() + "Faulty", caseId);
         simulateCcdCallback(issueFurtherEvidenceCallback);
-        verifyEvidenceIsNotIssued();
+        verifyEvidenceIsNotIssued(caseId);
     }
 
-    private void verifyEvidenceIsNotIssued() {
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+    private void verifyEvidenceIsNotIssued(String caseId) {
+        SscsCaseDetails caseDetails = findCaseById(caseId);
         SscsCaseData caseData = caseDetails.getData();
         assertThat(caseData.getHmctsDwpState(), is("failedSendingFurtherEvidence"));
         List<SscsDocument> docs = caseData.getSscsDocument();
@@ -55,8 +58,8 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         assertThat(docs.get(3).getValue().getEvidenceIssued(), is("No"));
     }
 
-    private void verifyEvidenceIssued() {
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+    private void verifyEvidenceIssued(String caseId) {
+        SscsCaseDetails caseDetails = findCaseById(caseId);
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
@@ -66,16 +69,21 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         assertThat(docs.get(3).getValue().getEvidenceIssued(), is("Yes"));
     }
 
-    private String createTestData(String fileName) throws IOException {
-        String docUrl = uploadDocToDocMgmtStore();
-        createCaseWithValidAppealState(VALID_APPEAL_CREATED);
-        String json = getJson(fileName);
-        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
-        json = json.replace("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
-        return json.replace("EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
+    private String createCaseWithTestData() {
+        String caseId = createCaseWithValidAppealState(VALID_APPEAL_CREATED);
+        return caseId;
     }
 
+   private String uploadDocAndUpdateJson(String fileName, String caseId) throws IOException {
+       String docUrl = uploadDocToDocMgmtStore();
+       String json = getJson(fileName);
+       json = json.replace("CASE_ID_TO_BE_REPLACED", caseId);
+       json = json.replace("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
+       return json.replace("EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
+   }
+
     private String uploadDocToDocMgmtStore() throws IOException {
+
         Path evidencePath = new File(Objects.requireNonNull(
             getClass().getClassLoader().getResource(EVIDENCE_DOCUMENT_PDF)).getFile()).toPath();
 

@@ -57,7 +57,7 @@ public abstract class AbstractFunctionalTest {
     private final String tcaInstance = System.getenv("TEST_URL");
     private final String localInstance = "http://localhost:8091";
 
-    void createCaseWithValidAppealState(EventType eventType) {
+    String createCaseWithValidAppealState(EventType eventType) {
         idamTokens = idamService.getIdamTokens();
 
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
@@ -78,6 +78,8 @@ public abstract class AbstractFunctionalTest {
             "Evidence share service send to DWP test",
             "Evidence share service send to DWP case created", idamTokens);
         ccdCaseId = String.valueOf(caseDetails.getId());
+
+        return ccdCaseId;
     }
 
 
