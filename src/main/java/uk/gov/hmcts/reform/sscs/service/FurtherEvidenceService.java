@@ -115,12 +115,12 @@ public class FurtherEvidenceService {
 
     private byte[] buildPdfsFor609_97(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName) {
         return coverLetterService.generateCoverLetter(caseData, letterType,
-            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609_97"), pdfName);
+            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-97"), pdfName);
     }
 
     private byte[] buildPdfsFor609_98(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName) {
         return coverLetterService.generateCoverLetter(caseData, letterType,
-            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609_98"), pdfName);
+            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-98"), pdfName);
     }
 
     public boolean canHandleAnyDocument(List<SscsDocument> sscsDocumentList) {
