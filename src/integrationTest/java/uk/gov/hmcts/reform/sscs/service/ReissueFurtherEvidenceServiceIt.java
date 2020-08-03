@@ -116,10 +116,10 @@ public class ReissueFurtherEvidenceServiceIt {
         englishDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-ENG-00068.doc");
-        englishDocs.put("d609_97", nameMap);
+        englishDocs.put("d609-97", nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-ENG-00069.doc");
-        englishDocs.put("d609_98", nameMap);
+        englishDocs.put("d609-98", nameMap);
 
         Map<String, Map<String, String>> welshDocs = new HashMap<>();
         nameMap = new HashMap<>();
@@ -130,10 +130,10 @@ public class ReissueFurtherEvidenceServiceIt {
         welshDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-WEL-00469.docx");
-        welshDocs.put("d609_97", nameMap);
+        welshDocs.put("d609-97", nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-WEL-00470.docx");
-        welshDocs.put("d609_98", nameMap);
+        welshDocs.put("d609-98", nameMap);
 
         template.put(LanguagePreference.ENGLISH, englishDocs);
         template.put(LanguagePreference.WELSH, welshDocs);
