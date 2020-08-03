@@ -74,13 +74,13 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         return caseId;
     }
 
-   private String uploadDocAndUpdateJson(String fileName, String caseId) throws IOException {
-       String docUrl = uploadDocToDocMgmtStore();
-       String json = getJson(fileName);
-       json = json.replace("CASE_ID_TO_BE_REPLACED", caseId);
-       json = json.replace("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
-       return json.replace("EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
-   }
+    private String uploadDocAndUpdateJson(String fileName, String caseId) throws IOException {
+        String docUrl = uploadDocToDocMgmtStore();
+        String json = getJson(fileName);
+        json = json.replace("CASE_ID_TO_BE_REPLACED", caseId);
+        json = json.replace("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
+        return json.replace("EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
+    }
 
     private String uploadDocToDocMgmtStore() throws IOException {
 
