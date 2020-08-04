@@ -57,6 +57,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        log.info("Processing Issue Further Evidence Callback for caseId {}", caseData.getCcdCaseId());
         issueFurtherEvidence(caseData);
         postIssueFurtherEvidenceTasks(caseData);
     }
@@ -76,6 +77,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             String errorMsg = "Failed sending further evidence for case(%s)...";
             throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
+        log.info("Issued {} for caseId {}", documentType.getLabel(), caseData.getCcdCaseId());
     }
 
     private void postIssueFurtherEvidenceTasks(SscsCaseData caseData) {
@@ -91,6 +93,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
                 + "for case(%s)";
             throw new PostIssueFurtherEvidenceTasksException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
+
+        log.info("Evidence Flags updated and case {} submitted to CCD", caseData.getCcdCaseId());
     }
 
     private void handleIssueFurtherEvidenceException(SscsCaseData caseData, DocumentType documentType) {
@@ -104,10 +108,17 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
     private void setEvidenceIssuedFlagToYes(List<SscsDocument> sscsDocuments) {
         if (sscsDocuments != null) {
+
             for (SscsDocument doc : sscsDocuments) {
+
                 if (doc.getValue() != null && doc.getValue().getEvidenceIssued() != null
                     && "No".equalsIgnoreCase(doc.getValue().getEvidenceIssued())) {
+
+                    log.info("Setting Evidence Issued to Yes for document {}", doc.getValue().getDocumentFileName());
                     doc.getValue().setEvidenceIssued("Yes");
+
+                } else {
+                    log.info("NOT Setting Evidence Issued to Yes for document {}", doc.getValue().getDocumentFileName());
                 }
             }
         }

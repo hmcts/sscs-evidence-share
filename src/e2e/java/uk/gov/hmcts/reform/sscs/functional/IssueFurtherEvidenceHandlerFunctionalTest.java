@@ -79,6 +79,7 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
 
     private String uploadDocAndUpdateJson(String fileName, String caseId) throws IOException {
         String docUrl = uploadDocToDocMgmtStore();
+
         String json = getJson(fileName);
         json = json.replace("CASE_ID_TO_BE_REPLACED", caseId);
         json = json.replace("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
