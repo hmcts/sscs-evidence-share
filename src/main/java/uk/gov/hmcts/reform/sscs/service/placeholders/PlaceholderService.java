@@ -8,6 +8,8 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.t
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.ExelaAddressConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 
+@Slf4j
 @Service
 public class PlaceholderService {
 
@@ -42,7 +45,15 @@ public class PlaceholderService {
         }
 
         placeholders.put(BENEFIT_TYPE_LITERAL, description);
-        placeholders.put(APPELLANT_FULL_NAME_LITERAL, appeal.getAppellant().getName().getAbbreviatedFullName());
+
+        log.info("Apellant = " + appeal.getAppellant().toString());
+        log.info("Apellant Name = " + appeal.getAppellant().getName().toString());
+        log.info("Full Name = " + appeal.getAppellant().getName().getAbbreviatedFullName());
+
+        String fullName = appeal.getAppellant().getName().getAbbreviatedFullName();
+
+        placeholders.put(APPELLANT_FULL_NAME_LITERAL, fullName);
+
         placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
         placeholders.put(NINO_LITERAL, defaultToEmptyStringIfNull(appeal.getAppellant().getIdentity().getNino()));
         placeholders.put(SSCS_URL_LITERAL, PlaceholderConstants.SSCS_URL);

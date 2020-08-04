@@ -1,11 +1,17 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -26,12 +32,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.sscs.callback.handlers.ReissueFurtherEvidenceHandler;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
+import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
@@ -91,6 +103,23 @@ public class ReissueFurtherEvidenceServiceIt {
     @Captor
     ArgumentCaptor<PdfDocumentRequest> pdfDocumentRequest;
 
+    private ObjectMapper mapper() {
+        Jackson2ObjectMapperBuilder objectMapperBuilder =
+            new Jackson2ObjectMapperBuilder()
+                .featuresToEnable(READ_ENUMS_USING_TO_STRING)
+                .featuresToEnable(READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
+                .featuresToEnable(WRITE_ENUMS_USING_TO_STRING)
+                .serializationInclusion(JsonInclude.Include.NON_ABSENT);
+
+        ObjectMapper mapper = objectMapperBuilder.createXmlMapper(false).build();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
+    }
+
+    public SscsCaseCallbackDeserializer sscsDeserializer() {
+        return new SscsCaseCallbackDeserializer(mapper());
+    }
+
     private static final String FILE_CONTENT = "Welcome to PDF document service";
 
     private Session session = Session.getInstance(new Properties());
@@ -129,6 +158,31 @@ public class ReissueFurtherEvidenceServiceIt {
         assertEquals("Sarah Smith", pdfDocumentRequest.getAllValues().get(0).getData().get("name"));
         assertEquals("609-97-template (original sender)", documentCaptor.getAllValues().get(0).get(0).getName());
         assertEquals("evidence-document", documentCaptor.getAllValues().get(0).get(1).getName());
+    }
+
+    @Test
+    public void doesItNpe() throws IOException {
+
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource("issueFurtherEvidenceCallback.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+
+        SscsCaseCallbackDeserializer deserializer =  sscsDeserializer();
+
+        Callback<SscsCaseData> callback = deserializer.deserialize(json);
+
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+
+        SscsCaseData caseData  = caseDetails.getCaseData();
+
+        Appeal appeal = caseData.getAppeal();
+
+        String name = appeal.getAppellant().getName().getAbbreviatedFullName();
+
+        System.out.println("Name is " + name);
+
+        assertTrue(true);
     }
 
     @Test
