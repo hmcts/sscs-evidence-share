@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -39,6 +40,7 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         verifyEvidenceIssued(caseId);
     }
 
+    @Ignore
     @Test
     public void givenIssueFurtherEvidenceFails_shouldHandleException() throws IOException {
         // we are able to cause the issue further evidence to fail by setting to null the Appellant.Name in the callback.json
