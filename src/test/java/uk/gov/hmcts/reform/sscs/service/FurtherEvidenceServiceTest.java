@@ -91,10 +91,10 @@ public class FurtherEvidenceServiceTest {
 
         Map<String, Map<String, String>> welshDocs = new HashMap<>();
         nameMap = new HashMap<>();
-        nameMap.put("name", "TB-SCS-GNO-WEL-00459.docx");
+        nameMap.put("name", "TB-SCS-GNO-ENG-00010.doc");
         welshDocs.put(DocumentType.DL6.getValue(), nameMap);
         nameMap = new HashMap<>();
-        nameMap.put("name", "TB-SCS-GNO-WEL-00461.docx");
+        nameMap.put("name", "TB-SCS-GNO-ENG-00011.doc");
         welshDocs.put(DocumentType.DL16.getValue(), nameMap);
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-GNO-WEL-00469.docx");
