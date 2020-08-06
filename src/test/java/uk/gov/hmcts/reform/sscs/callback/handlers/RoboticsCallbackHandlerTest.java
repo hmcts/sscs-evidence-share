@@ -41,6 +41,12 @@ public class RoboticsCallbackHandlerTest {
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
+    @Mock
+    private CaseDetails caseDetails;
+
+    @Mock
+    private SscsCaseData caseData;
+
     private RoboticsCallbackHandler handler;
 
     private LocalDateTime now = LocalDateTime.now();
@@ -51,6 +57,9 @@ public class RoboticsCallbackHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
 
         handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.FALSE);
     }
 
     @Test
@@ -135,4 +144,25 @@ public class RoboticsCallbackHandlerTest {
 
         return new CaseDetails<>(123L, "jurisdiction", state, caseData, now);
     }
+
+    @Test
+    public void givenSendToDWPWithDocTranslated_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
+
+        assertTrue(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenDocTranslationOutstanding_thenReturnFalse() {
+        when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.TRUE);
+        assertFalse(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenResendCaseToGaps2WithDocTranslationOutstanding_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.RESEND_CASE_TO_GAPS2);
+        when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.TRUE);
+        assertTrue(handler.canHandle(SUBMITTED, callback));
+    }
+
 }
