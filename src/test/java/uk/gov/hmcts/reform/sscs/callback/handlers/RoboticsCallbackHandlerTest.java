@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 
@@ -13,9 +12,12 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -25,6 +27,9 @@ import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 
 @RunWith(JUnitParamsRunner.class)
 public class RoboticsCallbackHandlerTest {
+
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -49,11 +54,10 @@ public class RoboticsCallbackHandlerTest {
 
     private RoboticsCallbackHandler handler;
 
-    private LocalDateTime now = LocalDateTime.now();
+    private final LocalDateTime now = LocalDateTime.now();
 
     @Before
     public void setUp() {
-        initMocks(this);
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
 
         handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService);
@@ -63,7 +67,7 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "READY_TO_LIST", "VALID_APPEAL_CREATED", "RESEND_CASE_TO_GAPS2"})
+    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "READY_TO_LIST", "VALID_APPEAL_CREATED", "RESEND_CASE_TO_GAPS2", "APPEAL_TO_PROCEED"})
     public void givenAValidRoboticsEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
@@ -78,7 +82,7 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "VALID_APPEAL_CREATED"})
+    @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "VALID_APPEAL_CREATED", "APPEAL_TO_PROCEED"})
     public void givenARoboticsRequestAndCreatedInGapsMatchesState_thenSendCaseToRoboticsAndSetSentToGapsDateAndDoNotTriggerUpdateCaseEvent(EventType eventType) {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(READY_TO_LIST, READY_TO_LIST.getId());
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);

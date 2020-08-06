@@ -1,13 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
-
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.RESEND_CASE_TO_GAPS2;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +54,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && ((callback.getEvent() == VALID_APPEAL_CREATED
+            || callback.getEvent() == APPEAL_TO_PROCEED
             || callback.getEvent() == READY_TO_LIST
             || callback.getEvent() == VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL
