@@ -131,7 +131,7 @@ public class SendToBulkPrintHandlerTest {
     }
 
     @Test
-    public void givenSendToDWPWithDocTranslated_thenReturnTrue() {
+    public void givenSendToDwpWithDocTranslated_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
 
         assertTrue(handler.canHandle(SUBMITTED, callback));
