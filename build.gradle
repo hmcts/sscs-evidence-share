@@ -212,14 +212,14 @@ dependencies {
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.3.RELEASE'
 
   compile group: 'org.springframework', name: 'spring-jms'
-  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.52.0'
+  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.53.0'
   compileOnly 'org.projectlombok:lombok:1.18.12'
 
   annotationProcessor "org.projectlombok:lombok:1.18.10"
 
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '2.6.0'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.3.37'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.3.38'
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.8'
 
   //Remove when our dependencies pull in this version or later
