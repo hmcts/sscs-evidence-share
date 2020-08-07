@@ -1,0 +1,1461 @@
+Picked up JAVA_TOOL_OPTIONS: -XX:InitialRAMPercentage=20.0 -XX:MaxRAMPercentage=65.0 -XX:MinRAMPercentage=10.0 -XX:+UseParallelOldGC -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=40 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Xms128M  -javaagent:/opt/app/applicationinsights-agent-2.5.1.jar -Dfile.encoding=UTF-8
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.3.1.RELEASE)
+
+2020-08-06T14:44:53.552 INFO  [main] o.s.c.b.c.PropertySourceBootstrapConfiguration Located property source: [BootstrapPropertySource {name='bootstrapProperties-propertiesvolume.null'}]
+2020-08-06T14:44:53.567 INFO  [main] u.g.hmcts.reform.sscs.SscsEvidenceShareApplication No active profile set, falling back to default profiles: default
+2020-08-06T14:44:56.222 WARN  [main] o.springframework.boot.actuate.endpoint.EndpointId Endpoint ID 'hystrix.stream' contains invalid characters, please migrate to a valid format.
+2020-08-06T14:44:56.405 INFO  [main] o.springframework.cloud.context.scope.GenericScope BeanFactory id=f23d6599-d62b-3ca8-8e12-713050189ac0
+2020-08-06T14:44:56.821 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.authorisation.ServiceAuthorisationHealthApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.822 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.823 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.824 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.824 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.825 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.ccd.client.CaseEventsApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.826 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.ccd.client.CaseUserApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.827 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.ccd.client.CaseAccessApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.828 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.idam.client.IdamApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.829 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.idam.client.IdamTestApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.830 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.sendletter.healthcheck.SendLetterHealthApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.830 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.sendletter.api.SendLetterApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.832 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.document.DocumentDeleteApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.833 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.document.DocumentMetadataDownloadClientApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.833 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'uk.gov.hmcts.reform.document.DocumentDownloadClientApi' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:56.900 INFO  [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker Bean 'org.springframework.retry.annotation.RetryConfiguration' of type [org.springframework.retry.annotation.RetryConfiguration$$EnhancerBySpringCGLIB$$3a531672] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-08-06T14:44:57.872 INFO  [main] o.s.boot.web.embedded.tomcat.TomcatWebServer Tomcat initialized with port(s): 8091 (http)
+2020-08-06T14:44:57.905 INFO  [main] org.apache.coyote.http11.Http11NioProtocol Initializing ProtocolHandler ["http-nio-8091"]
+2020-08-06T14:44:57.905 INFO  [main] org.apache.catalina.core.StandardService Starting service [Tomcat]
+2020-08-06T14:44:57.905 INFO  [main] org.apache.catalina.core.StandardEngine Starting Servlet engine: [Apache Tomcat/9.0.37]
+2020-08-06T14:44:58.034 INFO  [main] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] Initializing Spring embedded WebApplicationContext
+2020-08-06T14:44:58.034 INFO  [main] o.s.b.w.s.c.ServletWebServerApplicationContext Root WebApplicationContext: initialization completed in 4399 ms
+2020-08-06T14:44:58.403 WARN  [main] com.netflix.config.sources.URLConfigurationSource No URLs will be polled as dynamic configuration sources.
+2020-08-06T14:44:58.403 INFO  [main] com.netflix.config.sources.URLConfigurationSource To enable URLs as dynamic configuration sources, define System property archaius.configurationSource.additionalUrls or make config.properties available on classpath.
+2020-08-06T14:44:58.431 INFO  [main] com.netflix.config.DynamicPropertyFactory DynamicPropertyFactory is initialized with configuration sources: com.netflix.config.ConcurrentCompositeConfiguration@4dcbae55
+2020-08-06T14:45:03.876 INFO  [main] u.g.h.r.sscs.servicebus.messaging.MessagingConfig Creating JMSListenerContainer bean for topics..
+2020-08-06T14:45:04.425 INFO  [main] o.s.b.actuate.endpoint.web.EndpointLinksResolver Exposing 2 endpoint(s) beneath base path ''
+2020-08-06T14:45:04.512 INFO  [main] s.d.s.w.PropertySourcedRequestMappingHandlerMapping Mapped URL path [/v2/api-docs] onto method [springfox.documentation.swagger2.web.Swagger2Controller#getDocumentation(String, HttpServletRequest)]
+2020-08-06T14:45:04.549 WARN  [main] com.netflix.config.sources.URLConfigurationSource No URLs will be polled as dynamic configuration sources.
+2020-08-06T14:45:04.549 INFO  [main] com.netflix.config.sources.URLConfigurationSource To enable URLs as dynamic configuration sources, define System property archaius.configurationSource.additionalUrls or make config.properties available on classpath.
+2020-08-06T14:45:04.700 INFO  [main] o.s.scheduling.concurrent.ThreadPoolTaskExecutor Initializing ExecutorService 'applicationTaskExecutor'
+2020-08-06T14:45:05.066 INFO  [main] org.quartz.impl.StdSchedulerFactory Using default implementation for ThreadExecutor
+2020-08-06T14:45:05.104 INFO  [main] org.quartz.core.SchedulerSignalerImpl Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2020-08-06T14:45:05.104 INFO  [main] org.quartz.core.QuartzScheduler Quartz Scheduler v.2.3.2 created.
+2020-08-06T14:45:05.106 INFO  [main] org.quartz.simpl.RAMJobStore RAMJobStore initialized.
+2020-08-06T14:45:05.106 INFO  [main] org.quartz.core.QuartzScheduler Scheduler meta-data: Quartz Scheduler (v2.3.2) 'quartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 10 threads.
+  Using job-store 'org.quartz.simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2020-08-06T14:45:05.106 INFO  [main] org.quartz.impl.StdSchedulerFactory Quartz scheduler 'quartzScheduler' initialized from an externally provided properties instance.
+2020-08-06T14:45:05.107 INFO  [main] org.quartz.impl.StdSchedulerFactory Quartz scheduler version: 2.3.2
+2020-08-06T14:45:05.107 INFO  [main] org.quartz.core.QuartzScheduler JobFactory set to: org.springframework.scheduling.quartz.SpringBeanJobFactory@71fb8301
+2020-08-06T14:45:05.132 INFO  [main] o.s.scheduling.concurrent.ThreadPoolTaskScheduler Initializing ExecutorService 'taskScheduler'
+2020-08-06T14:45:05.354 INFO  [main] org.apache.coyote.http11.Http11NioProtocol Starting ProtocolHandler ["http-nio-8091"]
+2020-08-06T14:45:05.397 INFO  [main] o.s.boot.web.embedded.tomcat.TomcatWebServer Tomcat started on port(s): 8091 (http) with context path ''
+2020-08-06T14:45:05.400 INFO  [main] s.d.s.web.plugins.DocumentationPluginsBootstrapper Context refreshed
+2020-08-06T14:45:05.425 INFO  [main] s.d.s.web.plugins.DocumentationPluginsBootstrapper Found 1 custom documentation plugin(s)
+2020-08-06T14:45:05.503 INFO  [main] s.d.spring.web.scanners.ApiListingReferenceScanner Scanning for api listing references
+2020-08-06T14:45:06.720 INFO  [AmqpProvider :(1):[amqps://sscs-servicebus-aat.servicebus.windows.net:-1]] org.apache.qpid.jms.JmsConnection Connection ID:32ecb8b0-07a1-408f-bd91-d14faa355afc:1 connected to server: amqps://sscs-servicebus-aat.servicebus.windows.net
+2020-08-06T14:45:06.725 INFO  [main] o.s.scheduling.quartz.SchedulerFactoryBean Starting Quartz Scheduler now
+2020-08-06T14:45:07.131 INFO  [main] org.quartz.core.QuartzScheduler Scheduler quartzScheduler_$_NON_CLUSTERED started.
+2020-08-06T14:45:07.153 INFO  [main] u.g.hmcts.reform.sscs.SscsEvidenceShareApplication Started SscsEvidenceShareApplication in 16.75 seconds (JVM running for 20.452)
+2020-08-06T14:45:07.171 INFO  [scheduling-1] uk.gov.hmcts.reform.sscs.idam.IdamService Evicting idam token cache
+2020-08-06T14:45:20.262 INFO  [http-nio-8091-exec-1] o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] Initializing Spring DispatcherServlet 'dispatcherServlet'
+2020-08-06T14:45:20.262 INFO  [http-nio-8091-exec-1] org.springframework.web.servlet.DispatcherServlet Initializing Servlet 'dispatcherServlet'
+2020-08-06T14:45:20.274 INFO  [http-nio-8091-exec-1] org.springframework.web.servlet.DispatcherServlet Completed initialization in 12 ms
+2020-08-06T14:45:31.383 INFO  [http-nio-8091-exec-2] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request start
+2020-08-06T14:45:32.169 INFO  [http-nio-8091-exec-2] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request finish
+2020-08-06T14:47:37.469 INFO  [http-nio-8091-exec-3] u.g.h.r.sscs.controllers.FunctionalTestController authorising service auth header.
+2020-08-06T14:47:37.471 INFO  [http-nio-8091-exec-3] u.g.hmcts.reform.sscs.service.AuthorisationService About to authorise Notification request
+2020-08-06T14:47:37.482 INFO  [http-nio-8091-exec-3] u.g.hmcts.reform.sscs.service.AuthorisationService Notification request authorised
+2020-08-06T14:47:37.483 INFO  [http-nio-8091-exec-3] u.g.h.r.sscs.controllers.FunctionalTestController consuming message.
+2020-08-06T14:47:37.483 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Message received from the service bus by evidence share service
+2020-08-06T14:47:38.008 INFO  [http-nio-8091-exec-3] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Processing robotics for case id 1596725254108491 in evidence share service
+2020-08-06T14:47:38.008 INFO  [http-nio-8091-exec-3] u.g.h.r.s.c.handlers.RoboticsCallbackHandler The callback event is VALID_APPEAL_CREATED and the createdInGapsFrom field is validAppeal for case id 1596725254108491
+2020-08-06T14:47:38.009 INFO  [http-nio-8091-exec-3] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Is case valid to send to robotics true for case id 1596725254108491
+2020-08-06T14:47:38.013 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.RoboticsService Case sent to robotics service for case id 1596725254108491 
+2020-08-06T14:47:38.013 INFO  [http-nio-8091-exec-3] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice 5
+2020-08-06T14:47:38.013 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.RoboticsService Case 1596725254108491 automatically updating DWP office probably due to office closure
+2020-08-06T14:47:38.014 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.idam.IdamService No cached IDAM token found, requesting from IDAM service.
+2020-08-06T14:47:38.014 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.idam.IdamService Requesting idam access token from Open End Point
+2020-08-06T14:47:38.293 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.idam.IdamService Requesting idam access token successful
+2020-08-06T14:47:38.672 INFO  [http-nio-8091-exec-3] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725254108491 and eventType caseUpdated
+2020-08-06T14:47:38.672 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:47:39.814 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.RoboticsService Creating robotics for case id 1596725254108491 
+2020-08-06T14:47:39.819 INFO  [http-nio-8091-exec-3] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice DWP PIP (5)
+2020-08-06T14:47:39.825 INFO  [http-nio-8091-exec-3] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice DWP PIP (5)
+2020-08-06T14:47:39.988 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.RoboticsService Downloading additional evidence for robotics for case id 1596725254108491 
+2020-08-06T14:47:39.998 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.RoboticsService Downloading SSCS1 for robotics for case id 1596725254108491 
+2020-08-06T14:47:39.999 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.RoboticsService Add robotics default attachments for case id 1596725254108491
+2020-08-06T14:47:40.004 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.RoboticsService Add robotics additional evidence for non digital case and case id 1596725254108491
+2020-08-06T14:47:40.082 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.EmailService Case [1596725254108491] sending email with subject [Test_6 D for Robot [1]] of [-1] bytes with [991] bytes of attachments.
+2020-08-06T14:47:40.264 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.RoboticsService Case 1596725254108491 robotics JSON email with subject 'Test_6 D for Robot [1]' sent successfully for benefit type PIP isScottish false isPipAe false
+2020-08-06T14:47:40.264 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.RoboticsService Case 1596725254108491 Robotics JSON successfully sent for benefit type PIP
+2020-08-06T14:47:40.265 INFO  [http-nio-8091-exec-3] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Processing bulk print tasks for case id 1596725254108491
+2020-08-06T14:47:40.265 INFO  [http-nio-8091-exec-3] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice DWP PIP (5)
+2020-08-06T14:47:40.313 INFO  [http-nio-8091-exec-3] u.g.h.r.s.service.placeholders.PlaceholderService Apellant = Appellant(name=Name(title=Miss, firstName=AN, lastName=Test), address=Address(line1=2 Drake Close, line2=Hutton, town=Brentwood, county=Essex, postcode=CM13 1AQ, postcodeLookup=null, postcodeAddress=null), contact=Contact(email=null, phone=01424 752419, mobile=null), identity=Identity(dob=1900-01-01, nino=JT 12 34 56 D), isAppointee=null, appointee=null, isAddressSameAsAppointee=null)
+2020-08-06T14:47:40.314 INFO  [http-nio-8091-exec-3] u.g.h.r.s.service.placeholders.PlaceholderService Apellant Name = Name(title=Miss, firstName=AN, lastName=Test)
+2020-08-06T14:47:40.319 INFO  [http-nio-8091-exec-3] u.g.h.r.s.service.placeholders.PlaceholderService Full Name = Miss A Test
+2020-08-06T14:47:40.321 INFO  [http-nio-8091-exec-3] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Generating DL document for case id 1596725254108491
+2020-08-06T14:47:40.321 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:47:40.378 INFO  [http-nio-8091-exec-3] u.g.h.reform.sscs.ccd.service.ReadCcdCaseService searching cases by ccdID 1596725254108491
+2020-08-06T14:47:40.548 INFO  [http-nio-8091-exec-3] u.g.h.r.s.d.service.DocumentManagementService Generating template dl16 for case id 1596725254108491
+2020-08-06T14:47:40.549 INFO  [http-nio-8091-exec-3] u.g.h.r.s.d.service.DocmosisPdfGenerationService Making request to Docmosis pdf service to generate pdf document with template TB-SCS-GNO-ENG-00011.doc and placeholders of size [23] to endpoint https://docmosis-development.platform.hmcts.net/rs/render
+2020-08-06T14:47:40.562 INFO  [http-nio-8091-exec-3] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request start
+2020-08-06T14:47:43.946 INFO  [http-nio-8091-exec-3] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request finish
+2020-08-06T14:47:43.987 INFO  [http-nio-8091-exec-3] u.g.h.r.s.d.service.DocumentManagementService Adding document template dl16 to ccd for id 1596725254108491
+2020-08-06T14:47:43.987 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:47:44.058 INFO  [http-nio-8091-exec-3] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request start
+2020-08-06T14:47:44.257 INFO  [http-nio-8091-exec-3] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request finish
+2020-08-06T14:47:44.267 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.CcdPdfService Case 1596725254108491 PDF stored in DM for benefit type PIP
+2020-08-06T14:47:44.271 INFO  [http-nio-8091-exec-3] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725254108491 and eventType uploadDocument
+2020-08-06T14:47:44.272 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:47:44.904 INFO  [http-nio-8091-exec-3] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Sending to bulk print for case id 1596725254108491
+2020-08-06T14:47:45.317 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.service.BulkPrintService Letter service produced the following letter Id 3adcd00b-8350-4481-b34b-9221248691a5 for case 1596725254108491
+2020-08-06T14:47:45.322 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:47:45.382 INFO  [http-nio-8091-exec-3] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725254108491 and eventType sentToDwp
+2020-08-06T14:47:45.382 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:47:45.792 INFO  [http-nio-8091-exec-3] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Case sent to dwp for case id 1596725254108491 with returned value Optional[3adcd00b-8350-4481-b34b-9221248691a5]
+2020-08-06T14:47:45.793 INFO  [http-nio-8091-exec-3] u.g.h.r.s.callback.handlers.ReciprocalLinkHandler Reciprocal link handler for case id 1596725254108491
+2020-08-06T14:47:45.793 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:47:47.213 INFO  [http-nio-8091-exec-3] u.g.h.r.s.callback.handlers.ReciprocalLinkHandler Found 25 matching cases for Nino JT 12 34 56 D
+2020-08-06T14:47:47.213 INFO  [http-nio-8091-exec-3] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Sscs Case CCD callback `VALID_APPEAL_CREATED` handled for Case ID `1596725254108491`
+2020-08-06T14:47:47.213 INFO  [http-nio-8091-exec-3] u.g.h.r.sscs.controllers.FunctionalTestController done.
+2020-08-06T14:47:48.727 INFO  [http-nio-8091-exec-4] u.g.h.r.sscs.controllers.FunctionalTestController authorising service auth header.
+2020-08-06T14:47:48.727 INFO  [http-nio-8091-exec-4] u.g.hmcts.reform.sscs.service.AuthorisationService About to authorise Notification request
+2020-08-06T14:47:48.733 INFO  [http-nio-8091-exec-4] u.g.hmcts.reform.sscs.service.AuthorisationService Notification request authorised
+2020-08-06T14:47:48.734 INFO  [http-nio-8091-exec-4] u.g.h.r.sscs.controllers.FunctionalTestController consuming message.
+2020-08-06T14:47:48.734 INFO  [http-nio-8091-exec-4] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Message received from the service bus by evidence share service
+2020-08-06T14:47:48.735 INFO  [http-nio-8091-exec-4] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Processing robotics for case id 1596725268031382 in evidence share service
+2020-08-06T14:47:48.735 INFO  [http-nio-8091-exec-4] u.g.h.r.s.c.handlers.RoboticsCallbackHandler The callback event is VALID_APPEAL_CREATED and the createdInGapsFrom field is validAppeal for case id 1596725268031382
+2020-08-06T14:47:48.735 INFO  [http-nio-8091-exec-4] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Is case valid to send to robotics true for case id 1596725268031382
+2020-08-06T14:47:48.735 INFO  [http-nio-8091-exec-4] uk.gov.hmcts.reform.sscs.service.RoboticsService Case sent to robotics service for case id 1596725268031382 
+2020-08-06T14:47:48.735 INFO  [http-nio-8091-exec-4] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice 5
+2020-08-06T14:47:48.735 INFO  [http-nio-8091-exec-4] uk.gov.hmcts.reform.sscs.service.RoboticsService Case 1596725268031382 automatically updating DWP office probably due to office closure
+2020-08-06T14:47:48.735 INFO  [http-nio-8091-exec-4] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:47:48.800 INFO  [http-nio-8091-exec-4] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725268031382 and eventType caseUpdated
+2020-08-06T14:47:48.800 INFO  [http-nio-8091-exec-4] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:47:49.350 INFO  [http-nio-8091-exec-4] uk.gov.hmcts.reform.sscs.service.RoboticsService Creating robotics for case id 1596725268031382 
+2020-08-06T14:47:49.351 INFO  [http-nio-8091-exec-4] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice DWP PIP (5)
+2020-08-06T14:47:49.351 INFO  [http-nio-8091-exec-4] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice DWP PIP (5)
+2020-08-06T14:47:49.355 ERROR [http-nio-8091-exec-4] u.g.h.r.sscs.robotics.json.RoboticsJsonValidatororg.everit.json.schema.ValidationException: #/mrnDate: [] is not a valid date. Expected [yyyy-MM-dd]
+	at org.everit.json.schema.ValidationException.copy(ValidationException.java:486)
+	at org.everit.json.schema.DefaultValidator.performValidation(Validator.java:73)
+	at org.everit.json.schema.Schema.validate(Schema.java:152)
+	at uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator.validate(RoboticsJsonValidator.java:32)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.createRobotics(RoboticsService.java:219)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.sendCaseToRobotics(RoboticsService.java:88)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.RoboticsCallbackHandler.handle(RoboticsCallbackHandler.java:77)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+ Robotics service failed to validate json
+2020-08-06T14:47:49.366 ERROR [http-nio-8091-exec-4] u.g.h.r.s.c.handlers.RoboticsCallbackHandleruk.gov.hmcts.reform.sscs.robotics.exception.RoboticsValidationException: org.everit.json.schema.ValidationException: #/mrnDate: [] is not a valid date. Expected [yyyy-MM-dd]
+	at uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator.validate(RoboticsJsonValidator.java:35)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.createRobotics(RoboticsService.java:219)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.sendCaseToRobotics(RoboticsService.java:88)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.RoboticsCallbackHandler.handle(RoboticsCallbackHandler.java:77)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+Caused by: org.everit.json.schema.ValidationException: #/mrnDate: [] is not a valid date. Expected [yyyy-MM-dd]
+	at org.everit.json.schema.ValidationException.copy(ValidationException.java:486)
+	at org.everit.json.schema.DefaultValidator.performValidation(Validator.java:73)
+	at org.everit.json.schema.Schema.validate(Schema.java:152)
+	at uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator.validate(RoboticsJsonValidator.java:32)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.createRobotics(RoboticsService.java:219)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.sendCaseToRobotics(RoboticsService.java:88)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.RoboticsCallbackHandler.handle(RoboticsCallbackHandler.java:77)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+ Error when sending to robotics: 1596725268031382
+2020-08-06T14:47:49.368 INFO  [http-nio-8091-exec-4] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Processing bulk print tasks for case id 1596725268031382
+2020-08-06T14:47:49.368 INFO  [http-nio-8091-exec-4] u.g.h.r.s.callback.handlers.SendToBulkPrintHandlerjava.time.format.DateTimeParseException: Text '' could not be parsed at index 0
+	at java.base/java.time.format.DateTimeFormatter.parseResolved0(DateTimeFormatter.java:2046)
+	at java.base/java.time.format.DateTimeFormatter.parse(DateTimeFormatter.java:1948)
+	at java.base/java.time.LocalDate.parse(LocalDate.java:428)
+	at java.base/java.time.LocalDate.parse(LocalDate.java:413)
+	at uk.gov.hmcts.reform.sscs.service.TemplateService.findTemplate(TemplateService.java:27)
+	at uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory.create(DocumentRequestFactory.java:29)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.bulkPrintCase(SendToBulkPrintHandler.java:151)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.handle(SendToBulkPrintHandler.java:101)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+ Error when bulk-printing caseId: 1596725268031382
+2020-08-06T14:47:49.368 INFO  [http-nio-8091-exec-4] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:47:49.429 INFO  [http-nio-8091-exec-4] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725268031382 and eventType sendToDwpError
+2020-08-06T14:47:49.429 INFO  [http-nio-8091-exec-4] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:47:49.592 INFO  [http-nio-8091-exec-4] u.g.h.r.s.callback.handlers.ReciprocalLinkHandler Reciprocal link handler for case id 1596725268031382
+2020-08-06T14:47:49.592 INFO  [http-nio-8091-exec-4] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:47:50.957 INFO  [http-nio-8091-exec-4] u.g.h.r.s.callback.handlers.ReciprocalLinkHandler Found 25 matching cases for Nino JT 12 34 56 D
+2020-08-06T14:47:50.957 INFO  [http-nio-8091-exec-4] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Sscs Case CCD callback `VALID_APPEAL_CREATED` handled for Case ID `1596725268031382`
+2020-08-06T14:47:50.958 INFO  [http-nio-8091-exec-4] u.g.h.r.sscs.controllers.FunctionalTestController done.
+2020-08-06T14:47:52.400 INFO  [http-nio-8091-exec-6] u.g.h.r.sscs.controllers.FunctionalTestController authorising service auth header.
+2020-08-06T14:47:52.400 INFO  [http-nio-8091-exec-6] u.g.hmcts.reform.sscs.service.AuthorisationService About to authorise Notification request
+2020-08-06T14:47:52.405 INFO  [http-nio-8091-exec-6] u.g.hmcts.reform.sscs.service.AuthorisationService Notification request authorised
+2020-08-06T14:47:52.406 INFO  [http-nio-8091-exec-6] u.g.h.r.sscs.controllers.FunctionalTestController consuming message.
+2020-08-06T14:47:52.406 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Message received from the service bus by evidence share service
+2020-08-06T14:47:52.407 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Processing robotics for case id 1596725271756371 in evidence share service
+2020-08-06T14:47:52.407 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler The callback event is VALID_APPEAL_CREATED and the createdInGapsFrom field is validAppeal for case id 1596725271756371
+2020-08-06T14:47:52.407 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Is case valid to send to robotics true for case id 1596725271756371
+2020-08-06T14:47:52.407 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Case sent to robotics service for case id 1596725271756371 
+2020-08-06T14:47:52.407 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice 5
+2020-08-06T14:47:52.407 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Case 1596725271756371 automatically updating DWP office probably due to office closure
+2020-08-06T14:47:52.407 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:47:52.467 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725271756371 and eventType caseUpdated
+2020-08-06T14:47:52.467 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:47:52.654 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Creating robotics for case id 1596725271756371 
+2020-08-06T14:47:52.655 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice DWP PIP (5)
+2020-08-06T14:47:52.655 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice DWP PIP (5)
+2020-08-06T14:47:52.656 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Downloading additional evidence for robotics for case id 1596725271756371 
+2020-08-06T14:47:52.656 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Downloading SSCS1 for robotics for case id 1596725271756371 
+2020-08-06T14:47:52.656 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Add robotics default attachments for case id 1596725271756371
+2020-08-06T14:47:52.656 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Add robotics additional evidence for non digital case and case id 1596725271756371
+2020-08-06T14:47:52.656 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.EmailService Case [1596725271756371] sending email with subject [Test_6 D for Robot [2]] of [-1] bytes with [991] bytes of attachments.
+2020-08-06T14:47:52.781 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Case 1596725271756371 robotics JSON email with subject 'Test_6 D for Robot [2]' sent successfully for benefit type PIP isScottish false isPipAe false
+2020-08-06T14:47:52.781 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Case 1596725271756371 Robotics JSON successfully sent for benefit type PIP
+2020-08-06T14:47:52.782 INFO  [http-nio-8091-exec-6] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Processing bulk print tasks for case id 1596725271756371
+2020-08-06T14:47:52.782 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice DWP PIP (5)
+2020-08-06T14:47:52.782 INFO  [http-nio-8091-exec-6] u.g.h.r.s.service.placeholders.PlaceholderService Apellant = Appellant(name=Name(title=Miss, firstName=AN, lastName=Test), address=Address(line1=2 Drake Close, line2=Hutton, town=Brentwood, county=Essex, postcode=CM13 1AQ, postcodeLookup=null, postcodeAddress=null), contact=Contact(email=null, phone=01424 752419, mobile=null), identity=Identity(dob=1900-01-01, nino=JT 12 34 56 D), isAppointee=null, appointee=null, isAddressSameAsAppointee=null)
+2020-08-06T14:47:52.782 INFO  [http-nio-8091-exec-6] u.g.h.r.s.service.placeholders.PlaceholderService Apellant Name = Name(title=Miss, firstName=AN, lastName=Test)
+2020-08-06T14:47:52.782 INFO  [http-nio-8091-exec-6] u.g.h.r.s.service.placeholders.PlaceholderService Full Name = Miss A Test
+2020-08-06T14:47:52.782 INFO  [http-nio-8091-exec-6] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Generating DL document for case id 1596725271756371
+2020-08-06T14:47:52.782 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:47:52.840 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.ReadCcdCaseService searching cases by ccdID 1596725271756371
+2020-08-06T14:47:52.909 INFO  [http-nio-8091-exec-6] u.g.h.r.s.d.service.DocumentManagementService Generating template dl6 for case id 1596725271756371
+2020-08-06T14:47:52.909 INFO  [http-nio-8091-exec-6] u.g.h.r.s.d.service.DocmosisPdfGenerationService Making request to Docmosis pdf service to generate pdf document with template TB-SCS-GNO-ENG-00010.doc and placeholders of size [23] to endpoint https://docmosis-development.platform.hmcts.net/rs/render
+2020-08-06T14:47:52.910 INFO  [http-nio-8091-exec-6] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request start
+2020-08-06T14:47:57.925 ERROR [http-nio-8091-exec-6] u.g.h.r.s.d.service.DocmosisPdfGenerationServiceorg.springframework.web.client.ResourceAccessException: I/O error on POST request for "https://docmosis-development.platform.hmcts.net/rs/render": Read timed out; nested exception is java.net.SocketTimeoutException: Read timed out
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:748)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:674)
+	at org.springframework.web.client.RestTemplate.postForEntity(RestTemplate.java:449)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService.generatePdf(DocmosisPdfGenerationService.java:51)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService.generateDocumentAndAddToCcd(DocumentManagementService.java:31)
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcdWithRetry(DocumentManagementServiceWrapper.java:45)
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcd(DocumentManagementServiceWrapper.java:36)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.bulkPrintCase(SendToBulkPrintHandler.java:158)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.handle(SendToBulkPrintHandler.java:101)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+Caused by: java.net.SocketTimeoutException: Read timed out
+	at java.base/java.net.SocketInputStream.socketRead0(Native Method)
+	at java.base/java.net.SocketInputStream.socketRead(SocketInputStream.java:115)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:168)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:140)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.read(SSLSocketInputRecord.java:448)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.bytesInCompletePacket(SSLSocketInputRecord.java:68)
+	at java.base/sun.security.ssl.SSLSocketImpl.readApplicationRecord(SSLSocketImpl.java:1104)
+	at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:823)
+	at org.apache.http.impl.io.SessionInputBufferImpl.streamRead(SessionInputBufferImpl.java:137)
+	at org.apache.http.impl.io.SessionInputBufferImpl.fillBuffer(SessionInputBufferImpl.java:153)
+	at org.apache.http.impl.io.SessionInputBufferImpl.readLine(SessionInputBufferImpl.java:280)
+	at org.apache.http.impl.conn.DefaultHttpResponseParser.parseHead(DefaultHttpResponseParser.java:138)
+	at org.apache.http.impl.conn.DefaultHttpResponseParser.parseHead(DefaultHttpResponseParser.java:56)
+	at org.apache.http.impl.io.AbstractMessageParser.parse(AbstractMessageParser.java:259)
+	at org.apache.http.impl.DefaultBHttpClientConnection.receiveResponseHeader(DefaultBHttpClientConnection.java:163)
+	at org.apache.http.impl.conn.CPoolProxy.receiveResponseHeader(CPoolProxy.java:157)
+	at org.apache.http.protocol.HttpRequestExecutor.doReceiveResponse(HttpRequestExecutor.java:273)
+	at org.apache.http.protocol.HttpRequestExecutor.execute(HttpRequestExecutor.java:125)
+	at org.apache.http.impl.execchain.MainClientExec.execute(MainClientExec.java:272)
+	at org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:186)
+	at org.apache.http.impl.execchain.RetryExec.execute(RetryExec.java:89)
+	at org.apache.http.impl.execchain.RedirectExec.execute(RedirectExec.java:110)
+	at org.apache.http.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:185)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:56)
+	at org.springframework.http.client.HttpComponentsClientHttpRequest.executeInternal(HttpComponentsClientHttpRequest.java:87)
+	at org.springframework.http.client.AbstractBufferingClientHttpRequest.executeInternal(AbstractBufferingClientHttpRequest.java:48)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:53)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:739)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:674)
+	at org.springframework.web.client.RestTemplate.postForEntity(RestTemplate.java:449)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService.generatePdf(DocmosisPdfGenerationService.java:51)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService.generateDocumentAndAddToCcd(DocumentManagementService.java:31)
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcdWithRetry(DocumentManagementServiceWrapper.java:45)
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcd(DocumentManagementServiceWrapper.java:36)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.bulkPrintCase(SendToBulkPrintHandler.java:158)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.handle(SendToBulkPrintHandler.java:101)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+ Failed to request PDF from Docmosis REST endpoint https://docmosis-development.platform.hmcts.net/rs/render with error I/O error on POST request for "https://docmosis-development.platform.hmcts.net/rs/render": Read timed out; nested exception is java.net.SocketTimeoutException: Read timed out
+2020-08-06T14:47:57.939 INFO  [http-nio-8091-exec-6] u.g.h.r.s.callback.handlers.SendToBulkPrintHandleruk.gov.hmcts.reform.sscs.exception.PdfStoreException: Failed to request PDF from REST endpoint I/O error on POST request for "https://docmosis-development.platform.hmcts.net/rs/render": Read timed out; nested exception is java.net.SocketTimeoutException: Read timed out
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcdWithRetry(DocumentManagementServiceWrapper.java:48)
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcd(DocumentManagementServiceWrapper.java:36)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.bulkPrintCase(SendToBulkPrintHandler.java:158)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.handle(SendToBulkPrintHandler.java:101)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+Caused by: uk.gov.hmcts.reform.sscs.exception.PdfGenerationException: Failed to request PDF from REST endpoint I/O error on POST request for "https://docmosis-development.platform.hmcts.net/rs/render": Read timed out; nested exception is java.net.SocketTimeoutException: Read timed out
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService.generatePdf(DocmosisPdfGenerationService.java:56)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService.generateDocumentAndAddToCcd(DocumentManagementService.java:31)
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcdWithRetry(DocumentManagementServiceWrapper.java:45)
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcd(DocumentManagementServiceWrapper.java:36)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.bulkPrintCase(SendToBulkPrintHandler.java:158)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.handle(SendToBulkPrintHandler.java:101)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+Caused by: org.springframework.web.client.ResourceAccessException: I/O error on POST request for "https://docmosis-development.platform.hmcts.net/rs/render": Read timed out; nested exception is java.net.SocketTimeoutException: Read timed out
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:748)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:674)
+	at org.springframework.web.client.RestTemplate.postForEntity(RestTemplate.java:449)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService.generatePdf(DocmosisPdfGenerationService.java:51)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService.generateDocumentAndAddToCcd(DocumentManagementService.java:31)
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcdWithRetry(DocumentManagementServiceWrapper.java:45)
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcd(DocumentManagementServiceWrapper.java:36)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.bulkPrintCase(SendToBulkPrintHandler.java:158)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.handle(SendToBulkPrintHandler.java:101)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+Caused by: java.net.SocketTimeoutException: Read timed out
+	at java.base/java.net.SocketInputStream.socketRead0(Native Method)
+	at java.base/java.net.SocketInputStream.socketRead(SocketInputStream.java:115)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:168)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:140)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.read(SSLSocketInputRecord.java:448)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.bytesInCompletePacket(SSLSocketInputRecord.java:68)
+	at java.base/sun.security.ssl.SSLSocketImpl.readApplicationRecord(SSLSocketImpl.java:1104)
+	at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:823)
+	at org.apache.http.impl.io.SessionInputBufferImpl.streamRead(SessionInputBufferImpl.java:137)
+	at org.apache.http.impl.io.SessionInputBufferImpl.fillBuffer(SessionInputBufferImpl.java:153)
+	at org.apache.http.impl.io.SessionInputBufferImpl.readLine(SessionInputBufferImpl.java:280)
+	at org.apache.http.impl.conn.DefaultHttpResponseParser.parseHead(DefaultHttpResponseParser.java:138)
+	at org.apache.http.impl.conn.DefaultHttpResponseParser.parseHead(DefaultHttpResponseParser.java:56)
+	at org.apache.http.impl.io.AbstractMessageParser.parse(AbstractMessageParser.java:259)
+	at org.apache.http.impl.DefaultBHttpClientConnection.receiveResponseHeader(DefaultBHttpClientConnection.java:163)
+	at org.apache.http.impl.conn.CPoolProxy.receiveResponseHeader(CPoolProxy.java:157)
+	at org.apache.http.protocol.HttpRequestExecutor.doReceiveResponse(HttpRequestExecutor.java:273)
+	at org.apache.http.protocol.HttpRequestExecutor.execute(HttpRequestExecutor.java:125)
+	at org.apache.http.impl.execchain.MainClientExec.execute(MainClientExec.java:272)
+	at org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:186)
+	at org.apache.http.impl.execchain.RetryExec.execute(RetryExec.java:89)
+	at org.apache.http.impl.execchain.RedirectExec.execute(RedirectExec.java:110)
+	at org.apache.http.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:185)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:56)
+	at org.springframework.http.client.HttpComponentsClientHttpRequest.executeInternal(HttpComponentsClientHttpRequest.java:87)
+	at org.springframework.http.client.AbstractBufferingClientHttpRequest.executeInternal(AbstractBufferingClientHttpRequest.java:48)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:53)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:739)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:674)
+	at org.springframework.web.client.RestTemplate.postForEntity(RestTemplate.java:449)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService.generatePdf(DocmosisPdfGenerationService.java:51)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService.generateDocumentAndAddToCcd(DocumentManagementService.java:31)
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcdWithRetry(DocumentManagementServiceWrapper.java:45)
+	at uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper.generateDocumentAndAddToCcd(DocumentManagementServiceWrapper.java:36)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.bulkPrintCase(SendToBulkPrintHandler.java:158)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.handle(SendToBulkPrintHandler.java:101)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+ Error when bulk-printing caseId: 1596725271756371
+2020-08-06T14:47:57.939 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:47:58.001 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725271756371 and eventType sendToDwpError
+2020-08-06T14:47:58.002 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:47:58.149 INFO  [http-nio-8091-exec-6] u.g.h.r.s.callback.handlers.ReciprocalLinkHandler Reciprocal link handler for case id 1596725271756371
+2020-08-06T14:47:58.149 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:47:59.350 INFO  [http-nio-8091-exec-6] u.g.h.r.s.callback.handlers.ReciprocalLinkHandler Found 25 matching cases for Nino JT 12 34 56 D
+2020-08-06T14:47:59.350 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Sscs Case CCD callback `VALID_APPEAL_CREATED` handled for Case ID `1596725271756371`
+2020-08-06T14:47:59.350 INFO  [http-nio-8091-exec-6] u.g.h.r.sscs.controllers.FunctionalTestController done.
+2020-08-06T14:48:05.009 INFO  [http-nio-8091-exec-9] u.g.h.r.sscs.controllers.FunctionalTestController authorising service auth header.
+2020-08-06T14:48:05.009 INFO  [http-nio-8091-exec-9] u.g.hmcts.reform.sscs.service.AuthorisationService About to authorise Notification request
+2020-08-06T14:48:05.015 INFO  [http-nio-8091-exec-9] u.g.hmcts.reform.sscs.service.AuthorisationService Notification request authorised
+2020-08-06T14:48:05.015 INFO  [http-nio-8091-exec-9] u.g.h.r.sscs.controllers.FunctionalTestController consuming message.
+2020-08-06T14:48:05.015 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Message received from the service bus by evidence share service
+2020-08-06T14:48:05.016 INFO  [http-nio-8091-exec-9] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Processing robotics for case id 1596725284614260 in evidence share service
+2020-08-06T14:48:05.016 INFO  [http-nio-8091-exec-9] u.g.h.r.s.c.handlers.RoboticsCallbackHandler The callback event is VALID_APPEAL_CREATED and the createdInGapsFrom field is validAppeal for case id 1596725284614260
+2020-08-06T14:48:05.016 INFO  [http-nio-8091-exec-9] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Is case valid to send to robotics true for case id 1596725284614260
+2020-08-06T14:48:05.016 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.RoboticsService Case sent to robotics service for case id 1596725284614260 
+2020-08-06T14:48:05.016 INFO  [http-nio-8091-exec-9] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice 5
+2020-08-06T14:48:05.017 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.RoboticsService Case 1596725284614260 automatically updating DWP office probably due to office closure
+2020-08-06T14:48:05.017 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:05.072 INFO  [http-nio-8091-exec-9] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725284614260 and eventType caseUpdated
+2020-08-06T14:48:05.072 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:05.453 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.RoboticsService Creating robotics for case id 1596725284614260 
+2020-08-06T14:48:05.453 INFO  [http-nio-8091-exec-9] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice DWP PIP (5)
+2020-08-06T14:48:05.453 INFO  [http-nio-8091-exec-9] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice DWP PIP (5)
+2020-08-06T14:48:05.454 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.RoboticsService Downloading additional evidence for robotics for case id 1596725284614260 
+2020-08-06T14:48:05.454 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.RoboticsService Downloading SSCS1 for robotics for case id 1596725284614260 
+2020-08-06T14:48:05.454 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.RoboticsService Add robotics default attachments for case id 1596725284614260
+2020-08-06T14:48:05.454 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.RoboticsService Add robotics additional evidence for non digital case and case id 1596725284614260
+2020-08-06T14:48:05.455 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.EmailService Case [1596725284614260] sending email with subject [Test_6 D for Robot [1]] of [-1] bytes with [991] bytes of attachments.
+2020-08-06T14:48:05.573 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.RoboticsService Case 1596725284614260 robotics JSON email with subject 'Test_6 D for Robot [1]' sent successfully for benefit type PIP isScottish false isPipAe false
+2020-08-06T14:48:05.573 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.RoboticsService Case 1596725284614260 Robotics JSON successfully sent for benefit type PIP
+2020-08-06T14:48:05.573 INFO  [http-nio-8091-exec-9] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Processing bulk print tasks for case id 1596725284614260
+2020-08-06T14:48:05.573 INFO  [http-nio-8091-exec-9] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice DWP PIP (5)
+2020-08-06T14:48:05.573 INFO  [http-nio-8091-exec-9] u.g.h.r.s.service.placeholders.PlaceholderService Apellant = Appellant(name=Name(title=Miss, firstName=AN, lastName=Test), address=Address(line1=2 Drake Close, line2=Hutton, town=Brentwood, county=Essex, postcode=CM13 1AQ, postcodeLookup=null, postcodeAddress=null), contact=Contact(email=null, phone=01424 752419, mobile=null), identity=Identity(dob=1900-01-01, nino=JT 12 34 56 D), isAppointee=null, appointee=null, isAddressSameAsAppointee=null)
+2020-08-06T14:48:05.573 INFO  [http-nio-8091-exec-9] u.g.h.r.s.service.placeholders.PlaceholderService Apellant Name = Name(title=Miss, firstName=AN, lastName=Test)
+2020-08-06T14:48:05.573 INFO  [http-nio-8091-exec-9] u.g.h.r.s.service.placeholders.PlaceholderService Full Name = Miss A Test
+2020-08-06T14:48:05.574 INFO  [http-nio-8091-exec-9] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Generating DL document for case id 1596725284614260
+2020-08-06T14:48:05.574 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:05.661 INFO  [http-nio-8091-exec-9] u.g.h.reform.sscs.ccd.service.ReadCcdCaseService searching cases by ccdID 1596725284614260
+2020-08-06T14:48:05.712 INFO  [http-nio-8091-exec-9] u.g.h.r.s.d.service.DocumentManagementService Generating template dl6 for case id 1596725284614260
+2020-08-06T14:48:05.712 INFO  [http-nio-8091-exec-9] u.g.h.r.s.d.service.DocmosisPdfGenerationService Making request to Docmosis pdf service to generate pdf document with template TB-SCS-GNO-ENG-00010.doc and placeholders of size [23] to endpoint https://docmosis-development.platform.hmcts.net/rs/render
+2020-08-06T14:48:05.713 INFO  [http-nio-8091-exec-9] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request start
+2020-08-06T14:48:09.320 INFO  [http-nio-8091-exec-9] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request finish
+2020-08-06T14:48:09.360 INFO  [http-nio-8091-exec-9] u.g.h.r.s.d.service.DocumentManagementService Adding document template dl6 to ccd for id 1596725284614260
+2020-08-06T14:48:09.360 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:09.419 INFO  [http-nio-8091-exec-9] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request start
+2020-08-06T14:48:09.563 INFO  [http-nio-8091-exec-9] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request finish
+2020-08-06T14:48:09.564 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.CcdPdfService Case 1596725284614260 PDF stored in DM for benefit type PIP
+2020-08-06T14:48:09.565 INFO  [http-nio-8091-exec-9] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725284614260 and eventType uploadDocument
+2020-08-06T14:48:09.565 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:10.037 INFO  [http-nio-8091-exec-9] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Sending to bulk print for case id 1596725284614260
+2020-08-06T14:48:10.280 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.service.BulkPrintService Letter service produced the following letter Id 9b118de3-7fc7-4e9f-88ed-b2f007ab946a for case 1596725284614260
+2020-08-06T14:48:10.280 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:10.367 INFO  [http-nio-8091-exec-9] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725284614260 and eventType sentToDwp
+2020-08-06T14:48:10.367 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:10.559 INFO  [http-nio-8091-exec-9] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Case sent to dwp for case id 1596725284614260 with returned value Optional[9b118de3-7fc7-4e9f-88ed-b2f007ab946a]
+2020-08-06T14:48:10.560 INFO  [http-nio-8091-exec-9] u.g.h.r.s.callback.handlers.ReciprocalLinkHandler Reciprocal link handler for case id 1596725284614260
+2020-08-06T14:48:10.560 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:11.659 INFO  [http-nio-8091-exec-9] u.g.h.r.s.callback.handlers.ReciprocalLinkHandler Found 25 matching cases for Nino JT 12 34 56 D
+2020-08-06T14:48:11.659 INFO  [http-nio-8091-exec-9] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Sscs Case CCD callback `VALID_APPEAL_CREATED` handled for Case ID `1596725284614260`
+2020-08-06T14:48:11.659 INFO  [http-nio-8091-exec-9] u.g.h.r.sscs.controllers.FunctionalTestController done.
+2020-08-06T14:48:22.783 INFO  [http-nio-8091-exec-2] u.g.h.r.sscs.controllers.FunctionalTestController authorising service auth header.
+2020-08-06T14:48:22.783 INFO  [http-nio-8091-exec-2] u.g.hmcts.reform.sscs.service.AuthorisationService About to authorise Notification request
+2020-08-06T14:48:22.789 INFO  [http-nio-8091-exec-2] u.g.hmcts.reform.sscs.service.AuthorisationService Notification request authorised
+2020-08-06T14:48:22.789 INFO  [http-nio-8091-exec-2] u.g.h.r.sscs.controllers.FunctionalTestController consuming message.
+2020-08-06T14:48:22.789 INFO  [http-nio-8091-exec-2] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Message received from the service bus by evidence share service
+2020-08-06T14:48:22.898 INFO  [http-nio-8091-exec-2] u.g.h.r.s.service.placeholders.PlaceholderService Apellant = Appellant(name=Name(title=Mrs, firstName=Sarah, lastName=Smith), address=Address(line1=109 Drake Close, line2=Hutton, town=Brentwood, county=Essex, postcode=SE166RS, postcodeLookup=null, postcodeAddress=null), contact=Contact(email=null, phone=null, mobile=null), identity=Identity(dob=1979-12-09, nino=JJ123457A), isAppointee=No, appointee=Appointee(name=Name(title=Dr, firstName=Frederick, lastName=Falafel), address=Address(line1=1 New Street, line2=Smallville, town=Newbury, county=Berkshire, postcode=RG141LT, postcodeLookup=null, postcodeAddress=null), contact=Contact(email=null, phone=01895733303, mobile=07832882849), identity=Identity(dob=1976-11-11, nino=JJ123457A)), isAddressSameAsAppointee=null)
+2020-08-06T14:48:22.898 INFO  [http-nio-8091-exec-2] u.g.h.r.s.service.placeholders.PlaceholderService Apellant Name = Name(title=Mrs, firstName=Sarah, lastName=Smith)
+2020-08-06T14:48:22.898 INFO  [http-nio-8091-exec-2] u.g.h.r.s.service.placeholders.PlaceholderService Full Name = Mrs S Smith
+2020-08-06T14:48:22.901 INFO  [http-nio-8091-exec-2] u.g.h.r.s.d.service.DocmosisPdfGenerationService Making request to Docmosis pdf service to generate pdf document with template TB-SCS-GNO-ENG-00069.doc and placeholders of size [26] to endpoint https://docmosis-development.platform.hmcts.net/rs/render
+2020-08-06T14:48:22.902 INFO  [http-nio-8091-exec-2] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request start
+2020-08-06T14:48:27.879 INFO  [http-nio-8091-exec-2] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request finish
+2020-08-06T14:48:28.010 INFO  [http-nio-8091-exec-2] uk.gov.hmcts.reform.sscs.service.BulkPrintService Letter service produced the following letter Id c4fa47a5-419e-4f02-bb82-4abfa9345c90 for case 1596725302173794
+2020-08-06T14:48:28.014 INFO  [http-nio-8091-exec-2] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:28.089 INFO  [http-nio-8091-exec-2] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725302173794 and eventType updateCaseOnly
+2020-08-06T14:48:28.089 INFO  [http-nio-8091-exec-2] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:28.267 INFO  [http-nio-8091-exec-2] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Sscs Case CCD callback `REISSUE_FURTHER_EVIDENCE` handled for Case ID `1596725302173794`
+2020-08-06T14:48:28.267 INFO  [http-nio-8091-exec-2] u.g.h.r.sscs.controllers.FunctionalTestController done.
+2020-08-06T14:48:29.249 INFO  [http-nio-8091-exec-5] u.g.h.r.sscs.controllers.FunctionalTestController authorising service auth header.
+2020-08-06T14:48:29.249 INFO  [http-nio-8091-exec-5] u.g.hmcts.reform.sscs.service.AuthorisationService About to authorise Notification request
+2020-08-06T14:48:29.254 INFO  [http-nio-8091-exec-5] u.g.hmcts.reform.sscs.service.AuthorisationService Notification request authorised
+2020-08-06T14:48:29.254 INFO  [http-nio-8091-exec-5] u.g.h.r.sscs.controllers.FunctionalTestController consuming message.
+2020-08-06T14:48:29.254 INFO  [http-nio-8091-exec-5] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Message received from the service bus by evidence share service
+2020-08-06T14:48:29.255 INFO  [http-nio-8091-exec-5] u.g.h.r.s.c.handlers.IssueFurtherEvidenceHandler Processing Issue Further Evidence Callback for caseId 1596725308733302
+2020-08-06T14:48:29.360 INFO  [http-nio-8091-exec-5] u.g.h.r.s.service.placeholders.PlaceholderService Apellant = Appellant(name=Name(title=Mrs, firstName=Sarah, lastName=Smith), address=Address(line1=109 Drake Close, line2=Hutton, town=Brentwood, county=Essex, postcode=SE166RS, postcodeLookup=null, postcodeAddress=null), contact=Contact(email=null, phone=null, mobile=null), identity=Identity(dob=1979-12-09, nino=JJ123457A), isAppointee=No, appointee=Appointee(name=Name(title=Dr, firstName=Frederick, lastName=Falafel), address=Address(line1=1 New Street, line2=Smallville, town=Newbury, county=Berkshire, postcode=RG141LT, postcodeLookup=null, postcodeAddress=null), contact=Contact(email=null, phone=01895733303, mobile=07832882849), identity=Identity(dob=1976-11-11, nino=JJ123457A)), isAddressSameAsAppointee=null)
+2020-08-06T14:48:29.360 INFO  [http-nio-8091-exec-5] u.g.h.r.s.service.placeholders.PlaceholderService Apellant Name = Name(title=Mrs, firstName=Sarah, lastName=Smith)
+2020-08-06T14:48:29.360 INFO  [http-nio-8091-exec-5] u.g.h.r.s.service.placeholders.PlaceholderService Full Name = Mrs S Smith
+2020-08-06T14:48:29.360 INFO  [http-nio-8091-exec-5] u.g.h.r.s.d.service.DocmosisPdfGenerationService Making request to Docmosis pdf service to generate pdf document with template TB-SCS-GNO-ENG-00068.doc and placeholders of size [26] to endpoint https://docmosis-development.platform.hmcts.net/rs/render
+2020-08-06T14:48:29.361 INFO  [http-nio-8091-exec-5] u.g.h.r.l.h.OutboundRequestLoggingInterceptor Outbound request start
+2020-08-06T14:48:34.370 ERROR [http-nio-8091-exec-5] u.g.h.r.s.d.service.DocmosisPdfGenerationServiceorg.springframework.web.client.ResourceAccessException: I/O error on POST request for "https://docmosis-development.platform.hmcts.net/rs/render": Read timed out; nested exception is java.net.SocketTimeoutException: Read timed out
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:748)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:674)
+	at org.springframework.web.client.RestTemplate.postForEntity(RestTemplate.java:449)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService.generatePdf(DocmosisPdfGenerationService.java:51)
+	at uk.gov.hmcts.reform.sscs.service.CoverLetterService.generateCoverLetter(CoverLetterService.java:62)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.buildPdfsFor609_97(FurtherEvidenceService.java:119)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.send609_97_OriginalSender(FurtherEvidenceService.java:62)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.issue(FurtherEvidenceService.java:50)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.doIssuePerDocumentType(IssueFurtherEvidenceHandler.java:74)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.lambda$issueFurtherEvidence$0(IssueFurtherEvidenceHandler.java:68)
+	at java.base/java.util.Arrays$ArrayList.forEach(Arrays.java:4390)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.issueFurtherEvidence(IssueFurtherEvidenceHandler.java:68)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.handle(IssueFurtherEvidenceHandler.java:61)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+Caused by: java.net.SocketTimeoutException: Read timed out
+	at java.base/java.net.SocketInputStream.socketRead0(Native Method)
+	at java.base/java.net.SocketInputStream.socketRead(SocketInputStream.java:115)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:168)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:140)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.read(SSLSocketInputRecord.java:448)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.bytesInCompletePacket(SSLSocketInputRecord.java:68)
+	at java.base/sun.security.ssl.SSLSocketImpl.readApplicationRecord(SSLSocketImpl.java:1104)
+	at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:823)
+	at org.apache.http.impl.io.SessionInputBufferImpl.streamRead(SessionInputBufferImpl.java:137)
+	at org.apache.http.impl.io.SessionInputBufferImpl.fillBuffer(SessionInputBufferImpl.java:153)
+	at org.apache.http.impl.io.SessionInputBufferImpl.readLine(SessionInputBufferImpl.java:280)
+	at org.apache.http.impl.conn.DefaultHttpResponseParser.parseHead(DefaultHttpResponseParser.java:138)
+	at org.apache.http.impl.conn.DefaultHttpResponseParser.parseHead(DefaultHttpResponseParser.java:56)
+	at org.apache.http.impl.io.AbstractMessageParser.parse(AbstractMessageParser.java:259)
+	at org.apache.http.impl.DefaultBHttpClientConnection.receiveResponseHeader(DefaultBHttpClientConnection.java:163)
+	at org.apache.http.impl.conn.CPoolProxy.receiveResponseHeader(CPoolProxy.java:157)
+	at org.apache.http.protocol.HttpRequestExecutor.doReceiveResponse(HttpRequestExecutor.java:273)
+	at org.apache.http.protocol.HttpRequestExecutor.execute(HttpRequestExecutor.java:125)
+	at org.apache.http.impl.execchain.MainClientExec.execute(MainClientExec.java:272)
+	at org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:186)
+	at org.apache.http.impl.execchain.RetryExec.execute(RetryExec.java:89)
+	at org.apache.http.impl.execchain.RedirectExec.execute(RedirectExec.java:110)
+	at org.apache.http.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:185)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:56)
+	at org.springframework.http.client.HttpComponentsClientHttpRequest.executeInternal(HttpComponentsClientHttpRequest.java:87)
+	at org.springframework.http.client.AbstractBufferingClientHttpRequest.executeInternal(AbstractBufferingClientHttpRequest.java:48)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:53)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:739)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:674)
+	at org.springframework.web.client.RestTemplate.postForEntity(RestTemplate.java:449)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService.generatePdf(DocmosisPdfGenerationService.java:51)
+	at uk.gov.hmcts.reform.sscs.service.CoverLetterService.generateCoverLetter(CoverLetterService.java:62)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.buildPdfsFor609_97(FurtherEvidenceService.java:119)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.send609_97_OriginalSender(FurtherEvidenceService.java:62)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.issue(FurtherEvidenceService.java:50)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.doIssuePerDocumentType(IssueFurtherEvidenceHandler.java:74)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.lambda$issueFurtherEvidence$0(IssueFurtherEvidenceHandler.java:68)
+	at java.base/java.util.Arrays$ArrayList.forEach(Arrays.java:4390)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.issueFurtherEvidence(IssueFurtherEvidenceHandler.java:68)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.handle(IssueFurtherEvidenceHandler.java:61)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+ Failed to request PDF from Docmosis REST endpoint https://docmosis-development.platform.hmcts.net/rs/render with error I/O error on POST request for "https://docmosis-development.platform.hmcts.net/rs/render": Read timed out; nested exception is java.net.SocketTimeoutException: Read timed out
+2020-08-06T14:48:34.372 INFO  [http-nio-8091-exec-5] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:34.450 INFO  [http-nio-8091-exec-5] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725308733302 and eventType sendFurtherEvidenceError
+2020-08-06T14:48:34.450 INFO  [http-nio-8091-exec-5] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:34.606 ERROR [http-nio-8091-exec-5] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumeruk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException: Failed sending further evidence for case(1596725308733302)...
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.doIssuePerDocumentType(IssueFurtherEvidenceHandler.java:78)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.lambda$issueFurtherEvidence$0(IssueFurtherEvidenceHandler.java:68)
+	at java.base/java.util.Arrays$ArrayList.forEach(Arrays.java:4390)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.issueFurtherEvidence(IssueFurtherEvidenceHandler.java:68)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.handle(IssueFurtherEvidenceHandler.java:61)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+Caused by: uk.gov.hmcts.reform.sscs.exception.PdfGenerationException: Failed to request PDF from REST endpoint I/O error on POST request for "https://docmosis-development.platform.hmcts.net/rs/render": Read timed out; nested exception is java.net.SocketTimeoutException: Read timed out
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService.generatePdf(DocmosisPdfGenerationService.java:56)
+	at uk.gov.hmcts.reform.sscs.service.CoverLetterService.generateCoverLetter(CoverLetterService.java:62)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.buildPdfsFor609_97(FurtherEvidenceService.java:119)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.send609_97_OriginalSender(FurtherEvidenceService.java:62)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.issue(FurtherEvidenceService.java:50)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.doIssuePerDocumentType(IssueFurtherEvidenceHandler.java:74)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.lambda$issueFurtherEvidence$0(IssueFurtherEvidenceHandler.java:68)
+	at java.base/java.util.Arrays$ArrayList.forEach(Arrays.java:4390)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.issueFurtherEvidence(IssueFurtherEvidenceHandler.java:68)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.handle(IssueFurtherEvidenceHandler.java:61)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+Caused by: org.springframework.web.client.ResourceAccessException: I/O error on POST request for "https://docmosis-development.platform.hmcts.net/rs/render": Read timed out; nested exception is java.net.SocketTimeoutException: Read timed out
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:748)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:674)
+	at org.springframework.web.client.RestTemplate.postForEntity(RestTemplate.java:449)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService.generatePdf(DocmosisPdfGenerationService.java:51)
+	at uk.gov.hmcts.reform.sscs.service.CoverLetterService.generateCoverLetter(CoverLetterService.java:62)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.buildPdfsFor609_97(FurtherEvidenceService.java:119)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.send609_97_OriginalSender(FurtherEvidenceService.java:62)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.issue(FurtherEvidenceService.java:50)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.doIssuePerDocumentType(IssueFurtherEvidenceHandler.java:74)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.lambda$issueFurtherEvidence$0(IssueFurtherEvidenceHandler.java:68)
+	at java.base/java.util.Arrays$ArrayList.forEach(Arrays.java:4390)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.issueFurtherEvidence(IssueFurtherEvidenceHandler.java:68)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.handle(IssueFurtherEvidenceHandler.java:61)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+Caused by: java.net.SocketTimeoutException: Read timed out
+	at java.base/java.net.SocketInputStream.socketRead0(Native Method)
+	at java.base/java.net.SocketInputStream.socketRead(SocketInputStream.java:115)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:168)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:140)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.read(SSLSocketInputRecord.java:448)
+	at java.base/sun.security.ssl.SSLSocketInputRecord.bytesInCompletePacket(SSLSocketInputRecord.java:68)
+	at java.base/sun.security.ssl.SSLSocketImpl.readApplicationRecord(SSLSocketImpl.java:1104)
+	at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:823)
+	at org.apache.http.impl.io.SessionInputBufferImpl.streamRead(SessionInputBufferImpl.java:137)
+	at org.apache.http.impl.io.SessionInputBufferImpl.fillBuffer(SessionInputBufferImpl.java:153)
+	at org.apache.http.impl.io.SessionInputBufferImpl.readLine(SessionInputBufferImpl.java:280)
+	at org.apache.http.impl.conn.DefaultHttpResponseParser.parseHead(DefaultHttpResponseParser.java:138)
+	at org.apache.http.impl.conn.DefaultHttpResponseParser.parseHead(DefaultHttpResponseParser.java:56)
+	at org.apache.http.impl.io.AbstractMessageParser.parse(AbstractMessageParser.java:259)
+	at org.apache.http.impl.DefaultBHttpClientConnection.receiveResponseHeader(DefaultBHttpClientConnection.java:163)
+	at org.apache.http.impl.conn.CPoolProxy.receiveResponseHeader(CPoolProxy.java:157)
+	at org.apache.http.protocol.HttpRequestExecutor.doReceiveResponse(HttpRequestExecutor.java:273)
+	at org.apache.http.protocol.HttpRequestExecutor.execute(HttpRequestExecutor.java:125)
+	at org.apache.http.impl.execchain.MainClientExec.execute(MainClientExec.java:272)
+	at org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:186)
+	at org.apache.http.impl.execchain.RetryExec.execute(RetryExec.java:89)
+	at org.apache.http.impl.execchain.RedirectExec.execute(RedirectExec.java:110)
+	at org.apache.http.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:185)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:83)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:56)
+	at org.springframework.http.client.HttpComponentsClientHttpRequest.executeInternal(HttpComponentsClientHttpRequest.java:87)
+	at org.springframework.http.client.AbstractBufferingClientHttpRequest.executeInternal(AbstractBufferingClientHttpRequest.java:48)
+	at org.springframework.http.client.AbstractClientHttpRequest.execute(AbstractClientHttpRequest.java:53)
+	at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:739)
+	at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:674)
+	at org.springframework.web.client.RestTemplate.postForEntity(RestTemplate.java:449)
+	at uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService.generatePdf(DocmosisPdfGenerationService.java:51)
+	at uk.gov.hmcts.reform.sscs.service.CoverLetterService.generateCoverLetter(CoverLetterService.java:62)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.buildPdfsFor609_97(FurtherEvidenceService.java:119)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.send609_97_OriginalSender(FurtherEvidenceService.java:62)
+	at uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService.issue(FurtherEvidenceService.java:50)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.doIssuePerDocumentType(IssueFurtherEvidenceHandler.java:74)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.lambda$issueFurtherEvidence$0(IssueFurtherEvidenceHandler.java:68)
+	at java.base/java.util.Arrays$ArrayList.forEach(Arrays.java:4390)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.issueFurtherEvidence(IssueFurtherEvidenceHandler.java:68)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler.handle(IssueFurtherEvidenceHandler.java:61)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+ Caught unknown unrecoverable error Failed sending further evidence for case(1596725308733302)...
+2020-08-06T14:48:34.609 INFO  [http-nio-8091-exec-5] u.g.h.r.sscs.controllers.FunctionalTestController done.
+2020-08-06T14:48:35.221 INFO  [http-nio-8091-exec-7] u.g.h.r.sscs.controllers.FunctionalTestController authorising service auth header.
+2020-08-06T14:48:35.221 INFO  [http-nio-8091-exec-7] u.g.hmcts.reform.sscs.service.AuthorisationService About to authorise Notification request
+2020-08-06T14:48:35.226 INFO  [http-nio-8091-exec-7] u.g.hmcts.reform.sscs.service.AuthorisationService Notification request authorised
+2020-08-06T14:48:35.227 INFO  [http-nio-8091-exec-7] u.g.h.r.sscs.controllers.FunctionalTestController consuming message.
+2020-08-06T14:48:35.227 INFO  [http-nio-8091-exec-7] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Message received from the service bus by evidence share service
+2020-08-06T14:48:35.227 INFO  [http-nio-8091-exec-7] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Sscs Case CCD callback `DIRECTION_ISSUED` handled for Case ID `1596725314993585`
+2020-08-06T14:48:35.227 INFO  [http-nio-8091-exec-7] u.g.h.r.sscs.controllers.FunctionalTestController done.
+2020-08-06T14:48:35.707 INFO  [http-nio-8091-exec-6] u.g.h.r.sscs.controllers.FunctionalTestController authorising service auth header.
+2020-08-06T14:48:35.707 INFO  [http-nio-8091-exec-6] u.g.hmcts.reform.sscs.service.AuthorisationService About to authorise Notification request
+2020-08-06T14:48:35.711 INFO  [http-nio-8091-exec-6] u.g.hmcts.reform.sscs.service.AuthorisationService Notification request authorised
+2020-08-06T14:48:35.711 INFO  [http-nio-8091-exec-6] u.g.h.r.sscs.controllers.FunctionalTestController consuming message.
+2020-08-06T14:48:35.711 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Message received from the service bus by evidence share service
+2020-08-06T14:48:35.712 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Processing robotics for case id 1596725315521245 in evidence share service
+2020-08-06T14:48:35.712 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler The callback event is APPEAL_TO_PROCEED and the createdInGapsFrom field is null for case id 1596725315521245
+2020-08-06T14:48:35.712 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Is case valid to send to robotics true for case id 1596725315521245
+2020-08-06T14:48:35.712 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Case sent to robotics service for case id 1596725315521245 
+2020-08-06T14:48:35.712 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice test-hmcts-address
+2020-08-06T14:48:35.713 ERROR [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandlerjava.lang.NullPointerException: null
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.hasIssuingOfficeChanged(RoboticsService.java:126)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.updateClosedOffices(RoboticsService.java:107)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.sendCaseToRobotics(RoboticsService.java:86)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.RoboticsCallbackHandler.handle(RoboticsCallbackHandler.java:77)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+ Error when sending to robotics: 1596725315521245
+2020-08-06T14:48:35.714 INFO  [http-nio-8091-exec-6] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Case not valid to send to bulk print for case id 1596725315521245
+2020-08-06T14:48:35.718 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:35.793 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:35.793 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:36.890 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:36.890 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:38.069 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:38.069 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:38.183 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService Requesting IDAM tokens to update caseId 1596725315521245 with eventType sentToDwp
+2020-08-06T14:48:38.183 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:38.243 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService Received IDAM tokens for updating caseId 1596725315521245 with eventType sentToDwp
+2020-08-06T14:48:38.243 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:38.243 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:38.570 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Caught recoverable error [422 Unprocessable Entity] during [POST] to [http://ccd-data-store-api-aat.service.core-compute-aat.internal/caseworkers/c29f3aec-dc9a-4a80-866c-3027fa527a38/jurisdictions/SSCS/case-types/Benefit/cases/1596725315521245/events?ignore-warning=true] [CoreCaseDataApi#submitEventForCaseWorker(String,String,String,String,String,String,boolean,CaseDataContent)]: [{"exception":"uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException","timestamp":"2020-08-06T14:48:38.563","status":422,"error":"Unprocessable Entity","message":"Case data validation failed","p... (478 bytes)], retrying 1 out of 3
+2020-08-06T14:48:38.570 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Message received from the service bus by evidence share service
+2020-08-06T14:48:38.570 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Processing robotics for case id 1596725315521245 in evidence share service
+2020-08-06T14:48:38.570 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler The callback event is APPEAL_TO_PROCEED and the createdInGapsFrom field is null for case id 1596725315521245
+2020-08-06T14:48:38.570 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Is case valid to send to robotics true for case id 1596725315521245
+2020-08-06T14:48:38.570 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Case sent to robotics service for case id 1596725315521245 
+2020-08-06T14:48:38.570 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice test-hmcts-address
+2020-08-06T14:48:38.571 ERROR [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandlerjava.lang.NullPointerException: null
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.hasIssuingOfficeChanged(RoboticsService.java:126)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.updateClosedOffices(RoboticsService.java:107)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.sendCaseToRobotics(RoboticsService.java:86)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.RoboticsCallbackHandler.handle(RoboticsCallbackHandler.java:77)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:59)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+ Error when sending to robotics: 1596725315521245
+2020-08-06T14:48:38.572 INFO  [http-nio-8091-exec-6] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Case not valid to send to bulk print for case id 1596725315521245
+2020-08-06T14:48:38.572 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:38.637 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:38.637 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:39.718 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:39.718 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:40.824 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:40.824 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:40.936 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService Requesting IDAM tokens to update caseId 1596725315521245 with eventType sentToDwp
+2020-08-06T14:48:40.936 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:40.994 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService Received IDAM tokens for updating caseId 1596725315521245 with eventType sentToDwp
+2020-08-06T14:48:40.994 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:40.994 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:41.110 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Caught recoverable error [422 Unprocessable Entity] during [POST] to [http://ccd-data-store-api-aat.service.core-compute-aat.internal/caseworkers/c29f3aec-dc9a-4a80-866c-3027fa527a38/jurisdictions/SSCS/case-types/Benefit/cases/1596725315521245/events?ignore-warning=true] [CoreCaseDataApi#submitEventForCaseWorker(String,String,String,String,String,String,boolean,CaseDataContent)]: [{"exception":"uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException","timestamp":"2020-08-06T14:48:41.107","status":422,"error":"Unprocessable Entity","message":"Case data validation failed","p... (478 bytes)], retrying 2 out of 3
+2020-08-06T14:48:41.110 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Message received from the service bus by evidence share service
+2020-08-06T14:48:41.111 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Processing robotics for case id 1596725315521245 in evidence share service
+2020-08-06T14:48:41.111 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler The callback event is APPEAL_TO_PROCEED and the createdInGapsFrom field is null for case id 1596725315521245
+2020-08-06T14:48:41.111 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Is case valid to send to robotics true for case id 1596725315521245
+2020-08-06T14:48:41.111 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Case sent to robotics service for case id 1596725315521245 
+2020-08-06T14:48:41.111 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice test-hmcts-address
+2020-08-06T14:48:41.112 ERROR [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandlerjava.lang.NullPointerException: null
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.hasIssuingOfficeChanged(RoboticsService.java:126)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.updateClosedOffices(RoboticsService.java:107)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.sendCaseToRobotics(RoboticsService.java:86)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.RoboticsCallbackHandler.handle(RoboticsCallbackHandler.java:77)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:59)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:59)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+ Error when sending to robotics: 1596725315521245
+2020-08-06T14:48:41.113 INFO  [http-nio-8091-exec-6] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Case not valid to send to bulk print for case id 1596725315521245
+2020-08-06T14:48:41.113 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:41.167 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:41.167 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:42.261 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:42.261 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:43.365 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:43.365 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:43.512 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService Requesting IDAM tokens to update caseId 1596725315521245 with eventType sentToDwp
+2020-08-06T14:48:43.512 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:43.569 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService Received IDAM tokens for updating caseId 1596725315521245 with eventType sentToDwp
+2020-08-06T14:48:43.569 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:43.569 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:43.673 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Caught recoverable error [422 Unprocessable Entity] during [POST] to [http://ccd-data-store-api-aat.service.core-compute-aat.internal/caseworkers/c29f3aec-dc9a-4a80-866c-3027fa527a38/jurisdictions/SSCS/case-types/Benefit/cases/1596725315521245/events?ignore-warning=true] [CoreCaseDataApi#submitEventForCaseWorker(String,String,String,String,String,String,boolean,CaseDataContent)]: [{"exception":"uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException","timestamp":"2020-08-06T14:48:43.67","status":422,"error":"Unprocessable Entity","message":"Case data validation failed","pa... (477 bytes)], retrying 3 out of 3
+2020-08-06T14:48:43.673 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer Message received from the service bus by evidence share service
+2020-08-06T14:48:43.674 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Processing robotics for case id 1596725315521245 in evidence share service
+2020-08-06T14:48:43.674 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler The callback event is APPEAL_TO_PROCEED and the createdInGapsFrom field is null for case id 1596725315521245
+2020-08-06T14:48:43.674 INFO  [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandler Is case valid to send to robotics true for case id 1596725315521245
+2020-08-06T14:48:43.674 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.service.RoboticsService Case sent to robotics service for case id 1596725315521245 
+2020-08-06T14:48:43.674 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.service.DwpAddressLookupService looking up officeAddress for benefitType PIP and dwpIssuingOffice test-hmcts-address
+2020-08-06T14:48:43.675 ERROR [http-nio-8091-exec-6] u.g.h.r.s.c.handlers.RoboticsCallbackHandlerjava.lang.NullPointerException: null
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.hasIssuingOfficeChanged(RoboticsService.java:126)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.updateClosedOffices(RoboticsService.java:107)
+	at uk.gov.hmcts.reform.sscs.service.RoboticsService.sendCaseToRobotics(RoboticsService.java:86)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.RoboticsCallbackHandler.handle(RoboticsCallbackHandler.java:77)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:59)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:59)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:59)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.onMessage(TopicConsumer.java:46)
+	at uk.gov.hmcts.reform.sscs.controllers.FunctionalTestController.send(FunctionalTestController.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:190)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:105)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:879)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:793)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1040)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:943)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1006)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:909)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:665)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:883)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:750)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:119)
+ Error when sending to robotics: 1596725315521245
+2020-08-06T14:48:43.676 INFO  [http-nio-8091-exec-6] u.g.h.r.s.callback.handlers.SendToBulkPrintHandler Case not valid to send to bulk print for case id 1596725315521245
+2020-08-06T14:48:43.676 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:43.735 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:43.735 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:44.833 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:44.833 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:45.941 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:45.942 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:46.038 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService Requesting IDAM tokens to update caseId 1596725315521245 with eventType sentToDwp
+2020-08-06T14:48:46.038 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.idam.IdamService Using cached IDAM token.
+2020-08-06T14:48:46.097 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService Received IDAM tokens for updating caseId 1596725315521245 with eventType sentToDwp
+2020-08-06T14:48:46.097 INFO  [http-nio-8091-exec-6] u.g.h.reform.sscs.ccd.service.UpdateCcdCaseService UpdateCase for caseId 1596725315521245 and eventType sentToDwp
+2020-08-06T14:48:46.097 INFO  [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.ccd.client.CcdClient Starting CCD event for caseworker
+2020-08-06T14:48:46.240 ERROR [http-nio-8091-exec-6] uk.gov.hmcts.reform.sscs.servicebus.TopicConsumerfeign.FeignException$UnprocessableEntity: [422 Unprocessable Entity] during [POST] to [http://ccd-data-store-api-aat.service.core-compute-aat.internal/caseworkers/c29f3aec-dc9a-4a80-866c-3027fa527a38/jurisdictions/SSCS/case-types/Benefit/cases/1596725315521245/events?ignore-warning=true] [CoreCaseDataApi#submitEventForCaseWorker(String,String,String,String,String,String,boolean,CaseDataContent)]: [{"exception":"uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException","timestamp":"2020-08-06T14:48:46.236","status":422,"error":"Unprocessable Entity","message":"Case data validation failed","p... (478 bytes)]
+	at feign.FeignException.clientErrorStatus(FeignException.java:215)
+	at feign.FeignException.errorStatus(FeignException.java:177)
+	at feign.FeignException.errorStatus(FeignException.java:169)
+	at feign.codec.ErrorDecoder$Default.decode(ErrorDecoder.java:92)
+	at feign.AsyncResponseHandler.handleResponse(AsyncResponseHandler.java:96)
+	at feign.SynchronousMethodHandler.executeAndDecode(SynchronousMethodHandler.java:138)
+	at feign.SynchronousMethodHandler.invoke(SynchronousMethodHandler.java:89)
+	at feign.ReflectiveFeign$FeignInvocationHandler.invoke(ReflectiveFeign.java:100)
+	at com.sun.proxy.$Proxy120.submitEventForCaseWorker(Unknown Source)
+	at uk.gov.hmcts.reform.sscs.ccd.client.CcdClient.submitEventForCaseworker(CcdClient.java:67)
+	at uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService.updateCase(UpdateCcdCaseService.java:41)
+	at uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService.recover(UpdateCcdCaseService.java:53)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+	at org.springframework.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:282)
+	at org.springframework.retry.annotation.RecoverAnnotationRecoveryHandler.recover(RecoverAnnotationRecoveryHandler.java:73)
+	at org.springframework.retry.interceptor.RetryOperationsInterceptor$ItemRecovererCallback.recover(RetryOperationsInterceptor.java:141)
+	at org.springframework.retry.support.RetryTemplate.handleRetryExhausted(RetryTemplate.java:512)
+	at org.springframework.retry.support.RetryTemplate.doExecute(RetryTemplate.java:351)
+	at org.springframework.retry.support.RetryTemplate.execute(RetryTemplate.java:180)
+	at org.springframework.retry.interceptor.RetryOperationsInterceptor.invoke(RetryOperationsInterceptor.java:115)
+	at org.springframework.retry.annotation.AnnotationAwareRetryOperationsInterceptor.invoke(AnnotationAwareRetryOperationsInterceptor.java:153)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:749)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:691)
+	at uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService$$EnhancerBySpringCGLIB$$2622935b.updateCase(<generated>)
+	at uk.gov.hmcts.reform.sscs.ccd.service.CcdService.updateCase(CcdService.java:68)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.updateCaseToSentToDwp(SendToBulkPrintHandler.java:135)
+	at uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.handle(SendToBulkPrintHandler.java:109)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$dispatchToHandlers$3(CallbackDispatcher.java:41)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:177)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1654)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:484)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:474)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:497)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.dispatchToHandlers(CallbackDispatcher.java:41)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.lambda$handle$0(CallbackDispatcher.java:28)
+	at java.base/java.util.Spliterators$ArraySpliterator.forEachRemaining(Spliterators.java:948)
+	at java.base/java.util.stream.ReferencePipeline$Head.forEach(ReferencePipeline.java:658)
+	at uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher.handle(CallbackDispatcher.java:27)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessage(TopicConsumer.java:71)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:52)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:59)
+	at uk.gov.hmcts.reform.sscs.servicebus.TopicConsumer.processMessageWithRetry(TopicConsumer.java:59)
+ Caught unknown unrecoverable error [422 Unprocessable Entity] during [POST] to [http://ccd-data-store-api-aat.service.core-compute-aat.internal/caseworkers/c29f3aec-dc9a-4a80-866c-3027fa527a38/jurisdictions/SSCS/case-types/Benefit/cases/1596725315521245/events?ignore-warning=true] [CoreCaseDataApi#submitEventForCaseWorker(String,String,String,String,String,String,boolean,CaseDataContent)]: [{"exception":"uk.gov.hmcts.ccd.endpoint.exceptions.CaseValidationException","timestamp":"2020-08-06T14:48:46.236","status":422,"error":"Unprocessable Entity","message":"Case data validation failed","p... (478 bytes)]
+2020-08-06T14:48:46.245 INFO  [http-nio-8091-exec-6] u.g.h.r.sscs.controllers.FunctionalTestController done.
