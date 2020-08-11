@@ -25,8 +25,8 @@ import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
-import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonMapper;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsWrapper;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
