@@ -52,23 +52,26 @@ public class RequestTranslationService {
         this.idamService = idamService;
     }
 
-    public void sendCaseToWlu(CaseDetails<SscsCaseData> caseDetails) {
+    public boolean sendCaseToWlu(CaseDetails<SscsCaseData> caseDetails) {
         log.info("Case sent to wlu for case id {} ", caseDetails.getId());
+        boolean status = false;
         SscsCaseData caseData = caseDetails.getCaseData();
         Map<String, Object> placeholderMap = caseDataMap(caseDetails);
-
-        log.info("Generate tranlsation request form from wlu for casedetails id {} ", caseDetails.getId());
-        byte[] wluRequestForm = pdfGenerationService.generatePdf(DocumentHolder.builder()
-                .template(new Template("TB-SCS-EML-ENG-00530.docx",
-                        "WLU Request Form")).placeholders(placeholderMap).build());
 
         log.info("Downloading additional evidence for wlu for case id {} ", caseDetails.getId());
         Map<SscsDocument, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
 
-        sendEmailToWlu(caseDetails.getId(), caseData, wluRequestForm, additionalEvidence);
+        if (!additionalEvidence.isEmpty()) {
+            log.info("Generate tranlsation request form from wlu for casedetails id {} ", caseDetails.getId());
+            byte[] wluRequestForm = pdfGenerationService.generatePdf(DocumentHolder.builder()
+                    .template(new Template("TB-SCS-EML-ENG-00530.docx",
+                            "WLU Request Form")).placeholders(placeholderMap).build());
 
-        log.info("Case {} successfully sent for benefit type {} to wlu", caseDetails.getId(),
-            caseData.getAppeal().getBenefitType().getCode());
+            status = sendEmailToWlu(caseDetails.getId(), caseData, wluRequestForm, additionalEvidence);
+            log.info("Case {} successfully sent for benefit type {} to wlu", caseDetails.getId(),
+                    caseData.getAppeal().getBenefitType().getCode());
+        }
+        return status;
     }
 
     private Map<String, Object> caseDataMap(CaseDetails<SscsCaseData> caseDetails) {
@@ -124,23 +127,26 @@ public class RequestTranslationService {
         return CollectionUtils.isNotEmpty(sscsCaseData.getSscsDocument());
     }
 
-    private void sendEmailToWlu(long caseId, SscsCaseData caseData, byte[] requestFormPdf,
+    private boolean sendEmailToWlu(long caseId, SscsCaseData caseData, byte[] requestFormPdf,
                             Map<SscsDocument, byte[]> additionalEvidence) {
 
         log.info("Add request and sscs1 default attachments for case id {}", caseId);
         List<EmailAttachment> attachments = addDefaultAttachment(requestFormPdf, caseId);
         addAdditionalEvidenceAttachments(additionalEvidence, attachments);
-
-        emailService.sendEmail(caseId, requestTranslationTemplate.generateEmail(attachments, loggedInUserEmail));
+        if (attachments.size() > 1) {
+            emailService.sendEmail(caseId, requestTranslationTemplate.generateEmail(attachments, loggedInUserEmail));
+            return false;
+        }
 
         log.info("Case {} wlu email sent successfully. for benefit type {}  ",
             caseId, caseData.getAppeal().getBenefitType().getCode());
+        return true;
     }
 
     private void addAdditionalEvidenceAttachments(Map<SscsDocument, byte[]> additionalEvidence, List<EmailAttachment> attachments) {
         for (SscsDocument sscsDocument : additionalEvidence.keySet()) {
             if (sscsDocument != null) {
-                if (sscsDocument.getValue().getDocumentLink().getDocumentFilename() != null) {
+                if (sscsDocument.getValue().getDocumentLink() != null && sscsDocument.getValue().getDocumentLink().getDocumentFilename() != null) {
                     byte[] content = additionalEvidence.get(sscsDocument);
                     if (content != null) {
                         attachments.add(file(content, sscsDocument.getValue().getDocumentLink().getDocumentFilename()));

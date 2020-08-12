@@ -61,8 +61,6 @@ public class RequestTranslationCallbackHandlerTest {
 
     @Before
     public void setUp() {
-        when(callback.getEvent()).thenReturn(REQUEST_TRANSLATION_FROM_WLU);
-        when(callback.getCaseDetails()).thenReturn(getCaseDetails("Yes"));
         handler  = new RequestTranslationCallbackHandler(requestTranslationService, ccdCaseService, idamService);
     }
 
@@ -76,6 +74,7 @@ public class RequestTranslationCallbackHandlerTest {
     @Test
     public void givenCallbackIsSubmitted_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(REQUEST_TRANSLATION_FROM_WLU);
+        when(callback.getCaseDetails()).thenReturn(getCaseDetails("Yes"));
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
@@ -100,7 +99,7 @@ public class RequestTranslationCallbackHandlerTest {
     public void requestTranslationForelshCase() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("Yes");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), REQUEST_TRANSLATION_FROM_WLU, false);
-
+        when(requestTranslationService.sendCaseToWlu(any())).thenReturn(true);
         handler.handle(SUBMITTED, callback);
 
         verify(requestTranslationService).sendCaseToWlu(any());

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
@@ -100,5 +101,72 @@ public class RequestTranslationServiceTest {
         assertThat(caseData.getCaseData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus(),
                 is(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED));
 
+    }
+
+    @Test
+    public void givenACaseWithInvalidDocumentTypeToDownload_thenDoNotSendRequestEmail() {
+
+        byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
+        byte[] expectedBytes = new byte[]{1, 2, 3};
+        given(evidenceManagementService.download(any(), any())).willReturn(expectedBytes);
+        when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(expectedPdf);
+
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentFileName("test.jpg")
+                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)
+                        .build())
+                .build());
+
+        sscsCaseData.setSscsDocument(documents);
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
+
+        requestTranslationService.sendCaseToWlu(caseData);
+        verifyNoInteractions(requestTranslationTemplate);
+    }
+
+    @Test
+    public void givenACaseWithNEvidenceToDownload_thenDoNotSendRequestEmail() {
+
+        byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
+        byte[] expectedBytes = new byte[]{1, 2, 3};
+        given(evidenceManagementService.download(any(), any())).willReturn(expectedBytes);
+
+        when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(expectedPdf);
+        sscsCaseData.setSscsDocument(new ArrayList<>());
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
+
+        requestTranslationService.sendCaseToWlu(caseData);
+
+        verifyNoInteractions(requestTranslationTemplate);
+
+    }
+
+    @Test
+    public void givenACaseWithNoEvidenceLinkToDownload_thenCreateRequestFromWluWithDownloadedEvidence() {
+
+        byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
+        byte[] expectedBytes = new byte[]{0};
+        given(evidenceManagementService.download(any(), any())).willReturn(expectedBytes);
+
+        when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(expectedPdf);
+
+        List<SscsDocument> documents = new ArrayList<>();
+        documents.add(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentType("sscs1")
+                        .documentFileName("test.jpg")
+                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)
+                        .build())
+                .build());
+
+        sscsCaseData.setSscsDocument(documents);
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
+
+        requestTranslationService.sendCaseToWlu(caseData);
+
+        verifyNoInteractions(emailService);
+        verifyNoInteractions(requestTranslationTemplate);
     }
 }
