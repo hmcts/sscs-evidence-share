@@ -79,7 +79,7 @@ public class RequestTranslationService {
         Map<String, Object> dataMap = new HashMap<>();
         if (userDetails != null) {
             dataMap.put("name", String.join(" ",userDetails.getForename(), userDetails.getSurname()));
-            loggedInUserEmail = userDetails.getEmail();
+            //loggedInUserEmail = userDetails.getEmail();
             dataMap.put("email", userDetails.getEmail());
             dataMap.put("telephone", userDetails.getEmail());
         }
@@ -134,13 +134,12 @@ public class RequestTranslationService {
         List<EmailAttachment> attachments = addDefaultAttachment(requestFormPdf, caseId);
         addAdditionalEvidenceAttachments(additionalEvidence, attachments);
         if (attachments.size() > 1) {
+            log.info("Case {} wlu email sent successfully. for benefit type {}  ",
+                    caseId, caseData.getAppeal().getBenefitType().getCode());
             emailService.sendEmail(caseId, requestTranslationTemplate.generateEmail(attachments, loggedInUserEmail));
-            return false;
+            return true;
         }
-
-        log.info("Case {} wlu email sent successfully. for benefit type {}  ",
-            caseId, caseData.getAppeal().getBenefitType().getCode());
-        return true;
+        return false;
     }
 
     private void addAdditionalEvidenceAttachments(Map<SscsDocument, byte[]> additionalEvidence, List<EmailAttachment> attachments) {
