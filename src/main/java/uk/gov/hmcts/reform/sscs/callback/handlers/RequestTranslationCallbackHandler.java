@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.exception.WelshException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.RequestTranslationService;
 
@@ -42,13 +43,12 @@ public class RequestTranslationCallbackHandler implements CallbackHandler<SscsCa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-            && (callback.getEvent() == REQUEST_TRANSLATION_FROM_WLU)
-            && (callback.getCaseDetails().getCaseData().isLanguagePreferenceWelsh());
+            && (callback.getEvent() == REQUEST_TRANSLATION_FROM_WLU);
     }
 
     @Override
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        if (!canHandle(callbackType, callback)) {
+        if (!canHandle(callbackType, callback) || !callback.getCaseDetails().getCaseData().isLanguagePreferenceWelsh()) {
             throw new IllegalStateException("Error: This action is only available for Welsh cases");
         }
 
@@ -62,7 +62,7 @@ public class RequestTranslationCallbackHandler implements CallbackHandler<SscsCa
                     CASE_UPDATED.getCcdType(), "Case translations sent to wlu", "Updated case with date sent to wlu",
                     idamService.getIdamTokens());
             }
-        } catch (Exception e) {
+        } catch (WelshException e) {
             log.error("Error when sending to request translation from wlu: {}", callback.getCaseDetails().getId(), e);
         }
     }

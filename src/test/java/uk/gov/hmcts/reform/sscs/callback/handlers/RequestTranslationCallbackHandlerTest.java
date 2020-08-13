@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
@@ -25,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -34,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.exception.WelshException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.RequestTranslationService;
 
@@ -79,13 +82,6 @@ public class RequestTranslationCallbackHandlerTest {
     }
 
     @Test
-    public void givenCallbackIsSubmitted_AndCaseIsNotWelshthenReturnFalse() {
-        when(callback.getEvent()).thenReturn(REQUEST_TRANSLATION_FROM_WLU);
-        when(callback.getCaseDetails()).thenReturn(getCaseDetails("No"));
-        assertFalse(handler.canHandle(SUBMITTED, callback));
-    }
-
-    @Test
     public void requestTranslationForNonWelshCase() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("No");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), REQUEST_TRANSLATION_FROM_WLU, false);
@@ -96,7 +92,7 @@ public class RequestTranslationCallbackHandlerTest {
     }
 
     @Test
-    public void requestTranslationForelshCase() {
+    public void requestTranslationForWelshCase() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("Yes");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), REQUEST_TRANSLATION_FROM_WLU, false);
         when(requestTranslationService.sendCaseToWlu(any())).thenReturn(true);
@@ -104,6 +100,18 @@ public class RequestTranslationCallbackHandlerTest {
 
         verify(requestTranslationService).sendCaseToWlu(any());
         verify(ccdCaseService).updateCase(captor.capture(), eq(123L), eq(EventType.CASE_UPDATED.getCcdType()), eq("Case translations sent to wlu"), eq("Updated case with date sent to wlu"), any());
+    }
+
+    @Test
+    public void whenCallbackFailsthrowWelshException() {
+        RequestTranslationCallbackHandler mockHandle =  mock(RequestTranslationCallbackHandler.class);
+        Mockito.doThrow(new WelshException(new Exception())).when(mockHandle).handle(any(),any());
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("Yes");
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), REQUEST_TRANSLATION_FROM_WLU, false);
+        WelshException exception = assertThrows(
+                WelshException.class, () -> mockHandle.handle(SUBMITTED, callback));
+        assertNotNull(exception.getMessage());
     }
 
     private CaseDetails<SscsCaseData> getCaseDetails(String languagePreference) {
