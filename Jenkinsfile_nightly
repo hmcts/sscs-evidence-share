@@ -56,8 +56,9 @@ withNightlyPipeline(type, product, component) {
   env.TEST_URL = params.URL_TO_TEST
   env.Rules = params.SecurityRules
 
+  env.DOCUMENT_MANAGEMENT_URL = 'http://dm-store-aat.service.core-compute-aat.internal'
+
   loadVaultSecrets(secrets)
   enableSlackNotifications('#sscs-tech')
-  enableSecurityScan()
   enableFullFunctionalTest()
 }
