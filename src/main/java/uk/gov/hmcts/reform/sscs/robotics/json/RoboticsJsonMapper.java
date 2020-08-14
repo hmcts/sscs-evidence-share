@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +76,12 @@ public class RoboticsJsonMapper {
         if (roboticsWrapper.getState().equals(State.READY_TO_LIST)) {
             isReadyToList = "Yes";
         }
+        String isDigital = "No";
+        if (StringUtils.equals(roboticsWrapper.getSscsCaseData().getCreatedInGapsFrom(), ("readyToList"))) {
+            isDigital = "Yes";
+        }
         obj.put("isReadyToList", isReadyToList);
+        obj.put("isDigital", isDigital);
 
         obj.put("dwpResponseDate", sscsCaseData.getDwpResponseDate());
 
