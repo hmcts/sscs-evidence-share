@@ -48,7 +48,7 @@ public class RequestTranslationCallbackHandler implements CallbackHandler<SscsCa
 
     @Override
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        if (!canHandle(callbackType, callback) || !callback.getCaseDetails().getCaseData().isLanguagePreferenceWelsh()) {
+        if (!callback.getCaseDetails().getCaseData().isLanguagePreferenceWelsh()) {
             throw new IllegalStateException("Error: This action is only available for Welsh cases");
         }
 
