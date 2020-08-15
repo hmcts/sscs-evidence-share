@@ -65,13 +65,14 @@ public class RequestTranslationCallbackHandlerTest {
     @Before
     public void setUp() {
         handler  = new RequestTranslationCallbackHandler(requestTranslationService, ccdCaseService, idamService);
+
     }
 
     @Test(expected = IllegalStateException.class)
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
         handler.handle(callbackType,
-                buildTestCallbackForGivenData(null, APPEAL_CREATED, REQUEST_TRANSLATION_FROM_WLU));
+                buildTestCallbackForGivenData(SscsCaseData.builder().languagePreferenceWelsh("No").build(), APPEAL_CREATED, REQUEST_TRANSLATION_FROM_WLU));
     }
 
     @Test
