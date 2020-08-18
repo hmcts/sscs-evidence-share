@@ -1,9 +1,32 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.CASE_ID_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.NINO_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_COUNTY_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_POSTCODE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.SC_NUMBER_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.WELSH_CASE_CREATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseData;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseDataWithoutBenefitType;
 
@@ -30,6 +53,7 @@ public class PlaceholderServiceTest {
     private SscsCaseData caseData;
 
     private String now;
+    private String welshDate;
 
     @Mock
     private PdfDocumentConfig pdfDocumentConfig;
@@ -45,11 +69,13 @@ public class PlaceholderServiceTest {
         DateTimeUtils.setCurrentMillisFixed(1550000000000L);
 
         now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());
-
+        welshDate = "2001-12-02";
         caseData = buildCaseData();
         service = new PlaceholderService(pdfDocumentConfig, exelaAddressConfig);
         placeholders = new HashMap<>();
 
+        given(pdfDocumentConfig.getHmctsWelshImgKey()).willReturn("hmctsWelshImgKey");
+        given(pdfDocumentConfig.getHmctsWelshImgVal()).willReturn("welshhmcts.png");
         given(pdfDocumentConfig.getHmctsImgKey()).willReturn("hmctsKey");
         given(exelaAddressConfig.getAddressLine1()).willReturn("Line 1");
         given(exelaAddressConfig.getAddressLine2()).willReturn("Line 2");
@@ -66,7 +92,7 @@ public class PlaceholderServiceTest {
             .county("Bedford")
             .postcode("L2 5UZ").build();
 
-        service.build(caseData, placeholders, address, now.toString());
+        service.build(caseData, placeholders, address, now);
 
         assertEquals("HM Courts & Tribunals Service", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
         assertEquals("Social Security & Child Support Appeals", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL));
@@ -117,7 +143,7 @@ public class PlaceholderServiceTest {
             .postcode("L2 5UZ").build();
 
         caseData = buildCaseDataWithoutBenefitType();
-        service.build(caseData, placeholders, address, now.toString());
+        service.build(caseData, placeholders, address, now);
 
         assertEquals("HM Courts & Tribunals Service", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
         assertEquals("Social Security & Child Support Appeals", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL));
@@ -190,5 +216,22 @@ public class PlaceholderServiceTest {
         assertEquals("Unit 2", placeholders.get(RECIPIENT_ADDRESS_LINE_1_LITERAL));
         assertEquals("Bedford", placeholders.get(RECIPIENT_ADDRESS_LINE_2_LITERAL));
         assertEquals("L2 5UZ", placeholders.get(RECIPIENT_ADDRESS_LINE_3_LITERAL));
+    }
+
+    @Test
+    public void givenALanguagePreferenceIsWelsh_ThenPickWelshLogo() {
+        Address address = Address.builder()
+            .line1("Unit 2")
+            .line2("156 The Road")
+            .town("Lechworth")
+            .county("Bedford")
+            .postcode("L2 5UZ").build();
+        caseData.setLanguagePreferenceWelsh("Yes");
+
+        service.build(caseData, placeholders, address, welshDate);
+
+        assertEquals("HM Courts & Tribunals Service", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
+        assertEquals("welshhmcts.png", placeholders.get("hmctsWelshImgKey"));
+        assertNotNull(placeholders.get(WELSH_CASE_CREATED_DATE_LITERAL));
     }
 }
