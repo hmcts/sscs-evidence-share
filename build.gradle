@@ -219,7 +219,7 @@ dependencies {
 
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '2.6.0'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.3.46_RC_WLA-595'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.4.49_WLA-595_RC'
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.8_RC_WLA_595'
 
 
