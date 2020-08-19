@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -24,6 +25,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
@@ -50,9 +52,19 @@ public class RoboticsJsonMapperTest {
     @Mock
     private AirLookupService airLookupService;
 
+    private List<ElementDisputed> elementsDisputedGeneralList = new ArrayList<>();
+    private List<ElementDisputed> elementsDisputedSanctionsList = new ArrayList<>();
+    private List<ElementDisputed> elementsDisputedOverpaymentList = new ArrayList<>();
+    private List<ElementDisputed> elementsDisputedHousingList = new ArrayList<>();
+    private List<ElementDisputed> elementsDisputedChildCareList = new ArrayList<>();
+    private List<ElementDisputed> elementsDisputedCareList = new ArrayList<>();
+    private List<ElementDisputed> elementsDisputedChildElementList = new ArrayList<>();
+    private List<ElementDisputed> elementsDisputedChildDisabledList = new ArrayList<>();
+
+
     @Before
     public void setup() {
-        roboticsJsonMapper = new RoboticsJsonMapper(dwpAddressLookupService, regionalProcessingCenterService, airLookupService);
+        roboticsJsonMapper = new RoboticsJsonMapper(dwpAddressLookupService, regionalProcessingCenterService, airLookupService, false);
 
         SscsCaseData sscsCaseData = buildCaseData();
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
@@ -64,7 +76,6 @@ public class RoboticsJsonMapperTest {
             .build();
 
         given(airLookupService.lookupAirVenueNameByPostCode(any())).willReturn(AirlookupBenefitToVenue.builder().pipVenue("Bromley").esaOrUcVenue("Bath").build());
-        given(regionalProcessingCenterService.getFirstHalfOfPostcode("CM120HN")).willReturn("CM12");
     }
 
     @Test
@@ -516,6 +527,103 @@ public class RoboticsJsonMapperTest {
         roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
 
         assertThat(roboticsJson.get("isDigital"), is(expectedIsDigital));
+    }
+
+    @Test
+    public void givenUcFeatureFlagOff_thenDoNotPopulateRoboticsWithUcFields() {
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertFalse(roboticsJson.has("elementsDisputedGeneral"));
+        assertFalse(roboticsJson.has("elementsDisputedSanctions"));
+        assertFalse(roboticsJson.has("elementsDisputedOverpayment"));
+        assertFalse(roboticsJson.has("elementsDisputedHousing"));
+        assertFalse(roboticsJson.has("elementsDisputedChildCare"));
+        assertFalse(roboticsJson.has("elementsDisputedCare"));
+        assertFalse(roboticsJson.has("elementsDisputedChildElement"));
+        assertFalse(roboticsJson.has("elementsDisputedChildDisabled"));
+        assertFalse(roboticsJson.has("jointParty"));
+        assertFalse(roboticsJson.has("ucDecisionDisputedByOthers"));
+        assertFalse(roboticsJson.has("linkedAppealRef"));
+    }
+
+    @Test
+    public void givenUcFeatureFlagOn_thenPopulateRoboticsWithUcFields() {
+        initialiseElementDisputedLists();
+
+        roboticsWrapper.getSscsCaseData().setJointParty("Yes");
+        roboticsWrapper.getSscsCaseData().setJointPartyNameNoTitle(NameNoTitle.builder().firstName("Harry").lastName("Hotspur").build());
+        roboticsWrapper.getSscsCaseData().setJointPartyTitle("Mr");
+        roboticsWrapper.getSscsCaseData().setJointPartyAddress(Address.builder().line1("The road").line2("Test").town("Bedrock").county("Bedfordshire").postcode("BD1 5LK").build());
+        roboticsWrapper.getSscsCaseData().setJointPartyAddressSameAsAppellant("Yes");
+        roboticsWrapper.getSscsCaseData().setElementsDisputedIsDecisionDisputedByOthers("Yes");
+        roboticsWrapper.getSscsCaseData().setElementsDisputedLinkedAppealRef("12345678");
+        roboticsWrapper.getSscsCaseData().setJointPartyIdentity(Identity.builder().nino("JT000000B").dob("2000-01-01").build());
+
+        ReflectionTestUtils.setField(roboticsJsonMapper, "ucEnabled", true);
+
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertTrue(roboticsJson.has("jointParty"));
+        assertEquals("Yes", roboticsJson.getJSONObject("jointParty").getString("sameAddressAsAppellant"));
+        assertEquals("Mr", roboticsJson.getJSONObject("jointParty").get("title"));
+        assertEquals("Harry", roboticsJson.getJSONObject("jointParty").get("firstName"));
+        assertEquals("Hotspur", roboticsJson.getJSONObject("jointParty").get("lastName"));
+        assertEquals("Bedrock", roboticsJson.getJSONObject("jointParty").get("townOrCity"));
+        assertEquals("Bedfordshire", roboticsJson.getJSONObject("jointParty").get("county"));
+        assertEquals("The road", roboticsJson.getJSONObject("jointParty").get("addressLine1"));
+        assertEquals("Test", roboticsJson.getJSONObject("jointParty").get("addressLine2"));
+        assertEquals("BD1 5LK", roboticsJson.getJSONObject("jointParty").get("postCode"));
+        assertEquals("JT000000B", roboticsJson.getJSONObject("jointParty").get("nino"));
+        assertEquals("2000-01-01", roboticsJson.getJSONObject("jointParty").get("dob"));
+
+        assertEquals("firstIssueElementsDisputedGeneral", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("general").get(0));
+        assertEquals("firstIssueElementsDisputedSanctions", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("sanctions").get(0));
+        assertEquals("firstIssueElementsDisputedOverpayment", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("overpayment").get(0));
+        assertEquals("firstIssueElementsDisputedHousing", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("housing").get(0));
+        assertEquals("firstIssueElementsDisputedChildCare", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("childCare").get(0));
+        assertEquals("firstIssueElementsDisputedCare", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("care").get(0));
+        assertEquals("firstIssueElementsDisputedChildElement", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("childElement").get(0));
+        assertEquals("firstIssueElementsDisputedChildDisabled", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("childDisabled").get(0));
+
+        assertEquals("Yes", roboticsJson.get("ucDecisionDisputedByOthers"));
+        assertEquals("12345678", roboticsJson.get("linkedAppealRef"));
+    }
+
+    @Test
+    public void givenUcFeatureFlagOnAndElementContainsMultipleIssues_thenCheckMultipleIssuesTransformedToArray() {
+        elementsDisputedGeneralList.addAll(Arrays.asList(
+            ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedGeneral").build()).build(),
+            ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("secondIssueElementsDisputedGeneral").build()).build(),
+            ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("thirdIssueElementsDisputedGeneral").build()).build()));
+        roboticsWrapper.getSscsCaseData().setElementsDisputedGeneral(elementsDisputedGeneralList);
+
+        ReflectionTestUtils.setField(roboticsJsonMapper, "ucEnabled", true);
+
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertEquals("firstIssueElementsDisputedGeneral", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("general").get(0));
+        assertEquals("secondIssueElementsDisputedGeneral", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("general").get(1));
+        assertEquals("thirdIssueElementsDisputedGeneral", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("general").get(2));
+    }
+
+    private void initialiseElementDisputedLists() {
+        elementsDisputedGeneralList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedGeneral").build()).build());
+        elementsDisputedSanctionsList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedSanctions").build()).build());
+        elementsDisputedOverpaymentList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedOverpayment").build()).build());
+        elementsDisputedHousingList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedHousing").build()).build());
+        elementsDisputedChildCareList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedChildCare").build()).build());
+        elementsDisputedCareList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedCare").build()).build());
+        elementsDisputedChildElementList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedChildElement").build()).build());
+        elementsDisputedChildDisabledList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedChildDisabled").build()).build());
+
+        roboticsWrapper.getSscsCaseData().setElementsDisputedGeneral(elementsDisputedGeneralList);
+        roboticsWrapper.getSscsCaseData().setElementsDisputedSanctions(elementsDisputedSanctionsList);
+        roboticsWrapper.getSscsCaseData().setElementsDisputedOverpayment(elementsDisputedOverpaymentList);
+        roboticsWrapper.getSscsCaseData().setElementsDisputedHousing(elementsDisputedHousingList);
+        roboticsWrapper.getSscsCaseData().setElementsDisputedChildCare(elementsDisputedChildCareList);
+        roboticsWrapper.getSscsCaseData().setElementsDisputedCare(elementsDisputedCareList);
+        roboticsWrapper.getSscsCaseData().setElementsDisputedChildElement(elementsDisputedChildElementList);
+        roboticsWrapper.getSscsCaseData().setElementsDisputedChildDisabled(elementsDisputedChildDisabledList);
     }
 
 }

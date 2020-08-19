@@ -24,6 +24,7 @@
     "appellant": {"$ref": "#/definitions/person"},
     "appointee": {"$ref": "#/definitions/person"},
     "representative": {"$ref": "#/definitions/person"},
+    "jointParty": {"$ref": "#/definitions/person"},
     "rpcEmail": {"type": "string"},
     "isReadyToList": {"$ref": "#/definitions/yesOrNo"},
     "isDigital": {"$ref": "#/definitions/yesOrNo"},
@@ -52,6 +53,61 @@
         "accessibleHearingRoom"
       ],
       "additionalProperties": false
+    },
+    "ucDecisionDisputedByOthers": {"$ref": "#/definitions/yesOrNo"},
+    "linkedAppealRef": {"type": "string"},
+    "elementsDisputed": {
+      "type": "object",
+      "properties": {
+        "general": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sanctions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "overpayment": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "housing": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "childCare": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "care": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "childElement": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "childDisabled": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "dependencies": {
@@ -105,6 +161,7 @@
         "phoneNumber": { "type": "string" },
         "email": { "type": "string" },
         "dob": {"$ref": "#/definitions/dateType"},
+        "nino": { "type": "string" },
         "sameAddressAsAppellant": {"$ref": "#/definitions/yesOrNo"}
       },
       "additionalProperties": false,

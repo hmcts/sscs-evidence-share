@@ -61,5 +61,47 @@
     "phoneNumber": "07322939293",
     "email": "arya_stark@email.com",
     "dob": "2018-08-12"
+  },
+  "jointParty": {
+    "title": "Mr",
+    "firstName": "Ben",
+    "lastName": "Button",
+    "addressLine1": "1 Dark Lane",
+    "addressLine2": "",
+    "townOrCity": "The North",
+    "county": "Yorkshire",
+    "postCode": "EH13 8PL",
+    "sameAddressAsAppellant": "Yes",
+    "nino": "JT000000B",
+    "dob": "2020-01-01"
+  },
+  "ucDecisionDisputedByOthers": "Yes",
+  "linkedAppealRef": "12345",
+  "elementsDisputed": {
+    "general": [
+      "testGeneral",
+      "testGeneral2"
+    ],
+    "sanctions": [
+      "testSanctions"
+    ],
+    "overpayment": [
+      "testOverpayment"
+    ],
+    "housing": [
+      "testHousing"
+    ],
+    "childCare": [
+      "testChildCare"
+    ],
+    "care": [
+      "testCare"
+    ],
+    "childElement": [
+      "testChildElement"
+    ],
+    "childDisabled": [
+      "testChildDisabled"
+    ]
   }
 }

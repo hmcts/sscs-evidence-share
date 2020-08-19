@@ -120,4 +120,4 @@ exela:
   addressPostcode: CM20 9QF
 
 feature:
-  bulk-scan.migrated: ${BULK_SCAN_MIGRATED:false}
+  universal-credit.enabled: ${UC_ENABLED:false}

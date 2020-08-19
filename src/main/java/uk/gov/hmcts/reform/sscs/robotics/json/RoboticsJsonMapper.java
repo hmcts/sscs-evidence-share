@@ -4,12 +4,14 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
@@ -30,14 +32,17 @@ public class RoboticsJsonMapper {
     private final DwpAddressLookupService dwpAddressLookupService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final AirLookupService airLookupService;
+    private final boolean ucEnabled;
 
     @Autowired
     public RoboticsJsonMapper(DwpAddressLookupService dwpAddressLookupService,
                               RegionalProcessingCenterService regionalProcessingCenterService,
-                              AirLookupService airLookupService) {
+                              AirLookupService airLookupService,
+                              @Value("${universal-credit.enabled}") boolean ucEnabled) {
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.airLookupService = airLookupService;
+        this.ucEnabled = ucEnabled;
     }
 
     public JSONObject map(RoboticsWrapper roboticsWrapper) {
@@ -114,6 +119,26 @@ public class RoboticsJsonMapper {
         obj.put("dwpPresentingOffice", dwpPresentingOffice);
         obj.put("dwpIsOfficerAttending", dwpIsOfficerAttending);
         obj.put("dwpUcb", dwpUcb);
+
+
+        if (ucEnabled) {
+
+            JSONObject elementsDisputed = buildElementsDisputedLists(obj, sscsCaseData);
+            if (elementsDisputed.length() > 0) {
+                obj.put("elementsDisputed", elementsDisputed);
+            }
+
+            if (null != sscsCaseData.getJointParty() && "Yes".equalsIgnoreCase(sscsCaseData.getJointParty())) {
+                obj.put("jointParty", buildJointPartyDetails(sscsCaseData.getJointPartyName(), sscsCaseData.getJointPartyAddress(), sscsCaseData.isJointPartyAddressSameAsAppeallant(),
+                    sscsCaseData.getJointPartyIdentity().getDob(), sscsCaseData.getJointPartyIdentity().getNino()));
+            }
+            if (sscsCaseData.getElementsDisputedIsDecisionDisputedByOthers() != null) {
+                obj.put("ucDecisionDisputedByOthers", sscsCaseData.getElementsDisputedIsDecisionDisputedByOthers());
+            }
+            if (sscsCaseData.getElementsDisputedLinkedAppealRef() != null) {
+                obj.put("linkedAppealRef", sscsCaseData.getElementsDisputedLinkedAppealRef());
+            }
+        }
 
         return obj;
     }
@@ -197,23 +222,32 @@ public class RoboticsJsonMapper {
     private static JSONObject buildAppellantDetails(Appellant appellant) {
         JSONObject json = new JSONObject();
 
-        json.put("title", appellant.getName().getTitle());
-        json.put("firstName", appellant.getName().getFirstName());
-        json.put("lastName", appellant.getName().getLastName());
+        buildName(json, appellant.getName());
 
         return buildContactDetails(json, appellant.getAddress(), appellant.getContact());
     }
 
-    private static JSONObject buildAppointeeDetails(Appointee appointee, boolean sameAddressAsAppointee) {
+    private static JSONObject buildAppointeeDetails(Appointee appointee, boolean sameAddressAsAppellant) {
         JSONObject json = new JSONObject();
 
-        json.put("title", appointee.getName().getTitle());
-        json.put("firstName", appointee.getName().getFirstName());
-        json.put("lastName", appointee.getName().getLastName());
+        buildName(json, appointee.getName());
 
-        json.put("sameAddressAsAppellant", sameAddressAsAppointee ? "Yes" : "No");
+        json.put("sameAddressAsAppellant", sameAddressAsAppellant ? "Yes" : "No");
 
         return buildContactDetails(json, appointee.getAddress(), appointee.getContact());
+    }
+
+    private static JSONObject buildJointPartyDetails(Name jointPartyName, Address jointPartyAddress, boolean sameAddressAsAppellant,
+                                                     String dob, String nino) {
+        JSONObject json = new JSONObject();
+
+        buildName(json, jointPartyName);
+
+        json.put("sameAddressAsAppellant", sameAddressAsAppellant ? "Yes" : "No");
+        json.put("dob", dob);
+        json.put("nino", nino);
+
+        return buildContactDetails(json, jointPartyAddress, null);
     }
 
     private static JSONObject buildRepresentativeDetails(Representative rep) {
@@ -232,6 +266,12 @@ public class RoboticsJsonMapper {
         }
 
         return buildContactDetails(json, rep.getAddress(), rep.getContact());
+    }
+
+    private static void buildName(JSONObject json, Name name) {
+        json.put("title", name.getTitle());
+        json.put("firstName", name.getFirstName());
+        json.put("lastName", name.getLastName());
     }
 
     @SuppressWarnings("unchecked")
@@ -286,10 +326,60 @@ public class RoboticsJsonMapper {
         json.put("townOrCity", address.getTown());
         json.put("county", address.getCounty());
         json.put("postCode", address.getPostcode());
-        json.put("phoneNumber", contact.getMobile());
-        json.put("email", contact.getEmail());
+
+        if (contact != null) {
+            json.put("phoneNumber", contact.getMobile());
+            json.put("email", contact.getEmail());
+        }
 
         return json;
+    }
+
+    private static JSONObject buildElementsDisputedLists(JSONObject json, SscsCaseData sscsCaseData) {
+
+        JSONObject elementsDisputed = new JSONObject();
+
+        if (sscsCaseData.getElementsDisputedGeneral() != null && sscsCaseData.getElementsDisputedGeneral().size() > 0) {
+            elementsDisputed.put("general", buildElementIssueArray(sscsCaseData.getElementsDisputedGeneral()));
+        }
+
+        if (sscsCaseData.getElementsDisputedSanctions() != null && sscsCaseData.getElementsDisputedSanctions().size() > 0) {
+            elementsDisputed.put("sanctions", buildElementIssueArray(sscsCaseData.getElementsDisputedSanctions()));
+        }
+
+        if (sscsCaseData.getElementsDisputedOverpayment() != null && sscsCaseData.getElementsDisputedOverpayment().size() > 0) {
+            elementsDisputed.put("overpayment", buildElementIssueArray(sscsCaseData.getElementsDisputedOverpayment()));
+        }
+
+        if (sscsCaseData.getElementsDisputedHousing() != null && sscsCaseData.getElementsDisputedHousing().size() > 0) {
+            elementsDisputed.put("housing", buildElementIssueArray(sscsCaseData.getElementsDisputedHousing()));
+        }
+
+        if (sscsCaseData.getElementsDisputedChildCare() != null && sscsCaseData.getElementsDisputedChildCare().size() > 0) {
+            elementsDisputed.put("childCare", buildElementIssueArray(sscsCaseData.getElementsDisputedChildCare()));
+        }
+
+        if (sscsCaseData.getElementsDisputedCare() != null && sscsCaseData.getElementsDisputedCare().size() > 0) {
+            elementsDisputed.put("care", buildElementIssueArray(sscsCaseData.getElementsDisputedCare()));
+        }
+
+        if (sscsCaseData.getElementsDisputedChildElement() != null && sscsCaseData.getElementsDisputedChildElement().size() > 0) {
+            elementsDisputed.put("childElement", buildElementIssueArray(sscsCaseData.getElementsDisputedChildElement()));
+        }
+
+        if (sscsCaseData.getElementsDisputedChildDisabled() != null && sscsCaseData.getElementsDisputedChildDisabled().size() > 0) {
+            elementsDisputed.put("childDisabled", buildElementIssueArray(sscsCaseData.getElementsDisputedChildDisabled()));
+        }
+        return elementsDisputed;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static JSONArray buildElementIssueArray(List<ElementDisputed> elementList) {
+        JSONArray elementsDisputedArray = new JSONArray();
+
+        elementList.forEach(e -> elementsDisputedArray.add(e.getValue().getIssueCode()));
+
+        return elementsDisputedArray;
     }
 
     private boolean isAppointeeDetailsEmpty(Appointee appointee) {
