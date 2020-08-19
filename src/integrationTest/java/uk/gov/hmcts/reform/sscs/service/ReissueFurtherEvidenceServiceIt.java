@@ -31,9 +31,12 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.sscs.callback.handlers.ReissueFurtherEvidenceHandler;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.PdfDocumentRequest;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -79,6 +82,9 @@ public class ReissueFurtherEvidenceServiceIt {
     @MockBean
     private BulkPrintService bulkPrintService;
 
+    @MockBean
+    private DocmosisTemplateConfig docmosisTemplateConfig;
+
     @Autowired
     private ReissueFurtherEvidenceHandler handler;
 
@@ -96,9 +102,42 @@ public class ReissueFurtherEvidenceServiceIt {
     private Session session = Session.getInstance(new Properties());
 
     private Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
+    Map<LanguagePreference, Map<String, Map<String, String>>> template =  new HashMap<>();
 
     @Before
     public void setup() {
+        Map<String, String> nameMap;
+        Map<String, Map<String, String>> englishDocs = new HashMap<>();
+        nameMap = new HashMap<>();
+        nameMap.put("name", "TB-SCS-GNO-ENG-00010.doc");
+        englishDocs.put(DocumentType.DL6.getValue(), nameMap);
+        nameMap = new HashMap<>();
+        nameMap.put("name", "TB-SCS-GNO-ENG-00011.doc");
+        englishDocs.put(DocumentType.DL16.getValue(), nameMap);
+        nameMap = new HashMap<>();
+        nameMap.put("name", "TB-SCS-GNO-ENG-00068.doc");
+        englishDocs.put("d609-97", nameMap);
+        nameMap = new HashMap<>();
+        nameMap.put("name", "TB-SCS-GNO-ENG-00069.doc");
+        englishDocs.put("d609-98", nameMap);
+
+        Map<String, Map<String, String>> welshDocs = new HashMap<>();
+        nameMap = new HashMap<>();
+        nameMap.put("name", "TB-SCS-GNO-ENG-00010.doc");
+        welshDocs.put(DocumentType.DL6.getValue(), nameMap);
+        nameMap = new HashMap<>();
+        nameMap.put("name", "TB-SCS-GNO-ENG-00011.doc");
+        welshDocs.put(DocumentType.DL16.getValue(), nameMap);
+        nameMap = new HashMap<>();
+        nameMap.put("name", "TB-SCS-GNO-WEL-00469.docx");
+        welshDocs.put("d609-97", nameMap);
+        nameMap = new HashMap<>();
+        nameMap.put("name", "TB-SCS-GNO-WEL-00470.docx");
+        welshDocs.put("d609-98", nameMap);
+
+        template.put(LanguagePreference.ENGLISH, englishDocs);
+        template.put(LanguagePreference.WELSH, welshDocs);
+
         MimeMessage message = new MimeMessage(session);
         assertNotNull("ReissueFurtherEvidenceHandler must be autowired", handler);
 
@@ -109,6 +148,8 @@ public class ReissueFurtherEvidenceServiceIt {
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
+
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
 
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
@@ -136,7 +177,7 @@ public class ReissueFurtherEvidenceServiceIt {
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
@@ -168,7 +209,7 @@ public class ReissueFurtherEvidenceServiceIt {
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
@@ -200,7 +241,7 @@ public class ReissueFurtherEvidenceServiceIt {
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
@@ -242,7 +283,7 @@ public class ReissueFurtherEvidenceServiceIt {
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
@@ -269,7 +310,7 @@ public class ReissueFurtherEvidenceServiceIt {
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
