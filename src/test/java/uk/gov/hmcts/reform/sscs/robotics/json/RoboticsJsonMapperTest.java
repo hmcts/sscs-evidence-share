@@ -551,8 +551,7 @@ public class RoboticsJsonMapperTest {
         initialiseElementDisputedLists();
 
         roboticsWrapper.getSscsCaseData().setJointParty("Yes");
-        roboticsWrapper.getSscsCaseData().setJointPartyNameNoTitle(NameNoTitle.builder().firstName("Harry").lastName("Hotspur").build());
-        roboticsWrapper.getSscsCaseData().setJointPartyTitle("Mr");
+        roboticsWrapper.getSscsCaseData().setJointPartyName(JointPartyName.builder().title("Mr").firstName("Harry").lastName("Hotspur").build());
         roboticsWrapper.getSscsCaseData().setJointPartyAddress(Address.builder().line1("The road").line2("Test").town("Bedrock").county("Bedfordshire").postcode("BD1 5LK").build());
         roboticsWrapper.getSscsCaseData().setJointPartyAddressSameAsAppellant("Yes");
         roboticsWrapper.getSscsCaseData().setElementsDisputedIsDecisionDisputedByOthers("Yes");

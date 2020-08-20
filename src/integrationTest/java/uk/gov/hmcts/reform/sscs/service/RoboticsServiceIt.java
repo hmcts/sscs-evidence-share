@@ -229,8 +229,7 @@ public class RoboticsServiceIt {
         caseDetails.getCaseData().setElementsDisputedLinkedAppealRef("123456");
         caseDetails.getCaseData().setElementsDisputedIsDecisionDisputedByOthers("Yes");
 
-        caseDetails.getCaseData().setJointPartyNameNoTitle(NameNoTitle.builder().firstName("Terry").lastName("Tibbs").build());
-        caseDetails.getCaseData().setJointPartyTitle("Mr");
+        caseDetails.getCaseData().setJointPartyName(JointPartyName.builder().title("Mr").firstName("Terry").lastName("Tibbs").build());
         caseDetails.getCaseData().setJointPartyAddress(Address.builder().line1("99 My Road").town("Grantham").county("Surrey").postcode("CV10 6PO").build());
         caseDetails.getCaseData().setJointPartyIdentity(Identity.builder().nino("JT0123456B").dob("2000-01-01").build());
         caseDetails.getCaseData().setJointPartyAddress(Address.builder().line1("99 My Road").town("Chelmsford").county("Essex").postcode("CM12 0NS").build());

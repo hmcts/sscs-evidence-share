@@ -79,29 +79,29 @@
   "linkedAppealRef": "12345",
   "elementsDisputed": {
     "general": [
-      "testGeneral",
-      "testGeneral2"
+      "OS",
+      "OC"
     ],
     "sanctions": [
-      "testSanctions"
+      "HT"
     ],
     "overpayment": [
-      "testOverpayment"
+      "HC"
     ],
     "housing": [
-      "testHousing"
+      "EC"
     ],
     "childCare": [
-      "testChildCare"
+      "CR"
     ],
     "care": [
-      "testCare"
+      "CI"
     ],
     "childElement": [
-      "testChildElement"
+      "PT"
     ],
     "childDisabled": [
-      "testChildDisabled"
+      "SX"
     ]
   }
 }

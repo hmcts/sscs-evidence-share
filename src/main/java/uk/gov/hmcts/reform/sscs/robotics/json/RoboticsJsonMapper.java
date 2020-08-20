@@ -222,7 +222,7 @@ public class RoboticsJsonMapper {
     private static JSONObject buildAppellantDetails(Appellant appellant) {
         JSONObject json = new JSONObject();
 
-        buildName(json, appellant.getName());
+        buildName(json, appellant.getName().getTitle(), appellant.getName().getFirstName(), appellant.getName().getLastName());
 
         return buildContactDetails(json, appellant.getAddress(), appellant.getContact());
     }
@@ -230,18 +230,18 @@ public class RoboticsJsonMapper {
     private static JSONObject buildAppointeeDetails(Appointee appointee, boolean sameAddressAsAppellant) {
         JSONObject json = new JSONObject();
 
-        buildName(json, appointee.getName());
+        buildName(json, appointee.getName().getTitle(), appointee.getName().getFirstName(), appointee.getName().getLastName());
 
         json.put("sameAddressAsAppellant", sameAddressAsAppellant ? "Yes" : "No");
 
         return buildContactDetails(json, appointee.getAddress(), appointee.getContact());
     }
 
-    private static JSONObject buildJointPartyDetails(Name jointPartyName, Address jointPartyAddress, boolean sameAddressAsAppellant,
+    private static JSONObject buildJointPartyDetails(JointPartyName jointPartyName, Address jointPartyAddress, boolean sameAddressAsAppellant,
                                                      String dob, String nino) {
         JSONObject json = new JSONObject();
 
-        buildName(json, jointPartyName);
+        buildName(json, jointPartyName.getTitle(), jointPartyName.getFirstName(), jointPartyName.getLastName());
 
         json.put("sameAddressAsAppellant", sameAddressAsAppellant ? "Yes" : "No");
         json.put("dob", dob);
@@ -257,9 +257,7 @@ public class RoboticsJsonMapper {
         String firstName = rep.getName().getFirstName() != null ? rep.getName().getFirstName() : ".";
         String lastName = rep.getName().getLastName() != null ? rep.getName().getLastName() : ".";
 
-        json.put("title", title);
-        json.put("firstName", firstName);
-        json.put("lastName", lastName);
+        buildName(json, title, firstName, lastName);
 
         if (rep.getOrganisation() != null) {
             json.put("organisation", rep.getOrganisation());
@@ -268,10 +266,10 @@ public class RoboticsJsonMapper {
         return buildContactDetails(json, rep.getAddress(), rep.getContact());
     }
 
-    private static void buildName(JSONObject json, Name name) {
-        json.put("title", name.getTitle());
-        json.put("firstName", name.getFirstName());
-        json.put("lastName", name.getLastName());
+    private static void buildName(JSONObject json, String title, String firstName, String lastName) {
+        json.put("title", title);
+        json.put("firstName", firstName);
+        json.put("lastName", lastName);
     }
 
     @SuppressWarnings("unchecked")
