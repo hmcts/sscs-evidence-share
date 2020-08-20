@@ -38,7 +38,7 @@ public class RoboticsJsonMapper {
     public RoboticsJsonMapper(DwpAddressLookupService dwpAddressLookupService,
                               RegionalProcessingCenterService regionalProcessingCenterService,
                               AirLookupService airLookupService,
-                              @Value("${universal-credit.enabled}") boolean ucEnabled) {
+                              @Value("${feature.universal-credit.enabled}") boolean ucEnabled) {
         this.dwpAddressLookupService = dwpAddressLookupService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.airLookupService = airLookupService;
