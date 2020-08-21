@@ -100,6 +100,15 @@ robotics:
   englishCount: 3
   scottishCount: 1
 
+wlu:
+  email:
+    from: ${WLU_EMAIL_FROM:sscs@hmcts.net}
+    to: ${WLU_EMAIL_TO:sscs@hmcts.net}
+    subject: ${WLU_EMAIL_SUBJECT:Please translate}
+    message: ${WLU_EMAIL_MESSAGE:Please find attached the files along with request translation form.\nThank you
+      very much}
+    dateOfReturn: ${WLU_RETURN_DATE:24 hours from requested date.}
+
 docmosis:
   template:
     english:
