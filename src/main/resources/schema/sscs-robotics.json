@@ -26,6 +26,7 @@
     "representative": {"$ref": "#/definitions/person"},
     "rpcEmail": {"type": "string"},
     "isReadyToList": {"$ref": "#/definitions/yesOrNo"},
+    "isDigital": {"$ref": "#/definitions/yesOrNo"},
     "dwpResponseDate": {"$ref": "#/definitions/dateType"},
     "dwpIssuingOffice": {"type": "string"},
     "dwpPresentingOffice": {"type": "string"},

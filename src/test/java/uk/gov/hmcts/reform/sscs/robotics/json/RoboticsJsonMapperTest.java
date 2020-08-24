@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.robotics.json;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.time.LocalDate;
@@ -16,9 +18,12 @@ import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
 import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
@@ -29,6 +34,8 @@ import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 @RunWith(JUnitParamsRunner.class)
 public class RoboticsJsonMapperTest {
 
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
     private RoboticsJsonMapper roboticsJsonMapper;
     private RoboticsWrapper roboticsWrapper;
     private RoboticsJsonValidator roboticsJsonValidator = new RoboticsJsonValidator(
@@ -45,7 +52,6 @@ public class RoboticsJsonMapperTest {
 
     @Before
     public void setup() {
-        initMocks(this);
         roboticsJsonMapper = new RoboticsJsonMapper(dwpAddressLookupService, regionalProcessingCenterService, airLookupService);
 
         SscsCaseData sscsCaseData = buildCaseData();
@@ -71,7 +77,7 @@ public class RoboticsJsonMapperTest {
         roboticsJsonValidator.validate(roboticsJson);
 
         assertEquals(
-            "If this fails, add an assertion below, do not just increment the number :)", 23,
+            "If this fails, add an assertion below, do not just increment the number :)", 24,
             roboticsJson.length()
         );
 
@@ -500,6 +506,16 @@ public class RoboticsJsonMapperTest {
         assertEquals("DWP PIP (1)", roboticsJson.get("dwpPresentingOffice"));
         assertEquals("No", roboticsJson.get("dwpIsOfficerAttending"));
         assertEquals("No", roboticsJson.get("dwpUcb"));
+    }
+
+    @Test
+    @Parameters({"validAppeal, No", "readyToList, Yes", "null, No"})
+    public void givenCreatedInGapsFrom_shouldSetRetrieveIsDigitalAccordingly(@Nullable String createdInGapsFrom, String expectedIsDigital) {
+        roboticsWrapper.getSscsCaseData().setCreatedInGapsFrom(createdInGapsFrom);
+
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertThat(roboticsJson.get("isDigital"), is(expectedIsDigital));
     }
 
 }
