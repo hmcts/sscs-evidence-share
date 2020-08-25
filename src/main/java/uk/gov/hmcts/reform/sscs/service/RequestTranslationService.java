@@ -14,6 +14,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -36,15 +37,19 @@ public class RequestTranslationService {
     private final RequestTranslationTemplate requestTranslationTemplate;
     private DocmosisPdfGenerationService pdfGenerationService;
     private final IdamService idamService;
-    private String loggedInUserEmail;
+
+    @Value("${wlu.email.from}")
+    private String fromEmail;
+    @Value("${wlu.email.dateOfReturn}")
+    private String translationReturnDate;
 
     @Autowired
     public RequestTranslationService(
-        EvidenceManagementService evidenceManagementService,
-        EmailService emailService,
-        RequestTranslationTemplate requestTranslationTemplate,
-        DocmosisPdfGenerationService pdfGenerationService,
-        IdamService idamService) {
+            EvidenceManagementService evidenceManagementService,
+            EmailService emailService,
+            RequestTranslationTemplate requestTranslationTemplate,
+            DocmosisPdfGenerationService pdfGenerationService,
+            IdamService idamService) {
         this.evidenceManagementService = evidenceManagementService;
         this.emailService = emailService;
         this.requestTranslationTemplate = requestTranslationTemplate;
@@ -56,7 +61,7 @@ public class RequestTranslationService {
         log.info("Case sent to wlu for case id {} ", caseDetails.getId());
         boolean status = false;
         SscsCaseData caseData = caseDetails.getCaseData();
-        Map<String, Object> placeholderMap = caseDataMap(caseDetails);
+        Map<String, Object> placeholderMap = placeHolderMap(caseDetails);
 
         log.info("Downloading additional evidence for wlu for case id {} ", caseDetails.getId());
         Map<SscsDocument, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
@@ -74,19 +79,19 @@ public class RequestTranslationService {
         return status;
     }
 
-    private Map<String, Object> caseDataMap(CaseDetails<SscsCaseData> caseDetails) {
+    private Map<String, Object> placeHolderMap(CaseDetails<SscsCaseData> caseDetails) {
         UserDetails userDetails = idamService.getUserDetails(idamService.getIdamOauth2Token());
         Map<String, Object> dataMap = new HashMap<>();
         if (userDetails != null) {
             dataMap.put("name", String.join(" ",userDetails.getForename(), userDetails.getSurname()));
-            //loggedInUserEmail = userDetails.getEmail();
-            dataMap.put("email", userDetails.getEmail());
             dataMap.put("telephone", userDetails.getEmail());
         }
+        dataMap.put("email", fromEmail);
         dataMap.put("ccdId", caseDetails.getId());
         dataMap.put("department", "SSCS Requestor");
         dataMap.put("workdescription", "Translation required");
         dataMap.put("translation", caseDetails.getCaseData().getLanguagePreference().getCode().toUpperCase());
+        dataMap.put("translation_return_date", translationReturnDate);
         return dataMap;
     }
 
@@ -128,7 +133,7 @@ public class RequestTranslationService {
     }
 
     private boolean sendEmailToWlu(long caseId, SscsCaseData caseData, byte[] requestFormPdf,
-                            Map<SscsDocument, byte[]> additionalEvidence) {
+                                   Map<SscsDocument, byte[]> additionalEvidence) {
 
         log.info("Add request and sscs1 default attachments for case id {}", caseId);
         List<EmailAttachment> attachments = addDefaultAttachment(requestFormPdf, caseId);
@@ -136,7 +141,7 @@ public class RequestTranslationService {
         if (attachments.size() > 1) {
             log.info("Case {} wlu email sent successfully. for benefit type {}  ",
                     caseId, caseData.getAppeal().getBenefitType().getCode());
-            emailService.sendEmail(caseId, requestTranslationTemplate.generateEmail(attachments, loggedInUserEmail));
+            emailService.sendEmail(caseId, requestTranslationTemplate.generateEmail(attachments));
             return true;
         }
         return false;

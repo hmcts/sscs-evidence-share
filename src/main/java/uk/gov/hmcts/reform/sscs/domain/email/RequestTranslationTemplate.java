@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.domain.email;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -23,9 +22,9 @@ public class RequestTranslationTemplate {
         this.message = message;
     }
 
-    public Email generateEmail(List<EmailAttachment> attachments, String loggedInUserEmail) {
+    public Email generateEmail(List<EmailAttachment> attachments) {
         return new Email(
-                StringUtils.isNotEmpty(loggedInUserEmail) ? loggedInUserEmail : from,
+                from,
                 to,
                 subject,
                 message,

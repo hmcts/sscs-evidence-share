@@ -26,7 +26,6 @@ public class RequestTranslationCallbackHandler implements CallbackHandler<SscsCa
     private final CcdService ccdService;
     private final IdamService idamService;
 
-
     @Autowired
     public RequestTranslationCallbackHandler(RequestTranslationService requestTranslationService,
                                              CcdService ccdService,
@@ -43,7 +42,7 @@ public class RequestTranslationCallbackHandler implements CallbackHandler<SscsCa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-            && (callback.getEvent() == REQUEST_TRANSLATION_FROM_WLU);
+                && (callback.getEvent() == REQUEST_TRANSLATION_FROM_WLU);
     }
 
     @Override
@@ -59,8 +58,8 @@ public class RequestTranslationCallbackHandler implements CallbackHandler<SscsCa
             log.info("sending email for case  id {}", callback.getCaseDetails().getId());
             if (requestTranslationService.sendCaseToWlu(callback.getCaseDetails()) && callback.getEvent() == REQUEST_TRANSLATION_FROM_WLU) {
                 ccdService.updateCase(callback.getCaseDetails().getCaseData(), Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
-                    CASE_UPDATED.getCcdType(), "Case translations sent to wlu", "Updated case with date sent to wlu",
-                    idamService.getIdamTokens());
+                        CASE_UPDATED.getCcdType(), "Case translations sent to wlu", "Updated case with date sent to wlu",
+                        idamService.getIdamTokens());
             }
         } catch (WelshException e) {
             log.error("Error when sending to request translation from wlu: {}", callback.getCaseDetails().getId(), e);

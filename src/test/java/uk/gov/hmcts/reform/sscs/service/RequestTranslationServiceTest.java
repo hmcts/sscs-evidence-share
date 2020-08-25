@@ -90,7 +90,7 @@ public class RequestTranslationServiceTest {
 
         requestTranslationService.sendCaseToWlu(caseData);
 
-        verify(requestTranslationTemplate).generateEmail(captor.capture(), any());
+        verify(requestTranslationTemplate).generateEmail(captor.capture());
         List<EmailAttachment> attachmentResult = captor.getValue();
 
         assertThat(attachmentResult.get(0).getFilename(), is("RequestTranslationForm-1.pdf"));
