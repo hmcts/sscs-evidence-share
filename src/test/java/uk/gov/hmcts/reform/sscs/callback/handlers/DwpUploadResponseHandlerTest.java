@@ -94,7 +94,7 @@ public class DwpUploadResponseHandlerTest {
     @Test
     public void givenADwpUploadResponseEventWithDwpFurtherInfoIsNo_runReadyToListEvent() {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
-            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No").build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
+            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No").elementsDisputedIsDecisionDisputedByOthers("No").build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L).data(callback.getCaseDetails().getCaseData()).build());
