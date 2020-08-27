@@ -553,6 +553,48 @@ public class RoboticsJsonMapperTest {
         roboticsWrapper.getSscsCaseData().setJointParty("Yes");
         roboticsWrapper.getSscsCaseData().setJointPartyName(JointPartyName.builder().title("Mr").firstName("Harry").lastName("Hotspur").build());
         roboticsWrapper.getSscsCaseData().setJointPartyAddress(Address.builder().line1("The road").line2("Test").town("Bedrock").county("Bedfordshire").postcode("BD1 5LK").build());
+        roboticsWrapper.getSscsCaseData().setJointPartyAddressSameAsAppellant("No");
+        roboticsWrapper.getSscsCaseData().setElementsDisputedIsDecisionDisputedByOthers("Yes");
+        roboticsWrapper.getSscsCaseData().setElementsDisputedLinkedAppealRef("12345678");
+        roboticsWrapper.getSscsCaseData().setJointPartyIdentity(Identity.builder().nino("JT000000B").dob("2000-01-01").build());
+
+        ReflectionTestUtils.setField(roboticsJsonMapper, "ucEnabled", true);
+
+        roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+
+        assertTrue(roboticsJson.has("jointParty"));
+        assertEquals("No", roboticsJson.getJSONObject("jointParty").getString("sameAddressAsAppellant"));
+        assertEquals("Mr", roboticsJson.getJSONObject("jointParty").get("title"));
+        assertEquals("Harry", roboticsJson.getJSONObject("jointParty").get("firstName"));
+        assertEquals("Hotspur", roboticsJson.getJSONObject("jointParty").get("lastName"));
+        assertEquals("Bedrock", roboticsJson.getJSONObject("jointParty").get("townOrCity"));
+        assertEquals("Bedfordshire", roboticsJson.getJSONObject("jointParty").get("county"));
+        assertEquals("The road", roboticsJson.getJSONObject("jointParty").get("addressLine1"));
+        assertEquals("Test", roboticsJson.getJSONObject("jointParty").get("addressLine2"));
+        assertEquals("BD1 5LK", roboticsJson.getJSONObject("jointParty").get("postCode"));
+        assertEquals("JT000000B", roboticsJson.getJSONObject("jointParty").get("nino"));
+        assertEquals("2000-01-01", roboticsJson.getJSONObject("jointParty").get("dob"));
+
+        assertEquals("firstIssueElementsDisputedGeneral", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("general").get(0));
+        assertEquals("firstIssueElementsDisputedSanctions", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("sanctions").get(0));
+        assertEquals("firstIssueElementsDisputedOverpayment", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("overpayment").get(0));
+        assertEquals("firstIssueElementsDisputedHousing", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("housing").get(0));
+        assertEquals("firstIssueElementsDisputedChildCare", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("childCare").get(0));
+        assertEquals("firstIssueElementsDisputedCare", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("care").get(0));
+        assertEquals("firstIssueElementsDisputedChildElement", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("childElement").get(0));
+        assertEquals("firstIssueElementsDisputedChildDisabled", roboticsJson.getJSONObject("elementsDisputed").getJSONArray("childDisabled").get(0));
+
+        assertEquals("Yes", roboticsJson.get("ucDecisionDisputedByOthers"));
+        assertEquals("12345678", roboticsJson.get("linkedAppealRef"));
+    }
+
+    @Test
+    public void givenUcFeatureFlagOn_thenPopulateRoboticsWithUcFieldsSameAddress() {
+        initialiseElementDisputedLists();
+
+        roboticsWrapper.getSscsCaseData().setJointParty("Yes");
+        roboticsWrapper.getSscsCaseData().setJointPartyName(JointPartyName.builder().title("Mr").firstName("Harry").lastName("Hotspur").build());
+        roboticsWrapper.getSscsCaseData().setJointPartyAddress(Address.builder().line1("The road").line2("Test").town("Bedrock").county("Bedfordshire").postcode("BD1 5LK").build());
         roboticsWrapper.getSscsCaseData().setJointPartyAddressSameAsAppellant("Yes");
         roboticsWrapper.getSscsCaseData().setElementsDisputedIsDecisionDisputedByOthers("Yes");
         roboticsWrapper.getSscsCaseData().setElementsDisputedLinkedAppealRef("12345678");
@@ -567,11 +609,11 @@ public class RoboticsJsonMapperTest {
         assertEquals("Mr", roboticsJson.getJSONObject("jointParty").get("title"));
         assertEquals("Harry", roboticsJson.getJSONObject("jointParty").get("firstName"));
         assertEquals("Hotspur", roboticsJson.getJSONObject("jointParty").get("lastName"));
-        assertEquals("Bedrock", roboticsJson.getJSONObject("jointParty").get("townOrCity"));
-        assertEquals("Bedfordshire", roboticsJson.getJSONObject("jointParty").get("county"));
-        assertEquals("The road", roboticsJson.getJSONObject("jointParty").get("addressLine1"));
-        assertEquals("Test", roboticsJson.getJSONObject("jointParty").get("addressLine2"));
-        assertEquals("BD1 5LK", roboticsJson.getJSONObject("jointParty").get("postCode"));
+        assertEquals("123 Hairy Lane", roboticsJson.getJSONObject("appellant").get("addressLine1"));
+        assertEquals("Off Hairy Park", roboticsJson.getJSONObject("appellant").get("addressLine2"));
+        assertEquals("Hairyfield", roboticsJson.getJSONObject("appellant").get("townOrCity"));
+        assertEquals("Kent", roboticsJson.getJSONObject("appellant").get("county"));
+        assertEquals("TN32 6PL", roboticsJson.getJSONObject("appellant").get("postCode"));
         assertEquals("JT000000B", roboticsJson.getJSONObject("jointParty").get("nino"));
         assertEquals("2000-01-01", roboticsJson.getJSONObject("jointParty").get("dob"));
 
