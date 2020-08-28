@@ -116,6 +116,10 @@ public class RequestTranslationServiceTest {
         documents.add(SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
                         .documentFileName("test.jpg")
+                        .documentLink(DocumentLink.builder()
+                                .documentFilename("test.pdf")
+                                .documentUrl("www.pdf.com/mypdf")
+                                .build())
                         .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)
                         .build())
                 .build());
@@ -158,6 +162,7 @@ public class RequestTranslationServiceTest {
                 .value(SscsDocumentDetails.builder()
                         .documentType("sscs1")
                         .documentFileName("test.jpg")
+                        .documentLink(null)
                         .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)
                         .build())
                 .build());

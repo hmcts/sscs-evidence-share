@@ -7,9 +7,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
@@ -64,7 +65,7 @@ public class RequestTranslationService {
         Map<String, Object> placeholderMap = placeHolderMap(caseDetails);
 
         log.info("Downloading additional evidence for wlu for case id {} ", caseDetails.getId());
-        Map<SscsDocument, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
+        Map<String, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
 
         if (!additionalEvidence.isEmpty()) {
             log.info("Generate tranlsation request form from wlu for casedetails id {} ", caseDetails.getId());
@@ -95,9 +96,9 @@ public class RequestTranslationService {
         return dataMap;
     }
 
-    private Map<SscsDocument, byte[]> downloadEvidence(SscsCaseData sscsCaseData, Long caseId) {
+    private Map<String, byte[]> downloadEvidence(SscsCaseData sscsCaseData, Long caseId) {
         if (hasEvidence(sscsCaseData)) {
-            Map<SscsDocument, byte[]> map = new LinkedHashMap<>();
+            Map<String, byte[]> map = new HashMap<>();
             for (SscsDocument doc : sscsCaseData.getSscsDocument()) {
                 if (doc.getValue().getDocumentTranslationStatus() != null
                         && doc.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)) {
@@ -108,8 +109,10 @@ public class RequestTranslationService {
                             || doc.getValue().getDocumentType().equalsIgnoreCase("sscs1"))) {
                         doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus
                                 .TRANSLATION_REQUESTED);
-                        map.put(doc, downloadBinary(doc, caseId));
-
+                        if (getSscsDocumentFileName.apply(doc.getValue()) != null) {
+                            map.put(doc.getValue().getDocumentLink().getDocumentFilename() + "." + System.nanoTime(), downloadBinary(doc,
+                                    caseId));
+                        }
                     }
                 }
             }
@@ -119,9 +122,15 @@ public class RequestTranslationService {
         }
     }
 
+    private Function<SscsDocumentDetails, String> getSscsDocumentFileName =
+        sscsDocumentDetails -> (sscsDocumentDetails.getDocumentLink() != null
+                && sscsDocumentDetails.getDocumentLink().getDocumentFilename() != null
+                && sscsDocumentDetails.getDocumentLink().getDocumentUrl() != null)
+                ? sscsDocumentDetails.getDocumentLink().getDocumentFilename() + "." + System.nanoTime() : null;
+
     private byte[] downloadBinary(SscsDocument doc, Long caseId) {
         log.info("About to download binary to attach to wlu for caseId {}", caseId);
-        if (doc.getValue().getDocumentLink() != null) {
+        if (doc.getValue().getDocumentLink() != null && doc.getValue().getDocumentLink().getDocumentUrl() != null && doc.getValue().getDocumentLink().getDocumentFilename() != null) {
             return evidenceManagementService.download(URI.create(doc.getValue().getDocumentLink().getDocumentUrl()), null);
         } else {
             return new byte[0];
@@ -133,29 +142,26 @@ public class RequestTranslationService {
     }
 
     private boolean sendEmailToWlu(long caseId, SscsCaseData caseData, byte[] requestFormPdf,
-                                   Map<SscsDocument, byte[]> additionalEvidence) {
+                                   Map<String, byte[]> additionalEvidence) {
 
         log.info("Add request and sscs1 default attachments for case id {}", caseId);
         List<EmailAttachment> attachments = addDefaultAttachment(requestFormPdf, caseId);
         addAdditionalEvidenceAttachments(additionalEvidence, attachments);
         if (attachments.size() > 1) {
-            log.info("Case {} wlu email sent successfully. for benefit type {}  ",
-                    caseId, caseData.getAppeal().getBenefitType().getCode());
+            log.info("Successfully email sent to wlu for CaseId {}, benefit type {} and number of attachments {}",
+                    caseId, caseData.getAppeal().getBenefitType().getCode(), attachments.size());
             emailService.sendEmail(caseId, requestTranslationTemplate.generateEmail(attachments, caseId));
             return true;
         }
         return false;
     }
 
-    private void addAdditionalEvidenceAttachments(Map<SscsDocument, byte[]> additionalEvidence, List<EmailAttachment> attachments) {
-        for (SscsDocument sscsDocument : additionalEvidence.keySet()) {
-            if (sscsDocument != null) {
-                if (sscsDocument.getValue().getDocumentLink() != null && sscsDocument.getValue().getDocumentLink().getDocumentFilename() != null) {
-                    byte[] content = additionalEvidence.get(sscsDocument);
-                    if (content != null) {
-                        attachments.add(file(content, sscsDocument.getValue().getDocumentLink().getDocumentFilename()));
-                    }
-                }
+    private void addAdditionalEvidenceAttachments(Map<String, byte[]> additionalEvidence,
+                                                  List<EmailAttachment> attachments) {
+        for (String filename : additionalEvidence.keySet()) {
+            byte[] content = additionalEvidence.get(filename);
+            if (content != null) {
+                attachments.add(file(content, filename.substring(0,filename.lastIndexOf("."))));
             }
         }
     }
