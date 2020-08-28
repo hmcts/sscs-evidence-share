@@ -141,7 +141,7 @@ public class RequestTranslationService {
         if (attachments.size() > 1) {
             log.info("Case {} wlu email sent successfully. for benefit type {}  ",
                     caseId, caseData.getAppeal().getBenefitType().getCode());
-            emailService.sendEmail(caseId, requestTranslationTemplate.generateEmail(attachments));
+            emailService.sendEmail(caseId, requestTranslationTemplate.generateEmail(attachments, caseId));
             return true;
         }
         return false;

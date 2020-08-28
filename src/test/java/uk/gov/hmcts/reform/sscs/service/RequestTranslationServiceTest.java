@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -90,7 +91,7 @@ public class RequestTranslationServiceTest {
 
         requestTranslationService.sendCaseToWlu(caseData);
 
-        verify(requestTranslationTemplate).generateEmail(captor.capture());
+        verify(requestTranslationTemplate).generateEmail(captor.capture(), anyLong());
         List<EmailAttachment> attachmentResult = captor.getValue();
 
         assertThat(attachmentResult.get(0).getFilename(), is("RequestTranslationForm-1.pdf"));

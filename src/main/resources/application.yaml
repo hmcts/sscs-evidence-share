@@ -102,9 +102,9 @@ robotics:
 
 wlu:
   email:
-    from: ${WLU_EMAIL_FROM:sscs@hmcts.net}
-    to: ${WLU_EMAIL_TO:sscs@hmcts.net}
-    subject: ${WLU_EMAIL_SUBJECT:Please translate}
+    from: ${WLU_EMAIL_FROM:contactsscs@justice.gov.uk}
+    to: ${WLU_EMAIL_TO:contactsscs@justice.gov.uk}
+    subject: ${WLU_EMAIL_SUBJECT:Welsh translation –}
     message: ${WLU_EMAIL_MESSAGE:Please find attached the files along with request translation form.\nThank you
       very much}
     dateOfReturn: ${WLU_RETURN_DATE:24 hours from requested date.}

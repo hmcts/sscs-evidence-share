@@ -22,11 +22,11 @@ public class RequestTranslationTemplate {
         this.message = message;
     }
 
-    public Email generateEmail(List<EmailAttachment> attachments) {
+    public Email generateEmail(List<EmailAttachment> attachments, long caseId) {
         return new Email(
                 from,
                 to,
-                subject,
+                subject + " (" + caseId + ")",
                 message,
                 attachments
         );
