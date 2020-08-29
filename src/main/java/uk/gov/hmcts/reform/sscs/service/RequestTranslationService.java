@@ -110,7 +110,7 @@ public class RequestTranslationService {
                         doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus
                                 .TRANSLATION_REQUESTED);
                         if (getSscsDocumentFileName.apply(doc.getValue()) != null) {
-                            map.put(doc.getValue().getDocumentLink().getDocumentFilename() + "." + System.nanoTime(), downloadBinary(doc,
+                            map.put(getSscsDocumentFileName.apply(doc.getValue()), downloadBinary(doc,
                                     caseId));
                         }
                     }
