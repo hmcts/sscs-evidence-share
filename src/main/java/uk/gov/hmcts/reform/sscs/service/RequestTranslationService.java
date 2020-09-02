@@ -107,11 +107,11 @@ public class RequestTranslationService {
                             || doc.getValue().getDocumentType().equalsIgnoreCase("Decision Notice")
                             || doc.getValue().getDocumentType().equalsIgnoreCase("Direction Notice")
                             || doc.getValue().getDocumentType().equalsIgnoreCase("sscs1"))) {
-                        doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus
-                                .TRANSLATION_REQUESTED);
-                        if (getSscsDocumentFileName.apply(doc.getValue()) != null) {
-                            map.put(getSscsDocumentFileName.apply(doc.getValue()), downloadBinary(doc,
-                                    caseId));
+                        doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
+
+                        final String sscsFilename = getSscsDocumentFileName.apply(doc.getValue());
+                        if (sscsFilename != null) {
+                            map.put(sscsFilename, downloadBinary(doc, caseId));
                         }
                     }
                 }
