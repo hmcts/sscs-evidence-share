@@ -35,8 +35,8 @@ import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.dwp.Mapping;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
-import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonMapper;
-import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonValidator;
 
 @RunWith(JUnitParamsRunner.class)
 public class RoboticsServiceTest {
