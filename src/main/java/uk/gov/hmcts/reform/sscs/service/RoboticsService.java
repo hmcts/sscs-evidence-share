@@ -22,9 +22,9 @@ import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
-import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
-import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonMapper;
-import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonValidator;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsWrapper;
 
 @Component
 @Slf4j
