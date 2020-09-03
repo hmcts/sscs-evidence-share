@@ -22,9 +22,9 @@ import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
-import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
-import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonMapper;
-import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonValidator;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsWrapper;
 
 @Component
 @Slf4j
@@ -85,8 +85,15 @@ public class RoboticsService {
 
         updateClosedOffices(caseData);
         log.info("Creating robotics for case id {} ", caseDetails.getId());
-        JSONObject roboticsJson = createRobotics(RoboticsWrapper.builder().sscsCaseData(caseData)
-            .ccdCaseId(caseDetails.getId()).evidencePresent(caseData.getEvidencePresent()).state(caseDetails.getState()).build());
+
+        RoboticsWrapper wrapper = RoboticsWrapper
+            .builder()
+            .sscsCaseData(caseData)
+            .ccdCaseId(caseDetails.getId())
+            .evidencePresent(caseData.getEvidencePresent())
+            .state(caseDetails.getState()).build();
+
+        JSONObject roboticsJson = createRobotics(wrapper);
 
         log.info("Downloading additional evidence for robotics for case id {} ", caseDetails.getId());
         Map<SscsDocument, byte[]> additionalEvidence = downloadEvidence(caseData, Long.valueOf(caseData.getCcdCaseId()));
