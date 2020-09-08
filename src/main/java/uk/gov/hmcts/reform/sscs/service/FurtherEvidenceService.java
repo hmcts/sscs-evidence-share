@@ -8,18 +8,22 @@ import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESEN
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 
 @Service
 public class FurtherEvidenceService {
+
+    private DocmosisTemplateConfig docmosisTemplateConfig;
 
     private CoverLetterService coverLetterService;
 
@@ -27,20 +31,14 @@ public class FurtherEvidenceService {
 
     private PrintService bulkPrintService;
 
-    private final String furtherEvidenceOriginalSenderTemplateName;
-
-    private final String furtherEvidenceOtherPartiesTemplateName;
-
-    public FurtherEvidenceService(@Value("${docmosis.template.609-97.name}") String furtherEvidenceOriginalSenderTemplateName,
-                                  @Value("${docmosis.template.609-98.name}") String furtherEvidenceOtherPartiesTemplateName,
-                                  @Autowired CoverLetterService coverLetterService,
+    public FurtherEvidenceService(@Autowired CoverLetterService coverLetterService,
                                   @Autowired SscsDocumentService sscsDocumentService,
-                                  @Autowired PrintService bulkPrintService) {
-        this.furtherEvidenceOriginalSenderTemplateName = furtherEvidenceOriginalSenderTemplateName;
-        this.furtherEvidenceOtherPartiesTemplateName = furtherEvidenceOtherPartiesTemplateName;
+                                  @Autowired PrintService bulkPrintService,
+                                  @Autowired DocmosisTemplateConfig docmosisTemplateConfig) {
         this.coverLetterService = coverLetterService;
         this.sscsDocumentService = sscsDocumentService;
         this.bulkPrintService = bulkPrintService;
+        this.docmosisTemplateConfig =  docmosisTemplateConfig;
     }
 
     public void issue(List<SscsDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
@@ -116,11 +114,13 @@ public class FurtherEvidenceService {
     }
 
     private byte[] buildPdfsFor609_97(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName) {
-        return coverLetterService.generateCoverLetter(caseData, letterType, furtherEvidenceOriginalSenderTemplateName, pdfName);
+        return coverLetterService.generateCoverLetter(caseData, letterType,
+            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-97"), pdfName);
     }
 
     private byte[] buildPdfsFor609_98(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName) {
-        return coverLetterService.generateCoverLetter(caseData, letterType, furtherEvidenceOtherPartiesTemplateName, pdfName);
+        return coverLetterService.generateCoverLetter(caseData, letterType,
+            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-98"), pdfName);
     }
 
     public boolean canHandleAnyDocument(List<SscsDocument> sscsDocumentList) {
@@ -132,5 +132,10 @@ public class FurtherEvidenceService {
         return sscsDocument != null && sscsDocument.getValue() != null
             && "No".equals(sscsDocument.getValue().getEvidenceIssued())
             && null != sscsDocument.getValue().getDocumentType();
+    }
+
+    private String getTemplateNameBasedOnLanguagePreference(LanguagePreference languagePreference, String documentType) {
+        return docmosisTemplateConfig.getTemplate().get(languagePreference)
+                .get(documentType).get("name");
     }
 }
