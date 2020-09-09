@@ -221,8 +221,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
 
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.10'
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.4.61_RC-SSCS-7930-2'
-
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.4.62'
 
 
   //Remove when our dependencies pull in this version or later
