@@ -100,13 +100,13 @@ public class RequestTranslationService {
             Map<String, byte[]> map = new HashMap<>();
             for (SscsDocument doc : sscsCaseData.getSscsDocument()) {
                 if (doc.getValue().getDocumentTranslationStatus() != null
-                        && doc.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)) {
-                        doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
+                    && doc.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)) {
+                    doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
 
-                        final String sscsFilename = getSscsDocumentFileName.apply(doc.getValue());
-                        if (sscsFilename != null) {
-                            map.put(sscsFilename, downloadBinary(doc, caseId));
-                        }
+                    final String sscsFilename = getSscsDocumentFileName.apply(doc.getValue());
+                    if (sscsFilename != null) {
+                        map.put(sscsFilename, downloadBinary(doc, caseId));
+                    }
                 }
             }
             return map;
