@@ -58,13 +58,13 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         log.info("BenefitType" + benefitType);
 
         if (StringUtils.equalsIgnoreCase(benefitType.getCode(), "uc")) {
-            handleUc(callbackType, callback);
+            handleUc(callback);
         } else {
-            handleNonUc(callbackType, callback);
+            handleNonUc(callback);
         }
     }
 
-    private void handleNonUc(CallbackType callbackType, Callback<SscsCaseData> callback) {
+    private void handleNonUc(Callback<SscsCaseData> callback) {
         if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no")) {
             log.info("updating to ready to list");
 
@@ -83,7 +83,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         return caseData;
     }
 
-    private void handleUc(CallbackType callbackType, Callback<SscsCaseData> callback) {
+    private void handleUc(Callback<SscsCaseData> callback) {
         boolean dwpFurtherInfo =
             StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "yes");
 
@@ -111,7 +111,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             } else if (dwpFurtherInfo) {
                 description = "update to response received event as there is further information to "
                     + "assist the tribunal.";
-            } else if (disputedDecision) {
+            } else {
                 description = "update to response received event as there is a dispute.";
             }
 
