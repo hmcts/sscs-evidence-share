@@ -48,10 +48,16 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             throw new IllegalStateException("Cannot handle callback");
         }
 
+        if (callback.getCaseDetails().getCaseData().getAppeal() == null
+            && callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() == null) {
+            log.info("Cannot handle this event as no data");
+            throw new IllegalStateException("Cannot handle callback");
+        }
+
         BenefitType benefitType = callback.getCaseDetails().getCaseData().getAppeal().getBenefitType();
         log.info("BenefitType" + benefitType);
 
-        if (benefitType.getCode().equals("UC")) {
+        if (StringUtils.equalsIgnoreCase(benefitType.getCode(), "uc")) {
             handleUc(callbackType, callback);
         } else {
             handleNonUc(callbackType, callback);
@@ -65,14 +71,19 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         if (notDwpFurtherInfo) {
             log.info("updating to ready to list");
 
-            SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
-            caseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
+            SscsCaseData caseData = setDwpState(callback);
 
             ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.READY_TO_LIST.getCcdType(), "ready to list",
                 "update to ready to list event as there is no further information to assist the tribunal and no dispute.", idamService.getIdamTokens());
         }
+    }
+
+    private SscsCaseData setDwpState(Callback<SscsCaseData> callback) {
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
+        caseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
+        return caseData;
     }
 
     private void handleUc(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -86,9 +97,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             && !disputedDecision) {
             log.info("updating to ready to list");
 
-            SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
-            caseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
+            SscsCaseData caseData = setDwpState(callback);
 
             ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.READY_TO_LIST.getCcdType(), "ready to list",
