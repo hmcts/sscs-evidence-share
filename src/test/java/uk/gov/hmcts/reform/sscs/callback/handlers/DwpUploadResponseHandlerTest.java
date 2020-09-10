@@ -66,11 +66,29 @@ public class DwpUploadResponseHandlerTest {
             buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, eventType));
     }
 
+    @Test(expected = IllegalStateException.class)
+    @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
+    public void givenAppealIsNullEvidence_willThrowAnException(EventType eventType) {
+        handler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(State.READY_TO_LIST.getId()).appeal(null).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
+    public void givenBenefitCodeIsNullEvidence_willThrowAnException(EventType eventType) {
+        buildTestCallbackForGivenData(
+            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
+                .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
+                .benefitType(null)
+                .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
+        handler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(State.READY_TO_LIST.getId()).appeal(null).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE));
+    }
+
     @Test(expected = RequiredFieldMissingException.class)
     public void givenCaseDataInCallbackIsNull_shouldThrowException() {
         handler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE));
     }
+
 
     @Test(expected = NullPointerException.class)
     public void givenCallbackIsNull_whenCanHandleIsCalled_shouldThrowException() {

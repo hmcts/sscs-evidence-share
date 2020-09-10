@@ -49,7 +49,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         }
 
         if (callback.getCaseDetails().getCaseData().getAppeal() == null
-            && callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() == null) {
+            || callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() == null) {
             log.info("Cannot handle this event as no data");
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -65,10 +65,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void handleNonUc(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        boolean notDwpFurtherInfo =
-            StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no");
-
-        if (notDwpFurtherInfo) {
+        if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no")) {
             log.info("updating to ready to list");
 
             SscsCaseData caseData = setDwpState(callback);
