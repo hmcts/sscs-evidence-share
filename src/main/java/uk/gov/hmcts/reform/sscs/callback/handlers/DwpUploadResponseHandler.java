@@ -47,13 +47,14 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        boolean dwpFurtherInfo =
+        boolean notDwpFurtherInfo =
             StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no");
-        boolean disputedDecision =
-            StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "no");
 
-        if (dwpFurtherInfo
-            && disputedDecision) {
+        boolean notDisputedDecision = callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers() == null
+            || StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "no");
+
+        if (notDwpFurtherInfo
+            && notDisputedDecision) {
             log.info("updating to ready to list");
 
             SscsCaseData caseData = callback.getCaseDetails().getCaseData();
@@ -67,13 +68,13 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             log.info("updating to response received");
 
             String description = null;
-            if (!dwpFurtherInfo && !disputedDecision) {
+            if (!notDwpFurtherInfo && !notDisputedDecision) {
                 description = "update to response received event as there is further information to "
                     + "assist the tribunal and there is a dispute.";
-            } else if (!dwpFurtherInfo) {
+            } else if (!notDwpFurtherInfo) {
                 description = "update to response received event as there is further information to "
                     + "assist the tribunal.";
-            } else if (!disputedDecision) {
+            } else if (!notDisputedDecision) {
                 description = "update to response received event as there is a dispute.";
             }
 
