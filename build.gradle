@@ -219,9 +219,9 @@ dependencies {
 
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '2.7.0'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
-
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.4.63'
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.12'
+  
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.4.65-RC-SSCS-7812'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.14-RC1-SSCS-7812'
 
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.2'
