@@ -76,16 +76,14 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void handleUc(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        boolean notDwpFurtherInfo =
-            StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no");
+        boolean dwpFurtherInfo =
+            StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "yes");
 
-        boolean notDisputedDecision = true;
+        boolean disputedDecision = callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers() != null
+            && StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "yes");
 
-        notDisputedDecision = callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers() == null
-            || StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "no");
-
-        if (notDwpFurtherInfo
-            && notDisputedDecision) {
+        if (!dwpFurtherInfo
+            && !disputedDecision) {
             log.info("updating to ready to list");
 
             SscsCaseData caseData = callback.getCaseDetails().getCaseData();
@@ -99,13 +97,13 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             log.info("updating to response received");
 
             String description = null;
-            if (!notDwpFurtherInfo && !notDisputedDecision) {
+            if (dwpFurtherInfo && disputedDecision) {
                 description = "update to response received event as there is further information to "
                     + "assist the tribunal and there is a dispute.";
-            } else if (!notDwpFurtherInfo) {
+            } else if (dwpFurtherInfo) {
                 description = "update to response received event as there is further information to "
                     + "assist the tribunal.";
-            } else if (!notDisputedDecision) {
+            } else if (disputedDecision) {
                 description = "update to response received event as there is a dispute.";
             }
 
