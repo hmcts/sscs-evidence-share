@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -47,10 +48,40 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             throw new IllegalStateException("Cannot handle callback");
         }
 
+        BenefitType benefitType = callback.getCaseDetails().getCaseData().getAppeal().getBenefitType();
+        log.info("BenefitType" + benefitType);
+
+        if (benefitType.getCode().equals("UC")) {
+            handleUc(callbackType, callback);
+        } else {
+            handleNonUc(callbackType, callback);
+        }
+    }
+
+    private void handleNonUc(CallbackType callbackType, Callback<SscsCaseData> callback) {
         boolean notDwpFurtherInfo =
             StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no");
 
-        boolean notDisputedDecision = callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers() == null
+        if (notDwpFurtherInfo) {
+            log.info("updating to ready to list");
+
+            SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
+            caseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
+
+            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.READY_TO_LIST.getCcdType(), "ready to list",
+                "update to ready to list event as there is no further information to assist the tribunal and no dispute.", idamService.getIdamTokens());
+        }
+    }
+
+    private void handleUc(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        boolean notDwpFurtherInfo =
+            StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no");
+
+        boolean notDisputedDecision = true;
+
+        notDisputedDecision = callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers() == null
             || StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "no");
 
         if (notDwpFurtherInfo
