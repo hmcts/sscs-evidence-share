@@ -87,8 +87,10 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         boolean dwpFurtherInfo =
             StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "yes");
 
-        boolean disputedDecision = callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers() != null
-            && StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "yes");
+        boolean disputedDecision = false;
+        if (callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers() != null) {
+            disputedDecision = StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "yes");
+        }
 
         if (!dwpFurtherInfo
             && !disputedDecision) {

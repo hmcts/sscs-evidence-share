@@ -199,7 +199,7 @@ public class DwpUploadResponseHandlerTest {
     public void givenADwpUploadResponseEventUcWithBothYes_runResponseReceivedEvent() {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("Yes")
-                .elementsDisputedIsDecisionDisputedByOthers(null).appeal(Appeal.builder()
+                .elementsDisputedIsDecisionDisputedByOthers("Yes").appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("UC").build())
                 .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
 
