@@ -43,6 +43,8 @@ document:
   pdf:
     hmctsImgKey: hmcts2
     hmctsImgVal: "[userImage:hmcts.png]"
+    hmctsWelshImgKey: welshhmcts2
+    hmctsWelshImgVal: "[userImage:welshhmcts.png]"
 
 document_management.url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:5005}
 
@@ -98,16 +100,35 @@ robotics:
   englishCount: 3
   scottishCount: 1
 
+wlu:
+  email:
+    from: ${WLU_EMAIL_FROM:contactsscs@justice.gov.uk}
+    to: ${WLU_EMAIL_TO:contactsscs@justice.gov.uk}
+    subject: ${WLU_EMAIL_SUBJECT:Welsh translation –}
+    message: ${WLU_EMAIL_MESSAGE:Please find attached the files along with request translation form.\nThank you
+      very much}
+    dateOfReturn: ${WLU_RETURN_DATE:24 hours from requested date.}
+
 docmosis:
   template:
-    dl6:
-      name: TB-SCS-GNO-ENG-00010.doc
-    dl16:
-      name: TB-SCS-GNO-ENG-00011.doc
-    609-97:
-      name: TB-SCS-GNO-ENG-00068.doc
-    609-98:
-      name: TB-SCS-GNO-ENG-00069.doc
+    english:
+      dl6:
+        name: TB-SCS-GNO-ENG-00010.doc
+      dl16:
+        name: TB-SCS-GNO-ENG-00011.doc
+      d609-97:
+        name: TB-SCS-GNO-ENG-00068.doc
+      d609-98:
+        name: TB-SCS-GNO-ENG-00069.doc
+    welsh:
+      dl6:
+        name: TB-SCS-GNO-ENG-00010.doc
+      dl16:
+        name: TB-SCS-GNO-ENG-00011.doc
+      d609-97:
+        name: TB-SCS-GNO-WEL-00469.docx
+      d609-98:
+        name: TB-SCS-GNO-WEL-00470.docx
 
 evidence-share:
   submit-types:

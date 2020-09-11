@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -47,18 +48,55 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        boolean dwpFurtherInfo =
-            StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no");
-        boolean disputedDecision =
-            StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "no");
+        if (callback.getCaseDetails().getCaseData().getAppeal() == null
+            || callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() == null) {
+            log.info("Cannot handle this event as no data");
+            throw new IllegalStateException("Cannot handle callback");
+        }
 
-        if (dwpFurtherInfo
-            && disputedDecision) {
+        BenefitType benefitType = callback.getCaseDetails().getCaseData().getAppeal().getBenefitType();
+        log.info("BenefitType" + benefitType);
+
+        if (StringUtils.equalsIgnoreCase(benefitType.getCode(), "uc")) {
+            handleUc(callback);
+        } else {
+            handleNonUc(callback);
+        }
+    }
+
+    private void handleNonUc(Callback<SscsCaseData> callback) {
+        if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no")) {
             log.info("updating to ready to list");
 
-            SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+            SscsCaseData caseData = setDwpState(callback);
 
-            caseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
+            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.READY_TO_LIST.getCcdType(), "ready to list",
+                "update to ready to list event as there is no further information to assist the tribunal and no dispute.", idamService.getIdamTokens());
+        }
+    }
+
+    private SscsCaseData setDwpState(Callback<SscsCaseData> callback) {
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
+        caseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
+        return caseData;
+    }
+
+    private void handleUc(Callback<SscsCaseData> callback) {
+        boolean dwpFurtherInfo =
+            StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "yes");
+
+        boolean disputedDecision = false;
+        if (callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers() != null) {
+            disputedDecision = StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "yes");
+        }
+
+        if (!dwpFurtherInfo
+            && !disputedDecision) {
+            log.info("updating to ready to list");
+
+            SscsCaseData caseData = setDwpState(callback);
 
             ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.READY_TO_LIST.getCcdType(), "ready to list",
@@ -67,13 +105,13 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             log.info("updating to response received");
 
             String description = null;
-            if (!dwpFurtherInfo && !disputedDecision) {
+            if (dwpFurtherInfo && disputedDecision) {
                 description = "update to response received event as there is further information to "
                     + "assist the tribunal and there is a dispute.";
-            } else if (!dwpFurtherInfo) {
+            } else if (dwpFurtherInfo) {
                 description = "update to response received event as there is further information to "
                     + "assist the tribunal.";
-            } else if (!disputedDecision) {
+            } else {
                 description = "update to response received event as there is a dispute.";
             }
 

@@ -67,6 +67,12 @@ public class SendToBulkPrintHandlerTest {
     @Mock
     private Callback<SscsCaseData> callback;
 
+    @Mock
+    private CaseDetails caseDetails;
+
+    @Mock
+    private SscsCaseData caseData;
+
     private SendToBulkPrintHandler handler;
 
     private LocalDateTime now = LocalDateTime.now();
@@ -91,7 +97,9 @@ public class SendToBulkPrintHandlerTest {
             documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig,
             ccdCaseService, idamService);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(Collections.singletonList("paper"));
-
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.FALSE);
         placeholders.put("Test", "Value");
     }
 
@@ -120,6 +128,26 @@ public class SendToBulkPrintHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
         assertFalse(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenSendToDwpWithDocTranslated_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
+
+        assertTrue(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenDocTranslationOutstanding_thenReturnFalse() {
+        when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.TRUE);
+        assertFalse(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenResendToDwpWithDocTranslationOutstanding_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.RESEND_TO_DWP);
+        when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.TRUE);
+        assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
@@ -367,6 +395,9 @@ public class SendToBulkPrintHandlerTest {
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
+
+
+
     private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments, State state) {
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("123")
@@ -388,4 +419,5 @@ public class SendToBulkPrintHandlerTest {
             now
         );
     }
+
 }
