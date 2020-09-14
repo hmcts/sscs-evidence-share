@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 import static java.util.Objects.requireNonNull;
 
 import java.util.*;
+import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -41,7 +43,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
 
-        final SscsDocument selectedDocument = caseData.getSscsDocument().stream().filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getReissueFurtherEvidenceDocument().getValue().getCode())).findFirst()
+        final AbstractDocument selectedDocument =  Stream.of(caseData.getSscsDocument(), caseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getReissueFurtherEvidenceDocument().getValue().getCode())).findFirst()
             .orElseThrow(() ->
                 new IllegalStateException(String.format("Cannot find the selected document to reissue with url %s for caseId %s.", caseData.getReissueFurtherEvidenceDocument().getValue().getCode(), caseData.getCcdCaseId()))
             );
@@ -91,7 +93,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
             && furtherEvidenceService.canHandleAnyDocument(callback.getCaseDetails().getCaseData().getSscsDocument());
     }
 
-    private void setEvidenceIssuedFlagToYes(SscsDocument doc) {
+    private void setEvidenceIssuedFlagToYes(AbstractDocument doc) {
         if (doc.getValue().getEvidenceIssued() != null && doc.getValue().getEvidenceIssued().equals("No")) {
             doc.getValue().setEvidenceIssued("Yes");
         }
