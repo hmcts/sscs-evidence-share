@@ -105,33 +105,6 @@ public class RequestTranslationServiceTest {
     }
 
     @Test
-    public void givenACaseWithInvalidDocumentTypeToDownload_thenDoNotSendRequestEmail() {
-
-        byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
-        byte[] expectedBytes = new byte[]{1, 2, 3};
-        given(evidenceManagementService.download(any(), any())).willReturn(expectedBytes);
-        when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(expectedPdf);
-
-        List<SscsDocument> documents = new ArrayList<>();
-        documents.add(SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentFileName("test.jpg")
-                        .documentLink(DocumentLink.builder()
-                                .documentFilename("test.pdf")
-                                .documentUrl("www.pdf.com/mypdf")
-                                .build())
-                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)
-                        .build())
-                .build());
-
-        sscsCaseData.setSscsDocument(documents);
-        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
-
-        requestTranslationService.sendCaseToWlu(caseData);
-        verifyNoInteractions(requestTranslationTemplate);
-    }
-
-    @Test
     public void givenACaseWithNEvidenceToDownload_thenDoNotSendRequestEmail() {
 
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};

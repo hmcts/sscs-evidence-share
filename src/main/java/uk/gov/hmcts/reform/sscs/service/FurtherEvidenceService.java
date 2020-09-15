@@ -12,6 +12,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -41,7 +42,7 @@ public class FurtherEvidenceService {
         this.docmosisTemplateConfig =  docmosisTemplateConfig;
     }
 
-    public void issue(List<SscsDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
+    public void issue(List<? extends AbstractDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
                       List<FurtherEvidenceLetterType> allowedLetterTypes) {
         List<Pdf> pdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType);
         if (pdfs != null && pdfs.size() > 0) {

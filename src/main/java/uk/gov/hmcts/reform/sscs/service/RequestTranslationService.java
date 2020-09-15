@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +45,11 @@ public class RequestTranslationService {
 
     @Autowired
     public RequestTranslationService(
-            EvidenceManagementService evidenceManagementService,
-            EmailService emailService,
-            RequestTranslationTemplate requestTranslationTemplate,
-            DocmosisPdfGenerationService pdfGenerationService,
-            IdamService idamService) {
+        EvidenceManagementService evidenceManagementService,
+        EmailService emailService,
+        RequestTranslationTemplate requestTranslationTemplate,
+        DocmosisPdfGenerationService pdfGenerationService,
+        IdamService idamService) {
         this.evidenceManagementService = evidenceManagementService;
         this.emailService = emailService;
         this.requestTranslationTemplate = requestTranslationTemplate;
@@ -70,12 +69,12 @@ public class RequestTranslationService {
         if (!additionalEvidence.isEmpty()) {
             log.info("Generate tranlsation request form from wlu for casedetails id {} ", caseDetails.getId());
             byte[] wluRequestForm = pdfGenerationService.generatePdf(DocumentHolder.builder()
-                    .template(new Template("TB-SCS-EML-ENG-00530.docx",
-                            "WLU Request Form")).placeholders(placeholderMap).build());
+                .template(new Template("TB-SCS-EML-ENG-00530.docx",
+                    "WLU Request Form")).placeholders(placeholderMap).build());
 
             status = sendEmailToWlu(caseDetails.getId(), caseData, wluRequestForm, additionalEvidence);
             log.info("Case {} successfully sent for benefit type {} to wlu", caseDetails.getId(),
-                    caseData.getAppeal().getBenefitType().getCode());
+                caseData.getAppeal().getBenefitType().getCode());
         }
         return status;
     }
@@ -84,7 +83,7 @@ public class RequestTranslationService {
         UserDetails userDetails = idamService.getUserDetails(idamService.getIdamOauth2Token());
         Map<String, Object> dataMap = new HashMap<>();
         if (userDetails != null) {
-            dataMap.put("name", String.join(" ",userDetails.getForename(), userDetails.getSurname()));
+            dataMap.put("name", String.join(" ", userDetails.getForename(), userDetails.getSurname()));
             dataMap.put("telephone", userDetails.getEmail());
         }
         dataMap.put("email", fromEmail);
@@ -101,18 +100,12 @@ public class RequestTranslationService {
             Map<String, byte[]> map = new HashMap<>();
             for (SscsDocument doc : sscsCaseData.getSscsDocument()) {
                 if (doc.getValue().getDocumentTranslationStatus() != null
-                        && doc.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)) {
-                    if (doc.getValue().getDocumentType() != null
-                            && (doc.getValue().getDocumentType().equalsIgnoreCase("appellantEvidence")
-                            || doc.getValue().getDocumentType().equalsIgnoreCase("Decision Notice")
-                            || doc.getValue().getDocumentType().equalsIgnoreCase("Direction Notice")
-                            || doc.getValue().getDocumentType().equalsIgnoreCase("sscs1"))) {
-                        doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
+                    && doc.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)) {
+                    doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
 
-                        final String sscsFilename = getSscsDocumentFileName.apply(doc.getValue());
-                        if (sscsFilename != null) {
-                            map.put(sscsFilename, downloadBinary(doc, caseId));
-                        }
+                    final String sscsFilename = getSscsDocumentFileName.apply(doc.getValue());
+                    if (sscsFilename != null) {
+                        map.put(sscsFilename, downloadBinary(doc, caseId));
                     }
                 }
             }
@@ -124,9 +117,9 @@ public class RequestTranslationService {
 
     private Function<SscsDocumentDetails, String> getSscsDocumentFileName =
         sscsDocumentDetails -> (sscsDocumentDetails.getDocumentLink() != null
-                && sscsDocumentDetails.getDocumentLink().getDocumentFilename() != null
-                && sscsDocumentDetails.getDocumentLink().getDocumentUrl() != null)
-                ? sscsDocumentDetails.getDocumentLink().getDocumentFilename() + "." + System.nanoTime() : null;
+            && sscsDocumentDetails.getDocumentLink().getDocumentFilename() != null
+            && sscsDocumentDetails.getDocumentLink().getDocumentUrl() != null)
+            ? sscsDocumentDetails.getDocumentLink().getDocumentFilename() + "." + System.nanoTime() : null;
 
     private byte[] downloadBinary(SscsDocument doc, Long caseId) {
         log.info("About to download binary to attach to wlu for caseId {}", caseId);
@@ -149,7 +142,7 @@ public class RequestTranslationService {
         addAdditionalEvidenceAttachments(additionalEvidence, attachments);
         if (attachments.size() > 1) {
             log.info("Successfully email sent to wlu for CaseId {}, benefit type {} and number of attachments {}",
-                    caseId, caseData.getAppeal().getBenefitType().getCode(), attachments.size());
+                caseId, caseData.getAppeal().getBenefitType().getCode(), attachments.size());
             emailService.sendEmail(caseId, requestTranslationTemplate.generateEmail(attachments, caseId));
             return true;
         }
@@ -161,7 +154,7 @@ public class RequestTranslationService {
         for (String filename : additionalEvidence.keySet()) {
             byte[] content = additionalEvidence.get(filename);
             if (content != null) {
-                attachments.add(file(content, filename.substring(0,filename.lastIndexOf("."))));
+                attachments.add(file(content, filename.substring(0, filename.lastIndexOf("."))));
             }
         }
     }
