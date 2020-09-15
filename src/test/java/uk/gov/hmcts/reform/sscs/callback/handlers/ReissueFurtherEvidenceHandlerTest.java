@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 
@@ -29,7 +29,15 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
@@ -142,7 +150,7 @@ public class ReissueFurtherEvidenceHandlerTest {
 
         verify(furtherEvidenceService).canHandleAnyDocument(eq(caseData.getSscsDocument()));
 
-        List<FurtherEvidenceLetterType>  allowedLetterTypes = new ArrayList<>();
+        List<FurtherEvidenceLetterType> allowedLetterTypes = new ArrayList<>();
         if (resendToAppellant) {
             allowedLetterTypes.add(FurtherEvidenceLetterType.APPELLANT_LETTER);
         }

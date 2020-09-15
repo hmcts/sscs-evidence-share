@@ -2,7 +2,11 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -43,7 +46,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
 
-        final AbstractDocument selectedDocument =  Stream.of(caseData.getSscsDocument(), caseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getReissueFurtherEvidenceDocument().getValue().getCode())).findFirst()
+        final AbstractDocument selectedDocument = Stream.of(caseData.getSscsDocument(), caseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getReissueFurtherEvidenceDocument().getValue().getCode())).findFirst()
             .orElseThrow(() ->
                 new IllegalStateException(String.format("Cannot find the selected document to reissue with url %s for caseId %s.", caseData.getReissueFurtherEvidenceDocument().getValue().getCode(), caseData.getCcdCaseId()))
             );
