@@ -161,10 +161,9 @@ public class ReissueFurtherEvidenceHandlerTest {
             .resendToRepresentative(resendToRepresentative ? "yes" : "no")
             .build();
         if (isEnglish) {
-            caseData.setSscsDocument(Collections.singletonList((SscsDocument)sscsDocumentNotIssued));
-        }
-        else{
-            caseData.setSscsWelshDocuments(Collections.singletonList((SscsWelshDocument)sscsDocumentNotIssued));
+            caseData.setSscsDocument(Collections.singletonList((SscsDocument) sscsDocumentNotIssued));
+        } else {
+            caseData.setSscsWelshDocuments(Collections.singletonList((SscsWelshDocument) sscsDocumentNotIssued));
         }
 
         handler.handle(CallbackType.SUBMITTED,
@@ -187,10 +186,9 @@ public class ReissueFurtherEvidenceHandlerTest {
         if (resendToAppellant || resendToRepresentative) {
             verify(ccdService).updateCase(captor.capture(), any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
                 any(), any(), any(IdamTokens.class));
-            if( isEnglish) {
+            if (isEnglish) {
                 assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
-            }
-            else{
+            } else {
                 assertEquals("Yes", captor.getValue().getSscsWelshDocuments().get(0).getValue().getEvidenceIssued());
             }
         } else {
