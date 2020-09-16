@@ -106,7 +106,7 @@ public class SendToBulkPrintHandlerTest {
             documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig,
             ccdCaseService, idamService);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
-
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
         placeholders.put("Test", "Value");
     }
 
@@ -135,6 +135,26 @@ public class SendToBulkPrintHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
         assertFalse(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenSendToDwpWithDocTranslated_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
+        assertTrue(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenDocTranslationOutstanding_thenReturnFalse() {
+        caseDetails.getCaseData().setTranslationWorkOutstanding("Yes");
+        caseDetails.getCaseData().isTranslationWorkOutstanding();
+        assertFalse(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenResendToDwpWithDocTranslationOutstanding_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.RESEND_TO_DWP);
+        caseDetails.getCaseData().setTranslationWorkOutstanding("Yes");
+        assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
@@ -396,6 +416,7 @@ public class SendToBulkPrintHandlerTest {
             .ccdCaseId("123")
             .createdInGapsFrom("validAppeal")
             .caseCreated(nowString)
+            .translationWorkOutstanding("No")
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code(benefitType).build())
                 .receivedVia(receivedVia)

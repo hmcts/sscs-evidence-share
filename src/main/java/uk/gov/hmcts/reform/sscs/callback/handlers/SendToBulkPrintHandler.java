@@ -58,12 +58,12 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     @Autowired
     public SendToBulkPrintHandler(DocumentManagementServiceWrapper documentManagementServiceWrapper,
-        DocumentRequestFactory documentRequestFactory,
-        EvidenceManagementService evidenceManagementService,
-        PrintService bulkPrintService,
-        EvidenceShareConfig evidenceShareConfig,
-        CcdService ccdService,
-        IdamService idamService
+                                  DocumentRequestFactory documentRequestFactory,
+                                  EvidenceManagementService evidenceManagementService,
+                                  PrintService bulkPrintService,
+                                  EvidenceShareConfig evidenceShareConfig,
+                                  CcdService ccdService,
+                                  IdamService idamService
     ) {
         this.dispatchPriority = DispatchPriority.LATE;
         this.documentManagementServiceWrapper = documentManagementServiceWrapper;
@@ -81,11 +81,14 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-            && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
-            || callback.getEvent() == EventType.VALID_APPEAL
-            || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL
-            || callback.getEvent() == EventType.RESEND_TO_DWP
-            || callback.getEvent() == EventType.APPEAL_TO_PROCEED);
+            && ((callback.getEvent() == EventType.VALID_APPEAL_CREATED
+                || callback.getEvent() == EventType.VALID_APPEAL
+                || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL
+                || callback.getEvent() == EventType.APPEAL_TO_PROCEED
+                || callback.getEvent() == EventType.SEND_TO_DWP)
+            && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding())
+            || callback.getEvent() == EventType.RESEND_TO_DWP;
+
     }
 
     @Override

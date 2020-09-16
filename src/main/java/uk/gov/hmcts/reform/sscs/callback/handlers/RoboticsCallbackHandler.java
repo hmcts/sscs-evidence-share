@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -52,12 +53,14 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.SUBMITTED)
-            && (callback.getEvent() == VALID_APPEAL_CREATED
+            && ((callback.getEvent() == VALID_APPEAL_CREATED
             || callback.getEvent() == APPEAL_TO_PROCEED
             || callback.getEvent() == READY_TO_LIST
             || callback.getEvent() == VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL
-            || callback.getEvent() == RESEND_CASE_TO_GAPS2);
+            || callback.getEvent() == EventType.SEND_TO_DWP)
+            && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding())
+            || callback.getEvent() == RESEND_CASE_TO_GAPS2;
     }
 
     @Override

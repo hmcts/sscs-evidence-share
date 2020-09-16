@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -10,6 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,12 +23,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.robotics.domain.RoboticsWrapper;
-import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonMapper;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsWrapper;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -215,5 +218,64 @@ public class RoboticsServiceIt {
         verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
 
         assertEquals("DWP PIP (1)", caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice());
+    }
+
+    @Test
+    public void givenUcSscsCaseDataWithJointPartyAndElements_makeValidRoboticsJsonThatValidatesAgainstSchema() {
+        ReflectionTestUtils.setField(mapper, "ucEnabled", true);
+
+        caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("Pip").build());
+        caseDetails.getCaseData().setJointParty("Yes");
+        caseDetails.getCaseData().setElementsDisputedLinkedAppealRef("123456");
+        caseDetails.getCaseData().setElementsDisputedIsDecisionDisputedByOthers("Yes");
+
+        caseDetails.getCaseData().setJointPartyName(JointPartyName.builder().title("Mr").firstName("Terry").lastName("Tibbs").build());
+        caseDetails.getCaseData().setJointPartyAddress(Address.builder().line1("99 My Road").town("Grantham").county("Surrey").postcode("CV10 6PO").build());
+        caseDetails.getCaseData().setJointPartyIdentity(Identity.builder().nino("JT0123456B").dob("2000-01-01").build());
+        caseDetails.getCaseData().setJointPartyAddress(Address.builder().line1("99 My Road").town("Chelmsford").county("Essex").postcode("CM12 0NS").build());
+
+        List<ElementDisputed> elementsDisputedGeneralList = new ArrayList<>();
+        elementsDisputedGeneralList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedGeneral1").build()).build());
+        elementsDisputedGeneralList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("secondIssueElementsDisputedGeneral").build()).build());
+
+        List<ElementDisputed> elementsDisputedSanctionsList = new ArrayList<>();
+        elementsDisputedSanctionsList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedSanctions").build()).build());
+
+        List<ElementDisputed> elementsDisputedOverpaymentList = new ArrayList<>();
+        elementsDisputedOverpaymentList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedOverpayment").build()).build());
+
+        List<ElementDisputed> elementsDisputedHousingList = new ArrayList<>();
+        elementsDisputedHousingList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedHousing").build()).build());
+
+        List<ElementDisputed> elementsDisputedChildCareList = new ArrayList<>();
+        elementsDisputedChildCareList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedChildCare").build()).build());
+
+        List<ElementDisputed> elementsDisputedCareList = new ArrayList<>();
+        elementsDisputedCareList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedCare").build()).build());
+
+        List<ElementDisputed> elementsDisputedChildElementList = new ArrayList<>();
+        elementsDisputedChildElementList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedChildElement").build()).build());
+
+        List<ElementDisputed> elementsDisputedChildDisabledList = new ArrayList<>();
+        elementsDisputedChildDisabledList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedChildDisabled").build()).build());
+
+        caseDetails.getCaseData().setElementsDisputedGeneral(elementsDisputedGeneralList);
+        caseDetails.getCaseData().setElementsDisputedSanctions(elementsDisputedSanctionsList);
+        caseDetails.getCaseData().setElementsDisputedOverpayment(elementsDisputedOverpaymentList);
+        caseDetails.getCaseData().setElementsDisputedHousing(elementsDisputedHousingList);
+        caseDetails.getCaseData().setElementsDisputedChildCare(elementsDisputedChildCareList);
+        caseDetails.getCaseData().setElementsDisputedCare(elementsDisputedCareList);
+        caseDetails.getCaseData().setElementsDisputedChildElement(elementsDisputedChildElementList);
+        caseDetails.getCaseData().setElementsDisputedChildDisabled(elementsDisputedChildDisabledList);
+
+        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
+
+        assertThat(result.get("caseId"), is(1234L));
+        assertTrue(result.has("jointParty"));
+        assertTrue(result.has("elementsDisputed"));
+        assertTrue(result.has("linkedAppealRef"));
+        assertTrue(result.has("ucDecisionDisputedByOthers"));
+
+        verifyNoMoreInteractions(ccdService);
     }
 }
