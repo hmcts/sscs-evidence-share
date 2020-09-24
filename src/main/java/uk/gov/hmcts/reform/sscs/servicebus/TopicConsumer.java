@@ -12,12 +12,7 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
-import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
-import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
-import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
-import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
-import uk.gov.hmcts.reform.sscs.exception.PostIssueFurtherEvidenceTasksException;
+import uk.gov.hmcts.reform.sscs.exception.*;
 
 @Slf4j
 @Component
@@ -70,7 +65,7 @@ public class TopicConsumer {
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
             dispatcher.handle(SUBMITTED, callback);
             log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
-        } catch (PdfStoreException | BulkPrintException | DwpAddressLookupException | NoMrnDetailsException exception) {
+        } catch (NonPdfBulkPrintException | UnableToContactThirdPartyException | PdfStoreException | BulkPrintException | DwpAddressLookupException | NoMrnDetailsException exception) {
             // unrecoverable. Catch to remove it from the queue.
             log.error(format("Caught unrecoverable error: %s", exception.getMessage()), exception);
         }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -8,6 +9,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
+import feign.FeignException;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -31,8 +33,10 @@ import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
+import uk.gov.hmcts.reform.sscs.exception.NonPdfBulkPrintException;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -67,12 +71,6 @@ public class SendToBulkPrintHandlerTest {
     @Mock
     private Callback<SscsCaseData> callback;
 
-    @Mock
-    private CaseDetails caseDetails;
-
-    @Mock
-    private SscsCaseData caseData;
-
     private SendToBulkPrintHandler handler;
 
     private LocalDateTime now = LocalDateTime.now();
@@ -82,9 +80,20 @@ public class SendToBulkPrintHandlerTest {
     @Captor
     private ArgumentCaptor<SscsCaseData> caseDataCaptor;
 
-    String docUrl = "my/1/url.pdf";
-    Pdf docPdf = new Pdf(docUrl.getBytes(), "evidence1.pdf");
-    Pdf docPdf2 = new Pdf(docUrl.getBytes(), "evidence2.pdf");
+    private final String docUrl = "my/1/url.pdf";
+    private final Pdf docPdf = new Pdf(docUrl.getBytes(), "evidence1.pdf");
+    private final Pdf docPdf2 = new Pdf(docUrl.getBytes(), "evidence2.pdf");
+
+    private final CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", singletonList(
+        SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentFileName(docPdf.getName())
+            .documentType("sscs1")
+            .evidenceIssued("No")
+            .documentLink(DocumentLink.builder().documentUrl(docUrl)
+                .documentFilename(docPdf.getName()).build())
+            .build()).build()), APPEAL_CREATED);
+
+
 
     Map<String, Object> placeholders = new HashMap<>();
 
@@ -96,10 +105,8 @@ public class SendToBulkPrintHandlerTest {
         handler = new SendToBulkPrintHandler(documentManagementServiceWrapper,
             documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig,
             ccdCaseService, idamService);
-        when(evidenceShareConfig.getSubmitTypes()).thenReturn(Collections.singletonList("paper"));
+        when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
         when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.FALSE);
         placeholders.put("Test", "Value");
     }
 
@@ -133,20 +140,20 @@ public class SendToBulkPrintHandlerTest {
     @Test
     public void givenSendToDwpWithDocTranslated_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP);
-
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
     public void givenDocTranslationOutstanding_thenReturnFalse() {
-        when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.TRUE);
+        caseDetails.getCaseData().setTranslationWorkOutstanding("Yes");
+        caseDetails.getCaseData().isTranslationWorkOutstanding();
         assertFalse(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
     public void givenResendToDwpWithDocTranslationOutstanding_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.RESEND_TO_DWP);
-        when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.TRUE);
+        caseDetails.getCaseData().setTranslationWorkOutstanding("Yes");
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
@@ -205,19 +212,23 @@ public class SendToBulkPrintHandlerTest {
         assertNull(caseDataCaptor.getValue().getDwpState());
     }
 
+    protected Callback<SscsCaseData> setupMocksForFlagErrorTests() {
+        Map<String, Object> placeholders = new HashMap<>();
+        placeholders.put("Test", "Value");
+        Template template = new Template("bla", "bla2");
+
+        when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenReturn(docPdf.getContent());
+        when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(true);
+
+        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
+        when(documentRequestFactory.create(caseDetails.getCaseData(), nowString)).thenReturn(holder);
+
+        return new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
+    }
+
     @Test
     public void givenAnErrorWhenSendToBulkPrint_shouldUpdateCaseInCcdToFlagError() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
-            SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName(docPdf.getName())
-                .documentType("sscs1")
-                .evidenceIssued("No")
-                .documentLink(DocumentLink.builder().documentUrl(docUrl)
-                    .documentFilename(docPdf.getName()).build())
-                .build()).build()), APPEAL_CREATED);
-
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
-
+        Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
         handler.handle(CallbackType.SUBMITTED, callback);
@@ -233,32 +244,15 @@ public class SendToBulkPrintHandlerTest {
 
     @Test
     public void givenAnErrorIfDlDocumentsNotPresentWhenSendToBulkPrint_shouldUpdateCaseInCcdToFlagError() {
-        Map<String, Object> placeholders = new HashMap<>();
-        placeholders.put("Test", "Value");
-        Template template = new Template("bla", "bla2");
-
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
-                SscsDocument.builder().value(SscsDocumentDetails.builder()
-                        .documentFileName(docPdf.getName())
-                        .documentType("sscs1")
-                        .evidenceIssued("No")
-                        .documentLink(DocumentLink.builder().documentUrl(docUrl)
-                                .documentFilename(docPdf.getName()).build())
-                        .build()).build()), APPEAL_CREATED);
-
-        when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenReturn(docPdf.getContent());
+        Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
         when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(false);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
-
-        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
-
-        when(documentRequestFactory.create(caseDetails.getCaseData(), nowString)).thenReturn(holder);
-        ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
         handler.handle(CallbackType.SUBMITTED, callback);
+
+        ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
         then(ccdCaseService)
-                .should(times(1))
-                .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
+            .should(times(1))
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Triggered from Evidence Share – no DL6/16 present, please validate."), any());
 
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
 
@@ -268,54 +262,76 @@ public class SendToBulkPrintHandlerTest {
 
     @Test
     public void givenNoTemplates_shouldThrowAnExceptionAndFlagError() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper",
-            null, APPEAL_CREATED);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
-
+        Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
         when(documentRequestFactory.create(caseDetails.getCaseData(), nowString))
-            .thenReturn(DocumentHolder.builder()
-                .template(null)
-                .build());
+            .thenReturn(DocumentHolder.builder().template(null).build());
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
         then(ccdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Send to DWP Error event has been triggered from Evidence Share service"), any());
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
     @Test
     public void givenNoBulkPrintIdReturned_shouldThrowAnExceptionAndFlagError() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
-            SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName(docPdf.getName())
-                .documentType("sscs1")
-                .documentLink(DocumentLink.builder().documentUrl(docUrl)
-                    .documentFilename(docPdf.getName()).build())
-                .build()).build()), APPEAL_CREATED);
-
-        when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenReturn(docPdf.getContent());
-
-        Map<String, Object> placeholders = new HashMap<>();
-        placeholders.put("Test", "Value");
-
-        Template template = new Template("bla", "bla2");
-
-        DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
-
-        when(documentRequestFactory.create(caseDetails.getCaseData(), nowString)).thenReturn(holder);
+        Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
 
         when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
             .thenReturn(Optional.empty());
-
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
         then(ccdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), any(), any(), any());
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Send to DWP Error event has been triggered from Evidence Share service"), any());
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
+    }
+
+    @Test
+    public void givenAErrorDownloadingDocuments_shouldThrowAnExceptionAndFlagAnError() {
+        final Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
+
+        final FeignException feignException = mock(FeignException.class);
+        when(feignException.getMessage()).thenReturn("error");
+        when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenThrow(feignException);
+        when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(true);
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        then(ccdCaseService)
+            .should(times(1))
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Unable to contact dm-store, please try again by running the \"Send to DWP\"."), any());
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
+    }
+
+    @Test
+    public void givenABrokenPdfException_shouldThrowAnExceptionAndFlagAnError() {
+        final Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
+
+        when(bulkPrintService.sendToBulkPrint(any(), any()))
+            .thenThrow(new NonPdfBulkPrintException(new RuntimeException("error")));
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+        then(ccdCaseService)
+            .should(times(1))
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Non-PDFs/broken PDFs seen in list of documents, please correct."), any());
+        assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
+    }
+
+    @Test
+    public void givenAnIdamException_shouldThrowAnExceptionAndFlagAnError() {
+        final Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
+
+        final FeignException feignException = mock(FeignException.class);
+        when(feignException.getMessage()).thenReturn("error");
+        when(idamService.getIdamTokens()).thenThrow(feignException).thenReturn(IdamTokens.builder().build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+        then(ccdCaseService)
+            .should(times(1))
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Unable to contact idam, please try again by running the \"Send to DWP\"."), any());
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
@@ -395,14 +411,12 @@ public class SendToBulkPrintHandlerTest {
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
-
-
-
     private CaseDetails<SscsCaseData> getCaseDetails(String benefitType, String receivedVia, List<SscsDocument> sscsDocuments, State state) {
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("123")
             .createdInGapsFrom("validAppeal")
             .caseCreated(nowString)
+            .translationWorkOutstanding("No")
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code(benefitType).build())
                 .receivedVia(receivedVia)
@@ -419,5 +433,4 @@ public class SendToBulkPrintHandlerTest {
             now
         );
     }
-
 }

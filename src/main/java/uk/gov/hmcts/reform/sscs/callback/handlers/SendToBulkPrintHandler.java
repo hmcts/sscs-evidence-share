@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
+import feign.FeignException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.*;
@@ -24,8 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
-import uk.gov.hmcts.reform.sscs.exception.NoDl6DocumentException;
+import uk.gov.hmcts.reform.sscs.exception.*;
 import uk.gov.hmcts.reform.sscs.factory.DocumentRequestFactory;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -102,9 +102,9 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
         try {
             bulkPrintInfo = bulkPrintCase(callback);
-        } catch (NoDl6DocumentException e) {
-            log.info("Error when bulk-printing caseId: {}", callback.getCaseDetails().getId(), e);
-            updateCaseToFlagError(caseData, "Triggered from Evidence Share – no DL6/16 present, please validate");
+        } catch (NonPdfBulkPrintException | UnableToContactThirdPartyException | NoDl6DocumentException e) {
+            log.info(format("Error when bulk-printing caseId: %s. %s", callback.getCaseDetails().getId(), e.getMessage()), e);
+            updateCaseToFlagError(caseData, e.getMessage());
         } catch (Exception e) {
             log.info("Error when bulk-printing caseId: {}", callback.getCaseDetails().getId(), e);
             updateCaseToFlagError(caseData, "Send to DWP Error event has been triggered from Evidence Share service");
@@ -154,42 +154,46 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             DocumentHolder holder = documentRequestFactory.create(sscsCaseDataCallback.getCaseDetails().getCaseData(),
                 sscsCaseDataCallback.getCaseDetails().getCaseData().getCaseCreated());
 
-            if (holder.getTemplate() != null) {
-                log.info("Generating DL document for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
-
-                IdamTokens idamTokens = idamService.getIdamTokens();
-                documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
-                List<SscsDocument> sscsDocuments = getSscsDocumentsToPrint(caseData.getSscsDocument());
-                if (CollectionUtils.isEmpty(sscsDocuments)
-                    || !documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(sscsDocuments)) {
-                    throw new NoDl6DocumentException(
-                        format("No documents to send for bulk print for case id {}",
-                            caseData.getCcdCaseId()));
-                }
-                List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
-
-                log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
-                caseData.setDateSentToDwp(LocalDate.now().toString());
-
-                Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
-
-                if (id.isPresent()) {
-                    BulkPrintInfo info = BulkPrintInfo.builder()
-                        .uuid(id.get())
-                        .allowedTypeForBulkPrint(true)
-                        .desc(buildEventDescription(existingCasePdfs, id.get()))
-                        .build();
-
-                    return info;
-                } else {
-                    throw new BulkPrintException(
-                        format("Failed to send to bulk print for case %s. No print id returned",
-                            caseData.getCcdCaseId()));
-                }
+            if (holder.getTemplate() == null) {
+                throw new BulkPrintException(
+                    format("Failed to send to bulk print for case %s because no template was found",
+                        caseData.getCcdCaseId()));
             }
-            throw new BulkPrintException(
-                format("Failed to send to bulk print for case %s because no template was found",
-                    caseData.getCcdCaseId()));
+            log.info("Generating DL document for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
+
+            final IdamTokens idamTokens;
+            try {
+                idamTokens = idamService.getIdamTokens();
+            } catch (FeignException e) {
+                throw new UnableToContactThirdPartyException("idam", e);
+            }
+            documentManagementServiceWrapper.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
+            List<SscsDocument> sscsDocuments = getSscsDocumentsToPrint(caseData.getSscsDocument());
+            if (CollectionUtils.isEmpty(sscsDocuments)
+                    || !documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(sscsDocuments)) {
+                throw new NoDl6DocumentException();
+            }
+            List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
+
+            log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
+            caseData.setDateSentToDwp(LocalDate.now().toString());
+
+            Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
+
+            if (id.isPresent()) {
+                BulkPrintInfo info = BulkPrintInfo.builder()
+                    .uuid(id.get())
+                    .allowedTypeForBulkPrint(true)
+                    .desc(buildEventDescription(existingCasePdfs, id.get()))
+                    .build();
+
+                return info;
+            } else {
+                throw new BulkPrintException(
+                    format("Failed to send to bulk print for case %s. No print id returned",
+                        caseData.getCcdCaseId()));
+            }
+
         } else {
             log.info("Case not valid to send to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
 
@@ -264,9 +268,13 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private byte[] toBytes(SscsDocument sscsDocument) {
-        return evidenceManagementService.download(
-            URI.create(sscsDocument.getValue().getDocumentLink().getDocumentUrl()),
-            DM_STORE_USER_ID
-        );
+        try {
+            return evidenceManagementService.download(
+                URI.create(sscsDocument.getValue().getDocumentLink().getDocumentUrl()),
+                DM_STORE_USER_ID
+            );
+        } catch (FeignException e) {
+            throw new UnableToContactThirdPartyException("dm-store", e);
+        }
     }
 }
