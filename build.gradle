@@ -217,7 +217,7 @@ dependencies {
 
   annotationProcessor "org.projectlombok:lombok:1.18.10"
 
-  compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '2.7.0'
+  compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.0'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
 
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.4.69'
