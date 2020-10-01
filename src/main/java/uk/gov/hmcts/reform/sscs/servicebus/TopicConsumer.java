@@ -65,7 +65,12 @@ public class TopicConsumer {
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
             dispatcher.handle(SUBMITTED, callback);
             log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
-        } catch (NonPdfBulkPrintException | UnableToContactThirdPartyException | PdfStoreException | BulkPrintException | DwpAddressLookupException | NoMrnDetailsException exception) {
+        } catch (NonPdfBulkPrintException
+            | UnableToContactThirdPartyException
+            | PdfStoreException
+            | BulkPrintException
+            | DwpAddressLookupException
+            | NoMrnDetailsException exception) {
             // unrecoverable. Catch to remove it from the queue.
             log.error(format("Caught unrecoverable error: %s", exception.getMessage()), exception);
         }
