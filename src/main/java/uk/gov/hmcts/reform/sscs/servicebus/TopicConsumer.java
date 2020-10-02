@@ -53,7 +53,7 @@ public class TopicConsumer {
             } else {
 
                 log.info(String.format("Caught recoverable error %s, retrying %s out of %s for message id %s",
-                    e.getMessage(), retry, maxRetryAttempts), messageId);
+                    e.getMessage(), retry, maxRetryAttempts, messageId));
 
                 processMessageWithRetry(message, retry + 1, messageId);
             }
@@ -68,6 +68,7 @@ public class TopicConsumer {
         try {
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
             dispatcher.handle(SUBMITTED, callback);
+
             log.info("Sscs Case CCD callback `{}` handled for Case ID `{}` for message id {}", callback.getEvent(), callback.getCaseDetails().getId(), messageId);
         } catch (NonPdfBulkPrintException
             | UnableToContactThirdPartyException
