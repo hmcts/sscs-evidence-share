@@ -71,7 +71,9 @@ public class BulkPrintService implements PrintService {
             log.info(format("Failed to send to bulk print for case %s with error %s. Non-pdf's/broken pdf's seen in list of documents, please correct.",
                 sscsCaseData.getCcdCaseId(), e.getMessage()));
             throw new NonPdfBulkPrintException(e);
+
         } catch (Exception e) {
+
             if (reTryNumber > maxRetryAttempts) {
                 String message = format("Failed to send to bulk print for case %s with error %s.",
                     sscsCaseData.getCcdCaseId(), e.getMessage());

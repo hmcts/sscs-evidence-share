@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.support.JmsHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -37,21 +39,23 @@ public class TopicConsumer {
         containerFactory = "topicJmsListenerContainerFactory",
         subscription = "${amqp.subscription}"
     )
-    public void onMessage(String message) {
-        processMessageWithRetry(message, 1);
+    public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
+        processMessageWithRetry(message, 1, messageId);
     }
 
-    private void processMessageWithRetry(String message, int retry) {
+    private void processMessageWithRetry(String message, int retry, String messageId) {
         try {
-            log.info("Message received from the service bus by evidence share service");
-            processMessage(message);
+            log.info("Message Id {} received from the service bus by evidence share service", messageId);
+            processMessage(message, messageId);
         } catch (Exception e) {
             if (retry > maxRetryAttempts || isException(e)) {
-                log.error(format("Caught unknown unrecoverable error %s", e.getMessage()), e);
+                log.error(format("Caught unknown unrecoverable error %s for message id %s", e.getMessage(), messageId), e);
             } else {
-                log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
-                    e.getMessage(), retry, maxRetryAttempts));
-                processMessageWithRetry(message, retry + 1);
+
+                log.info(String.format("Caught recoverable error %s, retrying %s out of %s for message id %s",
+                    e.getMessage(), retry, maxRetryAttempts), messageId);
+
+                processMessageWithRetry(message, retry + 1, messageId);
             }
         }
     }
@@ -60,11 +64,11 @@ public class TopicConsumer {
         return e instanceof IssueFurtherEvidenceException || e instanceof PostIssueFurtherEvidenceTasksException;
     }
 
-    private void processMessage(String message) {
+    private void processMessage(String message, String messageId) {
         try {
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
             dispatcher.handle(SUBMITTED, callback);
-            log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
+            log.info("Sscs Case CCD callback `{}` handled for Case ID `{}` for message id {}", callback.getEvent(), callback.getCaseDetails().getId(), messageId);
         } catch (NonPdfBulkPrintException
             | UnableToContactThirdPartyException
             | PdfStoreException
@@ -72,7 +76,7 @@ public class TopicConsumer {
             | DwpAddressLookupException
             | NoMrnDetailsException exception) {
             // unrecoverable. Catch to remove it from the queue.
-            log.error(format("Caught unrecoverable error: %s", exception.getMessage()), exception);
+            log.error(format("Caught unrecoverable error: %s for message id %s", exception.getMessage(), messageId), exception);
         }
     }
 }

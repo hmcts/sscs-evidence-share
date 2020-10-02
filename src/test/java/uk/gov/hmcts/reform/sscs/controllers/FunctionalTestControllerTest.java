@@ -29,6 +29,6 @@ public class FunctionalTestControllerTest {
     @Test
     public void shouldCreateTemplateAndAddToCcdForMessage() {
         functionalTestController.send("", "message");
-        verify(consumer).onMessage("message");
+        verify(consumer).onMessage("message", "1");
     }
 }
