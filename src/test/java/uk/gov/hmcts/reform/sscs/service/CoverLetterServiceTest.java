@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
@@ -14,19 +15,23 @@ import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.service.PdfGenerationService;
+import uk.gov.hmcts.reform.sscs.exception.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.service.placeholders.FurtherEvidencePlaceholderService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -38,8 +43,14 @@ public class CoverLetterServiceTest {
     private FurtherEvidencePlaceholderService furtherEvidencePlaceholderService;
     @Mock
     private PdfGenerationService pdfGenerationService;
-    @InjectMocks
+
     private CoverLetterService coverLetterService;
+
+    @Before
+    public void initMocks() {
+        MockitoAnnotations.openMocks(this);
+        coverLetterService = new CoverLetterService(furtherEvidencePlaceholderService, pdfGenerationService, 3);
+    }
 
     @Test
     @Parameters(method = "generateNullScenarios")
@@ -83,7 +94,23 @@ public class CoverLetterServiceTest {
 
         then(furtherEvidencePlaceholderService).should(times(1))
             .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER));
+
         assertArgumentsForPdfGeneration();
+    }
+
+
+    @Test(expected = UnableToContactThirdPartyException.class)
+    public void generateCoverLetterHandleError() {
+        SscsCaseData caseData = SscsCaseData.builder().build();
+
+        given(furtherEvidencePlaceholderService
+            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER)))
+            .willReturn(Collections.singletonMap("someKey", "someValue"));
+
+        when(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
+            .thenThrow(new HttpClientErrorException(HttpStatus.valueOf(400)));
+
+        coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName");
     }
 
     private void assertArgumentsForPdfGeneration() {

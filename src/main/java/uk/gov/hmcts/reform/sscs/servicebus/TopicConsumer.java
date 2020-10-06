@@ -68,7 +68,6 @@ public class TopicConsumer {
         try {
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
             dispatcher.handle(SUBMITTED, callback);
-
             log.info("Sscs Case CCD callback `{}` handled for Case ID `{}` for message id {}", callback.getEvent(), callback.getCaseDetails().getId(), messageId);
         } catch (NonPdfBulkPrintException
             | UnableToContactThirdPartyException
