@@ -160,7 +160,7 @@ public class ReissueFurtherEvidenceServiceIt {
             .getResource("issueFurtherEvidenceCallback.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        topicConsumer.onMessage(json);
+        topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService).sendToBulkPrint(any(), any());
 
@@ -187,7 +187,7 @@ public class ReissueFurtherEvidenceServiceIt {
             .getResource("issueFurtherEvidenceCallbackWithRep.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        topicConsumer.onMessage(json);
+        topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any());
 
@@ -219,7 +219,7 @@ public class ReissueFurtherEvidenceServiceIt {
             .getResource("issueFurtherEvidenceCallbackWithRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        topicConsumer.onMessage(json);
+        topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any());
 
@@ -251,7 +251,7 @@ public class ReissueFurtherEvidenceServiceIt {
             .getResource("issueFurtherEvidenceCallbackWithAppellantEvidenceAndRepEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        topicConsumer.onMessage(json);
+        topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService, times(4)).sendToBulkPrint(any(), any());
 
@@ -293,7 +293,7 @@ public class ReissueFurtherEvidenceServiceIt {
             .getResource("issueFurtherEvidenceCallbackWithDwpEvidence.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        topicConsumer.onMessage(json);
+        topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService).sendToBulkPrint(any(), any());
 
@@ -320,7 +320,7 @@ public class ReissueFurtherEvidenceServiceIt {
             .getResource("issueFurtherEvidenceCallbackWithRepAndEvidenceFromDwp.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        topicConsumer.onMessage(json);
+        topicConsumer.onMessage(json, "1");
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any());
 

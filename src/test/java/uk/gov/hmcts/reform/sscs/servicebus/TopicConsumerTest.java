@@ -42,21 +42,21 @@ public class TopicConsumerTest {
     public void bulkPrintExceptionWillBeCaught() {
         exception = new BulkPrintException(MESSAGE, EXCEPTION);
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(MESSAGE);
+        topicConsumer.onMessage(MESSAGE, "1");
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
     @Test
     public void givenIssueFurtherEvidenceException_shouldNotRetry() {
         doThrow(IssueFurtherEvidenceException.class).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(MESSAGE);
+        topicConsumer.onMessage(MESSAGE, "1");
         verify(dispatcher, times(1)).handle(any(), any());
     }
 
     @Test
     public void givenPostIssueFurtherEvidenceTaskException_shouldNotRetry() {
         doThrow(PostIssueFurtherEvidenceTasksException.class).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(MESSAGE);
+        topicConsumer.onMessage(MESSAGE, "1");
         verify(dispatcher, times(1)).handle(any(), any());
     }
 
@@ -64,7 +64,7 @@ public class TopicConsumerTest {
     public void pdfStoreExceptionWillBeCaught() {
         exception = new PdfStoreException(MESSAGE, EXCEPTION);
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(MESSAGE);
+        topicConsumer.onMessage(MESSAGE, "1");
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -72,7 +72,7 @@ public class TopicConsumerTest {
     public void dwpAddressLookupExceptionWillBeCaught() {
         exception = new DwpAddressLookupException(MESSAGE);
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(MESSAGE);
+        topicConsumer.onMessage(MESSAGE, "1");
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -80,7 +80,7 @@ public class TopicConsumerTest {
     public void noMrnDetailsExceptionWillBeCaught() {
         exception = new NoMrnDetailsException(SscsCaseData.builder().ccdCaseId("123").build());
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(MESSAGE);
+        topicConsumer.onMessage(MESSAGE, "1");
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -88,7 +88,7 @@ public class TopicConsumerTest {
     public void unableToContactThirdPartyExceptionWillBeCaught() {
         exception = new UnableToContactThirdPartyException("dm-store", new RuntimeException());
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(MESSAGE);
+        topicConsumer.onMessage(MESSAGE, "1");
         verify(dispatcher, atLeastOnce()).handle(any(), any());
     }
 
@@ -96,7 +96,7 @@ public class TopicConsumerTest {
     public void nullPointerExceptionWillBeCaught() {
         exception = new NullPointerException();
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(MESSAGE);
+        topicConsumer.onMessage(MESSAGE, "1");
         verify(dispatcher, atLeast(RETRY_THREE_TIMES)).handle(any(), any());
     }
 
@@ -104,7 +104,7 @@ public class TopicConsumerTest {
     public void clientAuthorisationExceptionWillBeCaught() {
         exception = new ClientAuthorisationException(EXCEPTION);
         doThrow(exception).when(dispatcher).handle(any(), any());
-        topicConsumer.onMessage(MESSAGE);
+        topicConsumer.onMessage(MESSAGE, "1");
         verify(dispatcher, atLeast(RETRY_THREE_TIMES)).handle(any(), any());
     }
 
@@ -119,7 +119,7 @@ public class TopicConsumerTest {
         );
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED, false);
         when(deserializer.deserialize(any())).thenReturn(callback);
-        topicConsumer.onMessage(MESSAGE);
+        topicConsumer.onMessage(MESSAGE, "1");
         verify(dispatcher).handle(any(), any());
     }
 
