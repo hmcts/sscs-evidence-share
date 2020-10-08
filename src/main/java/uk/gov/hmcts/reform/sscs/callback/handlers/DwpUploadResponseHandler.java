@@ -92,11 +92,13 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             disputedDecision = StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "yes");
         }
 
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
         if (!dwpFurtherInfo
             && !disputedDecision) {
             log.info("updating to ready to list");
 
-            SscsCaseData caseData = setDwpState(callback);
+            caseData = setDwpState(callback);
 
             ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.READY_TO_LIST.getCcdType(), "ready to list",
@@ -115,13 +117,18 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                 description = "update to response received event as there is a dispute.";
             }
 
-            SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
             caseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
 
             ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.DWP_RESPOND.getCcdType(), "Response received",
                 description, idamService.getIdamTokens());
+        }
+
+        if (caseData.getJointParty() != null && StringUtils.equalsIgnoreCase("Yes", caseData.getJointParty())) {
+            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
+                "description", idamService.getIdamTokens());
+            log.info("jointPartyAdded event updated");
         }
     }
 
