@@ -127,7 +127,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         if (caseData.getJointParty() != null && StringUtils.equalsIgnoreCase("Yes", caseData.getJointParty())) {
             ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
-                "description", idamService.getIdamTokens());
+                "A joint party was added to the appeal", idamService.getIdamTokens());
             log.info("jointPartyAdded event updated");
         }
     }

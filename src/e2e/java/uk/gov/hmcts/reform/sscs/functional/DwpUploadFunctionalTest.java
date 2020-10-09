@@ -32,7 +32,7 @@ public class DwpUploadFunctionalTest extends AbstractFunctionalTest {
 
     // Need tribunals running to pass this functional test
     @Test
-    public void processAnAppealToProceedEvent_shouldUpdateInterlocReviewState() throws IOException {
+    public void dwpUploadResponseEventSendsToReadyToList() throws IOException {
 
         createCaseWithValidAppealState(VALID_APPEAL_CREATED, "UC", "Universal Credit", State.READY_TO_LIST.getId());
 
@@ -50,8 +50,6 @@ public class DwpUploadFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("DWP_EVIDENCE_BINARY_DOCUMENT_URL", binaryUrl);
 
         simulateCcdCallback(json);
-
-        System.out.println("ccdCaseId" + ccdCaseId);
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
