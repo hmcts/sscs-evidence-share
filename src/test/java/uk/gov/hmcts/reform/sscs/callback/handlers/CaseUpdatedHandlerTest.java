@@ -52,6 +52,15 @@ public class CaseUpdatedHandlerTest {
             buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, CASE_UPDATED));
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void givenCallbackHasNoBenefitType_willThrowAnException() {
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).jointParty("Yes")
+                .appeal(Appeal.builder()
+                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, CASE_UPDATED);
+        handler.handle(CallbackType.SUBMITTED, callback);
+    }
+
     @Test
     public void givenACaseUpdatedWithJointParty_runJointPartyAddedEvent() {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
