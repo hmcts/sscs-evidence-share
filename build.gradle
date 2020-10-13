@@ -214,9 +214,9 @@ dependencies {
 
   compile group: 'org.springframework', name: 'spring-jms'
   compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.54.0'
-  compileOnly 'org.projectlombok:lombok:1.18.12'
+  compileOnly 'org.projectlombok:lombok:1.18.14'
 
-  annotationProcessor "org.projectlombok:lombok:1.18.10"
+  annotationProcessor "org.projectlombok:lombok:1.18.14"
 
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.1'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
@@ -241,7 +241,7 @@ dependencies {
   compile 'org.projectlombok:lombok:1.18.12'
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  testCompileOnly 'org.projectlombok:lombok:1.18.8'
+  testCompileOnly 'org.projectlombok:lombok:1.18.14'
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   e2eCompileOnly 'org.projectlombok:lombok:1.18.8'
