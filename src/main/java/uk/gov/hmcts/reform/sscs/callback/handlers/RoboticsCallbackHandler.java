@@ -12,9 +12,7 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
@@ -55,9 +53,10 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         return callbackType.equals(CallbackType.SUBMITTED)
             && ((callback.getEvent() == VALID_APPEAL_CREATED
             || callback.getEvent() == APPEAL_TO_PROCEED
-            || callback.getEvent() == READY_TO_LIST
-            || callback.getEvent() == VALID_APPEAL
+            || callback.getEvent() == EventType.READY_TO_LIST
+            || callback.getEvent() == EventType.VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL
+            || isValidStateForConfidentialityRequest(callback)
             || callback.getEvent() == EventType.SEND_TO_DWP)
             && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding())
             || callback.getEvent() == RESEND_CASE_TO_GAPS2;
@@ -86,8 +85,9 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
                 callback.getCaseDetails().getCaseData().setDateCaseSentToGaps(LocalDate.now().toString());
 
-                if (callback.getEvent() == READY_TO_LIST
-                    || callback.getEvent() == RESEND_CASE_TO_GAPS2) {
+                if (callback.getEvent() == EventType.READY_TO_LIST
+                    || callback.getEvent() == RESEND_CASE_TO_GAPS2
+                    || callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST) {
 
                     ccdService.updateCase(callback.getCaseDetails().getCaseData(), Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
                         CASE_UPDATED.getCcdType(), "Case sent to robotics", "Updated case with date sent to robotics",
@@ -118,8 +118,17 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         log.info("The callback event is {} and the createdInGapsFrom field is {} for case id {}", callback.getEvent(), callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getId());
 
         return callback.getEvent() == RESEND_CASE_TO_GAPS2
+            || callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST
             || callback.getCaseDetails().getCaseData().getCreatedInGapsFrom() == null
             || StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getState().getId()) ? true : false;
+    }
+
+    private boolean isValidStateForConfidentialityRequest(Callback<SscsCaseData> callback) {
+        return callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST
+            && State.RESPONSE_RECEIVED.equals(callback.getCaseDetails().getState())
+            && ((callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeAppellant() != null && RequestOutcome.GRANTED.equals(callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeAppellant().getRequestOutcome()))
+                || (callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeJointParty() != null && RequestOutcome.GRANTED.equals(callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome())));
+
     }
 
     @Override
