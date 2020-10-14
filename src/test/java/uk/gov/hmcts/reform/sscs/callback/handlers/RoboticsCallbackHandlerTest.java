@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -120,7 +121,12 @@ public class RoboticsCallbackHandlerTest {
         verify(roboticsService).sendCaseToRobotics(any());
 
         assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
-        verify(ccdService).updateCase(any(), any(), any(), any(), any(), any());
+
+        ArgumentCaptor<SscsCaseData> capture = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        verify(ccdService).updateCase(capture.capture(), any(), any(), any(), any(), any());
+
+        assertEquals(State.NOT_LISTABLE, capture.getValue().getState());
     }
 
     @Test

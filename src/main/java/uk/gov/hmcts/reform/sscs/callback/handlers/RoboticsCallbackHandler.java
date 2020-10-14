@@ -85,6 +85,10 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
                 callback.getCaseDetails().getCaseData().setDateCaseSentToGaps(LocalDate.now().toString());
 
+                if (callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST) {
+                    callback.getCaseDetails().getCaseData().setState(State.NOT_LISTABLE);
+                }
+
                 if (callback.getEvent() == EventType.READY_TO_LIST
                     || callback.getEvent() == RESEND_CASE_TO_GAPS2
                     || callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST) {
