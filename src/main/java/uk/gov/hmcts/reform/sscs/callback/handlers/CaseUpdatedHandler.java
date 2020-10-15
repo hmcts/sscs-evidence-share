@@ -60,7 +60,7 @@ public class CaseUpdatedHandler  implements CallbackHandler<SscsCaseData> {
             if (caseData.getJointParty() != null && StringUtils.equalsIgnoreCase("Yes", caseData.getJointParty())) {
                 ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                     EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
-                    "description", idamService.getIdamTokens());
+                    "", idamService.getIdamTokens());
                 log.info("jointPartyAdded event updated");
             }
         }
