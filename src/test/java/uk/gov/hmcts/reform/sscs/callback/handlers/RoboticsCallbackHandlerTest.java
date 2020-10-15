@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 
 import java.time.LocalDate;
@@ -107,7 +109,11 @@ public class RoboticsCallbackHandlerTest {
         verify(roboticsService).sendCaseToRobotics(any());
 
         assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
-        verify(ccdService).updateCase(any(), any(), any(), any(), any(), any());
+
+        ArgumentCaptor<String> capture = ArgumentCaptor.forClass(String.class);
+        verify(ccdService).updateCase(any(), any(), capture.capture(), any(), any(), any());
+
+        assertEquals(CASE_UPDATED.getCcdType(), capture.getValue());
     }
 
     @Test
@@ -122,11 +128,10 @@ public class RoboticsCallbackHandlerTest {
 
         assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
 
-        ArgumentCaptor<SscsCaseData> capture = ArgumentCaptor.forClass(SscsCaseData.class);
+        ArgumentCaptor<String> capture = ArgumentCaptor.forClass(String.class);
+        verify(ccdService).updateCase(any(), any(), capture.capture(), any(), any(), any());
 
-        verify(ccdService).updateCase(capture.capture(), any(), any(), any(), any(), any());
-
-        assertEquals(State.NOT_LISTABLE, capture.getValue().getState());
+        assertEquals(NOT_LISTABLE.getCcdType(), capture.getValue());
     }
 
     @Test

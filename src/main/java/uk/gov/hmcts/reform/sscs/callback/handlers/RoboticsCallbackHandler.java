@@ -85,16 +85,17 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
                 callback.getCaseDetails().getCaseData().setDateCaseSentToGaps(LocalDate.now().toString());
 
+                String ccdEventType = null;
                 if (callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST) {
-                    callback.getCaseDetails().getCaseData().setState(State.NOT_LISTABLE);
+                    ccdEventType = NOT_LISTABLE.getCcdType();
+                } else if (callback.getEvent() == EventType.READY_TO_LIST
+                    || callback.getEvent() == RESEND_CASE_TO_GAPS2) {
+                    ccdEventType = CASE_UPDATED.getCcdType();
                 }
 
-                if (callback.getEvent() == EventType.READY_TO_LIST
-                    || callback.getEvent() == RESEND_CASE_TO_GAPS2
-                    || callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST) {
-
+                if (ccdEventType != null) {
                     ccdService.updateCase(callback.getCaseDetails().getCaseData(), Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
-                        CASE_UPDATED.getCcdType(), "Case sent to robotics", "Updated case with date sent to robotics",
+                        ccdEventType, "Case sent to robotics", "Updated case with date sent to robotics",
                         idamService.getIdamTokens());
                 }
             }
