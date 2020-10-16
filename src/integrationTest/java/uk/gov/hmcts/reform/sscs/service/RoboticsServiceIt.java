@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +63,9 @@ public class RoboticsServiceIt {
 
     @Captor
     private ArgumentCaptor<SscsCaseData> caseDataCaptor;
+
+    @Captor
+    private ArgumentCaptor<String> eventCaptor;
 
     @Before
     public void setup() {
@@ -276,6 +280,18 @@ public class RoboticsServiceIt {
         assertTrue(result.has("linkedAppealRef"));
         assertTrue(result.has("ucDecisionDisputedByOthers"));
 
+        verifyNoMoreInteractions(ccdService);
+    }
+
+    @Test
+    public void givenReviewConfidentialityRequest_thenAddIsConfidentialFlagToRobotics() {
+        caseDetails = new CaseDetails<>(1234L, "sscs", RESPONSE_RECEIVED, caseData, null);
+
+        caseDetails.getCaseData().setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
+
+        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
+
+        assertTrue(result.has("isConfidential"));
         verifyNoMoreInteractions(ccdService);
     }
 }
