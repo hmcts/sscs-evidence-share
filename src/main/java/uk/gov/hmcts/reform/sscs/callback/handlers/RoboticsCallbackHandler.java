@@ -55,8 +55,6 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             || callback.getEvent() == APPEAL_TO_PROCEED
             || callback.getEvent() == EventType.READY_TO_LIST
             || callback.getEvent() == EventType.VALID_APPEAL
-            || callback.getEvent() == READY_TO_LIST
-            || callback.getEvent() == VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL
             || isValidStateForConfidentialityRequest(callback)
             || callback.getEvent() == EventType.SEND_TO_DWP)
@@ -134,7 +132,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         return callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST
             && State.RESPONSE_RECEIVED.equals(callback.getCaseDetails().getState())
             && ((callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeAppellant() != null && RequestOutcome.GRANTED.equals(callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeAppellant().getRequestOutcome()))
-            || (callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeJointParty() != null && RequestOutcome.GRANTED.equals(callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome())));
+                || (callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeJointParty() != null && RequestOutcome.GRANTED.equals(callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome())));
 
     }
 
