@@ -214,7 +214,7 @@ dependencies {
 
   compile group: 'org.springframework', name: 'spring-jms'
   compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.54.0'
-  compileOnly 'org.projectlombok:lombok:1.18.14'
+  compileOnly 'org.projectlombok:lombok:1.18.16'
 
   annotationProcessor "org.projectlombok:lombok:1.18.14"
 
@@ -238,13 +238,13 @@ dependencies {
   testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.13'
   testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
-  compile 'org.projectlombok:lombok:1.18.12'
+  compile 'org.projectlombok:lombok:1.18.16'
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   testCompileOnly 'org.projectlombok:lombok:1.18.14'
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  e2eCompileOnly 'org.projectlombok:lombok:1.18.8'
+  e2eCompileOnly 'org.projectlombok:lombok:1.18.16'
   e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   integrationTestCompileOnly 'org.projectlombok:lombok:1.18.8'
