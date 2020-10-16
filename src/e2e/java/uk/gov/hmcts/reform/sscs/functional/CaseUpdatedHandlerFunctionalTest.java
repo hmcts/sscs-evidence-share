@@ -32,8 +32,6 @@ public class CaseUpdatedHandlerFunctionalTest extends AbstractFunctionalTest {
 
         simulateCcdCallback(json);
 
-        System.out.println("ccdCaseId" + ccdCaseId);
-
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
 
