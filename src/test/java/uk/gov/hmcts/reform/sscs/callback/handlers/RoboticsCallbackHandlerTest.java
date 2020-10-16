@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 
 import java.time.LocalDate;
@@ -15,6 +17,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -106,6 +109,42 @@ public class RoboticsCallbackHandlerTest {
         verify(roboticsService).sendCaseToRobotics(any());
 
         assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
+
+        ArgumentCaptor<String> capture = ArgumentCaptor.forClass(String.class);
+        verify(ccdService).updateCase(any(), any(), capture.capture(), any(), any(), any());
+
+        assertEquals(CASE_UPDATED.getCcdType(), capture.getValue());
+    }
+
+    @Test
+    public void givenARoboticsRequestFromReviewConfidentialityRequestAppellantAndStateIsResponseReceivedAndConfidentialityRequestGranted_thenSendCaseToRobotics() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(RESPONSE_RECEIVED, READY_TO_LIST.getId());
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.REVIEW_CONFIDENTIALITY_REQUEST, false);
+        caseDetails.getCaseData().setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(roboticsService).sendCaseToRobotics(any());
+
+        assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
+
+        ArgumentCaptor<String> capture = ArgumentCaptor.forClass(String.class);
+        verify(ccdService).updateCase(any(), any(), capture.capture(), any(), any(), any());
+
+        assertEquals(NOT_LISTABLE.getCcdType(), capture.getValue());
+    }
+
+    @Test
+    public void givenARoboticsRequestFromReviewConfidentialityRequestJointPartyAndStateIsResponseReceivedAndConfidentialityRequestGranted_thenSendCaseToRobotics() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(RESPONSE_RECEIVED, READY_TO_LIST.getId());
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.REVIEW_CONFIDENTIALITY_REQUEST, false);
+        caseDetails.getCaseData().setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(roboticsService).sendCaseToRobotics(any());
+
+        assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
         verify(ccdService).updateCase(any(), any(), any(), any(), any(), any());
     }
 
@@ -167,6 +206,24 @@ public class RoboticsCallbackHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.RESEND_CASE_TO_GAPS2);
         when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.TRUE);
         assertTrue(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenARoboticsRequestFromReviewConfidentialityRequestAndStateIsNotResponseReceivedAndConfidentialityRequestGranted_thenDoNotSendCaseToRobotics() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(WITH_DWP, READY_TO_LIST.getId());
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.REVIEW_CONFIDENTIALITY_REQUEST, false);
+        caseDetails.getCaseData().setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.GRANTED).build());
+
+        assertFalse(handler.canHandle(SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenARoboticsRequestFromReviewConfidentialityRequestAndStateIsResponseReceivedAndConfidentialityRequestRefused_thenDoNotSendCaseToRobotics() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(RESPONSE_RECEIVED, READY_TO_LIST.getId());
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.REVIEW_CONFIDENTIALITY_REQUEST, false);
+        caseDetails.getCaseData().setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder().requestOutcome(RequestOutcome.REFUSED).build());
+
+        assertFalse(handler.canHandle(SUBMITTED, callback));
     }
 
 }
