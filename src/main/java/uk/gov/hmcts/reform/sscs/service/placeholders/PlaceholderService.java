@@ -34,7 +34,6 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.t
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Stream;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,7 +45,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.ExelaAddressConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
-
 
 @Service
 public class PlaceholderService {
