@@ -14,7 +14,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.domain.email;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
