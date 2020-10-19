@@ -58,7 +58,8 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             || callback.getEvent() == INTERLOC_VALID_APPEAL
             || isValidStateForConfidentialityRequest(callback)
             || callback.getEvent() == EventType.SEND_TO_DWP)
-            && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding())
+            && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding()
+            || (callback.getEvent() == EventType.DWP_RAISE_EXCEPTION_NOT_LISTABLE && ucEnabled))
             || callback.getEvent() == RESEND_CASE_TO_GAPS2;
     }
 
@@ -86,7 +87,8 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
                 callback.getCaseDetails().getCaseData().setDateCaseSentToGaps(LocalDate.now().toString());
 
                 String ccdEventType = null;
-                if (callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST) {
+                if (callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST
+                    || callback.getEvent() == DWP_RAISE_EXCEPTION_NOT_LISTABLE) {
                     ccdEventType = NOT_LISTABLE.getCcdType();
                 } else if (callback.getEvent() == EventType.READY_TO_LIST
                     || callback.getEvent() == RESEND_CASE_TO_GAPS2) {
@@ -124,6 +126,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         return callback.getEvent() == RESEND_CASE_TO_GAPS2
             || callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST
+            || callback.getEvent() == DWP_RAISE_EXCEPTION_NOT_LISTABLE
             || callback.getCaseDetails().getCaseData().getCreatedInGapsFrom() == null
             || StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getState().getId()) ? true : false;
     }
