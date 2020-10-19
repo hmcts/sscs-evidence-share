@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerUtils.isANewJointParty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import lombok.extern.slf4j.Slf4j;
@@ -56,15 +57,15 @@ public class CaseUpdatedHandler  implements CallbackHandler<SscsCaseData> {
         BenefitType benefitType = caseData.getAppeal().getBenefitType();
         log.info("BenefitType" + benefitType);
 
-        if (StringUtils.equalsIgnoreCase(benefitType.getCode(), "uc")) {
-            if (caseData.getJointParty() != null && StringUtils.equalsIgnoreCase("Yes", caseData.getJointParty())) {
-                ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                    EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
-                    "", idamService.getIdamTokens());
-                log.info("jointPartyAdded event updated");
-            }
+        if (StringUtils.equalsIgnoreCase(benefitType.getCode(), "uc") && isANewJointParty(callback, caseData)) {
+            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
+                "", idamService.getIdamTokens());
+            log.info("jointPartyAdded event updated");
         }
     }
+
+
 
     @Override
     public DispatchPriority getPriority() {
