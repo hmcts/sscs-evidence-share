@@ -63,7 +63,7 @@ public class RoboticsCallbackHandlerTest {
     public void setUp() {
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
 
-        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService);
+        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService, false);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.FALSE);
@@ -226,4 +226,33 @@ public class RoboticsCallbackHandlerTest {
         assertFalse(handler.canHandle(SUBMITTED, callback));
     }
 
+    @Test
+    public void givenARoboticsRequestFromDwpRaiseExceptionAndStateIsWithDwp_thenSendCaseToRobotics() {
+        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService, true);
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(WITH_DWP, READY_TO_LIST.getId());
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION_NOT_LISTABLE, false);
+        caseDetails.getCaseData().setIsProgressingViaGaps("Yes");
+
+        handler.handle(SUBMITTED, callback);
+
+
+        verify(roboticsService).sendCaseToRobotics(any());
+
+        assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
+
+        ArgumentCaptor<String> capture = ArgumentCaptor.forClass(String.class);
+        verify(ccdService).updateCase(any(), any(), capture.capture(), any(), any(), any());
+
+        assertEquals(NOT_LISTABLE.getCcdType(), capture.getValue());
+    }
+
+    @Test
+    public void givenARoboticsRequestFromDwpRaiseExceptionAndStateIsWithDwpUcNotEnabled_thenCantHandle() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(WITH_DWP, READY_TO_LIST.getId());
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION_NOT_LISTABLE, false);
+        caseDetails.getCaseData().setIsProgressingViaGaps("Yes");
+
+        assertFalse(handler.canHandle(SUBMITTED, callback));
+    }
 }

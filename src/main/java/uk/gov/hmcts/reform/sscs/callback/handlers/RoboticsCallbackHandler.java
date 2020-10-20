@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -32,17 +33,21 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
 
+    private final boolean ucEnabled;
+
     @Autowired
     public RoboticsCallbackHandler(RoboticsService roboticsService,
                                    CcdService ccdService,
                                    IdamService idamService,
-                                   RegionalProcessingCenterService regionalProcessingCenterService
+                                   RegionalProcessingCenterService regionalProcessingCenterService,
+                                   @Value("${feature.universal-credit.enabled}") boolean ucEnabled
     ) {
         this.roboticsService = roboticsService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.dispatchPriority = DispatchPriority.EARLIEST;
+        this.ucEnabled = ucEnabled;
     }
 
     @Override
