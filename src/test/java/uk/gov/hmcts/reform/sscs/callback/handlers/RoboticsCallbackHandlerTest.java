@@ -261,4 +261,15 @@ public class RoboticsCallbackHandlerTest {
 
         assertFalse(handler.canHandle(SUBMITTED, callback));
     }
+
+    @Test
+    public void givenACcdExceptionAndStateIsWithDwpUcEnabled_thenNoExceptionThrown() {
+        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService, true);
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(WITH_DWP, READY_TO_LIST.getId());
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION, false);
+
+        ccdService = null;
+
+        handler.handle(SUBMITTED, callback);
+    }
 }
