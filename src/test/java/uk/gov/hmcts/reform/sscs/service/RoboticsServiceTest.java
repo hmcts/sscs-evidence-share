@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
@@ -90,7 +90,7 @@ public class RoboticsServiceTest {
 
     @Before
     public void setup() {
-        initMocks(this);
+        openMocks(this);
 
         emailHelper = new EmailHelper();
         convertService = new SscsCcdConvertService();
