@@ -93,7 +93,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
                 String ccdEventType = null;
                 if (callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST
-                    || (callback.getEvent() == DWP_RAISE_EXCEPTION && ucEnabled)) {
+                    || (callback.getEvent() == DWP_RAISE_EXCEPTION)) {
                     ccdEventType = NOT_LISTABLE.getCcdType();
                 } else if (callback.getEvent() == EventType.READY_TO_LIST
                     || callback.getEvent() == RESEND_CASE_TO_GAPS2) {
@@ -131,7 +131,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         return callback.getEvent() == RESEND_CASE_TO_GAPS2
             || callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST
-            || (callback.getEvent() == DWP_RAISE_EXCEPTION && ucEnabled)
+            || (callback.getEvent() == DWP_RAISE_EXCEPTION)
             || callback.getCaseDetails().getCaseData().getCreatedInGapsFrom() == null
             || StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getState().getId()) ? true : false;
     }
