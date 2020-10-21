@@ -231,7 +231,7 @@ public class RoboticsCallbackHandlerTest {
         handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService, true);
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(WITH_DWP, READY_TO_LIST.getId());
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION_NOT_LISTABLE, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION, false);
         caseDetails.getCaseData().setIsProgressingViaGaps("Yes");
 
         handler.handle(SUBMITTED, callback);
@@ -250,7 +250,7 @@ public class RoboticsCallbackHandlerTest {
     @Test
     public void givenARoboticsRequestFromDwpRaiseExceptionAndStateIsWithDwpUcNotEnabled_thenCantHandle() {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(WITH_DWP, READY_TO_LIST.getId());
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION_NOT_LISTABLE, false);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION, false);
         caseDetails.getCaseData().setIsProgressingViaGaps("Yes");
 
         assertFalse(handler.canHandle(SUBMITTED, callback));
