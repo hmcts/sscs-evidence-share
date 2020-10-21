@@ -84,6 +84,13 @@ public class RoboticsCallbackHandlerTest {
         assertFalse(handler.canHandle(SUBMITTED, callback));
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void givenANonRoboticsEvent_thenThrowException() {
+        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+
+        handler.handle(SUBMITTED, callback);
+    }
+
     @Test
     @Parameters({"VALID_APPEAL", "INTERLOC_VALID_APPEAL", "VALID_APPEAL_CREATED", "APPEAL_TO_PROCEED"})
     public void givenARoboticsRequestAndCreatedInGapsMatchesState_thenSendCaseToRoboticsAndSetSentToGapsDateAndDoNotTriggerUpdateCaseEvent(EventType eventType) {
@@ -235,7 +242,6 @@ public class RoboticsCallbackHandlerTest {
         caseDetails.getCaseData().setIsProgressingViaGaps("Yes");
 
         handler.handle(SUBMITTED, callback);
-
 
         verify(roboticsService).sendCaseToRobotics(any());
 
