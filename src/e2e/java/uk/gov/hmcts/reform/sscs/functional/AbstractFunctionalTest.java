@@ -85,7 +85,7 @@ public abstract class AbstractFunctionalTest {
         return ccdService.getByCaseId(Long.valueOf(ccdCaseId), idamTokens);
     }
 
-    public String getJson(String fileName) throws IOException {
+    String getJson(String fileName) throws IOException {
         String resource = fileName + "Callback.json";
         String file = Objects.requireNonNull(getClass().getClassLoader().getResource(resource)).getFile();
         return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
