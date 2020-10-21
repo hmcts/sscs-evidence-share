@@ -62,9 +62,9 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             || callback.getEvent() == EventType.VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL
             || isValidStateForConfidentialityRequest(callback)
-            || callback.getEvent() == EventType.SEND_TO_DWP)
-            && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding()
+            || callback.getEvent() == EventType.SEND_TO_DWP
             || (callback.getEvent() == EventType.DWP_RAISE_EXCEPTION && ucEnabled))
+            && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding())
             || callback.getEvent() == RESEND_CASE_TO_GAPS2;
     }
 
