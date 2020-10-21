@@ -1,19 +1,21 @@
 package uk.gov.hmcts.reform.sscs;
 
-import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_CASE_ONLY;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.functional.AbstractFunctionalTest;
 
-@SpringBootTest
-@RunWith(SpringRunner.class)
-public class SmokeTest {
+public class SmokeTest extends AbstractFunctionalTest {
+
+    public SmokeTest() {
+        super();
+    }
 
     @Test
-    public void assertOneEqualsOne() {
+    public void checkSendEndpointReturns200() throws Exception {
 
-        assertEquals(1,1);
+        String json = getJson(UPDATE_CASE_ONLY.getCcdType());
+
+        simulateCcdCallback(json);
     }
 }
