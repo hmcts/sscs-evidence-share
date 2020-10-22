@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.controllers;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +23,7 @@ public class FunctionalTestControllerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
     }
 
     @Test

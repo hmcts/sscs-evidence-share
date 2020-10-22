@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
@@ -65,7 +65,7 @@ public class PlaceholderServiceTest {
 
     @Before
     public void setup() {
-        initMocks(this);
+        openMocks(this);
         DateTimeUtils.setCurrentMillisFixed(1550000000000L);
 
         now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());
