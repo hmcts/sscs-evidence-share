@@ -1,10 +1,13 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -59,6 +62,30 @@ public class CaseUpdatedHandlerTest {
                 .appeal(Appeal.builder()
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, CASE_UPDATED);
         handler.handle(CallbackType.SUBMITTED, callback);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void givenCallbackHasNullAppeal_willThrowAnException() {
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).jointParty("Yes")
+                .build(), INTERLOCUTORY_REVIEW_STATE, CASE_UPDATED);
+        handler.handle(CallbackType.SUBMITTED, callback);
+    }
+
+    @Test
+    public void givenCallbackWithMatchingParams_returnsTrue() {
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).jointParty("Yes")
+                .appeal(Appeal.builder()
+                    .benefitType(BenefitType.builder().code("UC").build())
+                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, CASE_UPDATED);
+        assertTrue(handler.canHandle(CallbackType.SUBMITTED, callback));
+    }
+
+    @Test
+    @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
+    public void givenAValidAppealReceivedEventForNonDigitalCase_thenReturnFalse(CallbackType callbackType) {
+        assertFalse(handler.canHandle(callbackType, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(VALID_APPEAL.getId()).build(), INTERLOCUTORY_REVIEW_STATE, CASE_UPDATED)));
     }
 
     @Test
