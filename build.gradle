@@ -235,7 +235,7 @@ dependencies {
 
   testCompile 'pl.pragmatists:JUnitParams:1.1.1'
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.13'
+  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.15'
   testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
   compile 'org.projectlombok:lombok:1.18.16'
