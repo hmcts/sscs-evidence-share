@@ -216,7 +216,7 @@ public class DwpUploadResponseHandlerTest {
     }
 
     @Test
-    public void givenADwpUploadResponseEventUcWithBothNo_runResponseReceivedEvent() {
+    public void givenADwpUploadResponseEventUcWithBothNo_runReadyToListEvent() {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
@@ -234,5 +234,28 @@ public class DwpUploadResponseHandlerTest {
         verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
             eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any());
     }
+
+    @Test
+    public void givenADwpUploadResponseEventWithJointParty_runJointPartyAddedEvent() {
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
+                .jointParty("Yes").elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("UC").build())
+                .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
+            .data(callback.getCaseDetails().getCaseData()).build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService, times(2)).getIdamTokens();
+        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
+            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any());
+        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
+            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.JOINT_PARTY_ADDED.getCcdType()), anyString(), anyString(), any());
+
+    }
+
 
 }

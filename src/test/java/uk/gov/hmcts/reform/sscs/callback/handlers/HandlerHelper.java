@@ -18,4 +18,13 @@ public final class HandlerHelper {
             LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
+
+    public static Callback<SscsCaseData> buildTestCallbackForGivenData(SscsCaseData sscsCaseData, SscsCaseData oldSscsCaseData, State state, EventType eventType) {
+        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "SSCS", state, sscsCaseData,
+            LocalDateTime.now());
+        CaseDetails<SscsCaseData> oldCaseDetails = new CaseDetails<>(1L, "SSCS", state, oldSscsCaseData,
+            LocalDateTime.now());
+        
+        return new Callback<>(caseDetails, Optional.of(oldCaseDetails), eventType, false);
+    }
 }

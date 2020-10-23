@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerUtils.isANewJointParty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import lombok.extern.slf4j.Slf4j;
@@ -92,11 +93,13 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             disputedDecision = StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "yes");
         }
 
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
         if (!dwpFurtherInfo
             && !disputedDecision) {
             log.info("updating to ready to list");
 
-            SscsCaseData caseData = setDwpState(callback);
+            caseData = setDwpState(callback);
 
             ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.READY_TO_LIST.getCcdType(), "ready to list",
@@ -115,13 +118,18 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                 description = "update to response received event as there is a dispute.";
             }
 
-            SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
             caseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
 
             ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.DWP_RESPOND.getCcdType(), "Response received",
                 description, idamService.getIdamTokens());
+        }
+
+        if (isANewJointParty(callback, caseData)) {
+            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
+                "A joint party was added to the appeal", idamService.getIdamTokens());
+            log.info("jointPartyAdded event updated");
         }
     }
 
