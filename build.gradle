@@ -194,7 +194,7 @@ configurations.all {
 }
 
 dependencies {
-  compile group: 'com.google.guava', name: 'guava', version: '29.0-jre' //to remove CVE-2018-10237
+  compile group: 'com.google.guava', name: 'guava', version: '30.0-jre' //to remove CVE-2018-10237
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -222,7 +222,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.1'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
 
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.0.0-RC6'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.0.0-RC7'
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.14'
 
   //Remove when our dependencies pull in this version or later
@@ -236,7 +236,7 @@ dependencies {
 
   testCompile 'pl.pragmatists:JUnitParams:1.1.1'
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.15'
+  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
   testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
   compile 'org.projectlombok:lombok:1.18.16'

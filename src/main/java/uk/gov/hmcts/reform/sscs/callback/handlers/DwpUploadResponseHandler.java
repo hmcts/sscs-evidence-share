@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -25,11 +26,15 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
     private CcdService ccdService;
     private IdamService idamService;
+    private final boolean urgentHearingEnabled;
 
     @Autowired
-    public DwpUploadResponseHandler(CcdService ccdService, IdamService idamService) {
+    public DwpUploadResponseHandler(CcdService ccdService,
+                                    IdamService idamService,
+                                    @Value("${feature.urgent-hearing.enabled}") boolean urgentHearingEnabled) {
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.urgentHearingEnabled = urgentHearingEnabled;
 
     }
 
@@ -66,7 +71,13 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void handleNonUc(Callback<SscsCaseData> callback) {
-        if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no")) {
+        if (urgentHearingEnabled && "Yes".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getUrgentCase())) {
+            log.info("urgent case updating to responseReceived");
+            SscsCaseData caseData = setDwpState(callback);
+            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.DWP_RESPOND.getCcdType(), "Response received",
+                "urgent hearing set to response received event", idamService.getIdamTokens());
+        } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no")) {
             log.info("updating to ready to list");
 
             SscsCaseData caseData = setDwpState(callback);
@@ -95,7 +106,14 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        if (!dwpFurtherInfo
+        if (urgentHearingEnabled && "Yes".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getUrgentCase())) {
+            log.info("urgent case updating to responseReceived");
+            caseData = setDwpState(callback);
+            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.DWP_RESPOND.getCcdType(), "Response received",
+                "urgent hearing set to response received event", idamService.getIdamTokens());
+
+        } else if (!dwpFurtherInfo
             && !disputedDecision) {
             log.info("updating to ready to list");
 
