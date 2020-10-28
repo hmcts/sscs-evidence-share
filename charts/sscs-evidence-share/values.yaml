@@ -58,3 +58,4 @@ java:
     EMAIL_SMTP_TLS_ENABLED: "true"
     EMAIL_SMTP_SSL_TRUST: "*"
     UC_ENABLED: false
+    URGENT_HEARING_ENABLED: false
