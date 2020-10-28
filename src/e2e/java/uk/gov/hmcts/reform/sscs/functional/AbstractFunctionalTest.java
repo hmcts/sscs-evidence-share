@@ -58,16 +58,21 @@ public abstract class AbstractFunctionalTest {
     private final String localInstance = "http://localhost:8091";
 
     void createCaseWithValidAppealState(EventType eventType) {
+        createCaseWithValidAppealState(eventType, "PIP", "Personal Independence Payment", State.VALID_APPEAL.getId());
+    }
+
+
+    void createCaseWithValidAppealState(EventType eventType, String benefitType, String benefitDescription, String createdInGapsFrom) {
         idamTokens = idamService.getIdamTokens();
 
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
 
         SscsCaseData caseData = minimalCaseData.toBuilder()
-            .createdInGapsFrom(State.VALID_APPEAL.getId())
+            .createdInGapsFrom(createdInGapsFrom)
             .appeal(minimalCaseData.getAppeal().toBuilder()
                 .benefitType(BenefitType.builder()
-                    .code("PIP")
-                    .description("Personal Independence Payment")
+                    .code(benefitType)
+                    .description(benefitDescription)
                     .build())
                 .receivedVia("Paper")
                 .build())
