@@ -3,9 +3,11 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
+import org.springframework.web.client.ResourceAccessException;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -16,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
+import uk.gov.hmcts.reform.sscs.exception.UnableToContactThirdPartyException;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 
@@ -92,14 +95,27 @@ public class DocumentManagementServiceWrapperTest {
         verifyNoMoreInteractions(documentManagementService);
     }
 
-    @Test(expected = PdfStoreException.class)
-    public void ifAPdfGenerationExceptionIsThrownServiceCallWillNotBeRetried() {
+    @Test(expected = UnableToContactThirdPartyException.class)
+    public void whenPdfGenerationExceptionAIsThrownServiceCallWillNotBeRetried() {
         when(documentManagementService.generateDocumentAndAddToCcd(any(), any()))
             .thenThrow(new PdfGenerationException("a message", new RuntimeException("blah")));
         try {
             service.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
         } catch (PdfStoreException e) {
-            verify(documentManagementService).generateDocumentAndAddToCcd(eq(holder), eq(caseData));
+            verify(documentManagementService, atLeastOnce()).generateDocumentAndAddToCcd(eq(holder), eq(caseData));
+            verifyNoMoreInteractions(documentManagementService);
+            throw e;
+        }
+    }
+
+    @Test(expected = UnableToContactThirdPartyException.class)
+    public void whenResourceAccessExceptionIsThrownServiceCallWillNotBeRetried() {
+        when(documentManagementService.generateDocumentAndAddToCcd(any(), any()))
+            .thenThrow(new ResourceAccessException("a message", new IOException("blah")));
+        try {
+            service.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
+        } catch (PdfStoreException e) {
+            verify(documentManagementService, atLeastOnce()).generateDocumentAndAddToCcd(eq(holder), eq(caseData));
             verifyNoMoreInteractions(documentManagementService);
             throw e;
         }
@@ -118,13 +134,18 @@ public class DocumentManagementServiceWrapperTest {
         verifyNoMoreInteractions(documentManagementService);
     }
 
-    @Test(expected = PdfStoreException.class)
+    @Test(expected = RuntimeException.class)
     public void anExceptionWillBeCaughtAndRetriedUntilItFails() {
         when(documentManagementService.generateDocumentAndAddToCcd(any(), any()))
             .thenThrow(new RuntimeException("blah"))
             .thenThrow(new RuntimeException("blah"))
             .thenThrow(new RuntimeException("blah"));
 
-        service.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
+        try {
+            service.generateDocumentAndAddToCcd(holder, caseData, idamTokens);
+        } catch (Exception e) {
+            verify(documentManagementService, atLeast(3)).generateDocumentAndAddToCcd(any(), any());
+            throw e;
+        }
     }
 }

@@ -30,7 +30,7 @@ public class FunctionalTestController {
         log.info("authorising service auth header.");
         authorisationService.authorise(serviceAuthHeader);
         log.info("consuming message.");
-        consumer.onMessage(message);
+        consumer.onMessage(message, "1");
         log.info("done.");
     }
 }

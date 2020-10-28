@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 public final class PlaceholderConstants {
 
     public static final String CASE_CREATED_DATE_LITERAL = "case_created_date";
+    public static final String WELSH_CASE_CREATED_DATE_LITERAL = "welsh_case_created_date";
     public static final String BENEFIT_TYPE_LITERAL = "benefit_type";
     public static final String APPELLANT_FULL_NAME_LITERAL = "appellant_full_name";
     public static final String CASE_ID_LITERAL = "case_id";
     public static final String NINO_LITERAL = "nino";
     public static final String GENERATED_DATE_LITERAL = "generated_date";
+    public static final String WELSH_GENERATED_DATE_LITERAL = "welsh_generated_date";
     public static final String SSCS_URL_LITERAL = "sscs_url";
     public static final String SSCS_URL = "https://www.gov.uk/appeal-benefit-decision";
     public static final String SC_NUMBER_LITERAL = "sc_number";

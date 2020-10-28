@@ -17,6 +17,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
@@ -27,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.exception.NonPdfBulkPrintException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -87,6 +90,12 @@ public class BulkPrintServiceTest {
         bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
     }
 
+    @Test(expected = NonPdfBulkPrintException.class)
+    public void shouldThrowANonPdfBulkPrintExceptionOnHttpClientErrorExceptionFromBulkPrint() {
+        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
+            .thenThrow(new HttpClientErrorException(HttpStatus.valueOf(400)));
+        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+    }
 
     @Test
     public void sendLetterNotEnabledWillNotSendToBulkPrint() {

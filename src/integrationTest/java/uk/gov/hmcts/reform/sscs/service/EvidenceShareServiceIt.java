@@ -149,7 +149,7 @@ public class EvidenceShareServiceIt {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        topicConsumer.onMessage(json);
+        topicConsumer.onMessage(json, "1");
 
         assertEquals(3, documentCaptor.getValue().size());
         assertEquals("dl6-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -188,7 +188,7 @@ public class EvidenceShareServiceIt {
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        topicConsumer.onMessage(json);
+        topicConsumer.onMessage(json, "1");
 
         assertEquals(3, documentCaptor.getValue().size());
         assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
@@ -215,7 +215,7 @@ public class EvidenceShareServiceIt {
 
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
 
-        topicConsumer.onMessage(json);
+        topicConsumer.onMessage(json, "1");
 
         then(ccdService)
             .should(times(1))
@@ -238,7 +238,7 @@ public class EvidenceShareServiceIt {
         json = json.replace("PAPER", receivedVia);
         json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
 
-        topicConsumer.onMessage(json);
+        topicConsumer.onMessage(json, "1");
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
@@ -254,7 +254,7 @@ public class EvidenceShareServiceIt {
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
 
-        topicConsumer.onMessage(json);
+        topicConsumer.onMessage(json, "1");
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);

@@ -57,4 +57,4 @@ java:
     EMAIL_SERVER_PORT: "25"
     EMAIL_SMTP_TLS_ENABLED: "true"
     EMAIL_SMTP_SSL_TRUST: "*"
-    BULK_SCAN_MIGRATED: true
+    UC_ENABLED: false

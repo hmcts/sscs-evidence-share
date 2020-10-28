@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
@@ -35,8 +35,8 @@ import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.dwp.Mapping;
 import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
-import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonMapper;
-import uk.gov.hmcts.reform.sscs.robotics.json.RoboticsJsonValidator;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
+import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonValidator;
 
 @RunWith(JUnitParamsRunner.class)
 public class RoboticsServiceTest {
@@ -90,7 +90,7 @@ public class RoboticsServiceTest {
 
     @Before
     public void setup() {
-        initMocks(this);
+        openMocks(this);
 
         emailHelper = new EmailHelper();
         convertService = new SscsCcdConvertService();

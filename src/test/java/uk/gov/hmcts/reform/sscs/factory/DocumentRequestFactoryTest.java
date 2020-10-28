@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.factory;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -36,7 +36,7 @@ public class DocumentRequestFactoryTest {
 
     @Before
     public void setup() {
-        initMocks(this);
+        openMocks(this);
     }
 
     @Test

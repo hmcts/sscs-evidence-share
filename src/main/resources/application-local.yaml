@@ -19,6 +19,9 @@ feign:
 
 send-letter:
   url: ${SEND_LETTER_SERVICE_BASEURL:false}
+  maxRetryAttempts: 3
+
 
 amqp:
   password: ${AMQP_PASSWORD:guest}
+
