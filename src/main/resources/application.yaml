@@ -142,3 +142,4 @@ exela:
 
 feature:
   universal-credit.enabled: ${UC_ENABLED:false}
+  urgent-hearing.enabled: ${URGENT_HEARING_ENABLED:false}
