@@ -335,6 +335,7 @@ public class DwpUploadResponseHandlerTest {
         verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
             eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any());
     }
+
     @Test
     public void givenADwpUploadResponseEventWithJointParty_runJointPartyAddedEvent() {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
