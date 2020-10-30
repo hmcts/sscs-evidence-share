@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -29,7 +28,6 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     @Autowired
     private EvidenceManagementService evidenceManagementService;
 
-    @Ignore("Flaky, to be fixed under SSCS-7621")
     @Test
     public void givenIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
