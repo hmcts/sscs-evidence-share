@@ -6,7 +6,6 @@ java:
   ingressHost: sscs-evidence-share-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   keyVaults:
     sscs:
-      resourceGroup: sscs
       secrets:
         - idam-oauth-user
         - idam-redirect
@@ -26,6 +25,7 @@ java:
         - robotics-email-scottish-to
         - robotics-email-pip-ae-to
         - AppInsightsInstrumentationKey
+        - ld-sdk-key
   environment:
     REFORM_TEAM: sscs
     REFORM_SERVICE_NAME: sscs-evidence-share

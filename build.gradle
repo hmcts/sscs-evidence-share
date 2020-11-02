@@ -3,7 +3,7 @@ plugins {
   id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.10.RELEASE'
-  id 'org.springframework.boot' version '2.3.4.RELEASE'
+  id 'org.springframework.boot' version '2.3.5.RELEASE'
   id 'uk.gov.hmcts.java' version '0.12.1'
   id 'com.github.ben-manes.versions' version '0.33.0'
   id 'org.owasp.dependencycheck' version '6.0.2'
@@ -174,12 +174,13 @@ repositories {
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
 // enforces it's own (older) version which is not recommended.
 def versions = [
-  junit: '5.3.2',
-  reformLogging: '5.1.0',
+  junit           : '5.7.0',
+  junitPlatform   : '1.7.0',
+  reformLogging: '5.1.7',
   springBoot: springBoot.class.package.implementationVersion,
   springfoxSwagger: '2.9.2',
-  lombok: '1.18.6',
-  restAssured: '4.3.0'
+  lombok: '1.18.16',
+  restAssured: '4.3.1'
 ]
 
 configurations.all {
@@ -192,6 +193,17 @@ configurations.all {
     }
   }
 }
+
+ext.libraries = [
+  junit5: [
+    "org.junit.jupiter:junit-jupiter-api:${versions.junit}",
+    "org.junit.jupiter:junit-jupiter-engine:${versions.junit}",
+    "org.junit.jupiter:junit-jupiter-params:${versions.junit}",
+    "org.junit.vintage:junit-vintage-engine:${versions.junit}",
+    "org.junit.platform:junit-platform-commons:${versions.junitPlatform}",
+    "org.junit.platform:junit-platform-engine:${versions.junitPlatform}",
+  ]
+]
 
 dependencies {
   compile group: 'com.google.guava', name: 'guava', version: '30.0-jre' //to remove CVE-2018-10237
@@ -219,7 +231,7 @@ dependencies {
 
   annotationProcessor "org.projectlombok:lombok:1.18.14"
 
-  compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.1'
+  compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.2'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
 
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.0.0'
@@ -230,25 +242,23 @@ dependencies {
 
   integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit
-  testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: versions.junit
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit
+  testImplementation libraries.junit5
+  testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
   testCompile 'pl.pragmatists:JUnitParams:1.1.1'
-  testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
   testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
   testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
-  compile 'org.projectlombok:lombok:1.18.16'
+  compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  testCompileOnly 'org.projectlombok:lombok:1.18.14'
+  testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   e2eCompileOnly 'org.projectlombok:lombok:1.18.16'
   e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  integrationTestCompileOnly 'org.projectlombok:lombok:1.18.8'
+  integrationTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
 }
@@ -314,7 +324,9 @@ run {
 mainClassName = 'uk.gov.hmcts.reform.sscs.SscsEvidenceShareApplication'
 
 bootJar {
-  archiveName = 'sscs-evidence-share.jar'
+  getArchiveFileName().set(provider {
+    'sscs-evidence-share.jar'
+  })
 
   manifest {
     attributes('Implementation-Version': project.version.toString())
