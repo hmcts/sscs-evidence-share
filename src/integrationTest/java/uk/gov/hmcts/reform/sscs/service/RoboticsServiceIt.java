@@ -8,8 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -292,6 +291,19 @@ public class RoboticsServiceIt {
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
 
         assertTrue(result.has("isConfidential"));
+        verifyNoMoreInteractions(ccdService);
+    }
+
+    @Test
+    public void givenDwpRaiseException_thenSetDigitalFlagNoToRobotics() {
+        caseData.setCreatedInGapsFrom(VALID_APPEAL.getId());
+        caseData.setIsProgressingViaGaps("Yes");
+
+        caseDetails = new CaseDetails<>(1234L, "sscs", State.NOT_LISTABLE, caseData, null);
+
+        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
+
+        assertEquals("No", result.getString("isDigital"));
         verifyNoMoreInteractions(ccdService);
     }
 }
