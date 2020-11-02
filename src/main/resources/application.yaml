@@ -23,6 +23,10 @@ http:
     read:
       timeout: 5000
 
+ld:
+  user_key: sscs-evidence-share
+  sdk_key:
+
 service:
   pdf-service:
     uri: ${PDF_SERVICE_BASE_URL:https://docmosis-development.platform.hmcts.net/rs/render}
