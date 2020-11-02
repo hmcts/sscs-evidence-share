@@ -114,7 +114,7 @@ public class EvidenceShareServiceIt {
 
     protected MimeMessage message;
 
-    @MockBean
+    @MockBean(name = "sendGridMailSender")
     protected JavaMailSender mailSender;
 
     Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
