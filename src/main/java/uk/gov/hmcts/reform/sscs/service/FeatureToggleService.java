@@ -15,7 +15,7 @@ public class FeatureToggleService {
     private final String ldUserKey;
 
     @Autowired
-    public FeatureToggleService(LDClient ldClient, @Value("${ld.user_key}") String ldUserKey) {
+    public FeatureToggleService(LDClient ldClient, @Value("${ld.user-key}") String ldUserKey) {
         this.ldClient = ldClient;
         this.ldUserKey = ldUserKey;
     }

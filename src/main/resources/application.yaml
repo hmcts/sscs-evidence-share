@@ -28,8 +28,7 @@ send-grid:
   port: 587
 
 ld:
-  user_key: sscs-evidence-share
-  sdk_key:
+  user-key: sscs-evidence-share
 
 service:
   pdf-service:
