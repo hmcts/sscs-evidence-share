@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
@@ -74,11 +73,7 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
-        HashMap<String, String> map = new HashMap<String, String>();
-
-        map.put("case.appeal.appellant.identity.nino", nino);
-
-        return ccdService.findCaseBy(map, idamTokens);
+        return ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens);
     }
 
     private void backLinkAssociatedCases(Long caseId, List<SscsCaseDetails> matchedByNinoCases, IdamTokens idamTokens) {
