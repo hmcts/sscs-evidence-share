@@ -18,7 +18,7 @@ public class RequestTranslationTemplate {
     public RequestTranslationTemplate(
         @Autowired FeatureToggleService featureToggleService,
         @Value("${wlu.email.from}") String from,
-        @Value("${wlu.email.fromSendGrid}") String fromSendGrid,
+        @Value("${wlu.email.from-send-grid}") String fromSendGrid,
         @Value("${wlu.email.to}") String to,
         @Value("${wlu.email.subject}") String subject,
         @Value("${wlu.email.message}") String message

@@ -21,7 +21,7 @@ public class RoboticsEmailTemplate {
     public RoboticsEmailTemplate(
         @Autowired FeatureToggleService featureToggleService,
         @Value("${robotics.email.from}") String from,
-        @Value("${robotics.email.fromSendGrid}") String fromSendGrid,
+        @Value("${robotics.email.from-send-grid}") String fromSendGrid,
         @Value("${robotics.email.to}") String to,
         @Value("${robotics.email.scottishTo}") String scottishTo,
         @Value("${robotics.email.pipAeTo}") String pipAeTo,
