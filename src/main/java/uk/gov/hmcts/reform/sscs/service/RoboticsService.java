@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.*;
 
 import java.net.URI;
+import java.security.SecureRandom;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -46,7 +47,7 @@ public class RoboticsService {
     private final int englishRoboticCount;
     private final int scottishRoboticCount;
 
-    private Random rn;
+    private final Random rn;
 
     @Autowired
     public RoboticsService(
@@ -75,7 +76,7 @@ public class RoboticsService {
         this.idamService = idamService;
         this.englishRoboticCount = englishRoboticCount;
         this.scottishRoboticCount = scottishRoboticCount;
-        rn = new Random();
+        rn = new SecureRandom();
     }
 
     public JSONObject sendCaseToRobotics(CaseDetails<SscsCaseData> caseDetails) {

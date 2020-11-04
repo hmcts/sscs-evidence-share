@@ -23,7 +23,7 @@ data "azurerm_key_vault_secret" "send_grid_api_key" {
 
 
   key_vault_id = data.azurerm_key_vault.send_grid.id
-  name         = "sscs-password"
+  name         = "sscs-api-key"
 }
 
 resource "azurerm_key_vault_secret" "sendgrid_api_key" {
