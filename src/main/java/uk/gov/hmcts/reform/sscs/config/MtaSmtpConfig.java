@@ -8,7 +8,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 @Configuration
-public class SmtpConfig {
+public class MtaSmtpConfig {
 
     @Value("${appeal.email.host}")
     private String emailHost;
@@ -22,7 +22,7 @@ public class SmtpConfig {
     @Value("${appeal.email.smtp.ssl.trust}")
     private String smtpSslTrust;
 
-    @Bean
+    @Bean("mtaMailSender")
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
         javaMailSender.setHost(emailHost);
