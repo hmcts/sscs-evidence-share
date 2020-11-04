@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -26,10 +26,7 @@ public class EmailService {
         backoff = @Backoff(delay = 100, maxDelay = 500))
     public void sendEmail(long caseId, final Email email) {
         try {
-            JavaMailSenderImpl mailSender = (JavaMailSenderImpl) emailSenderProvider.getMailSender();
-
-            String password = mailSender.getPassword();
-            log.info("Connecting to mail server {} {} {}", mailSender.getHost(), mailSender.getPort(), password != null ? password.length() : "empty password");
+            JavaMailSender mailSender = emailSenderProvider.getMailSender();
             final MimeMessage message = mailSender.createMimeMessage();
             final MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, true);
 
