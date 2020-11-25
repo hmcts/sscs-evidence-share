@@ -160,15 +160,15 @@ repositories {
   maven {
     url "https://dl.bintray.com/hmcts/hmcts-maven"
   }
-  maven {
-    url 'https://repo.spring.io/libs-milestone'
-  }
-  jcenter()
   mavenCentral()
+  jcenter()
 
   // jitpack should be last resort
   // see: https://github.com/jitpack/jitpack.io/issues/1939
   maven { url 'https://jitpack.io' }
+  maven {
+    url 'https://repo.spring.io/libs-milestone'
+  }
 }
 
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
@@ -307,6 +307,15 @@ dependencyManagement {
       entry 'netty-buffer'
       entry 'netty-resolver'
       entry 'netty-common'
+    }
+
+    // CVE-2020-13954
+    dependencySet(group: 'org.apache.cxf', version: '3.4.1') {
+        entry 'cxf-core'
+        entry 'cxf-rt-frontend-jaxrs'
+        entry 'cxf-rt-rs-client'
+        entry 'cxf-rt-security'
+        entry 'cxf-rt-transports-http'
     }
 
   }
