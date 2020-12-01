@@ -150,5 +150,4 @@ exela:
   addressPostcode: CM20 9QF
 
 feature:
-  universal-credit.enabled: ${UC_ENABLED:false}
   urgent-hearing.enabled: ${URGENT_HEARING_ENABLED:false}
