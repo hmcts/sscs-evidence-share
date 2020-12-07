@@ -23,7 +23,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -225,8 +224,6 @@ public class RoboticsServiceIt {
 
     @Test
     public void givenUcSscsCaseDataWithJointPartyAndElements_makeValidRoboticsJsonThatValidatesAgainstSchema() {
-        ReflectionTestUtils.setField(mapper, "ucEnabled", true);
-
         caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("Pip").build());
         caseDetails.getCaseData().setJointParty("Yes");
         caseDetails.getCaseData().setElementsDisputedLinkedAppealRef("123456");

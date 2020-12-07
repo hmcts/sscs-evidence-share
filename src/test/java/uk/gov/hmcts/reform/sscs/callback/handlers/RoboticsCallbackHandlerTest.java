@@ -63,7 +63,7 @@ public class RoboticsCallbackHandlerTest {
     public void setUp() {
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
 
-        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService, false);
+        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.FALSE);
@@ -229,7 +229,7 @@ public class RoboticsCallbackHandlerTest {
 
     @Test
     public void givenARoboticsRequestFromDwpRaiseExceptionAndStateIsWithDwp_thenSendCaseToRobotics() {
-        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService, true);
+        handler = new RoboticsCallbackHandler(roboticsService, ccdService, idamService, regionalProcessingCenterService);
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(WITH_DWP, READY_TO_LIST.getId());
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION, false);
@@ -247,12 +247,4 @@ public class RoboticsCallbackHandlerTest {
         assertEquals(NOT_LISTABLE.getCcdType(), capture.getValue());
     }
 
-    @Test
-    public void givenARoboticsRequestFromDwpRaiseExceptionAndStateIsWithDwpUcNotEnabled_thenCantHandle() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(WITH_DWP, READY_TO_LIST.getId());
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION, false);
-        caseDetails.getCaseData().setIsProgressingViaGaps("Yes");
-
-        assertFalse(handler.canHandle(SUBMITTED, callback));
-    }
 }

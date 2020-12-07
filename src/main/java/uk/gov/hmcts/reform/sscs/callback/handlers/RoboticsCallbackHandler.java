@@ -1,13 +1,12 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -33,21 +32,17 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
 
-    private final boolean ucEnabled;
-
     @Autowired
     public RoboticsCallbackHandler(RoboticsService roboticsService,
                                    CcdService ccdService,
                                    IdamService idamService,
-                                   RegionalProcessingCenterService regionalProcessingCenterService,
-                                   @Value("${feature.universal-credit.enabled}") boolean ucEnabled
+                                   RegionalProcessingCenterService regionalProcessingCenterService
     ) {
         this.roboticsService = roboticsService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.dispatchPriority = DispatchPriority.EARLIEST;
-        this.ucEnabled = ucEnabled;
     }
 
     @Override
@@ -63,7 +58,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             || callback.getEvent() == INTERLOC_VALID_APPEAL
             || isValidStateForConfidentialityRequest(callback)
             || callback.getEvent() == EventType.SEND_TO_DWP
-            || (callback.getEvent() == EventType.DWP_RAISE_EXCEPTION && ucEnabled))
+            || callback.getEvent() == EventType.DWP_RAISE_EXCEPTION)
             && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding())
             || callback.getEvent() == RESEND_CASE_TO_GAPS2;
     }
@@ -133,7 +128,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             || callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST
             || (callback.getEvent() == DWP_RAISE_EXCEPTION)
             || callback.getCaseDetails().getCaseData().getCreatedInGapsFrom() == null
-            || StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getState().getId()) ? true : false;
+            || equalsIgnoreCase(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getState().getId());
     }
 
     private boolean isValidStateForConfidentialityRequest(Callback<SscsCaseData> callback) {
