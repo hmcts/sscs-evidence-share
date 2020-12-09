@@ -5,8 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 
@@ -61,9 +59,6 @@ public class RoboticsServiceIt {
 
     @Captor
     private ArgumentCaptor<SscsCaseData> caseDataCaptor;
-
-    @Captor
-    private ArgumentCaptor<String> eventCaptor;
 
     @Before
     public void setup() {
@@ -210,16 +205,6 @@ public class RoboticsServiceIt {
         assertFalse(result.has("hearingArrangements"));
 
         verifyNoMoreInteractions(ccdService);
-    }
-
-    @Test
-    public void givenDwpOfficeIsClosed_thenSaveNewOfficeToCaseWhenRoboticsIsProcessed() {
-        caseDetails.getCaseData().getAppeal().getMrnDetails().setDwpIssuingOffice("1");
-        roboticsService.sendCaseToRobotics(caseDetails);
-
-        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
-
-        assertEquals("DWP PIP (1)", caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
     @Test

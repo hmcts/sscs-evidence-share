@@ -341,9 +341,6 @@ public class RoboticsServiceTest {
         roboticsService.sendCaseToRobotics(caseData);
 
         assertThat(caseData.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice(), is(newOffice));
-        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
-
-        assertThat(caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice(), is(newOffice));
     }
 
     @Test
@@ -362,9 +359,6 @@ public class RoboticsServiceTest {
         roboticsService.sendCaseToRobotics(caseData);
 
         assertThat(caseData.getCaseData().getDwpOriginatingOffice().getValue().getCode(), is(newOffice));
-        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
-
-        assertThat(caseDataCaptor.getValue().getDwpOriginatingOffice().getValue().getCode(), is(newOffice));
     }
 
     @Test
@@ -383,9 +377,6 @@ public class RoboticsServiceTest {
         roboticsService.sendCaseToRobotics(caseData);
 
         assertThat(caseData.getCaseData().getDwpPresentingOffice().getValue().getCode(), is(newOffice));
-        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
-
-        assertThat(caseDataCaptor.getValue().getDwpPresentingOffice().getValue().getCode(), is(newOffice));
     }
 
     @Test
@@ -408,10 +399,5 @@ public class RoboticsServiceTest {
         assertThat(caseData.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice(), is(newOffice));
         assertThat(caseData.getCaseData().getDwpOriginatingOffice().getValue().getCode(), is(newOffice));
         assertThat(caseData.getCaseData().getDwpPresentingOffice().getValue().getCode(), is(newOffice));
-        verify(ccdService).updateCase(caseDataCaptor.capture(), any(), any(), any(), any(), any());
-
-        assertThat(caseDataCaptor.getValue().getAppeal().getMrnDetails().getDwpIssuingOffice(), is(newOffice));
-        assertThat(caseData.getCaseData().getDwpOriginatingOffice().getValue().getCode(), is(newOffice));
-        assertThat(caseDataCaptor.getValue().getDwpPresentingOffice().getValue().getCode(), is(newOffice));
     }
 }
