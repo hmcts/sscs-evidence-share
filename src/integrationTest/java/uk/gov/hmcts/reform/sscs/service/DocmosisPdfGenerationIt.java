@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -65,7 +67,7 @@ public class DocmosisPdfGenerationIt {
 
         byte[] result = pdfGenerationService.generatePdf(DocumentHolder.builder().template(new Template("dl6-template.doc", "dl6")).placeholders(PLACEHOLDERS).build());
         assertNotNull(result);
-        assertEquals(FILE_CONTENT.getBytes(), result);
+        assertThat(result, is(equalTo(FILE_CONTENT.getBytes())));
     }
 
     @Test
