@@ -318,6 +318,13 @@ dependencyManagement {
         entry 'cxf-rt-transports-http'
     }
 
+    // CVE-2020-17521
+    dependencySet(group: 'org.codehaus.groovy', version: '3.0.7') {
+      entry 'groovy'
+      entry 'groovy-json'
+      entry 'groovy-xml'
+    }
+
   }
 }
 
