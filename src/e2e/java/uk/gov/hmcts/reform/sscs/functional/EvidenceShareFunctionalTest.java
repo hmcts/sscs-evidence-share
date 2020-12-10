@@ -3,11 +3,12 @@ package uk.gov.hmcts.reform.sscs.functional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_TEST_CASE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
-import io.github.artsok.RepeatedIfExceptionsTest;
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -25,10 +26,10 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         ccdCaseId = null;
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
+    @Test
     public void processANonDigitalAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
 
-        createNonDigitalCaseWithEvent(VALID_APPEAL_CREATED);
+        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -49,10 +50,10 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         assertEquals(LocalDate.now().toString(), caseData.getDateCaseSentToGaps());
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000)
+    @Test
     public void processANonDigitalAppealWithNoValidMrnDate_shouldNotBeSentToDwpAndShouldBeUpdatedToFlagError() throws Exception {
 
-        createNonDigitalCaseWithEvent(VALID_APPEAL_CREATED);
+        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -67,9 +68,9 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         assertEquals("failedSending", caseDetails.getData().getHmctsDwpState());
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000)
+    @Test
     public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws Exception {
-        createNonDigitalCaseWithEvent(VALID_APPEAL_CREATED);
+        createNonDigitalCaseWithEvent(CREATE_TEST_CASE);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -89,10 +90,10 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
+    @Test
     public void processADigitalAppealWithValidMrn_shouldSendToWithDwpState() throws Exception {
 
-        createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
+        createDigitalCaseWithEvent(CREATE_TEST_CASE);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);

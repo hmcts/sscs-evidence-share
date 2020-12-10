@@ -14,7 +14,6 @@ import java.util.Objects;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
@@ -33,7 +32,10 @@ public class DwpUploadFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void dwpUploadResponseEventSendsToReadyToList() throws IOException {
 
-        createCaseWithValidAppealState(VALID_APPEAL_CREATED, "UC", "Universal Credit", State.READY_TO_LIST.getId());
+        SscsCaseDetails createdCase = createCaseWithState(CREATE_TEST_CASE, "UC", "Universal Credit", State.READY_TO_LIST.getId());
+
+        //Get case into correct state without triggering any callbacks that cause race conditions
+        updateCaseEvent(SEND_TO_DWP_OFFLINE, createdCase);
 
         String json = getJson(DWP_UPLOAD_RESPONSE.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
@@ -51,7 +53,6 @@ public class DwpUploadFunctionalTest extends AbstractFunctionalTest {
         simulateCcdCallback(json);
 
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-        SscsCaseData caseData = caseDetails.getData();
 
         assertEquals("readyToList", caseDetails.getState());
     }
