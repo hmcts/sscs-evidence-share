@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional;
 
 import static java.util.Collections.singletonList;
 import static junit.framework.TestCase.assertNull;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
@@ -43,9 +42,9 @@ public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest exten
         List<SscsDocument> docs = caseData.getSscsDocument();
 
         assertNull(docs.get(0).getValue().getEvidenceIssued());
-        assertThat(docs.get(1).getValue().getEvidenceIssued(), is("Yes"));
-        assertThat(docs.get(2).getValue().getEvidenceIssued(), is("Yes"));
-        assertThat(docs.get(3).getValue().getEvidenceIssued(), is("Yes"));
+        assertEquals("Yes",docs.get(1).getValue().getEvidenceIssued());
+        assertEquals("Yes",docs.get(2).getValue().getEvidenceIssued());
+        assertEquals("Yes",docs.get(3).getValue().getEvidenceIssued());
     }
 
     private String createTestData() throws IOException {

@@ -1,14 +1,9 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -52,7 +47,7 @@ public class SscsDocumentServiceTest {
 
         sscsDocumentList.stream()
             .filter(doc -> APPELLANT_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()))
-            .forEach(doc -> assertThat(doc.getValue().getEvidenceIssued(), is("Yes")));
+            .forEach(doc -> assertEquals("Yes", doc.getValue().getEvidenceIssued()));
     }
 
     @Test
@@ -68,10 +63,8 @@ public class SscsDocumentServiceTest {
 
         List<Pdf> actualPdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(createTestData(), documentType);
 
-        assertThat(actualPdfs, hasSize(1));
-        assertThat(actualPdfs, hasItems(
-            new Pdf(new byte[]{'a'}, expectedDocName)
-        ));
+        assertEquals(1, actualPdfs.size());
+        assertEquals(new Pdf(new byte[]{'a'}, expectedDocName), actualPdfs.get(0));
 
     }
 
