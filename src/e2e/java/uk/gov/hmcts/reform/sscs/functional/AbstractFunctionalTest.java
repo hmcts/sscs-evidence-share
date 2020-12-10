@@ -57,8 +57,12 @@ public abstract class AbstractFunctionalTest {
     private final String tcaInstance = System.getenv("TEST_URL");
     private final String localInstance = "http://localhost:8091";
 
-    void createCaseWithValidAppealState(EventType eventType) {
+    void createNonDigitalCaseWithEvent(EventType eventType) {
         createCaseWithValidAppealState(eventType, "PIP", "Personal Independence Payment", State.VALID_APPEAL.getId());
+    }
+
+    void createDigitalCaseWithEvent(EventType eventType) {
+        createCaseWithValidAppealState(eventType, "PIP", "Personal Independence Payment", State.READY_TO_LIST.getId());
     }
 
 
@@ -96,7 +100,7 @@ public abstract class AbstractFunctionalTest {
         return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
     }
 
-    public void simulateCcdCallback(String json) throws IOException {
+    public void simulateCcdCallback(String json) {
 
         baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
 

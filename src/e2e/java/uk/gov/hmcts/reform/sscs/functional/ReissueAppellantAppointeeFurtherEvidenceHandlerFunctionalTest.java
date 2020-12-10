@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
@@ -49,10 +50,11 @@ public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest exten
 
     private String createTestData() throws IOException {
         String docUrl = uploadDocToDocMgmtStore();
-        createCaseWithValidAppealState(VALID_APPEAL_CREATED);
+        createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
         String json = getJson(REISSUE_FURTHER_EVIDENCE.getCcdType());
         json = json.replaceAll("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replaceAll("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
+        json = json.replace("CREATED_IN_GAPS_FROM", State.READY_TO_LIST.getId());
         return json.replaceAll("EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
     }
 

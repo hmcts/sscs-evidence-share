@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import io.github.artsok.RepeatedIfExceptionsTest;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
@@ -23,13 +26,14 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     }
 
     @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
-    public void processAnAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
+    public void processANonDigitalAppealWithValidMrn_shouldGenerateADl6AndAddToCcdAndUpdateState() throws Exception {
 
-        createCaseWithValidAppealState(VALID_APPEAL_CREATED);
+        createNonDigitalCaseWithEvent(VALID_APPEAL_CREATED);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
+        json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
 
         simulateCcdCallback(json);
 
@@ -46,13 +50,14 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
     }
 
     @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000)
-    public void processAnAppealWithNoValidMrnDate_shouldNotBeSentToDwpAndShouldBeUpdatedToFlagError() throws Exception {
+    public void processANonDigitalAppealWithNoValidMrnDate_shouldNotBeSentToDwpAndShouldBeUpdatedToFlagError() throws Exception {
 
-        createCaseWithValidAppealState(VALID_APPEAL_CREATED);
+        createNonDigitalCaseWithEvent(VALID_APPEAL_CREATED);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", "");
+        json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
 
         simulateCcdCallback(json);
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
@@ -64,11 +69,12 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
     @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000)
     public void processAnAppealWithLateMrn_shouldGenerateADl16AndAddToCcdAndUpdateState() throws Exception {
-        createCaseWithValidAppealState(VALID_APPEAL_CREATED);
+        createNonDigitalCaseWithEvent(VALID_APPEAL_CREATED);
 
         String json = getJson(VALID_APPEAL_CREATED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
+        json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
 
         simulateCcdCallback(json);
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
@@ -76,10 +82,32 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
 
         List<SscsDocument> docs = caseData.getSscsDocument();
 
-        assertNotNull("docs is not null", docs);
+        assertNotNull(docs);
         assertEquals(1, docs.size());
         assertEquals("dl16-" + ccdCaseId + ".pdf", docs.get(0).getValue().getDocumentFileName());
         assertEquals("withDwp", caseDetails.getState());
         assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
+    }
+
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
+    public void processADigitalAppealWithValidMrn_shouldSendToWithDwpState() throws Exception {
+
+        createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
+
+        String json = getJson(VALID_APPEAL_CREATED.getCcdType());
+        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
+        json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
+        json = json.replace("CREATED_IN_GAPS_FROM", State.READY_TO_LIST.getId());
+
+        simulateCcdCallback(json);
+
+        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+
+        SscsCaseData caseData = caseDetails.getData();
+
+        assertNull(caseData.getSscsDocument());
+        assertEquals("withDwp", caseDetails.getState());
+        assertEquals(LocalDate.now().toString(), caseData.getDateSentToDwp());
+        assertNull(caseData.getDateCaseSentToGaps());
     }
 }

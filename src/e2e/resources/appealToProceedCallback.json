@@ -24,10 +24,11 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "createdInGapsFrom": "readyToList",
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
-      "interlocReviewState": "appealToProceed",
+      "directionTypeDl": "appealToProceed",
       "hearings": [
         {
           "value": {
