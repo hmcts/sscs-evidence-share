@@ -27,7 +27,7 @@
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
-      "directionType": "appealToProceed",
+      "directionTypeDl": "appealToProceed",
       "hearings": [
         {
           "value": {

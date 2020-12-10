@@ -57,12 +57,16 @@ public abstract class AbstractFunctionalTest {
     private final String tcaInstance = System.getenv("TEST_URL");
     private final String localInstance = "http://localhost:8091";
 
-    void createCaseWithValidAppealState(EventType eventType) {
-        createCaseWithValidAppealState(eventType, "PIP", "Personal Independence Payment", State.VALID_APPEAL.getId());
+    void createNonDigitalCaseWithEvent(EventType eventType) {
+        createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.VALID_APPEAL.getId());
+    }
+
+    void createDigitalCaseWithEvent(EventType eventType) {
+        createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.READY_TO_LIST.getId());
     }
 
 
-    void createCaseWithValidAppealState(EventType eventType, String benefitType, String benefitDescription, String createdInGapsFrom) {
+    SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription, String createdInGapsFrom) {
         idamTokens = idamService.getIdamTokens();
 
         SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
@@ -80,9 +84,18 @@ public abstract class AbstractFunctionalTest {
 
 
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
-            "Evidence share service send to DWP test",
-            "Evidence share service send to DWP case created", idamTokens);
+            "Evidence share service created case",
+            "Evidence share service case created for functional test", idamTokens);
         ccdCaseId = String.valueOf(caseDetails.getId());
+        return caseDetails;
+    }
+
+    void updateCaseEvent(EventType eventType, SscsCaseDetails caseDetails) {
+        idamTokens = idamService.getIdamTokens();
+
+        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(),
+            eventType.getCcdType(), "Evidence share update case test",
+            "Evidence share service pushed case update for functional test", idamService.getIdamTokens());
     }
 
 
@@ -96,7 +109,7 @@ public abstract class AbstractFunctionalTest {
         return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
     }
 
-    public void simulateCcdCallback(String json) throws IOException {
+    public void simulateCcdCallback(String json) {
 
         baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
 

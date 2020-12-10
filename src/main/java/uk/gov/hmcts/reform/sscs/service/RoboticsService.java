@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.*;
 
@@ -118,9 +117,6 @@ public class RoboticsService {
 
         if (issuingOfficeChanged || originatingOfficeChanged || presentingOfficeChanged) {
             log.info("Case {} automatically updating DWP office probably due to office closure", sscsCaseData.getCcdCaseId());
-
-            ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()),
-                CASE_UPDATED.getCcdType(), "Case updated", "Case updated with new DWP office", idamService.getIdamTokens());
         }
     }
 

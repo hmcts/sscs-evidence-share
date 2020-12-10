@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
@@ -66,7 +66,7 @@ public class DocmosisPdfGenerationIt {
             .andRespond(withSuccess(FILE_CONTENT, MediaType.APPLICATION_JSON));
 
         byte[] result = pdfGenerationService.generatePdf(DocumentHolder.builder().template(new Template("dl6-template.doc", "dl6")).placeholders(PLACEHOLDERS).build());
-        assertThat(result, is(notNullValue()));
+        assertNotNull(result);
         assertThat(result, is(equalTo(FILE_CONTENT.getBytes())));
     }
 
@@ -81,7 +81,7 @@ public class DocmosisPdfGenerationIt {
             fail("should have thrown bad-request exception");
         } catch (PdfGenerationException e) {
             HttpStatus httpStatus = ((HttpClientErrorException) e.getCause()).getStatusCode();
-            assertThat(httpStatus, is(HttpStatus.BAD_REQUEST));
+            assertEquals(HttpStatus.BAD_REQUEST, httpStatus);
         }
     }
 }

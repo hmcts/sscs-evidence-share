@@ -19,7 +19,7 @@ public class IssueDirectionFunctionalTest extends AbstractFunctionalTest {
     @Test
     public void processAnIssueDirectionEvent_shouldUpdateInterlocReviewState() throws IOException {
 
-        createCaseWithValidAppealState(NON_COMPLIANT);
+        createDigitalCaseWithEvent(NON_COMPLIANT);
 
         String json = getJson(DIRECTION_ISSUED.getCcdType());
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);

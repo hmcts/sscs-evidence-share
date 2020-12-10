@@ -2,7 +2,7 @@
   "case_details": {
     "id": 12345656789,
     "jurisdiction": "SSCS",
-    "state": "validAppeal",
+    "state": "CASE_STATE",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
@@ -27,7 +27,7 @@
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
-      "createdInGapsFrom": "validAppeal",
+      "createdInGapsFrom": "CREATED_IN_GAPS_FROM",
       "hearings": [
         {
           "value": {
@@ -634,5 +634,5 @@
     }
   },
   "case_details_before": null,
-  "event_id": "validAppealCreated"
+    "event_id": "CCD_EVENT_ID"
 }
