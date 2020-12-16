@@ -50,7 +50,7 @@ public class FurtherEvidenceService {
         if (pdfs != null && pdfs.size() > 0) {
             send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes);
             send609_98_OtherParty(caseData, documentType, pdfs, allowedLetterTypes);
-            log.info("Sending documents to bulk print for ccd Id: {} and document type {}", caseData.getCcdCaseId(), documentType);
+            log.info("Sending documents to bulk print for ccd Id: {} and document type: {}", caseData.getCcdCaseId(), documentType);
         }
     }
 
