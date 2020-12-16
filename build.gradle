@@ -207,7 +207,6 @@ ext.libraries = [
 ]
 
 dependencies {
-  compile group: 'com.google.guava', name: 'guava', version: '30.1-jre' //to remove CVE-2018-10237
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
@@ -319,6 +318,10 @@ dependencyManagement {
         entry 'cxf-rt-transports-http'
     }
 
+    //to remove CVE-2018-10237
+    dependencySet(group: 'com.google.guava', version: '30.1-jre') {
+      entry 'guava'
+    }
   }
 }
 
