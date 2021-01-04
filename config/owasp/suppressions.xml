@@ -34,7 +34,7 @@
         ]]></notes>
     <cve>CVE-2020-15250</cve>
   </suppress>
-  <suppress until="2020-12-30">
+  <suppress until="2021-01-31">
     <notes><![CDATA[
    file name: launchdarkly-java-server-sdk-5.2.1.jar (shaded: com.google.guava:guava:28.2-jre)
    ]]></notes>
