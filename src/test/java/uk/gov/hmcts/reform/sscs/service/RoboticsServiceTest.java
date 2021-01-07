@@ -140,7 +140,7 @@ public class RoboticsServiceTest {
         assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
 
         verify(roboticsJsonMapper).map(any());
-        verify(roboticsJsonValidator).validate(any());
+        verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
     }
 
@@ -179,7 +179,7 @@ public class RoboticsServiceTest {
         }
 
         verify(roboticsJsonMapper).map(any());
-        verify(roboticsJsonValidator).validate(any());
+        verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
     }
 
@@ -214,7 +214,7 @@ public class RoboticsServiceTest {
         assertThat(attachmentResult.size(), is(1));
 
         verify(roboticsJsonMapper).map(any());
-        verify(roboticsJsonValidator).validate(any());
+        verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
     }
 
@@ -250,7 +250,7 @@ public class RoboticsServiceTest {
         assertThat(attachmentResult.size(), is(1));
 
         verify(roboticsJsonMapper).map(any());
-        verify(roboticsJsonValidator).validate(any());
+        verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
     }
 
@@ -286,7 +286,7 @@ public class RoboticsServiceTest {
         assertThat(attachmentResult.size(), is(1));
 
         verify(roboticsJsonMapper).map(any());
-        verify(roboticsJsonValidator).validate(any());
+        verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
     }
 
@@ -323,7 +323,7 @@ public class RoboticsServiceTest {
         assertThat(attachmentResult.size(), is(1));
 
         verify(roboticsJsonMapper).map(any());
-        verify(roboticsJsonValidator).validate(any());
+        verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
     }
 
