@@ -40,7 +40,7 @@ public class SscsDocumentServiceTest {
 
     @Test
     public void filterByDocTypeAndApplyActionHappyPath() {
-        List<SscsDocument> sscsDocumentList = createTestData();
+        List<SscsDocument> sscsDocumentList = createTestData(false);
         Consumer<SscsDocument> action = doc -> doc.getValue().setEvidenceIssued("Yes");
 
         sscsDocumentService.filterByDocTypeAndApplyAction(sscsDocumentList, APPELLANT_EVIDENCE, action);
@@ -52,31 +52,38 @@ public class SscsDocumentServiceTest {
 
     @Test
     @Parameters({
-        "APPELLANT_EVIDENCE,appellantEvidenceDoc",
-        "REPRESENTATIVE_EVIDENCE,repsEvidenceDoc",
-        "OTHER_DOCUMENT,otherEvidenceDoc"
+        "APPELLANT_EVIDENCE,appellantEvidenceDoc, false",
+        "REPRESENTATIVE_EVIDENCE,repsEvidenceDoc, false",
+        "OTHER_DOCUMENT,otherEvidenceDoc, false",
+        "APPELLANT_EVIDENCE,appellantEvidenceDoc, true",
+        "REPRESENTATIVE_EVIDENCE,repsEvidenceDoc, true",
+        "OTHER_DOCUMENT,otherEvidenceDoc, true"
     })
-    public void getPdfsForGivenDocType(DocumentType documentType, String expectedDocName) {
+    public void getPdfsForGivenDocType(DocumentType documentType, String expectedDocName, boolean editedDocument) {
 
-        given(evidenceManagementService.download(ArgumentMatchers.any(URI.class), eq("sscs")))
+        String expectedDocumentUrl = editedDocument ? "http://editedDocumentUrl" : "http://documentUrl";
+        given(evidenceManagementService.download(eq(URI.create(expectedDocumentUrl)), eq("sscs")))
             .willReturn(new byte[]{'a'});
 
-        List<Pdf> actualPdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(createTestData(), documentType);
+        List<Pdf> actualPdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(createTestData(editedDocument), documentType);
 
         assertEquals(1, actualPdfs.size());
         assertEquals(new Pdf(new byte[]{'a'}, expectedDocName), actualPdfs.get(0));
-
     }
 
-    private List<SscsDocument> createTestData() {
+    private List<SscsDocument> createTestData(boolean withEditedDocument) {
         DocumentLink documentLink = DocumentLink.builder()
             .documentUrl("http://documentUrl")
+            .build();
+        DocumentLink editedDocumentLink = DocumentLink.builder()
+            .documentUrl("http://editedDocumentUrl")
             .build();
         SscsDocument sscsDocumentAppellantType = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentFileName("appellantEvidenceDoc")
                 .documentType(APPELLANT_EVIDENCE.getValue())
                 .documentLink(documentLink)
+                .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
                 .evidenceIssued("No")
                 .build())
             .build();
@@ -85,6 +92,7 @@ public class SscsDocumentServiceTest {
                 .documentFileName("appellantEvidenceDoc")
                 .documentType(APPELLANT_EVIDENCE.getValue())
                 .documentLink(documentLink)
+                .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
                 .evidenceIssued("Yes")
                 .build())
             .build();
@@ -93,6 +101,7 @@ public class SscsDocumentServiceTest {
                 .documentFileName("repsEvidenceDoc")
                 .documentType(REPRESENTATIVE_EVIDENCE.getValue())
                 .documentLink(documentLink)
+                .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
                 .evidenceIssued("No")
                 .build())
             .build();
@@ -101,6 +110,7 @@ public class SscsDocumentServiceTest {
                 .documentFileName("otherEvidenceDoc")
                 .documentType(OTHER_DOCUMENT.getValue())
                 .documentLink(documentLink)
+                .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
                 .evidenceIssued("No")
                 .build())
             .build();
