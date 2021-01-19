@@ -55,15 +55,13 @@ public class BulkPrintServiceHelper {
         } else if (letterType.equals(REPRESENTATIVE_LETTER)) {
             name = sscsCaseData.getAppeal().getRep().getName().getFullNameNoTitle();
         }
-        final Correspondence correspondence = getCorLetterCorrespondence(name, event);
-
-        final byte[] pdfForLetter = pdfs.get(0).getContent();
+        final Correspondence correspondence = getLetterCorrespondence(name, event);
 
         ccdNotificationsPdfService.mergeReasonableAdjustmentsCorrespondenceIntoCcd(pdfs,
             Long.valueOf(sscsCaseData.getCcdCaseId()), correspondence);
     }
 
-    private Correspondence getCorLetterCorrespondence(String name, EventType event) {
+    private Correspondence getLetterCorrespondence(String name, EventType event) {
         return Correspondence.builder().value(
             CorrespondenceDetails.builder()
                 .to(name)
