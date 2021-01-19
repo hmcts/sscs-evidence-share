@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Optional.*;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
-
-import static java.util.Optional.*;
 
 @Service
 public class SscsDocumentService {
