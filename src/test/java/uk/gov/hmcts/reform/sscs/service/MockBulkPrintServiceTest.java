@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -9,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 
@@ -17,16 +19,23 @@ public class MockBulkPrintServiceTest {
 
     private MockBulkPrintService mockBulkPrintService;
 
+    private CcdNotificationsPdfService ccdNotificationsPdfService;
+
+    private BulkPrintServiceHelper bulkPrintServiceHelper;
+
     @Before
     public void setUp() {
-        this.mockBulkPrintService = new MockBulkPrintService();
+        ccdNotificationsPdfService = new CcdNotificationsPdfService();
+        bulkPrintServiceHelper = new BulkPrintServiceHelper(ccdNotificationsPdfService);
+        this.mockBulkPrintService = new MockBulkPrintService(ccdNotificationsPdfService, bulkPrintServiceHelper,false);
+
     }
 
     @Test
     public void sendToMockBulkPrint() {
         Optional<UUID> letterIdOptional = mockBulkPrintService.sendToBulkPrint(
             singletonList(new Pdf("myData".getBytes(), "file.pdf")),
-            SscsCaseData.builder().build());
+            SscsCaseData.builder().build(), APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
         assertEquals(Optional.of(UUID.fromString("abc123ca-c336-11e9-9cb5-123456789abc")), letterIdOptional);
     }
 }

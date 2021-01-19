@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -57,7 +58,7 @@ public class BulkPrintServiceIt {
         assertNotNull("bulkPrintService must be autowired", bulkPrintService);
 
         Optional<UUID> uuidOptional = bulkPrintService.sendToBulkPrint(
-            singletonList(new Pdf("my data".getBytes(), "file.pdf")), SSCS_CASE_DATA);
+            singletonList(new Pdf("my data".getBytes(), "file.pdf")), SSCS_CASE_DATA, APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
         assertTrue("a uuid should exist", uuidOptional.isPresent());
     }
 }

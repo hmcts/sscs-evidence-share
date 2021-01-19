@@ -16,10 +16,7 @@ import java.util.Objects;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
@@ -44,6 +41,14 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         verifyEvidenceIsNotIssued();
     }
 
+    @Test
+    public void givenIssueFurtherEventIsTriggeredWithReasonableAdjustment_shouldNotBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
+        throws IOException {
+        String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ReasonableAdjustment");
+        simulateCcdCallback(issueFurtherEvidenceCallback);
+        verifyEvidenceIssuedAndReasonableAdjustmentRaised();
+    }
+
     private void verifyEvidenceIsNotIssued() {
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
@@ -64,6 +69,20 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         assertEquals("Yes", docs.get(1).getValue().getEvidenceIssued());
         assertEquals("Yes", docs.get(2).getValue().getEvidenceIssued());
         assertEquals("Yes", docs.get(3).getValue().getEvidenceIssued());
+    }
+
+    private void verifyEvidenceIssuedAndReasonableAdjustmentRaised() {
+        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+        SscsCaseData caseData = caseDetails.getData();
+        List<SscsDocument> docs = caseData.getSscsDocument();
+
+        assertNull(docs.get(0).getValue().getEvidenceIssued());
+        assertEquals("Yes", docs.get(1).getValue().getEvidenceIssued());
+        assertEquals("Yes", docs.get(2).getValue().getEvidenceIssued());
+        assertEquals("Yes", docs.get(3).getValue().getEvidenceIssued());
+
+        assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
+        assertEquals(2, caseData.getReasonableAdjustmentsLetters().size());
     }
 
     private String createTestData(String fileName) throws IOException {

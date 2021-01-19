@@ -193,7 +193,7 @@ public class SendToBulkPrintHandlerTest {
 
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
 
-        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
+        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any(), any(), any()))
             .thenReturn(expectedOptionalUuid);
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
@@ -201,7 +201,7 @@ public class SendToBulkPrintHandlerTest {
         handler.handle(CallbackType.SUBMITTED, callback);
 
         verify(evidenceManagementService, times(2)).download(eq(URI.create(docUrl)), any());
-        verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any());
+        verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any(), any(), any());
 
         String documentList = "Case has been sent to the DWP via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: evidence1.pdf, evidence2.pdf";
         verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq(documentList), any());
@@ -278,7 +278,7 @@ public class SendToBulkPrintHandlerTest {
     public void givenNoBulkPrintIdReturned_shouldThrowAnExceptionAndFlagError() {
         Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
 
-        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
+        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any(), any(), any()))
             .thenReturn(Optional.empty());
 
         handler.handle(CallbackType.SUBMITTED, callback);
@@ -310,7 +310,7 @@ public class SendToBulkPrintHandlerTest {
     public void givenABrokenPdfException_shouldThrowAnExceptionAndFlagAnError() {
         final Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
 
-        when(bulkPrintService.sendToBulkPrint(any(), any()))
+        when(bulkPrintService.sendToBulkPrint(any(), any(), any(), any()))
             .thenThrow(new NonPdfBulkPrintException(new RuntimeException("error")));
 
         handler.handle(CallbackType.SUBMITTED, callback);
@@ -400,7 +400,7 @@ public class SendToBulkPrintHandlerTest {
 
         Optional<UUID> expectedOptionalUuid = Optional.empty();
 
-        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 

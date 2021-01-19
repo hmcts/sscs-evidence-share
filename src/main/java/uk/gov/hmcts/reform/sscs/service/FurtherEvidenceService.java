@@ -11,11 +11,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
@@ -58,7 +54,8 @@ public class FurtherEvidenceService {
 
         if (allowedLetterTypes.contains(letterType)) {
             byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, letterType, docName);
-            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData);
+            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData, letterType,
+                EventType.ISSUE_FURTHER_EVIDENCE);
         }
     }
 
@@ -74,7 +71,8 @@ public class FurtherEvidenceService {
                 byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, letterType, docName);
 
                 List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs, docName);
-                bulkPrintService.sendToBulkPrint(pdfs60998, caseData);
+                bulkPrintService.sendToBulkPrint(pdfs60998, caseData, letterType,
+                    EventType.ISSUE_FURTHER_EVIDENCE);
             }
         }
     }

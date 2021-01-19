@@ -156,7 +156,8 @@
           "mrnMissingReason": null
         },
         "benefitType": {
-          "code": "PIP"
+          "code": "PIP",
+          "description": "Personal Independence Payment"
         },
         "hearingType": "paper",
         "receivedVia": "Paper",
@@ -204,9 +205,9 @@
           "id": "202c33d8-455a-4eb4-958f-6857f2500a7f",
           "value": {
             "documentLink": {
-              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465",
+              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
               "document_filename": "dl16-1563382899630221.pdf",
-              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465/binary"
+              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
             },
             "documentType": "dl16",
             "documentFileName": "dl16-1563382899630221.pdf",
@@ -247,9 +248,9 @@
           "id": "98f4cb7a-18bd-487a-aa7e-bb6355dfe1be",
           "value": {
             "documentLink": {
-              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7",
+              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
               "document_filename": "Screenshot 2019-07-19 at 13.45.04.pdf",
-              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7/binary"
+              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
             },
             "documentType": "Other document",
             "controlNumber": "4",

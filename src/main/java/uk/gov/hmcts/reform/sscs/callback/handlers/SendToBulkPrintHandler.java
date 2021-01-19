@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import feign.FeignException;
 import java.net.URI;
@@ -178,7 +179,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
             caseData.setDateSentToDwp(LocalDate.now().toString());
 
-            Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
+            Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData, APPELLANT_LETTER,
+                sscsCaseDataCallback.getEvent());
 
             if (id.isPresent()) {
                 BulkPrintInfo info = BulkPrintInfo.builder()
@@ -219,6 +221,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private boolean isAllowedReceivedTypeForBulkPrint(SscsCaseData caseData) {
+        log.info("caseData.getCreatedInGapsFrom()" + caseData.getCreatedInGapsFrom());
+        log.info("caseData.getAppeal().getReceivedVia()" + caseData.getAppeal().getReceivedVia());
         return nonNull(caseData)
             && nonNull(caseData.getAppeal())
             && nonNull(caseData.getAppeal().getReceivedVia())

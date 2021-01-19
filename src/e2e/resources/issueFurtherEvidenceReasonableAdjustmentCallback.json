@@ -24,6 +24,12 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "reasonableAdjustments": {
+        "appellant": {
+          "wantsReasonableAdjustment": "Yes",
+          "reasonableAdjustmentRequirements": "Wants it with very big text"
+        }
+      },
       "evidencePresent": "No",
       "generatedNino": "JJ123457A",
       "subscriptions": {
