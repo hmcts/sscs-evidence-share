@@ -13,6 +13,8 @@ public class BulkPrintServiceHelperTest {
     @Mock
     private CcdNotificationsPdfService ccdNotificationsPdfService;
 
+    BulkPrintServiceHelper bulkPrintServiceHelper;
+
     private SscsCaseData appellantWantsRa;
     private SscsCaseData repWantsRa;
 
@@ -29,41 +31,32 @@ public class BulkPrintServiceHelperTest {
                 .representative(ReasonableAdjustmentDetails.builder()
                     .wantsReasonableAdjustment(YesNo.YES).build()).build())
             .build();
+
+        bulkPrintServiceHelper =
+            new BulkPrintServiceHelper(ccdNotificationsPdfService);
     }
 
     @Test
     public void testForAppellantWhoWantsAdjustmentWithAppellantLetter() {
-        BulkPrintServiceHelper bulkPrintServiceHelper =
-            new BulkPrintServiceHelper(ccdNotificationsPdfService);
-
         assertTrue(bulkPrintServiceHelper.sendForReasonableAdjustMent(appellantWantsRa,
             FurtherEvidenceLetterType.APPELLANT_LETTER, EventType.ISSUE_FURTHER_EVIDENCE));
     }
 
     @Test
     public void testForAppellantWhoWantsAdjustmentWithRepLetter() {
-        BulkPrintServiceHelper bulkPrintServiceHelper =
-            new BulkPrintServiceHelper(ccdNotificationsPdfService);
-
         assertFalse(bulkPrintServiceHelper.sendForReasonableAdjustMent(appellantWantsRa,
             FurtherEvidenceLetterType.REPRESENTATIVE_LETTER, EventType.ISSUE_FURTHER_EVIDENCE));
     }
 
     @Test
     public void testForRepWhoWantsAdjustmentWithAppellantLetter() {
-        BulkPrintServiceHelper bulkPrintServiceHelper =
-            new BulkPrintServiceHelper(ccdNotificationsPdfService);
-
-        assertFalse(bulkPrintServiceHelper.sendForReasonableAdjustMent(appellantWantsRa,
+        assertFalse(bulkPrintServiceHelper.sendForReasonableAdjustMent(repWantsRa,
             FurtherEvidenceLetterType.APPELLANT_LETTER, EventType.ISSUE_FURTHER_EVIDENCE));
     }
 
     @Test
     public void testForRepWhoWantsAdjustmentWithRepLetter() {
-        BulkPrintServiceHelper bulkPrintServiceHelper =
-            new BulkPrintServiceHelper(ccdNotificationsPdfService);
-
-        assertTrue(bulkPrintServiceHelper.sendForReasonableAdjustMent(appellantWantsRa,
+        assertTrue(bulkPrintServiceHelper.sendForReasonableAdjustMent(repWantsRa,
             FurtherEvidenceLetterType.REPRESENTATIVE_LETTER, EventType.ISSUE_FURTHER_EVIDENCE));
     }
 }
