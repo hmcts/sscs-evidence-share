@@ -20,23 +20,23 @@ public class SscsDocumentService {
     @Autowired
     private EvidenceManagementService evidenceManagementService;
 
-    public List<Pdf> getPdfsForGivenDocTypeNotIssued(List<? extends AbstractDocument> sscsDocuments, DocumentType documentType) {
+    public List<Pdf> getPdfsForGivenDocTypeNotIssued(List<? extends AbstractDocument> sscsDocuments, DocumentType documentType, boolean isConfidentialCase) {
         Objects.requireNonNull(sscsDocuments);
         Objects.requireNonNull(documentType);
         return sscsDocuments.stream()
             .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType())
                 && "No".equals(doc.getValue().getEvidenceIssued()))
-            .map(this::toPdf)
+            .map(doc -> toPdf(doc, isConfidentialCase))
             .collect(Collectors.toList());
     }
 
-    private Pdf toPdf(AbstractDocument sscsDocument) {
-        return new Pdf(getContentForGivenDoc(sscsDocument), sscsDocument.getValue().getDocumentFileName());
+    private Pdf toPdf(AbstractDocument sscsDocument, boolean isConfidentialCase) {
+        return new Pdf(getContentForGivenDoc(sscsDocument, isConfidentialCase), sscsDocument.getValue().getDocumentFileName());
     }
 
-    private byte[] getContentForGivenDoc(AbstractDocument sscsDocument) {
-        final DocumentLink documentLink = ofNullable(sscsDocument.getValue().getEditedDocumentLink())
-            .orElse(sscsDocument.getValue().getDocumentLink());
+    private byte[] getContentForGivenDoc(AbstractDocument sscsDocument, boolean isConfidentialCase) {
+        final DocumentLink documentLink = isConfidentialCase ? ofNullable(sscsDocument.getValue().getEditedDocumentLink())
+            .orElse(sscsDocument.getValue().getDocumentLink()) : sscsDocument.getValue().getDocumentLink();
         return evidenceManagementService.download(URI.create(documentLink.getDocumentUrl()), "sscs");
     }
 

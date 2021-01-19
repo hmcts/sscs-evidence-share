@@ -64,7 +64,7 @@ public class SscsDocumentServiceTest {
         given(evidenceManagementService.download(eq(URI.create(expectedDocumentUrl)), eq("sscs")))
             .willReturn(new byte[]{'a'});
 
-        List<Pdf> actualPdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(createTestData(editedDocument), documentType);
+        List<Pdf> actualPdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(createTestData(editedDocument), documentType, true);
 
         assertEquals(1, actualPdfs.size());
         assertEquals(new Pdf(new byte[]{'a'}, expectedDocName), actualPdfs.get(0));
