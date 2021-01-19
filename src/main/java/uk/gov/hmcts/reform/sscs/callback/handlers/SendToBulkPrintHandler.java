@@ -221,8 +221,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private boolean isAllowedReceivedTypeForBulkPrint(SscsCaseData caseData) {
-        log.info("caseData.getCreatedInGapsFrom()" + caseData.getCreatedInGapsFrom());
-        log.info("caseData.getAppeal().getReceivedVia()" + caseData.getAppeal().getReceivedVia());
         return nonNull(caseData)
             && nonNull(caseData.getAppeal())
             && nonNull(caseData.getAppeal().getReceivedVia())
