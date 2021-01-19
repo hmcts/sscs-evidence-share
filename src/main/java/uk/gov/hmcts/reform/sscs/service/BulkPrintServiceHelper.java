@@ -43,18 +43,6 @@ public class BulkPrintServiceHelper {
                         return true;
                     }
                 }
-            } else if (letterType.name().equals("joint_party")) {
-                if (sscsCaseData.getReasonableAdjustments().getJointParty() != null) {
-                    if (YesNo.isYes(sscsCaseData.getReasonableAdjustments().getJointParty().getWantsReasonableAdjustment())) {
-                        return true;
-                    }
-                }
-            } else if (letterType.name().equals("appointee")) {
-                if (sscsCaseData.getReasonableAdjustments().getAppointee() != null) {
-                    if (YesNo.isYes(sscsCaseData.getReasonableAdjustments().getAppointee().getWantsReasonableAdjustment())) {
-                        return true;
-                    }
-                }
             }
         }
         return false;
