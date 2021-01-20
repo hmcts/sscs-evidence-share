@@ -4,8 +4,8 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public class BulkPrintServiceTest {
     private SendLetterApi sendLetterApi;
     @Mock
     private IdamService idamService;
-
+    @Mock
     private BulkPrintServiceHelper bulkPrintServiceHelper;
 
     @Captor
@@ -104,5 +104,18 @@ public class BulkPrintServiceTest {
         verifyNoInteractions(sendLetterApi);
     }
 
+    @Test
+    public void willSendToBulkPrintWithReasonableAdjustment() {
+        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1, true);
 
+        SSCS_CASE_DATA.setReasonableAdjustments(ReasonableAdjustments.builder()
+            .appellant(ReasonableAdjustmentDetails.builder()
+                .wantsReasonableAdjustment(YesNo.YES).reasonableAdjustmentRequirements("Big text")
+                .build()).build());
+
+        when(bulkPrintServiceHelper.sendForReasonableAdjustMent(SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE)).thenReturn(true);
+        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE);
+
+        verify(bulkPrintServiceHelper).saveAsReasonableAdjustment(any(), any(), any(), any());
+    }
 }
