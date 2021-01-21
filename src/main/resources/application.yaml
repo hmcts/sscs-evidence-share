@@ -149,5 +149,3 @@ exela:
   addressLine3: Harlow
   addressPostcode: CM20 9QF
 
-feature:
-  urgent-hearing.enabled: ${URGENT_HEARING_ENABLED:false}
