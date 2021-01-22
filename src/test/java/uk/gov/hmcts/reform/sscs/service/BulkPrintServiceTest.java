@@ -109,7 +109,7 @@ public class BulkPrintServiceTest {
                 .wantsReasonableAdjustment(YesNo.YES).reasonableAdjustmentRequirements("Big text")
                 .build()).build());
 
-        when(bulkPrintServiceHelper.sendForReasonableAdjustMent(SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE)).thenReturn(true);
+        when(bulkPrintServiceHelper.sendForReasonableAdjustment(SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE)).thenReturn(true);
         List<Correspondence> reasonableAdjustment = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE);
         assertEquals("Should be no reasonable adjustment", 0, reasonableAdjustment.size());
 

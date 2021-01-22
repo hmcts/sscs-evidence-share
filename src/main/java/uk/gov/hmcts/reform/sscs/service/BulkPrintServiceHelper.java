@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.model.LetterType;
 
 
 @Slf4j
@@ -61,8 +62,8 @@ public class BulkPrintServiceHelper {
         }
         final Correspondence correspondence = getLetterCorrespondence(name, event);
 
-        return ccdNotificationsPdfService.getReasonableAdjustmentsCorrespondence(pdfs,
-            Long.valueOf(sscsCaseData.getCcdCaseId()), correspondence);
+        ccdNotificationsPdfService.mergeReasonableAdjustmentsCorrespondenceIntoCcd(pdfs,
+            Long.valueOf(sscsCaseData.getCcdCaseId()), correspondence, LetterType.findLetterTypeFromFurtherEvidenceLetterType(letterType.getValue()));
     }
 
     private Correspondence getLetterCorrespondence(String name, EventType event) {
