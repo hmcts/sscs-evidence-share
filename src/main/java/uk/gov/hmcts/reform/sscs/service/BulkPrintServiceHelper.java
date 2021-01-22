@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.model.LetterType;
 
 
 @Slf4j
@@ -29,7 +30,7 @@ public class BulkPrintServiceHelper {
         this.ccdNotificationsPdfService = ccdNotificationsPdfService;
     }
 
-    protected boolean sendForReasonableAdjustMent(SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
+    protected boolean sendForReasonableAdjustment(SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
         if (sscsCaseData.getReasonableAdjustments() != null) {
             if (letterType.equals(APPELLANT_LETTER)) {
                 if (sscsCaseData.getReasonableAdjustments().getAppellant() != null) {
@@ -58,7 +59,7 @@ public class BulkPrintServiceHelper {
         final Correspondence correspondence = getLetterCorrespondence(name, event);
 
         ccdNotificationsPdfService.mergeReasonableAdjustmentsCorrespondenceIntoCcd(pdfs,
-            Long.valueOf(sscsCaseData.getCcdCaseId()), correspondence);
+            Long.valueOf(sscsCaseData.getCcdCaseId()), correspondence, LetterType.findLetterTypeFromFurtherEvidenceLetterType(letterType.getValue()));
     }
 
     private Correspondence getLetterCorrespondence(String name, EventType event) {

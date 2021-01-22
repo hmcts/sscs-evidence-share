@@ -40,7 +40,7 @@ public class MockBulkPrintService implements PrintService {
         logger.info("Sending to bulk print service {} reasonable adjustments enabled {}", sscsCaseData.getCcdCaseId(), reasonableAdjustmentsEnabled);
 
         if (reasonableAdjustmentsEnabled) {
-            if (bulkPrintServiceHelper.sendForReasonableAdjustMent(sscsCaseData, letterType, event)) {
+            if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType, event)) {
                 bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
             }
         } else {
