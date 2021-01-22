@@ -32,7 +32,7 @@ public class BulkPrintServiceHelper {
         this.ccdNotificationsPdfService = ccdNotificationsPdfService;
     }
 
-    protected boolean sendForReasonableAdjustMent(SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
+    protected boolean sendForReasonableAdjustment(SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
         if (sscsCaseData.getReasonableAdjustments() != null) {
             if (letterType.equals(APPELLANT_LETTER)) {
                 if (sscsCaseData.getReasonableAdjustments().getAppellant() != null) {
