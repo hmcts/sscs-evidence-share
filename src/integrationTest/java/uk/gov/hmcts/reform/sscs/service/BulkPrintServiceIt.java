@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -21,6 +19,7 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
@@ -57,8 +56,8 @@ public class BulkPrintServiceIt {
     public void willSendFileToBulkPrint() {
         assertNotNull("bulkPrintService must be autowired", bulkPrintService);
 
-        Optional<UUID> uuidOptional = bulkPrintService.sendToBulkPrint(
+        List<Correspondence> reeasonableAdjustments = bulkPrintService.sendToBulkPrint(
             singletonList(new Pdf("my data".getBytes(), "file.pdf")), SSCS_CASE_DATA, APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
-        assertTrue("a uuid should exist", uuidOptional.isPresent());
+        assertEquals(reeasonableAdjustments.size(), 0);
     }
 }

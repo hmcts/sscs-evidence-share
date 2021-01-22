@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDEN
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,19 +66,16 @@ public class BulkPrintServiceTest {
     public void willSendToBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
             .thenReturn(new SendLetterResponse(LETTER_ID));
-        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
-        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
-        assertEquals("sscs-data-pack", captor.getValue().getAdditionalData().get("letterType"));
-        assertEquals("Appellant LastName", captor.getValue().getAdditionalData().get("appellantName"));
-        assertEquals("234", captor.getValue().getAdditionalData().get("caseIdentifier"));
+        List<Correspondence> reasonableAdjustments = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
+        assertEquals("Should be no reasonable adjustment", 0, reasonableAdjustments.size());
     }
 
     @Test
     public void willSendToBulkPrintWithAdditionalData() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenReturn(new SendLetterResponse(LETTER_ID));
-        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
-        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
+        List<Correspondence> reasonableAdjustments = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
+        assertEquals("Should be no reasonable adjustment", 0, reasonableAdjustments.size());
     }
 
     @Test(expected = BulkPrintException.class)
@@ -114,7 +110,8 @@ public class BulkPrintServiceTest {
                 .build()).build());
 
         when(bulkPrintServiceHelper.sendForReasonableAdjustMent(SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE)).thenReturn(true);
-        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE);
+        List<Correspondence> reasonableAdjustment = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE);
+        assertEquals("Should be no reasonable adjustment", 0, reasonableAdjustment.size());
 
         verify(bulkPrintServiceHelper).saveAsReasonableAdjustment(any(), any(), any(), any());
     }

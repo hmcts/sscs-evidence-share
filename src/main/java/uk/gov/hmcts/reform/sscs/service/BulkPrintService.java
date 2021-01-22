@@ -3,12 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +13,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
@@ -58,18 +54,19 @@ public class BulkPrintService implements PrintService {
         this.reasonableAdjustmentsEnabled = reasonableAdjustmentsEnabled;
     }
 
-    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
+    public List<Correspondence> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
         if (reasonableAdjustmentsEnabled) {
             if (bulkPrintServiceHelper.sendForReasonableAdjustMent(sscsCaseData, letterType, event)) {
                 bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
             }
         } else {
-            return sendToBulkPrint(pdfs, sscsCaseData);
+            sendToBulkPrint(pdfs, sscsCaseData);
+            return Collections.emptyList();
         }
-        return Optional.empty();
+        return Collections.emptyList();
     }
 
-    private Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData)
+    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData)
         throws BulkPrintException {
         if (sendLetterEnabled) {
             List<String> encodedData = new ArrayList<>();

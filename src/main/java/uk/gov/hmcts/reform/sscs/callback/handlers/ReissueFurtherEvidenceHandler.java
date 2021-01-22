@@ -17,11 +17,13 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.BulkPrintServiceHelper;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
 @Service
@@ -54,13 +56,20 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         final DocumentType documentType = Arrays.stream(DocumentType.values()).filter(f -> f.getValue().equals(selectedDocument.getValue().getDocumentType())).findFirst().orElse(DocumentType.APPELLANT_EVIDENCE);
 
         List<FurtherEvidenceLetterType> allowedLetterTypes = getAllowedFurtherEvidenceLetterTypes(caseData);
-        furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, documentType, allowedLetterTypes);
+
+        List<Correspondence> reasonableAdjustments = furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, documentType, allowedLetterTypes);
 
         if (CollectionUtils.isNotEmpty(allowedLetterTypes)) {
+            setReasonableAdjustments(reasonableAdjustments, caseData);
             setEvidenceIssuedFlagToYes(selectedDocument);
             setReissueFlagsToNull(caseData);
             updateCase(caseData);
         }
+
+    }
+
+    private void setReasonableAdjustments(List<Correspondence> reasonableAdjustments, SscsCaseData caseData) {
+        caseData = BulkPrintServiceHelper.addReasonableAdjustments(reasonableAdjustments, caseData);
     }
 
     private List<FurtherEvidenceLetterType> getAllowedFurtherEvidenceLetterTypes(SscsCaseData caseData) {

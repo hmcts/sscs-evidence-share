@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,19 +34,20 @@ public class MockBulkPrintService implements PrintService {
     }
 
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData) {
-        return sendToBulkPrint(pdfs, sscsCaseData, null, null);
+        logger.info("No bulk print operation needs to be performed as 'Bulk print url' is switched off.");
+        return Optional.of(UUID.fromString("abc123ca-c336-11e9-9cb5-123456789abc"));
     }
 
-    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
+    public List<Correspondence>  sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
         logger.info("Sending to bulk print service {} reasonable adjustments enabled {}", sscsCaseData.getCcdCaseId(), reasonableAdjustmentsEnabled);
 
         if (reasonableAdjustmentsEnabled) {
             if (bulkPrintServiceHelper.sendForReasonableAdjustMent(sscsCaseData, letterType, event)) {
-                bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
+                return bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
             }
         } else {
             logger.info("No bulk print operation needs to be performed as 'Bulk print url' is switched off.");
         }
-        return Optional.of(UUID.fromString("abc123ca-c336-11e9-9cb5-123456789abc"));
+        return Collections.emptyList();
     }
 }

@@ -4,15 +4,16 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class MockBulkPrintServiceTest {
@@ -33,9 +34,9 @@ public class MockBulkPrintServiceTest {
 
     @Test
     public void sendToMockBulkPrint() {
-        Optional<UUID> letterIdOptional = mockBulkPrintService.sendToBulkPrint(
+        List<Correspondence> reasonableAdjustments = mockBulkPrintService.sendToBulkPrint(
             singletonList(new Pdf("myData".getBytes(), "file.pdf")),
-            SscsCaseData.builder().build(), APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
-        assertEquals(Optional.of(UUID.fromString("abc123ca-c336-11e9-9cb5-123456789abc")), letterIdOptional);
+            SscsCaseData.builder().ccdCaseId("12345678").build(), APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
+        assertEquals(0, reasonableAdjustments.size());
     }
 }

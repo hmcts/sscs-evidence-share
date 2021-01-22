@@ -148,7 +148,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(Collections.emptyList());
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -176,7 +176,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(Collections.emptyList());
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -209,7 +209,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(Collections.emptyList());
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -242,7 +242,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(Collections.emptyList());
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -285,7 +285,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(Collections.emptyList());
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -313,7 +313,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(Collections.emptyList());
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);

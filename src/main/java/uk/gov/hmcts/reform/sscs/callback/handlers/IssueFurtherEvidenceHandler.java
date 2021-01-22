@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -25,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.exception.PostIssueFurtherEvidenceTasksException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.BulkPrintServiceHelper;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
 @Service
@@ -57,20 +60,28 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        issueFurtherEvidence(caseData);
+
+        List<Correspondence> reasonableAdjustments = issueFurtherEvidence(caseData);
+        caseData = BulkPrintServiceHelper.addReasonableAdjustments(reasonableAdjustments, caseData);
+
         postIssueFurtherEvidenceTasks(caseData);
     }
 
-    private void issueFurtherEvidence(SscsCaseData caseData) {
+    private List<Correspondence> issueFurtherEvidence(SscsCaseData caseData) {
         List<DocumentType> documentTypes = Arrays.asList(APPELLANT_EVIDENCE, REPRESENTATIVE_EVIDENCE, DWP_EVIDENCE);
         List<FurtherEvidenceLetterType> allowedLetterTypes = Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER);
-        documentTypes.forEach(documentType -> doIssuePerDocumentType(caseData, allowedLetterTypes, documentType));
+
+        List<Correspondence> reasonableAdjustments = new ArrayList<>();
+        for (DocumentType documentType :documentTypes) {
+            reasonableAdjustments.addAll(doIssuePerDocumentType(caseData, allowedLetterTypes, documentType));
+        }
+        return reasonableAdjustments;
     }
 
-    private void doIssuePerDocumentType(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes,
-                                        DocumentType documentType) {
+    protected List<Correspondence> doIssuePerDocumentType(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes,
+                                                                                                     DocumentType documentType) {
         try {
-            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes);
+            return furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes);
         } catch (Exception e) {
             handleIssueFurtherEvidenceException(caseData, documentType);
             String errorMsg = "Failed sending further evidence for case(%s)...";

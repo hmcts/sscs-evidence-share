@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 import static java.lang.String.format;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import feign.FeignException;
 import java.net.URI;
@@ -34,6 +33,11 @@ import uk.gov.hmcts.reform.sscs.model.BulkPrintInfo;
 import uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.PrintService;
+
+/*
+    This code is deprecated as it is for paper cases and everything is now digital.
+    It has been left in as it may need to be brought back in for future appeal types
+     */
 
 @Slf4j
 @Service
@@ -131,6 +135,11 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     private void updateCaseToSentToDwp(Callback<SscsCaseData> sscsCaseDataCallback, SscsCaseData caseData,
                                        BulkPrintInfo bulkPrintInfo) {
         if (bulkPrintInfo != null) {
+            BulkPrintInfo info = BulkPrintInfo.builder()
+                .uuid(null)
+                .allowedTypeForBulkPrint(false)
+                .desc("Case state is now sent to DWP")
+                .build();
             if (State.READY_TO_LIST.getId().equals(caseData.getCreatedInGapsFrom())) {
                 caseData.setDwpState(DwpState.UNREGISTERED.getId());
             }
@@ -179,8 +188,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
             caseData.setDateSentToDwp(LocalDate.now().toString());
 
-            Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData, APPELLANT_LETTER,
-                sscsCaseDataCallback.getEvent());
+            Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
 
             if (id.isPresent()) {
                 BulkPrintInfo info = BulkPrintInfo.builder()
