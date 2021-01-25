@@ -71,6 +71,7 @@ public class BulkPrintServiceHelper {
                 .correspondenceType(CorrespondenceType.Letter)
                 .sentOn(LocalDateTime.now(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER))
                 .eventType("stoppedForReasonableAdjustment")
+                .reasonableAdjustmentStatus(ReasonableAdjustmentStatus.REQUIRED)
                 .build()
         ).build();
     }
