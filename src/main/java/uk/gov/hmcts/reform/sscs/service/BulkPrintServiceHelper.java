@@ -6,8 +6,6 @@ import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESEN
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +49,7 @@ public class BulkPrintServiceHelper {
         return false;
     }
 
-    public List<Correspondence> saveAsReasonableAdjustment(SscsCaseData sscsCaseData, List<Pdf> pdfs, FurtherEvidenceLetterType letterType, EventType event) {
+    public void saveAsReasonableAdjustment(SscsCaseData sscsCaseData, List<Pdf> pdfs, FurtherEvidenceLetterType letterType, EventType event) {
         String name = "";
         if (letterType.equals(APPELLANT_LETTER)) {
             log.info("Adding a reasonable adjustment letter for the appellant on case {}", sscsCaseData.getCcdCaseId());
@@ -76,17 +74,4 @@ public class BulkPrintServiceHelper {
                 .build()
         ).build();
     }
-
-    public static SscsCaseData addReasonableAdjustments(List<Correspondence> newReasonableAdjustments, SscsCaseData sscsCaseData) {
-        if (newReasonableAdjustments.size() > 0) {
-            List<Correspondence> existingCorrespondence = sscsCaseData.getReasonableAdjustmentsLetters() == null ? new ArrayList<>() : sscsCaseData.getReasonableAdjustmentsLetters();
-            List<Correspondence> allCorrespondence = new ArrayList<>(existingCorrespondence);
-            allCorrespondence.addAll(newReasonableAdjustments);
-            allCorrespondence.sort(Comparator.reverseOrder());
-            sscsCaseData.setReasonableAdjustmentsLetters(allCorrespondence);
-            sscsCaseData.setReasonableAdjustmentsOutstanding(YesNo.YES);
-        }
-        return sscsCaseData;
-    }
-
 }

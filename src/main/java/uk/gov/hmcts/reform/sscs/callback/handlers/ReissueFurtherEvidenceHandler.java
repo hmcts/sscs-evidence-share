@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.service.BulkPrintServiceHelper;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
 @Service
@@ -60,16 +59,11 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         List<Correspondence> reasonableAdjustments = furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, documentType, allowedLetterTypes);
 
         if (CollectionUtils.isNotEmpty(allowedLetterTypes)) {
-            setReasonableAdjustments(reasonableAdjustments, caseData);
             setEvidenceIssuedFlagToYes(selectedDocument);
             setReissueFlagsToNull(caseData);
             updateCase(caseData);
         }
 
-    }
-
-    private void setReasonableAdjustments(List<Correspondence> reasonableAdjustments, SscsCaseData caseData) {
-        caseData = BulkPrintServiceHelper.addReasonableAdjustments(reasonableAdjustments, caseData);
     }
 
     private List<FurtherEvidenceLetterType> getAllowedFurtherEvidenceLetterTypes(SscsCaseData caseData) {

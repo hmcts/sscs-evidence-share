@@ -27,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.exception.PostIssueFurtherEvidenceTasksException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.service.BulkPrintServiceHelper;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 
 @Service
@@ -61,8 +60,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        List<Correspondence> reasonableAdjustments = issueFurtherEvidence(caseData);
-        caseData = BulkPrintServiceHelper.addReasonableAdjustments(reasonableAdjustments, caseData);
+        issueFurtherEvidence(caseData);
 
         postIssueFurtherEvidenceTasks(caseData);
     }

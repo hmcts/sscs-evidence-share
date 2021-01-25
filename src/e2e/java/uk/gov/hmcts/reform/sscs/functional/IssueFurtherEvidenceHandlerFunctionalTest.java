@@ -82,8 +82,8 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         assertEquals("Yes", docs.get(3).getValue().getEvidenceIssued());
 
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
-        assertEquals(1, caseData.getReasonableAdjustmentsLetters().getAppellantReasonableAdjustmentsLetters().size());
-        assertEquals(1, caseData.getReasonableAdjustmentsLetters().getRepresentativeReasonableAdjustmentsLetters().size());
+        assertEquals(1, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
+        assertEquals(1, caseData.getReasonableAdjustmentsLetters().getRepresentative().size());
     }
 
     private String createTestData(String fileName) throws IOException {
