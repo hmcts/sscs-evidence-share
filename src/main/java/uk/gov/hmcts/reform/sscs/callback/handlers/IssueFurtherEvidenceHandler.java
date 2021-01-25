@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -63,21 +62,16 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         postIssueFurtherEvidenceTasks(caseData);
     }
 
-    private List<Correspondence> issueFurtherEvidence(SscsCaseData caseData) {
+    private void issueFurtherEvidence(SscsCaseData caseData) {
         List<DocumentType> documentTypes = Arrays.asList(APPELLANT_EVIDENCE, REPRESENTATIVE_EVIDENCE, DWP_EVIDENCE);
         List<FurtherEvidenceLetterType> allowedLetterTypes = Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER);
-
-        List<Correspondence> reasonableAdjustments = new ArrayList<>();
-        for (DocumentType documentType :documentTypes) {
-            reasonableAdjustments.addAll(doIssuePerDocumentType(caseData, allowedLetterTypes, documentType));
-        }
-        return reasonableAdjustments;
+        documentTypes.forEach(documentType -> doIssuePerDocumentType(caseData, allowedLetterTypes, documentType));
     }
 
-    protected List<Correspondence> doIssuePerDocumentType(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes,
+    private void doIssuePerDocumentType(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes,
                                                                                                      DocumentType documentType) {
         try {
-            return furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes);
+            furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes);
         } catch (Exception e) {
             handleIssueFurtherEvidenceException(caseData, documentType);
             String errorMsg = "Failed sending further evidence for case(%s)...";

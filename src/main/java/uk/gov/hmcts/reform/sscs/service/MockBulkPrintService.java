@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -23,14 +21,10 @@ public class MockBulkPrintService implements PrintService {
 
     private final BulkPrintServiceHelper bulkPrintServiceHelper;
 
-    private final boolean reasonableAdjustmentsEnabled;
-
     public MockBulkPrintService(CcdNotificationsPdfService ccdNotificationsPdfService,
-                                BulkPrintServiceHelper bulkPrintServiceHelper,
-                                @Value("${feature.reasonable-adjustments.enabled}") boolean reasonableAdjustmentsEnabled) {
+                                BulkPrintServiceHelper bulkPrintServiceHelper) {
         this.ccdNotificationsPdfService = ccdNotificationsPdfService;
         this.bulkPrintServiceHelper = bulkPrintServiceHelper;
-        this.reasonableAdjustmentsEnabled = reasonableAdjustmentsEnabled;
     }
 
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData) {
@@ -38,16 +32,15 @@ public class MockBulkPrintService implements PrintService {
         return Optional.of(UUID.fromString("abc123ca-c336-11e9-9cb5-123456789abc"));
     }
 
-    public List<Correspondence>  sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
-        logger.info("Sending to bulk print service {} reasonable adjustments enabled {}", sscsCaseData.getCcdCaseId(), reasonableAdjustmentsEnabled);
 
-        if (reasonableAdjustmentsEnabled) {
-            if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType, event)) {
-                bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
-            }
+    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
+        if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType, event)) {
+            logger.info("Sending to bulk print service {} reasonable adjustments enabled {}", sscsCaseData.getCcdCaseId());
+            bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
         } else {
             logger.info("No bulk print operation needs to be performed as 'Bulk print url' is switched off.");
         }
-        return Collections.emptyList();
+
+        return Optional.empty();
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
@@ -36,7 +35,6 @@ public class BulkPrintService implements PrintService {
     private final IdamService idamService;
     private final boolean sendLetterEnabled;
     private final Integer maxRetryAttempts;
-    private final boolean reasonableAdjustmentsEnabled;
     private final BulkPrintServiceHelper bulkPrintServiceHelper;
 
     @Autowired
@@ -44,26 +42,23 @@ public class BulkPrintService implements PrintService {
                             IdamService idamService,
                             BulkPrintServiceHelper bulkPrintServiceHelper,
                             @Value("${send-letter.enabled}") boolean sendLetterEnabled,
-                            @Value("${send-letter.maxRetryAttempts}")Integer maxRetryAttempts,
-                            @Value("${feature.reasonable-adjustments.enabled}") boolean reasonableAdjustmentsEnabled) {
+                            @Value("${send-letter.maxRetryAttempts}")Integer maxRetryAttempts) {
         this.idamService = idamService;
         this.bulkPrintServiceHelper = bulkPrintServiceHelper;
         this.sendLetterApi = sendLetterApi;
         this.sendLetterEnabled = sendLetterEnabled;
         this.maxRetryAttempts = maxRetryAttempts;
-        this.reasonableAdjustmentsEnabled = reasonableAdjustmentsEnabled;
     }
 
-    public List<Correspondence> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
-        if (reasonableAdjustmentsEnabled) {
-            if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType, event)) {
-                bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
-            }
+    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
+        if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType, event)) {
+            log.info("Sending to bulk print service {} reasonable adjustments", sscsCaseData.getCcdCaseId());
+            bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
         } else {
-            sendToBulkPrint(pdfs, sscsCaseData);
-            return Collections.emptyList();
+            return sendToBulkPrint(pdfs, sscsCaseData);
         }
-        return Collections.emptyList();
+
+        return Optional.empty();
     }
 
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData)

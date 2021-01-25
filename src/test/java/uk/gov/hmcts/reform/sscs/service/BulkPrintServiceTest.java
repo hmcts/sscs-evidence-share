@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDEN
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +59,7 @@ public class BulkPrintServiceTest {
 
     @Before
     public void setUp() {
-        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1, false);
+        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1);
         when(idamService.generateServiceAuthorization()).thenReturn(AUTH_TOKEN);
     }
 
@@ -66,43 +67,46 @@ public class BulkPrintServiceTest {
     public void willSendToBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
             .thenReturn(new SendLetterResponse(LETTER_ID));
-        List<Correspondence> reasonableAdjustments = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
-        assertEquals("Should be no reasonable adjustment", 0, reasonableAdjustments.size());
+        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
+        assertEquals("sscs-data-pack", captor.getValue().getAdditionalData().get("letterType"));
+        assertEquals("Appellant LastName", captor.getValue().getAdditionalData().get("appellantName"));
+        assertEquals("234", captor.getValue().getAdditionalData().get("caseIdentifier"));
     }
 
     @Test
     public void willSendToBulkPrintWithAdditionalData() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenReturn(new SendLetterResponse(LETTER_ID));
-        List<Correspondence> reasonableAdjustments = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
-        assertEquals("Should be no reasonable adjustment", 0, reasonableAdjustments.size());
+        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+        assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
     }
 
     @Test(expected = BulkPrintException.class)
     public void willThrowAnyExceptionsToBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenThrow(new RuntimeException("error"));
-        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
+        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
     }
 
     @Test(expected = NonPdfBulkPrintException.class)
     public void shouldThrowANonPdfBulkPrintExceptionOnHttpClientErrorExceptionFromBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenThrow(new HttpClientErrorException(HttpStatus.valueOf(400)));
-        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
+        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
     }
 
     @Test
     public void sendLetterNotEnabledWillNotSendToBulkPrint() {
-        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1, false);
-        notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
+        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1);
+        notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
         verifyNoInteractions(idamService);
         verifyNoInteractions(sendLetterApi);
     }
 
     @Test
     public void willSendToBulkPrintWithReasonableAdjustment() {
-        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1, true);
+        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1);
 
         SSCS_CASE_DATA.setReasonableAdjustments(ReasonableAdjustments.builder()
             .appellant(ReasonableAdjustmentDetails.builder()
@@ -110,8 +114,7 @@ public class BulkPrintServiceTest {
                 .build()).build());
 
         when(bulkPrintServiceHelper.sendForReasonableAdjustment(SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE)).thenReturn(true);
-        List<Correspondence> reasonableAdjustment = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE);
-        assertEquals("Should be no reasonable adjustment", 0, reasonableAdjustment.size());
+        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE);
 
         verify(bulkPrintServiceHelper).saveAsReasonableAdjustment(any(), any(), any(), any());
     }

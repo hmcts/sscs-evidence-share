@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETT
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,19 +37,17 @@ public class FurtherEvidenceService {
         this.docmosisTemplateConfig =  docmosisTemplateConfig;
     }
 
-    public List<Correspondence> issue(List<? extends AbstractDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
+    public void issue(List<? extends AbstractDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
                       List<FurtherEvidenceLetterType> allowedLetterTypes) {
         List<Pdf> pdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType);
 
-        List<Correspondence> reasonableAdjustments = new ArrayList<>();
         if (pdfs != null && pdfs.size() > 0) {
-            reasonableAdjustments.addAll(send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes));
-            reasonableAdjustments.addAll(send609_98_OtherParty(caseData, documentType, pdfs, allowedLetterTypes));
+            send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes);
+            send609_98_OtherParty(caseData, documentType, pdfs, allowedLetterTypes);
         }
-        return reasonableAdjustments;
     }
 
-    protected List<Correspondence> send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
+    protected void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                            List<FurtherEvidenceLetterType> allowedLetterTypes) {
 
         String docName = "609-97-template (original sender)";
@@ -58,18 +55,17 @@ public class FurtherEvidenceService {
 
         if (allowedLetterTypes.contains(letterType)) {
             byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, letterType, docName);
-            return bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData, letterType,
+            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData, letterType,
                 EventType.ISSUE_FURTHER_EVIDENCE);
+
         }
-        return Collections.emptyList();
     }
 
-    protected List<Correspondence> send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
+    protected void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                        List<FurtherEvidenceLetterType> allowedLetterTypes) {
 
         List<FurtherEvidenceLetterType> otherPartiesList = buildOtherPartiesList(caseData, documentType);
 
-        List<Correspondence> reasonableAdjustments = new ArrayList<>();
         for (FurtherEvidenceLetterType letterType : otherPartiesList) {
             String docName = letterType == DWP_LETTER ? "609-98-template (DWP)" : "609-98-template (other parties)";
 
@@ -77,11 +73,10 @@ public class FurtherEvidenceService {
                 byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, letterType, docName);
 
                 List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs, docName);
-                reasonableAdjustments.addAll(bulkPrintService.sendToBulkPrint(pdfs60998, caseData, letterType,
-                    EventType.ISSUE_FURTHER_EVIDENCE));
+                bulkPrintService.sendToBulkPrint(pdfs60998, caseData, letterType,
+                    EventType.ISSUE_FURTHER_EVIDENCE);
             }
         }
-        return reasonableAdjustments;
     }
 
     private List<FurtherEvidenceLetterType> buildOtherPartiesList(SscsCaseData caseData, DocumentType documentType) {
