@@ -18,10 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
@@ -62,6 +59,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
         issueFurtherEvidence(caseData);
 
+
         postIssueFurtherEvidenceTasks(caseData);
     }
 
@@ -89,6 +87,11 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
     private void postIssueFurtherEvidenceTasks(SscsCaseData caseData) {
         try {
+            if (caseData.getReasonableAdjustmentsLetters() != null) {
+                final SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseData.getCcdCaseId()), idamService.getIdamTokens());
+                caseData = sscsCaseDetails.getData();
+            }
+
             setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.UPDATE_CASE_ONLY.getCcdType(),
