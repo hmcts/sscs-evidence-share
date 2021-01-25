@@ -2,11 +2,9 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
@@ -138,10 +136,38 @@ public class RoboticsServiceTest {
 
         assertThat(attachmentResult.size(), is(1));
         assertThat(attachmentResult.get(0).getFilename(), is("Bloggs_123.txt"));
-
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
+        verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
+    }
+
+    @Test
+    @Parameters({"CARDIFF", "GLASGOW", "", "null"})
+    public void generatingRoboticsWhenThrowValidationErrors(String rpcName) {
+
+        Set<String> errorSet = new HashSet<>();
+        errorSet.add("Surname is missing");
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name(rpcName).build());
+
+        given(evidenceManagementService.download(any(), eq(null))).willReturn(null);
+
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
+        caseData.getCaseData().getAppeal().getAppellant().getName().setLastName("");
+        when(roboticsJsonValidator.validate(any(), any())).thenReturn(errorSet);
+        roboticsService.sendCaseToRobotics(caseData);
+
+        boolean isScottish = StringUtils.equalsAnyIgnoreCase(rpcName,"GLASGOW");
+        verify(roboticsEmailTemplate).generateEmail(eq("_123 for Robot [1]"), captor.capture(), eq(isScottish), eq(false));
+        List<EmailAttachment> attachmentResult = captor.getValue();
+
+        assertThat(attachmentResult.size(), is(1));
+        assertThat(attachmentResult.get(0).getFilename(), is("_123.txt"));
+        assertThat(caseData.getCaseData().getHmctsDwpState(), is("failedRobotics"));
+        verify(roboticsJsonMapper).map(any());
+        verify(roboticsJsonValidator).validate(any(), any());
+        verify(emailService).sendEmail(eq(1L), any());
+        verify(ccdService).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
@@ -181,6 +207,7 @@ public class RoboticsServiceTest {
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
+        verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
@@ -216,6 +243,7 @@ public class RoboticsServiceTest {
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
+        verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
@@ -241,7 +269,7 @@ public class RoboticsServiceTest {
 
         CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
 
-        roboticsService.sendCaseToRobotics(caseData);
+        JSONObject actual = roboticsService.sendCaseToRobotics(caseData);
 
         verify(roboticsEmailTemplate).generateEmail(eq("Bloggs_123 for Robot [1]"), captor.capture(), eq(false), eq(true));
         List<EmailAttachment> attachmentResult = captor.getValue();
@@ -252,6 +280,7 @@ public class RoboticsServiceTest {
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
+        verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
@@ -288,6 +317,7 @@ public class RoboticsServiceTest {
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
+        verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
@@ -325,6 +355,7 @@ public class RoboticsServiceTest {
         verify(roboticsJsonMapper).map(any());
         verify(roboticsJsonValidator).validate(any(), any());
         verify(emailService).sendEmail(eq(1L), any());
+        verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
@@ -341,6 +372,7 @@ public class RoboticsServiceTest {
         roboticsService.sendCaseToRobotics(caseData);
 
         assertThat(caseData.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice(), is(newOffice));
+        verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
@@ -359,6 +391,7 @@ public class RoboticsServiceTest {
         roboticsService.sendCaseToRobotics(caseData);
 
         assertThat(caseData.getCaseData().getDwpOriginatingOffice().getValue().getCode(), is(newOffice));
+        verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
@@ -377,6 +410,7 @@ public class RoboticsServiceTest {
         roboticsService.sendCaseToRobotics(caseData);
 
         assertThat(caseData.getCaseData().getDwpPresentingOffice().getValue().getCode(), is(newOffice));
+        verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
     @Test
@@ -399,5 +433,6 @@ public class RoboticsServiceTest {
         assertThat(caseData.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice(), is(newOffice));
         assertThat(caseData.getCaseData().getDwpOriginatingOffice().getValue().getCode(), is(newOffice));
         assertThat(caseData.getCaseData().getDwpPresentingOffice().getValue().getCode(), is(newOffice));
+        verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 }
