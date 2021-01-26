@@ -49,6 +49,14 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         verifyEvidenceIssuedAndReasonableAdjustmentRaised();
     }
 
+    @Test
+    public void givenIssueFurtherEventIsTriggeredWithExistingReasonableAdjustment_shouldNotBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
+        throws IOException {
+        String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ExistingReasonableAdjustment");
+        simulateCcdCallback(issueFurtherEvidenceCallback);
+        verifyEvidenceIssuedAndExistingReasonableAdjustmentRaised();
+    }
+
     private void verifyEvidenceIsNotIssued() {
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
@@ -82,8 +90,21 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         assertEquals("Yes", docs.get(3).getValue().getEvidenceIssued());
 
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
+        assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
+    }
+
+    private void verifyEvidenceIssuedAndExistingReasonableAdjustmentRaised() {
+        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+        SscsCaseData caseData = caseDetails.getData();
+        List<SscsDocument> docs = caseData.getSscsDocument();
+
+        assertNull(docs.get(0).getValue().getEvidenceIssued());
+        assertEquals("Yes", docs.get(1).getValue().getEvidenceIssued());
+        assertEquals("Yes", docs.get(2).getValue().getEvidenceIssued());
+        assertEquals("Yes", docs.get(3).getValue().getEvidenceIssued());
+
+        assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(1, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
-        assertEquals(1, caseData.getReasonableAdjustmentsLetters().getRepresentative().size());
     }
 
     private String createTestData(String fileName) throws IOException {
