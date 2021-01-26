@@ -150,7 +150,6 @@ exela:
 
 feature:
   urgent-hearing.enabled: ${URGENT_HEARING_ENABLED:false}
-  reasonable-adjustments.enabled: ${REASONABLE_ADJUSTMENTS_ENABLED:true}
 
 pdf:
   api:
