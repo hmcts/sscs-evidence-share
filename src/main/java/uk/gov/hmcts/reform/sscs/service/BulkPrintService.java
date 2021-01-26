@@ -51,7 +51,7 @@ public class BulkPrintService implements PrintService {
     }
 
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
-        if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType, event)) {
+        if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType)) {
             log.info("Sending to bulk print service {} reasonable adjustments", sscsCaseData.getCcdCaseId());
             bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
         } else {

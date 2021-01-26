@@ -50,25 +50,25 @@ public class BulkPrintServiceHelperTest {
     @Test
     public void testForAppellantWhoWantsAdjustmentWithAppellantLetter() {
         assertTrue(bulkPrintServiceHelper.sendForReasonableAdjustment(appellantWantsRa,
-            FurtherEvidenceLetterType.APPELLANT_LETTER, EventType.ISSUE_FURTHER_EVIDENCE));
+            FurtherEvidenceLetterType.APPELLANT_LETTER));
     }
 
     @Test
     public void testForAppellantWhoWantsAdjustmentWithRepLetter() {
         assertFalse(bulkPrintServiceHelper.sendForReasonableAdjustment(appellantWantsRa,
-            FurtherEvidenceLetterType.REPRESENTATIVE_LETTER, EventType.ISSUE_FURTHER_EVIDENCE));
+            FurtherEvidenceLetterType.REPRESENTATIVE_LETTER));
     }
 
     @Test
     public void testForRepWhoWantsAdjustmentWithAppellantLetter() {
         assertFalse(bulkPrintServiceHelper.sendForReasonableAdjustment(repWantsRa,
-            FurtherEvidenceLetterType.APPELLANT_LETTER, EventType.ISSUE_FURTHER_EVIDENCE));
+            FurtherEvidenceLetterType.APPELLANT_LETTER));
     }
 
     @Test
     public void testForRepWhoWantsAdjustmentWithRepLetter() {
         assertTrue(bulkPrintServiceHelper.sendForReasonableAdjustment(repWantsRa,
-            FurtherEvidenceLetterType.REPRESENTATIVE_LETTER, EventType.ISSUE_FURTHER_EVIDENCE));
+            FurtherEvidenceLetterType.REPRESENTATIVE_LETTER));
     }
 
     @Test

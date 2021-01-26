@@ -30,7 +30,7 @@ public class BulkPrintServiceHelper {
         this.ccdNotificationsPdfService = ccdNotificationsPdfService;
     }
 
-    protected boolean sendForReasonableAdjustment(SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
+    protected boolean sendForReasonableAdjustment(SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType) {
         if (sscsCaseData.getReasonableAdjustments() != null) {
             if (letterType.equals(APPELLANT_LETTER)) {
                 if (sscsCaseData.getReasonableAdjustments().getAppellant() != null) {
@@ -58,13 +58,13 @@ public class BulkPrintServiceHelper {
             log.info("Adding a reasonable adjustment letter for the rep on case {}", sscsCaseData.getCcdCaseId());
             name = sscsCaseData.getAppeal().getRep().getName().getFullNameNoTitle();
         }
-        final Correspondence correspondence = getLetterCorrespondence(name, event);
+        final Correspondence correspondence = getLetterCorrespondence(name);
 
         ccdNotificationsPdfService.mergeReasonableAdjustmentsCorrespondenceIntoCcd(pdfs,
             Long.valueOf(sscsCaseData.getCcdCaseId()), correspondence, LetterType.findLetterTypeFromFurtherEvidenceLetterType(letterType.getValue()));
     }
 
-    private Correspondence getLetterCorrespondence(String name, EventType event) {
+    private Correspondence getLetterCorrespondence(String name) {
         return Correspondence.builder().value(
             CorrespondenceDetails.builder()
                 .to(name)
