@@ -272,7 +272,7 @@
         },
         "list_items": [
           {
-            "code": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER",
+            "code": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
             "label": "test_doc - "
           },
           {
