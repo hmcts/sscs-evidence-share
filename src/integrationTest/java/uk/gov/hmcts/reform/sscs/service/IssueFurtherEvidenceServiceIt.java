@@ -11,6 +11,7 @@ import java.util.*;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -170,7 +171,8 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantAndRepFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAnd609_98ToRep() throws IOException {
+    @Parameters({"Rep", "JointParty"})
+    public void appealWithAppellantAndRepFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAnd609_98ToParty(String party) throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
@@ -182,7 +184,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithRep.json")).getFile();
+            .getResource(String.format("issueFurtherEvidenceCallbackWith%s.json", party))).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -307,7 +309,8 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithRepAndFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToRepAndAppellant() throws IOException {
+    @Parameters({"Rep", "JointParty"})
+    public void appealWithRepAndFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToAppellantAndParty(String party) throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
@@ -319,7 +322,7 @@ public class IssueFurtherEvidenceServiceIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithRepAndEvidenceFromDwp.json")).getFile();
+            .getResource(String.format("issueFurtherEvidenceCallbackWith%sAndEvidenceFromDwp.json", party))).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");

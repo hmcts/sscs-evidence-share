@@ -1,15 +1,21 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseData;
 
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,6 +32,20 @@ import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @RunWith(JUnitParamsRunner.class)
 public class FurtherEvidencePlaceholderServiceTest {
+
+    private static final Address REP_ADDRESS = Address.builder()
+        .line1("HM Courts & Tribunals Service Reps")
+        .town("Social Security & Child Support Appeals Reps")
+        .county("Prudential Buildings Reps")
+        .postcode("L2 5UZ")
+        .build();
+
+    private static final Address APPOINTEE_ADDRESS = Address.builder()
+        .line1("HM Courts & Tribunals Service Appointee")
+        .town("Social Security & Child Support Appeals Appointee")
+        .county("Prudential Buildings Appointee")
+        .postcode("L2 5UZ")
+        .build();
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
@@ -59,6 +79,7 @@ public class FurtherEvidencePlaceholderServiceTest {
 
     @Before
     public void setup() {
+
         sscsCaseDataWithAppointee = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("PIP").build())
@@ -67,12 +88,7 @@ public class FurtherEvidencePlaceholderServiceTest {
                     .appointee(Appointee.builder()
                         .name(Name.builder().title("Mr").firstName("Terry").lastName("Appointee").build())
                         .identity(Identity.builder().nino("JT0123456B").build())
-                        .address(Address.builder()
-                            .line1("HM Courts & Tribunals Service Appointee")
-                            .town("Social Security & Child Support Appeals Appointee")
-                            .county("Prudential Buildings Appointee")
-                            .postcode("L2 5UZ")
-                            .build())
+                        .address(APPOINTEE_ADDRESS)
                         .build())
                     .isAppointee("Yes")
                     .build())
@@ -85,12 +101,7 @@ public class FurtherEvidencePlaceholderServiceTest {
                 .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
                 .rep(Representative.builder()
                     .name(Name.builder().title("Mr").firstName("Terry").lastName("Rep").build())
-                    .address(Address.builder()
-                        .line1("HM Courts & Tribunals Service Reps")
-                        .town("Social Security & Child Support Appeals Reps")
-                        .county("Prudential Buildings Reps")
-                        .postcode("L2 5UZ")
-                        .build())
+                    .address(REP_ADDRESS)
                     .build())
                 .build())
             .build();
@@ -101,12 +112,7 @@ public class FurtherEvidencePlaceholderServiceTest {
                 .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
                 .rep(Representative.builder()
                     .organisation("Nandos")
-                    .address(Address.builder()
-                        .line1("HM Courts & Tribunals Service Reps")
-                        .town("Social Security & Child Support Appeals Reps")
-                        .county("Prudential Buildings Reps")
-                        .postcode("L2 5UZ")
-                        .build())
+                    .address(REP_ADDRESS)
                     .build())
                 .build())
             .build();
@@ -118,12 +124,7 @@ public class FurtherEvidencePlaceholderServiceTest {
                 .rep(Representative.builder()
                     .name(Name.builder().title(null).firstName(null).lastName(null).build())
                     .organisation("Nandos")
-                    .address(Address.builder()
-                        .line1("HM Courts & Tribunals Service Reps")
-                        .town("Social Security & Child Support Appeals Reps")
-                        .county("Prudential Buildings Reps")
-                        .postcode("L2 5UZ")
-                        .build())
+                    .address(REP_ADDRESS)
                     .build())
                 .build())
             .build();
@@ -135,12 +136,7 @@ public class FurtherEvidencePlaceholderServiceTest {
                 .rep(Representative.builder()
                     .name(Name.builder().title("").firstName("").lastName("").build())
                     .organisation("Nandos")
-                    .address(Address.builder()
-                        .line1("HM Courts & Tribunals Service Reps")
-                        .town("Social Security & Child Support Appeals Reps")
-                        .county("Prudential Buildings Reps")
-                        .postcode("L2 5UZ")
-                        .build())
+                    .address(REP_ADDRESS)
                     .build())
                 .build())
             .build();
@@ -150,12 +146,7 @@ public class FurtherEvidencePlaceholderServiceTest {
                 .benefitType(BenefitType.builder().code("PIP").build())
                 .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
                 .rep(Representative.builder()
-                    .address(Address.builder()
-                        .line1("HM Courts & Tribunals Service Reps")
-                        .town("Social Security & Child Support Appeals Reps")
-                        .county("Prudential Buildings Reps")
-                        .postcode("L2 5UZ")
-                        .build())
+                    .address(REP_ADDRESS)
                     .build())
                 .build())
             .build();
@@ -166,12 +157,7 @@ public class FurtherEvidencePlaceholderServiceTest {
                 .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
                 .rep(Representative.builder()
                     .organisation("")
-                    .address(Address.builder()
-                        .line1("HM Courts & Tribunals Service Reps")
-                        .town("Social Security & Child Support Appeals Reps")
-                        .county("Prudential Buildings Reps")
-                        .postcode("L2 5UZ")
-                        .build())
+                    .address(REP_ADDRESS)
                     .build())
                 .build())
             .build();
@@ -182,12 +168,7 @@ public class FurtherEvidencePlaceholderServiceTest {
                 .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
                 .rep(Representative.builder()
                     .organisation(null)
-                    .address(Address.builder()
-                        .line1("HM Courts & Tribunals Service Reps")
-                        .town("Social Security & Child Support Appeals Reps")
-                        .county("Prudential Buildings Reps")
-                        .postcode("L2 5UZ")
-                        .build())
+                    .address(REP_ADDRESS)
                     .build())
                 .build())
             .build();
@@ -287,5 +268,40 @@ public class FurtherEvidencePlaceholderServiceTest {
         verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
 
         assertEquals("Sir/Madam", actual.get("name"));
+    }
+
+    @Test
+    @Parameters({
+        ",, Sir/Madam, NO",
+        "  ,  , Sir/Madam, NO",
+        "John, Smith, John Smith, NO",
+        "John, Smith, John Smith, YES"
+    })
+    public void givenAJointPartyWithNameAndAddress_thenGeneratePlaceholders(@Nullable String firstName,
+                                                              @Nullable String lastName,
+                                                              String expectedName,
+                                                              YesNo sameAddressAsAppellant) {
+
+        final Address appellantAddress = Address.builder().postcode("W1 1AA").build();
+        SscsCaseData caseData = SscsCaseData.builder()
+            .jointParty(YES.getValue())
+            .jointPartyAddress(REP_ADDRESS)
+            .jointPartyName(JointPartyName.builder().title("Mr").firstName(firstName).lastName(lastName).build())
+            .jointPartyAddressSameAsAppellant(sameAddressAsAppellant.getValue())
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder().address(appellantAddress).build())
+                .benefitType(BenefitType.builder().code("PIP").build())
+                .mrnDetails(MrnDetails.builder().dwpIssuingOffice("1").build())
+                .build())
+            .build();
+        Map<String, Object> actual = furtherEvidencePlaceholderService.populatePlaceholders(caseData, JOINT_PARTY_LETTER);
+        verify(placeholderService).build(any(), any(), captor.capture(), eq(null));
+
+        assertThat(actual.get("name"), is(expectedName));
+        if (sameAddressAsAppellant.toBoolean()) {
+            assertThat(appellantAddress, is(captor.getValue()));
+        } else {
+            assertThat(REP_ADDRESS, is(captor.getValue()));
+        }
     }
 }

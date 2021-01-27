@@ -1,21 +1,14 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
@@ -88,6 +81,9 @@ public class FurtherEvidenceService {
         if (documentType != REPRESENTATIVE_EVIDENCE && checkRepExists(caseData)) {
             otherPartiesList.add(REPRESENTATIVE_LETTER);
         }
+        if (documentType != JOINT_PARTY_EVIDENCE && checkJointPartyExists(caseData)) {
+            otherPartiesList.add(JOINT_PARTY_LETTER);
+        }
 
         return otherPartiesList;
     }
@@ -95,6 +91,10 @@ public class FurtherEvidenceService {
     private boolean checkRepExists(SscsCaseData caseData) {
         Representative rep = caseData.getAppeal().getRep();
         return null != rep && "yes".equalsIgnoreCase(rep.getHasRepresentative());
+    }
+
+    private boolean checkJointPartyExists(SscsCaseData caseData) {
+        return caseData.isThereAJointParty();
     }
 
     private FurtherEvidenceLetterType findLetterType(DocumentType documentType) {

@@ -7,9 +7,10 @@ public enum FurtherEvidenceLetterType {
 
     APPELLANT_LETTER("appellantLetter"),
     REPRESENTATIVE_LETTER("representativeLetter"),
-    DWP_LETTER("dwpLetter");
+    DWP_LETTER("dwpLetter"),
+    JOINT_PARTY_LETTER("jointPartyLetter");
 
-    private String value;
+    private final String value;
 
     FurtherEvidenceLetterType(String value) {
         this.value = value;
