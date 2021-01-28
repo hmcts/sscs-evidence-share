@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Optional.*;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 
@@ -17,23 +20,24 @@ public class SscsDocumentService {
     @Autowired
     private EvidenceManagementService evidenceManagementService;
 
-    public List<Pdf> getPdfsForGivenDocTypeNotIssued(List<? extends AbstractDocument> sscsDocuments, DocumentType documentType) {
+    public List<Pdf> getPdfsForGivenDocTypeNotIssued(List<? extends AbstractDocument> sscsDocuments, DocumentType documentType, boolean isConfidentialCase) {
         Objects.requireNonNull(sscsDocuments);
         Objects.requireNonNull(documentType);
         return sscsDocuments.stream()
             .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType())
                 && "No".equals(doc.getValue().getEvidenceIssued()))
-            .map(this::toPdf)
+            .map(doc -> toPdf(doc, isConfidentialCase))
             .collect(Collectors.toList());
     }
 
-    private Pdf toPdf(AbstractDocument sscsDocument) {
-        return new Pdf(getContentForGivenDoc(sscsDocument), sscsDocument.getValue().getDocumentFileName());
+    private Pdf toPdf(AbstractDocument sscsDocument, boolean isConfidentialCase) {
+        return new Pdf(getContentForGivenDoc(sscsDocument, isConfidentialCase), sscsDocument.getValue().getDocumentFileName());
     }
 
-    private byte[] getContentForGivenDoc(AbstractDocument sscsDocument) {
-        return evidenceManagementService.download(URI.create(
-            sscsDocument.getValue().getDocumentLink().getDocumentUrl()), "sscs");
+    private byte[] getContentForGivenDoc(AbstractDocument sscsDocument, boolean isConfidentialCase) {
+        final DocumentLink documentLink = isConfidentialCase ? ofNullable(sscsDocument.getValue().getEditedDocumentLink())
+            .orElse(sscsDocument.getValue().getDocumentLink()) : sscsDocument.getValue().getDocumentLink();
+        return evidenceManagementService.download(URI.create(documentLink.getDocumentUrl()), "sscs");
     }
 
     public void filterByDocTypeAndApplyAction(List<SscsDocument> sscsDocument, DocumentType documentType,
