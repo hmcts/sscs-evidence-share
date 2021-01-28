@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
@@ -39,9 +40,9 @@ public class FurtherEvidenceService {
 
     public void issue(List<? extends AbstractDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
                       List<FurtherEvidenceLetterType> allowedLetterTypes) {
-        List<Pdf> pdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType);
 
-        if (pdfs != null && pdfs.size() > 0) {
+        List<Pdf> pdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType, isYes(caseData.getIsConfidentialCase()));
+
             send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes);
             send609_98_OtherParty(caseData, documentType, pdfs, allowedLetterTypes);
         }
