@@ -240,7 +240,7 @@ dependencies {
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
-  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.2.1'
+  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.2.2'
 
   integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
@@ -248,7 +248,7 @@ dependencies {
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
   testCompile 'pl.pragmatists:JUnitParams:1.1.1'
-  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.28'
+  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.7.7'
   testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
