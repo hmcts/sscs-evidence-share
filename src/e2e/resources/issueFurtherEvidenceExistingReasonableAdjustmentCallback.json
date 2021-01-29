@@ -30,6 +30,28 @@
           "reasonableAdjustmentRequirements": "Wants it with very big text"
         }
       },
+      "reasonableAdjustmentLetters": {
+        "appellant": [
+          {
+            "sentOn": "29 Jan 2021 15:43",
+            "from": null,
+            "to": "Sarah Smith",
+            "subject": null,
+            "body": null,
+            "documentLink": {
+              "documentUrl": "http://dm-store-aat.service.core-compute-aat.internal/documents/b3d46e0a-8e36-4135-a7ca-5c676c34ae48",
+              "documentBinaryUrl": "http://dm-store-aat.service.core-compute-aat.internal/documents/b3d46e0a-8e36-4135-a7ca-5c676c34ae48/binary",
+              "doumentFilename": "stoppedForReasonableAdjustment 29 Jan 2021 1543.pdf"
+            },
+            "correspondenceType": "letter",
+            "eventType": null,
+            "reasonableAdjustmentStatus": "required"
+            }
+          ],
+        "joint_party": null,
+        "representative": null,
+        "appointee": null
+      },
       "evidencePresent": "No",
       "generatedNino": "JJ123457A",
       "subscriptions": {
@@ -215,9 +237,9 @@
           "id": "202c33d8-455a-4eb4-958f-6857f2500a7f",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465",
               "document_filename": "dl16-1563382899630221.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465/binary"
             },
             "documentType": "dl16",
             "documentFileName": "dl16-1563382899630221.pdf",
@@ -234,7 +256,7 @@
             },
             "documentType": "appellantEvidence",
             "controlNumber": "4",
-            "evidenceIssued": "Yes",
+            "evidenceIssued": "No",
             "documentFileName": "evidence-document",
             "documentDateAdded": "2019-01-01"
           }
@@ -249,7 +271,7 @@
             },
             "documentType": "representativeEvidence",
             "controlNumber": "4",
-            "evidenceIssued": "Yes",
+            "evidenceIssued": "No",
             "documentFileName": "test_doc",
             "documentDateAdded": "2019-01-01"
           }
@@ -258,29 +280,14 @@
           "id": "98f4cb7a-18bd-487a-aa7e-bb6355dfe1be",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7",
               "document_filename": "Screenshot 2019-07-19 at 13.45.04.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7/binary"
             },
             "documentType": "Other document",
             "controlNumber": "4",
-            "evidenceIssued": "Yes",
-            "documentFileName": "test_doc",
-            "documentDateAdded": "2019-01-01"
-          }
-        },
-        {
-          "id": "636030ca-243f-4a96-8c81-813ab44c1ac9",
-          "value": {
-            "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
-              "document_filename": "new-evidence-document.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
-            },
-            "documentType": "appellantEvidence",
-            "controlNumber": "4",
             "evidenceIssued": "No",
-            "documentFileName": "evidence-document",
+            "documentFileName": "test_doc",
             "documentDateAdded": "2019-01-01"
           }
         }
