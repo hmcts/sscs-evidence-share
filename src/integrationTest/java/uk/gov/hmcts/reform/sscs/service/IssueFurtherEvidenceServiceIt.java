@@ -32,7 +32,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.sscs.callback.handlers.IssueFurtherEvidenceHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
@@ -337,5 +337,38 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals("Peter Hyland", pdfDocumentRequest.getAllValues().get(1).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(1).get(0).getName());
         assertEquals("evidence-document", documentCaptor.getAllValues().get(1).get(1).getName());
+    }
+
+    @Test
+    public void appealWithAppellantAndFurtherEvidenceFromAppellantWithReasonableAdjustment_shouldReloadCaseData() throws IOException {
+        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+
+        doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
+            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        List<Correspondence> reasonableadjustments = new ArrayList<>();
+        Correspondence correspondence = new Correspondence(CorrespondenceDetails.builder().reasonableAdjustmentStatus(ReasonableAdjustmentStatus.REQUIRED)
+            .to("Sarah Smith").build());
+        reasonableadjustments.add(correspondence);
+        when(ccdService.getByCaseId(any(), any())).thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder()
+            .ccdCaseId("12345656789")
+            .reasonableAdjustmentsLetters(ReasonableAdjustmentsLetters.builder()
+                .appellant(reasonableadjustments).representative(Collections.emptyList()).appointee(Collections.emptyList())
+                .jointParty(Collections.emptyList()).build()).build()).build());
+
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource("issueFurtherEvidenceCallbackReasonableAdjustment.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        topicConsumer.onMessage(json, "1");
+
+        verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any());
+
+        verify(ccdService, times(1)).getByCaseId(any(), any());
     }
 }
