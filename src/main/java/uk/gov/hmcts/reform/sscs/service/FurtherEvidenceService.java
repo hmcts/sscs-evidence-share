@@ -108,6 +108,8 @@ public class FurtherEvidenceService {
             return APPELLANT_LETTER;
         } else if (documentType == REPRESENTATIVE_EVIDENCE) {
             return REPRESENTATIVE_LETTER;
+        } else if (documentType == JOINT_PARTY_EVIDENCE) {
+            return JOINT_PARTY_LETTER;
         } else {
             return DWP_LETTER;
         }
