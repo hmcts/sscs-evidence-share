@@ -3,12 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +13,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.exception.NonPdfBulkPrintException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -38,16 +35,30 @@ public class BulkPrintService implements PrintService {
     private final IdamService idamService;
     private final boolean sendLetterEnabled;
     private final Integer maxRetryAttempts;
+    private final BulkPrintServiceHelper bulkPrintServiceHelper;
 
     @Autowired
     public BulkPrintService(SendLetterApi sendLetterApi,
                             IdamService idamService,
+                            BulkPrintServiceHelper bulkPrintServiceHelper,
                             @Value("${send-letter.enabled}") boolean sendLetterEnabled,
                             @Value("${send-letter.maxRetryAttempts}")Integer maxRetryAttempts) {
         this.idamService = idamService;
+        this.bulkPrintServiceHelper = bulkPrintServiceHelper;
         this.sendLetterApi = sendLetterApi;
         this.sendLetterEnabled = sendLetterEnabled;
         this.maxRetryAttempts = maxRetryAttempts;
+    }
+
+    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
+        if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType)) {
+            log.info("Sending to bulk print service {} reasonable adjustments", sscsCaseData.getCcdCaseId());
+            bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
+        } else {
+            return sendToBulkPrint(pdfs, sscsCaseData);
+        }
+
+        return Optional.empty();
     }
 
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData)

@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +19,7 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
@@ -54,8 +54,6 @@ public class BulkPrintServiceIt {
     @Test
     @Ignore("need to get send-letter-service working locally")
     public void willSendFileToBulkPrint() {
-        assertNotNull("bulkPrintService must be autowired", bulkPrintService);
-
         Optional<UUID> uuidOptional = bulkPrintService.sendToBulkPrint(
             singletonList(new Pdf("my data".getBytes(), "file.pdf")), SSCS_CASE_DATA);
         assertTrue("a uuid should exist", uuidOptional.isPresent());

@@ -1,6 +1,6 @@
 {
   "case_details": {
-    "id": "CASE_ID_TO_BE_REPLACED",
+    "id": "12345656789",
     "jurisdiction": "SSCS",
     "state": "withDwp",
     "case_type_id": "Benefit",
@@ -24,6 +24,31 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "reasonableAdjustments": {
+        "appellant": {
+          "wantsReasonableAdjustment": "Yes",
+          "reasonableAdjustmentRequirements": "Wants it with very big text"
+        }
+      },
+      "reasonableAdjustmentsLetters": {
+        "appellant": [
+          {
+            "sentOn": "12 Jan 2021",
+            "from": "",
+            "to": "Sarah Smith",
+            "documentLink": {
+              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465",
+              "document_filename": "dl16-1563382899630221.pdf",
+              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465/binary"
+            },
+            "correspondenceType": "letter",
+            "reasonableAdjustmentStatus": "required"
+          }
+        ],
+        "appointee": [],
+        "representative": [],
+        "jointParty": []
+      },
       "evidencePresent": "No",
       "generatedNino": "JJ123457A",
       "subscriptions": {
@@ -83,30 +108,13 @@
       "bulkScanCaseReference": "12222",
       "generatedSurname": "Smith",
       "appeal": {
-        "rep": {
-          "name": {
-            "title": "Mr",
-            "lastName": "Hyland",
-            "firstName": "Peter"
-          },
-          "address": {
-            "town": "Redhill",
-            "line1": "63 Grove Hill Road",
-            "line2": "The Square",
-            "county": "Surrey",
-            "postcode": "RH1 6RE"
-          },
-          "contact": {
-            "email": null,
-            "phone": "02072323231",
-            "mobile": null
-          },
-          "organisation": "ABC Advisory Services",
-          "hasRepresentative": "Yes"
-        },
         "signer": "Sarah Smith",
         "appellant": {
-          "name": null,
+          "name": {
+            "title": "Mrs",
+            "lastName": "Smith",
+            "firstName": "Sarah"
+          },
           "address": {
             "town": "Brentwood",
             "line1": "109 Drake Close",
@@ -205,9 +213,9 @@
           "id": "202c33d8-455a-4eb4-958f-6857f2500a7f",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465",
               "document_filename": "dl16-1563382899630221.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465/binary"
             },
             "documentType": "dl16",
             "documentFileName": "dl16-1563382899630221.pdf",
@@ -218,9 +226,9 @@
           "id": "636030ca-243f-4a96-8c81-813ab44c1ac8",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+              "document_url": "http://bla.com/",
               "document_filename": "evidence-document.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_binary_url": "http://bla.com/binary"
             },
             "documentType": "appellantEvidence",
             "controlNumber": "4",
@@ -230,17 +238,17 @@
           }
         },
         {
-          "id": "c6838220-88f6-43db-b163-a3eb5008ec11",
+          "id": "636030ca-243f-4a96-8c81-813ab44c1ac9",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
-              "document_filename": "rep-doc.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_url": "http://bla.com/",
+              "document_filename": "evidence-document-issued.pdf",
+              "document_binary_url": "http://bla.com/binary"
             },
-            "documentType": "representativeEvidence",
+            "documentType": "appellantEvidence",
             "controlNumber": "4",
-            "evidenceIssued": "No",
-            "documentFileName": "test_doc",
+            "evidenceIssued": "Yes",
+            "documentFileName": "evidence-document-issued",
             "documentDateAdded": "2019-01-01"
           }
         },
@@ -248,9 +256,9 @@
           "id": "98f4cb7a-18bd-487a-aa7e-bb6355dfe1be",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7",
               "document_filename": "Screenshot 2019-07-19 at 13.45.04.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/2266abe2-38e0-4d1d-9aca-4419f6c82eb7/binary"
             },
             "documentType": "Other document",
             "controlNumber": "4",

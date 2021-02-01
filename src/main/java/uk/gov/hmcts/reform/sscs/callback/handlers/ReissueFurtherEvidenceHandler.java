@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -55,12 +56,21 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
 
         List<FurtherEvidenceLetterType> allowedLetterTypes = getAllowedFurtherEvidenceLetterTypes(caseData);
         furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, documentType, allowedLetterTypes);
-
+        
         if (CollectionUtils.isNotEmpty(allowedLetterTypes)) {
-            setEvidenceIssuedFlagToYes(selectedDocument);
-            setReissueFlagsToNull(caseData);
-            updateCase(caseData);
+            udateCaseForReasonableAdjustments(caseData, selectedDocument);
         }
+
+    }
+
+    private void udateCaseForReasonableAdjustments(SscsCaseData caseData, AbstractDocument selectedDocument) {
+        if (caseData.getReasonableAdjustmentsLetters() != null) {
+            final SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseData.getCcdCaseId()), idamService.getIdamTokens());
+            caseData = sscsCaseDetails.getData();
+        }
+        setEvidenceIssuedFlagToYes(selectedDocument);
+        setReissueFlagsToNull(caseData);
+        updateCase(caseData);
     }
 
     private List<FurtherEvidenceLetterType> getAllowedFurtherEvidenceLetterTypes(SscsCaseData caseData) {

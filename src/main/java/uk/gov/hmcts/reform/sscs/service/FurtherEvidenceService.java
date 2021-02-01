@@ -47,7 +47,7 @@ public class FurtherEvidenceService {
         }
     }
 
-    private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
+    protected void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                            List<FurtherEvidenceLetterType> allowedLetterTypes) {
 
         String docName = "609-97-template (original sender)";
@@ -55,11 +55,13 @@ public class FurtherEvidenceService {
 
         if (allowedLetterTypes.contains(letterType)) {
             byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, letterType, docName);
-            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData);
+            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData, letterType,
+                EventType.ISSUE_FURTHER_EVIDENCE);
+
         }
     }
 
-    private void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
+    protected void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                        List<FurtherEvidenceLetterType> allowedLetterTypes) {
 
         List<FurtherEvidenceLetterType> otherPartiesList = buildOtherPartiesList(caseData, documentType);
@@ -71,7 +73,8 @@ public class FurtherEvidenceService {
                 byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, letterType, docName);
 
                 List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs, docName);
-                bulkPrintService.sendToBulkPrint(pdfs60998, caseData);
+                bulkPrintService.sendToBulkPrint(pdfs60998, caseData, letterType,
+                    EventType.ISSUE_FURTHER_EVIDENCE);
             }
         }
     }

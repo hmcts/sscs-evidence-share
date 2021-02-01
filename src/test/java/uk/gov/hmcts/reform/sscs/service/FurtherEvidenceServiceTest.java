@@ -34,12 +34,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
@@ -123,7 +118,7 @@ public class FurtherEvidenceServiceTest {
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
@@ -140,7 +135,7 @@ public class FurtherEvidenceServiceTest {
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesWelshTemplateName),
                 eq(furtherEvidenceOtherPartiesDwpDocName));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
@@ -158,7 +153,7 @@ public class FurtherEvidenceServiceTest {
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
@@ -179,7 +174,7 @@ public class FurtherEvidenceServiceTest {
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesWelshTemplateName),
                 eq(furtherEvidenceOtherPartiesDwpDocName));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
@@ -197,7 +192,7 @@ public class FurtherEvidenceServiceTest {
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
@@ -218,7 +213,7 @@ public class FurtherEvidenceServiceTest {
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesWelshTemplateName),
                 eq(furtherEvidenceOtherPartiesDwpDocName));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
@@ -233,7 +228,7 @@ public class FurtherEvidenceServiceTest {
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
@@ -250,7 +245,7 @@ public class FurtherEvidenceServiceTest {
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesWelshTemplateName),
                 eq(furtherEvidenceOtherPartiesDocName));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
@@ -268,7 +263,7 @@ public class FurtherEvidenceServiceTest {
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
@@ -289,7 +284,7 @@ public class FurtherEvidenceServiceTest {
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER),
                 eq(furtherEvidenceOtherPartiesWelshTemplateName), eq(furtherEvidenceOtherPartiesDocName));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
@@ -309,7 +304,7 @@ public class FurtherEvidenceServiceTest {
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(furtherEvidenceLetterType), eq(templateName), eq(docName));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
         then(coverLetterService).shouldHaveNoMoreInteractions();
         then(bulkPrintService).shouldHaveNoMoreInteractions();
     }
@@ -331,7 +326,7 @@ public class FurtherEvidenceServiceTest {
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(furtherEvidenceLetterType), eq(templateName), eq(docName));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
         then(coverLetterService).shouldHaveNoMoreInteractions();
         then(bulkPrintService).shouldHaveNoMoreInteractions();
     }
