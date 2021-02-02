@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
@@ -12,11 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
@@ -45,7 +42,7 @@ public class FurtherEvidenceService {
 
     public void issue(List<? extends AbstractDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
                       List<FurtherEvidenceLetterType> allowedLetterTypes) {
-        List<Pdf> pdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType);
+        List<Pdf> pdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType, isYes(caseData.getIsConfidentialCase()));
         if (pdfs != null && pdfs.size() > 0) {
             send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes);
             send609_98_OtherParty(caseData, documentType, pdfs, allowedLetterTypes);
@@ -53,7 +50,7 @@ public class FurtherEvidenceService {
         }
     }
 
-    private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
+    protected void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                            List<FurtherEvidenceLetterType> allowedLetterTypes) {
 
         String docName = "609-97-template (original sender)";
@@ -61,11 +58,13 @@ public class FurtherEvidenceService {
 
         if (allowedLetterTypes.contains(letterType)) {
             byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, letterType, docName);
-            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData);
+            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData, letterType,
+                EventType.ISSUE_FURTHER_EVIDENCE);
+
         }
     }
 
-    private void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
+    protected void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                        List<FurtherEvidenceLetterType> allowedLetterTypes) {
 
         List<FurtherEvidenceLetterType> otherPartiesList = buildOtherPartiesList(caseData, documentType);
@@ -77,7 +76,8 @@ public class FurtherEvidenceService {
                 byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, letterType, docName);
 
                 List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs, docName);
-                bulkPrintService.sendToBulkPrint(pdfs60998, caseData);
+                bulkPrintService.sendToBulkPrint(pdfs60998, caseData, letterType,
+                    EventType.ISSUE_FURTHER_EVIDENCE);
             }
         }
     }

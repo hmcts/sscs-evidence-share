@@ -26,7 +26,6 @@ http:
 send-grid:
   host: smtp.sendgrid.net
   port: 587
-
 ld:
   user-key: sscs-evidence-share
 
@@ -151,3 +150,7 @@ exela:
 
 feature:
   urgent-hearing.enabled: ${URGENT_HEARING_ENABLED:false}
+
+pdf:
+  api:
+    url: ${PDF_API_URL:http://localhost:5500}

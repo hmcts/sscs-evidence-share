@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.*;
 import java.net.URI;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.json.JSONObject;
@@ -220,8 +221,14 @@ public class RoboticsService {
 
         JSONObject roboticsAppeal = roboticsJsonMapper.map(appeal);
 
-        roboticsJsonValidator.validate(roboticsAppeal);
+        Set<String> errorSet = roboticsJsonValidator.validate(roboticsAppeal, String.valueOf(appeal.getCcdCaseId()));
 
+        if (CollectionUtils.isNotEmpty(errorSet)) {
+            appeal.getSscsCaseData().setHmctsDwpState("failedRobotics");
+            ccdService.updateCase(appeal.getSscsCaseData(), appeal.getCcdCaseId(),
+                EventType.SEND_TO_ROBOTICS_ERROR.getCcdType(), "Flag error to Send to robotics",
+                errorSet.stream().collect(Collectors.joining()), idamService.getIdamTokens());
+        }
         return roboticsAppeal;
     }
 
