@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESEN
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 
 @Service
+@Slf4j
 public class FurtherEvidenceService {
 
     private DocmosisTemplateConfig docmosisTemplateConfig;
@@ -46,10 +48,11 @@ public class FurtherEvidenceService {
         if (pdfs != null && pdfs.size() > 0) {
             send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes);
             send609_98_OtherParty(caseData, documentType, pdfs, allowedLetterTypes);
+            log.info("Sending documents to bulk print for ccd Id: {} and document type: {}", caseData.getCcdCaseId(), documentType);
         }
     }
 
-    private void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
+    protected void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                            List<FurtherEvidenceLetterType> allowedLetterTypes) {
 
         String docName = "609-97-template (original sender)";
@@ -57,11 +60,13 @@ public class FurtherEvidenceService {
 
         if (allowedLetterTypes.contains(letterType)) {
             byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, letterType, docName);
-            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData);
+            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData, letterType,
+                EventType.ISSUE_FURTHER_EVIDENCE);
+
         }
     }
 
-    private void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
+    protected void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                        List<FurtherEvidenceLetterType> allowedLetterTypes) {
 
         List<FurtherEvidenceLetterType> otherPartiesList = buildOtherPartiesList(caseData, documentType);
@@ -73,7 +78,8 @@ public class FurtherEvidenceService {
                 byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, letterType, docName);
 
                 List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs, docName);
-                bulkPrintService.sendToBulkPrint(pdfs60998, caseData);
+                bulkPrintService.sendToBulkPrint(pdfs60998, caseData, letterType,
+                    EventType.ISSUE_FURTHER_EVIDENCE);
             }
         }
     }

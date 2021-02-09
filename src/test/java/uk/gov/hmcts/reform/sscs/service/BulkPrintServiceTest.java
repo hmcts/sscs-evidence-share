@@ -4,8 +4,9 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +23,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.exception.NonPdfBulkPrintException;
@@ -54,13 +51,15 @@ public class BulkPrintServiceTest {
     private SendLetterApi sendLetterApi;
     @Mock
     private IdamService idamService;
+    @Mock
+    private BulkPrintServiceHelper bulkPrintServiceHelper;
 
     @Captor
     ArgumentCaptor<LetterWithPdfsRequest> captor;
 
     @Before
     public void setUp() {
-        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, true, 1);
+        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1);
         when(idamService.generateServiceAuthorization()).thenReturn(AUTH_TOKEN);
     }
 
@@ -99,11 +98,24 @@ public class BulkPrintServiceTest {
 
     @Test
     public void sendLetterNotEnabledWillNotSendToBulkPrint() {
-        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, false, 1);
+        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1);
         notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
         verifyNoInteractions(idamService);
         verifyNoInteractions(sendLetterApi);
     }
 
+    @Test
+    public void willSendToBulkPrintWithReasonableAdjustment() {
+        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1);
 
+        SSCS_CASE_DATA.setReasonableAdjustments(ReasonableAdjustments.builder()
+            .appellant(ReasonableAdjustmentDetails.builder()
+                .wantsReasonableAdjustment(YesNo.YES).reasonableAdjustmentRequirements("Big text")
+                .build()).build());
+
+        when(bulkPrintServiceHelper.sendForReasonableAdjustment(SSCS_CASE_DATA, APPELLANT_LETTER)).thenReturn(true);
+        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE);
+
+        verify(bulkPrintServiceHelper).saveAsReasonableAdjustment(any(), any(), any(), any());
+    }
 }

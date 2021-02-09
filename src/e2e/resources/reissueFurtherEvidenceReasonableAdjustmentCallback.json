@@ -24,6 +24,12 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "reasonableAdjustments": {
+        "appellant": {
+          "wantsReasonableAdjustment": "Yes",
+          "reasonableAdjustmentRequirements": "Wants it with very big text"
+        }
+      },
       "evidencePresent": "No",
       "generatedNino": "JJ123457A",
       "subscriptions": {
@@ -106,7 +112,11 @@
         },
         "signer": "Sarah Smith",
         "appellant": {
-          "name": null,
+          "name": {
+            "title": "Mrs",
+            "lastName": "Smith",
+            "firstName": "Sarah"
+          },
           "address": {
             "town": "Brentwood",
             "line1": "109 Drake Close",
@@ -205,9 +215,9 @@
           "id": "202c33d8-455a-4eb4-958f-6857f2500a7f",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465",
               "document_filename": "dl16-1563382899630221.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465/binary"
             },
             "documentType": "dl16",
             "documentFileName": "dl16-1563382899630221.pdf",
@@ -218,13 +228,13 @@
           "id": "636030ca-243f-4a96-8c81-813ab44c1ac8",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465",
               "document_filename": "evidence-document.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465/binary"
             },
             "documentType": "appellantEvidence",
             "controlNumber": "4",
-            "evidenceIssued": "No",
+            "evidenceIssued": "Yes",
             "documentFileName": "evidence-document",
             "documentDateAdded": "2019-01-01"
           }
@@ -248,35 +258,38 @@
           "id": "98f4cb7a-18bd-487a-aa7e-bb6355dfe1be",
           "value": {
             "documentLink": {
-              "document_url": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+              "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465",
               "document_filename": "Screenshot 2019-07-19 at 13.45.04.pdf",
-              "document_binary_url": "EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER"
+              "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465/binary"
             },
             "documentType": "Other document",
             "controlNumber": "4",
-            "evidenceIssued": "No",
+            "evidenceIssued": "Yes",
             "documentFileName": "test_doc",
             "documentDateAdded": "2019-01-01"
           }
         }
       ],
       "dateSentToDwp": "2019-07-17",
-      "furtherEvidenceAction": {
+      "reissueFurtherEvidenceDocument": {
         "value": {
-          "code": "otherDocumentManual",
-          "label": "Other document type - action manually"
+          "code": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+          "label": "rep-doc.pdf - Representative evidence"
         },
         "list_items": [
           {
-            "code": "issueFurtherEvidence",
-            "label": "Issue further evidence to all parties"
+            "code": "http://dm-store-aat.service.core-compute-aat.internal/documents/6f893454-abf7-4a9e-8220-25d00317f465/binary",
+            "label": "test_doc - "
           },
           {
-            "code": "otherDocumentManual",
-            "label": "Other document type - action manually"
+            "code": "EVIDENCE_DOCUMENT_URL_PLACEHOLDER",
+            "label": "rep-doc.pdf - Representative evidence"
           }
         ]
       },
+      "resendToAppellant": "YES",
+      "resendToRepresentative": "NO",
+      "resendToDwp": "NO",
       "caseCreated": "2019-07-17",
       "regionalProcessingCenter": {
         "city": "BIRMINGHAM",
@@ -302,6 +315,6 @@
     "security_classifications": {}
   },
   "case_details_before": {},
-  "event_id": "issueFurtherEvidence",
+  "event_id": "reissueFurtherEvidence",
   "ignore_warning": null
 }
