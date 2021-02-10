@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
 
 import java.util.ArrayList;
@@ -91,6 +93,9 @@ public class FurtherEvidenceService {
         if (documentType != REPRESENTATIVE_EVIDENCE && checkRepExists(caseData)) {
             otherPartiesList.add(REPRESENTATIVE_LETTER);
         }
+        if (documentType != JOINT_PARTY_EVIDENCE && checkJointPartyExists(caseData)) {
+            otherPartiesList.add(JOINT_PARTY_LETTER);
+        }
 
         return otherPartiesList;
     }
@@ -100,11 +105,17 @@ public class FurtherEvidenceService {
         return null != rep && "yes".equalsIgnoreCase(rep.getHasRepresentative());
     }
 
+    private boolean checkJointPartyExists(SscsCaseData caseData) {
+        return caseData.isThereAJointParty();
+    }
+
     private FurtherEvidenceLetterType findLetterType(DocumentType documentType) {
         if (documentType == APPELLANT_EVIDENCE) {
             return APPELLANT_LETTER;
         } else if (documentType == REPRESENTATIVE_EVIDENCE) {
             return REPRESENTATIVE_LETTER;
+        } else if (documentType == JOINT_PARTY_EVIDENCE) {
+            return JOINT_PARTY_LETTER;
         } else {
             return DWP_LETTER;
         }

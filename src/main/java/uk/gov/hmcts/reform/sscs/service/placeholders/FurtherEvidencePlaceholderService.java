@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.truncateAddressLine;
 
@@ -46,18 +48,14 @@ public class FurtherEvidencePlaceholderService {
     }
 
     private String getName(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
-
         if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
-
             return extractNameAppellant(caseData);
-
         } else if (FurtherEvidenceLetterType.REPRESENTATIVE_LETTER.getValue().equals(letterType.getValue())) {
-
-            return extraceNameRep(caseData);
-
-        } else {
-            return null;
+            return extractNameRep(caseData);
+        } else if (FurtherEvidenceLetterType.JOINT_PARTY_LETTER.getValue().equals(letterType.getValue())) {
+            return extractNameJointParty(caseData);
         }
+        return null;
     }
 
     private String extractNameAppellant(SscsCaseData caseData) {
@@ -76,7 +74,7 @@ public class FurtherEvidencePlaceholderService {
                 .orElse("Sir/Madam"));
     }
 
-    private String extraceNameRep(SscsCaseData caseData) {
+    private String extractNameRep(SscsCaseData caseData) {
         return Optional.of(caseData.getAppeal())
             .map(Appeal::getRep)
             .map(Representative::getName)
@@ -85,17 +83,26 @@ public class FurtherEvidencePlaceholderService {
             .orElseGet(() -> Optional.of(caseData.getAppeal())
                 .map(Appeal::getRep)
                 .map(Representative::getOrganisation)
-                .filter(org -> StringUtils.isNoneBlank(org))
+                .filter(org -> isNoneBlank(org))
                 .orElse("Sir/Madam"));
     }
 
+    private String extractNameJointParty(SscsCaseData caseData) {
+        return ofNullable(caseData.getJointPartyName())
+            .filter(jpn -> isValidName(Name.builder().firstName(jpn.getFirstName()).lastName(jpn.getLastName()).build()))
+            .map(JointPartyName::getFullNameNoTitle)
+            .orElse("Sir/Madam");
+    }
+
     private Boolean isValidName(Name name) {
-        return (StringUtils.isNoneBlank(name.getFirstName()) && StringUtils.isNoneBlank(name.getLastName())) ? true : false;
+        return isNoneBlank(name.getFirstName()) && isNoneBlank(name.getLastName());
     }
 
     private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
         if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
             return getAppellantAddress(caseData);
+        } else if (FurtherEvidenceLetterType.JOINT_PARTY_LETTER.getValue().equals(letterType.getValue())) {
+            return getJointPartyAddress(caseData);
         }
         return getRepsAddress(caseData);
     }
@@ -114,6 +121,11 @@ public class FurtherEvidencePlaceholderService {
             .map(Appellant::getAppointee)
             .map(Appointee::getAddress)
             .orElseGet(() -> defaultAddress(caseData.getAppeal()));
+    }
+
+    private Address getJointPartyAddress(SscsCaseData caseData) {
+        return caseData.isJointPartyAddressSameAsAppeallant() ? getAppellantAddress(caseData)
+            : ofNullable(caseData.getJointPartyAddress()).orElse(getEmptyAddress());
     }
 
     private Address defaultAddress(Appeal appeal) {
