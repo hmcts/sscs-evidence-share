@@ -52,6 +52,14 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
             throw new IllegalStateException("Cannot handle callback");
         }
 
+        try {
+            // This handler was causing 409 conflicts with Send to bulk print handler for digital cases as was trying to trigger the sent to dwp event at the same time.
+            // This sleep should resolve this issue until we address properly with tickets SSCS-7525 and SSCS-7526 which look at removing the appeal received event.
+            Thread.sleep(5000L);
+        } catch (InterruptedException e) {
+            log.error("Thread sleep interrupted: " + e.getMessage());
+        }
+
         log.info("About to update case with appealReceived event for id {}", callback.getCaseDetails().getId());
         ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(), APPEAL_RECEIVED.getCcdType(), "Appeal received", "Appeal received event has been triggered from Evidence Share for digital case",  idamService.getIdamTokens());
     }
