@@ -47,6 +47,7 @@ public class AppealReceivedHandler implements CallbackHandler<SscsCaseData> {
     }
 
     @Override
+    @SuppressWarnings("squid:S2142")
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
