@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
         "uk.gov.hmcts.reform.sscs.idam",
         "uk.gov.hmcts.reform.sscs.document",
         "uk.gov.hmcts.reform.ccd.client",
-        "uk.gov.hmcts.reform.idam.client"
+        "uk.gov.hmcts.reform.idam"
     })
 @EnableRetry
 @ComponentScan(
