@@ -6,7 +6,7 @@ plugins {
   id 'org.springframework.boot' version '2.3.5.RELEASE'
   id 'uk.gov.hmcts.java' version '0.12.4'
   id 'com.github.ben-manes.versions' version '0.36.0'
-  id 'org.owasp.dependencycheck' version '6.1.0'
+  id 'org.owasp.dependencycheck' version '6.1.1'
   id 'org.sonarqube' version '3.1.1'
 }
 
@@ -174,7 +174,7 @@ repositories {
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
 // enforces it's own (older) version which is not recommended.
 def versions = [
-  junit           : '5.7.0',
+  junit           : '5.7.1',
   junitPlatform   : '1.7.1',
   reformLogging: '5.1.7',
   springBoot: springBoot.class.package.implementationVersion,
@@ -234,8 +234,8 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.2'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.4'
 
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.13-RC-SSCS-8684-IdamOnly'
-  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.22'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.2.15'
+  compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.23'
 
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
@@ -296,7 +296,7 @@ dependencyManagement {
     dependency group: 'org.apache.tika', name: 'tika-core', version: '1.25'
 
     // CVE-2019-16869 - brought in by qpid-jms-client
-    dependencySet(group: 'io.netty', version: '4.1.56.Final') {
+    dependencySet(group: 'io.netty', version: '4.1.59.Final') {
       entry 'netty-handler'
       entry 'netty-transport-native-epoll'
       entry 'netty-transport-native-kqueue'
