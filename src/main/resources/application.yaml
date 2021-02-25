@@ -26,15 +26,16 @@ http:
 send-grid:
   host: smtp.sendgrid.net
   port: 587
+
 ld:
   user-key: sscs-evidence-share
 
 service:
   pdf-service:
-    uri: ${PDF_SERVICE_BASE_URL:https://docmosis-development.platform.hmcts.net/rs/render}
+    uri: ${PDF_SERVICE_BASE_URL:https://docmosis.aat.platform.hmcts.net/rs/render}
     accessKey: ${PDF_SERVICE_ACCESS_KEY:}
     health:
-      uri: ${PDF_SERVICE_HEALTH_URL:https://docmosis-development.platform.hmcts.net/rs/status}
+      uri: ${PDF_SERVICE_HEALTH_URL:https://docmosis.aat.platform.hmcts.net/rs/status}
 
 amqp:
   host: ${AMQP_HOST:localhost}
