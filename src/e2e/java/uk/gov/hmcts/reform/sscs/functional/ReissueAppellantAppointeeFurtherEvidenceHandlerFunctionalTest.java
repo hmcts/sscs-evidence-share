@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
+@Slf4j
 public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
     private static final String EVIDENCE_DOCUMENT_PDF = "evidence-document.pdf";
 
@@ -41,6 +43,7 @@ public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest exten
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
+        log.info("verifyEvidenceIssued ccdCaseId " + ccdCaseId);
 
         assertNull(docs.get(0).getValue().getEvidenceIssued());
         assertEquals("Yes",docs.get(1).getValue().getEvidenceIssued());
