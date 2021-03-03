@@ -237,7 +237,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.24'
 
   //Remove when our dependencies pull in this version or later
-  compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.12.1'
 
   compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.2.3'
 
@@ -287,7 +287,7 @@ dependencyManagement {
 
     // solves CVE-2019-12086
     // remove once spring manager incorporates this changes
-    dependencySet(group: 'com.fasterxml.jackson.core', version: '2.11.3') {
+    dependencySet(group: 'com.fasterxml.jackson.core', version: '2.12.1') {
       entry 'jackson-core'
       entry 'jackson-databind'
     }
