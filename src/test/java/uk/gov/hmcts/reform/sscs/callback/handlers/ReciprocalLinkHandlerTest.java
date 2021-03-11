@@ -68,7 +68,7 @@ public class ReciprocalLinkHandlerTest {
     }
 
     @Test
-    @Parameters({"VALID_APPEAL_CREATED", "NON_COMPLIANT", "INCOMPLETE_APPLICATION_RECEIVED"})
+    @Parameters({"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "NON_COMPLIANT", "DRAFT_TO_NON_COMPLIANT", "INCOMPLETE_APPLICATION_RECEIVED", "DRAFT_TO_INCOMPLETE_APPLICATION"})
     public void givenAValidEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
