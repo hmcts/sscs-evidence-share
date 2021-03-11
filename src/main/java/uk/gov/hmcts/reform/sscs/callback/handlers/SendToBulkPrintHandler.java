@@ -87,6 +87,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && ((callback.getEvent() == EventType.VALID_APPEAL_CREATED
+                || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
                 || callback.getEvent() == EventType.VALID_APPEAL
                 || callback.getEvent() == EventType.INTERLOC_VALID_APPEAL
                 || callback.getEvent() == EventType.APPEAL_TO_PROCEED
