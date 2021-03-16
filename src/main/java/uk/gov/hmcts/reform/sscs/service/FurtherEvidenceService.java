@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESEN
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.model.PdfDocument;
 
 @Service
 @Slf4j
@@ -44,13 +46,46 @@ public class FurtherEvidenceService {
 
     public void issue(List<? extends AbstractDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
                       List<FurtherEvidenceLetterType> allowedLetterTypes) {
-        List<Pdf> pdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType, isYes(caseData.getIsConfidentialCase()));
+        List<PdfDocument> pdfDocument = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType, isYes(caseData.getIsConfidentialCase()));
+
+        List<PdfDocument> sizeNormalisedPdfDocuments = sscsDocumentService.sizeNormalisePdfs(pdfDocument);
+
+        updateCaseDocuments(sizeNormalisedPdfDocuments.stream().map(pdfDoc -> pdfDoc.getDocument()).collect(Collectors.toList()), caseData, documentType);
+
+        List<Pdf> pdfs = sizeNormalisedPdfDocuments.stream().map(pdfDoc -> pdfDoc.getPdf()).collect(Collectors.toList());
+
         if (pdfs != null && pdfs.size() > 0) {
             send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes);
             send609_98_OtherParty(caseData, documentType, pdfs, allowedLetterTypes);
             log.info("Sending documents to bulk print for ccd Id: {} and document type: {}", caseData.getCcdCaseId(), documentType);
         }
     }
+
+    public void updateCaseDocuments(List<? extends AbstractDocument> documents, SscsCaseData caseData, DocumentType documentType) {
+
+        List<SscsDocument> sscsCaseDocuments = caseData.getSscsDocument();
+
+        for (AbstractDocument doc : documents) {
+
+            if (doc.getValue() != null
+                && documentType.getValue().equals(doc.getValue().getDocumentType())
+                && doc.getValue().getResizedDocumentLink() != null) {
+
+                String docSubType = doc.getValue().getDocumentDetailsSubType();
+
+                if (docSubType.equals("SscsDocumentDetails")) {
+                    sscsCaseDocuments
+                        .stream()
+                        .filter(d -> d.getValue().getDocumentLink().getDocumentBinaryUrl().equals(doc.getValue().getDocumentLink().getDocumentBinaryUrl()))
+                        .map(d -> {
+                            d.getValue().setResizedDocumentLink(doc.getValue().getResizedDocumentLink());
+                            return d;
+                        }).findFirst();
+                }
+            }
+        }
+    }
+
 
     protected void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                            List<FurtherEvidenceLetterType> allowedLetterTypes) {

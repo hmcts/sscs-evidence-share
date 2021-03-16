@@ -51,6 +51,9 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
+
+        log.info("Handling with Issue Further Evidence Handler");
+
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         issueFurtherEvidence(caseData);
@@ -68,15 +71,18 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private void doIssuePerDocumentType(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes,
                                                                                                      DocumentType documentType) {
         try {
+            log.info("Issuing for " + documentType.getValue());
             furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes);
         } catch (Exception e) {
             handleIssueFurtherEvidenceException(caseData, documentType);
             String errorMsg = "Failed sending further evidence for case(%s)...";
             throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
+        log.info("Issued");
     }
 
     private void postIssueFurtherEvidenceTasks(SscsCaseData caseData) {
+        log.info("Post Issue Tasks");
         try {
             if (caseData.getReasonableAdjustmentsLetters() != null) {
                 final SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseData.getCcdCaseId()), idamService.getIdamTokens());
@@ -87,13 +93,24 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.UPDATE_CASE_ONLY.getCcdType(),
                 "Update case data",
-                "Update issued evidence document flags after issuing further evidence",
+                determineDescription(caseData.getSscsDocument()),
                 idamService.getIdamTokens());
         } catch (Exception e) {
             String errorMsg = "Failed to update document evidence issued flags after issuing further evidence "
                 + "for case(%s)";
             throw new PostIssueFurtherEvidenceTasksException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
+    }
+
+    public String determineDescription(List<SscsDocument> documents) {
+        final boolean hasResizedDocs = documents.stream().anyMatch(document ->
+            document.getValue().getResizedDocumentLink() != null
+        );
+
+        final String baseDescription = "Update issued evidence document flags after issuing further evidence";
+        final String  fullDescription = !hasResizedDocs ? baseDescription : baseDescription + " and attached resized document(s)";
+
+        return fullDescription;
     }
 
     private void handleIssueFurtherEvidenceException(SscsCaseData caseData, DocumentType documentType) {

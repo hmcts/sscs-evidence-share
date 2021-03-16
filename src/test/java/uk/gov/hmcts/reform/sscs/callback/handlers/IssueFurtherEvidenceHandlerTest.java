@@ -16,6 +16,7 @@ import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESEN
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Rule;
@@ -175,5 +176,27 @@ public class IssueFurtherEvidenceHandlerTest {
 
         verifyNoMoreInteractions(ccdService);
         verifyNoMoreInteractions(furtherEvidenceService);
+    }
+
+    @Test
+    public void shouldReturnBaseDescriptionWhenNoResizedDocuments() {
+        SscsDocumentDetails docDetails = SscsDocumentDetails.builder().build();
+        SscsDocument doc = SscsDocument.builder().value(docDetails).build();
+
+        String result = issueFurtherEvidenceHandler.determineDescription(List.of(doc));
+        assertEquals("Update issued evidence document flags after issuing further evidence", result);
+    }
+
+    @Test
+    public void shouldReturnBaseDescriptionWhenHasResizedDocuments() {
+        SscsDocumentDetails docDetails = SscsDocumentDetails.builder()
+            .resizedDocumentLink(
+                DocumentLink.builder().documentFilename("resized").build()
+            )
+            .build();
+        SscsDocument doc = SscsDocument.builder().value(docDetails).build();
+
+        String result = issueFurtherEvidenceHandler.determineDescription(List.of(doc));
+        assertEquals("Update issued evidence document flags after issuing further evidence and attached resized document(s)", result);
     }
 }
