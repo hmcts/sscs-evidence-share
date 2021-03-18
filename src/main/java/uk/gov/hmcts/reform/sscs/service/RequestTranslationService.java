@@ -91,7 +91,7 @@ public class RequestTranslationService {
     private Map<String, byte[]> downloadEvidence(SscsCaseData sscsCaseData, Long caseId) {
         if (hasEvidence(sscsCaseData)) {
             Map<String, byte[]> map = new HashMap<>();
-            ListUtils.emptyIfNull(sscsCaseData.getSscsDocument()).stream().filter(doc -> doc.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED))
+            ListUtils.emptyIfNull(sscsCaseData.getSscsDocument()).stream().filter(doc -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(doc.getValue().getDocumentTranslationStatus()))
                 .forEach(doc -> {
                     doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
                     final String sscsFilename = getSscsDocumentFileName.apply(doc.getValue());
@@ -100,7 +100,7 @@ public class RequestTranslationService {
                     }
                 });
 
-            ListUtils.emptyIfNull(sscsCaseData.getDwpDocuments()).stream().filter(doc -> doc.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED))
+            ListUtils.emptyIfNull(sscsCaseData.getDwpDocuments()).stream().filter(doc -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(doc.getValue().getDocumentTranslationStatus()))
                 .forEach(doc -> {
                     doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
                     final String sscsFilename = getDwpDocumentFileName.apply(doc.getValue());
@@ -122,7 +122,7 @@ public class RequestTranslationService {
 
     private final Function<DwpDocumentDetails, DocumentLink> getDwpDocumentLink =
         dwpDocumentDetails ->
-            Optional.ofNullable(dwpDocumentDetails.getRip1DocumentLink()).orElse(dwpDocumentDetails.getDocumentLink())
+            Optional.ofNullable(dwpDocumentDetails.getRip1DocumentLink()).orElse(dwpDocumentDetails.getDocumentLink());
 
 
     private final Function<DwpDocumentDetails, String> getDwpDocumentFileName =
@@ -151,7 +151,7 @@ public class RequestTranslationService {
     }
 
     private boolean hasEvidence(SscsCaseData sscsCaseData) {
-        return CollectionUtils.isNotEmpty(sscsCaseData.getSscsDocument());
+        return CollectionUtils.isNotEmpty(sscsCaseData.getSscsDocument()) || CollectionUtils.isNotEmpty(sscsCaseData.getDwpDocuments());
     }
 
     private boolean sendEmailToWlu(long caseId, SscsCaseData caseData, byte[] requestFormPdf,
