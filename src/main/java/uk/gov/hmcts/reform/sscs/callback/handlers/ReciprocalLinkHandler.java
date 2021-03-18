@@ -43,8 +43,11 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
+            || callback.getEvent() == EventType.DRAFT_TO_VALID_APPEAL_CREATED
             || callback.getEvent() == EventType.NON_COMPLIANT
-            || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED);
+            || callback.getEvent() == EventType.DRAFT_TO_NON_COMPLIANT
+            || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED
+            || callback.getEvent() == EventType.DRAFT_TO_INCOMPLETE_APPLICATION);
     }
 
     @Override

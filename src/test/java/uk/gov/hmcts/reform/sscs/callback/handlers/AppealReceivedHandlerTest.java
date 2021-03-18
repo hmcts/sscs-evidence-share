@@ -56,13 +56,13 @@ public class AppealReceivedHandlerTest {
     }
 
     @Test
-    @Parameters({"VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
+    @Parameters({"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
     public void givenAValidAppealReceivedEventForDigitalCase_thenReturnTrue(EventType eventType) {
         assertTrue(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), INTERLOCUTORY_REVIEW_STATE, eventType)));
     }
 
     @Test
-    @Parameters({"VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
+    @Parameters({"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
     public void givenAValidAppealReceivedEventForNonDigitalCase_thenReturnFalse(EventType eventType) {
         assertFalse(handler.canHandle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(VALID_APPEAL.getId()).build(), INTERLOCUTORY_REVIEW_STATE, eventType)));
     }
@@ -78,7 +78,7 @@ public class AppealReceivedHandlerTest {
     }
 
     @Test
-    @Parameters({"VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
+    @Parameters({"VALID_APPEAL_CREATED", "DRAFT_TO_VALID_APPEAL_CREATED", "VALID_APPEAL", "INTERLOC_VALID_APPEAL"})
     public void givenValidEventAndDigitalCase_thenTriggerAppealReceivedEvent(EventType eventType) {
         handler.handle(SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), INTERLOCUTORY_REVIEW_STATE, eventType));
 
