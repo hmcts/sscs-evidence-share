@@ -18,6 +18,7 @@ spring:
         robotics-email-to: robotics.email.to
         robotics-email-from: robotics.email.from
         robotics-email-scottish-to: robotics.email.scottishTo
+        robotics-email-pip-ae-to: robotics.email.pipAeTo
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
         ld-sdk-key: ld.sdk-key
         sendgrid-api-key: send-grid.api-key
