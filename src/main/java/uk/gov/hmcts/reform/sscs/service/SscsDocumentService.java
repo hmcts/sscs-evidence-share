@@ -5,12 +5,7 @@ import static java.util.Optional.*;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -115,8 +110,6 @@ public class SscsDocumentService {
 
         log.info("About to upload resized document [" + pdfFileName + "]");
 
-        saveFile(pdfFileName, file.getBytes());
-
         try {
             UploadResponse upload = evidenceManagementService.upload(singletonList(file), "sscs");
             String location = upload.getEmbedded().getDocuments().get(0).links.self.href;
@@ -131,36 +124,19 @@ public class SscsDocumentService {
 
     public Optional<Pdf> resizedPdf(Pdf originalPdf) throws BulkPrintException {
 
-        try {
-            PDDocument document = PDDocument.load(originalPdf.getContent());
-            final boolean isPdfAcceptedSize = pdfHelper.isDocumentWithinSize(document, pdfPageSize);
-            if (isPdfAcceptedSize) {
-                log.info("PDF is correct size");
-                return Optional.empty();
+        try (PDDocument document = PDDocument.load(originalPdf.getContent())) {
+            Optional<PDDocument> resizedDoc = pdfHelper.scaleToA4(document);
+
+            if (resizedDoc.isPresent()) {
+                try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                    resizedDoc.get().save(baos);
+                    return Optional.of(new Pdf(baos.toByteArray(), originalPdf.getName()));
+                }
             } else {
-                saveFile("pre-" + originalPdf.getName() + ".pdf", originalPdf.getContent());
-
-                final BigDecimal scalingFactor = pdfHelper.calculateScalingFactor(document, pdfPageSize);
-
-                log.info("PDF is NOT correct size, scaling factor  = {}", scalingFactor.doubleValue());
-                PDDocument resizedDoc = pdfHelper.scaleDownDocumentToPageSize(document, scalingFactor, pdfPageSize);
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                resizedDoc.save(baos);
-                return Optional.of(new Pdf(baos.toByteArray(), originalPdf.getName()));
+                return Optional.empty();
             }
         } catch (Exception e) {
             throw new BulkPrintException("Failed to check and resize PDF", e);
-        }
-    }
-
-    private void saveFile(String pdfFileName, byte[] bytes) {
-        URL url = this.getClass().getClassLoader().getResource("/");
-        File fileOut = new File(url + pdfFileName);
-
-        try (OutputStream os = new FileOutputStream(fileOut)) {
-            os.write(bytes);
-        } catch (Exception e) {
-            log.error("Problem saving pdf to disk", e);
         }
     }
 }

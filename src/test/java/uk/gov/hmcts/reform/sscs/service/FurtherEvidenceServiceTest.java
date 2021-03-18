@@ -418,7 +418,7 @@ public class FurtherEvidenceServiceTest {
     }
 
     @Test
-    public void updateCaseDocumentsWhichMatchCorrectCriteria() {
+    public void updateSscsCaseDocumentsWhichHaveResizedDocumentsAndMatchingDocTypeAndMatchingDocIdentifier() {
 
         DocumentLink resizedDocLink = DocumentLink.builder().documentUrl("resized.com").build();
 

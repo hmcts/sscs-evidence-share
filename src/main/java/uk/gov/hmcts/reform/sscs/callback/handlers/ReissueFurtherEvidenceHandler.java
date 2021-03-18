@@ -16,10 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -56,7 +53,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
 
         List<FurtherEvidenceLetterType> allowedLetterTypes = getAllowedFurtherEvidenceLetterTypes(caseData);
         furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, documentType, allowedLetterTypes);
-        
+
         if (CollectionUtils.isNotEmpty(allowedLetterTypes)) {
             udateCaseForReasonableAdjustments(caseData, selectedDocument);
         }
@@ -70,7 +67,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         }
         setEvidenceIssuedFlagToYes(selectedDocument);
         setReissueFlagsToNull(caseData);
-        updateCase(caseData);
+        updateCase(caseData, selectedDocument);
     }
 
     private List<FurtherEvidenceLetterType> getAllowedFurtherEvidenceLetterTypes(SscsCaseData caseData) {
@@ -112,14 +109,24 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         }
     }
 
-    private void updateCase(SscsCaseData caseData) {
+    private void updateCase(SscsCaseData caseData, AbstractDocument selectedDocument) {
+
         ccdService.updateCase(
             caseData,
             Long.valueOf(caseData.getCcdCaseId()),
             EventType.UPDATE_CASE_ONLY.getCcdType(),
             "Update case data only",
-            "Update document evidence reissued flags after re-issuing further evidence to DWP",
+            determineDescription(selectedDocument),
             idamService.getIdamTokens());
+    }
+
+    public String determineDescription(AbstractDocument document) {
+        final boolean hasResizedDocs = document.getValue().getResizedDocumentLink() != null;
+
+        final String baseDescription = "Update document evidence reissued flags after re-issuing further evidence to DWP";
+        final String  fullDescription = !hasResizedDocs ? baseDescription : baseDescription + " and attached resized document(s)";
+
+        return fullDescription;
     }
 
     @Override

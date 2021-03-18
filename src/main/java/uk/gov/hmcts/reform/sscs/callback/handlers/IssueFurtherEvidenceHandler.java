@@ -71,18 +71,18 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private void doIssuePerDocumentType(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes,
                                                                                                      DocumentType documentType) {
         try {
-            log.info("Issuing for " + documentType.getValue());
+            log.info("Issuing for {} for caseId {}", documentType.getValue(), caseData.getCcdCaseId());
             furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes);
         } catch (Exception e) {
             handleIssueFurtherEvidenceException(caseData, documentType);
             String errorMsg = "Failed sending further evidence for case(%s)...";
             throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
-        log.info("Issued");
+        log.info("Issued for caseId {}", caseData.getCcdCaseId());
     }
 
     private void postIssueFurtherEvidenceTasks(SscsCaseData caseData) {
-        log.info("Post Issue Tasks");
+        log.debug("Post Issue Tasks for caseId {}", caseData.getCcdCaseId());
         try {
             if (caseData.getReasonableAdjustmentsLetters() != null) {
                 final SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseData.getCcdCaseId()), idamService.getIdamTokens());

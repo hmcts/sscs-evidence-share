@@ -65,20 +65,21 @@ public class FurtherEvidenceService {
 
         List<SscsDocument> sscsCaseDocuments = caseData.getSscsDocument();
 
-        for (AbstractDocument doc : documents) {
+        for (AbstractDocument<AbstractDocumentDetails> doc : documents) {
 
             if (doc.getValue() != null
                 && documentType.getValue().equals(doc.getValue().getDocumentType())
                 && doc.getValue().getResizedDocumentLink() != null) {
 
-                String docSubType = doc.getValue().getDocumentDetailsSubType();
-
-                if (docSubType.equals("SscsDocumentDetails")) {
+                if (doc.getValue().getClass().isAssignableFrom(SscsDocumentDetails.class)) {
                     sscsCaseDocuments
                         .stream()
                         .filter(d -> d.getValue().getDocumentLink().getDocumentBinaryUrl().equals(doc.getValue().getDocumentLink().getDocumentBinaryUrl()))
                         .map(d -> {
-                            d.getValue().setResizedDocumentLink(doc.getValue().getResizedDocumentLink());
+                            DocumentLink resizedLink = doc.getValue().getResizedDocumentLink();
+                            d.getValue().setResizedDocumentLink(resizedLink);
+                            log.info("Sending resized document to bulk print link: DocumentLink(documentUrl= {} , documentFilename= {} and caseId {} )",
+                                resizedLink.getDocumentUrl(), resizedLink.getDocumentFilename(), caseData.getCcdCaseId());
                             return d;
                         }).findFirst();
                 }

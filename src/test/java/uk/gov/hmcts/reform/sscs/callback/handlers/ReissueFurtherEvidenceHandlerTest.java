@@ -115,6 +115,42 @@ public class ReissueFurtherEvidenceHandlerTest {
     }
 
     @Test
+    public void determineResizedDescriptionCorrectly() {
+
+        SscsDocument doc = SscsDocument
+            .builder()
+            .value(
+                SscsDocumentDetails
+                    .builder()
+                    .resizedDocumentLink(
+                        DocumentLink
+                            .builder()
+                            .documentUrl("someurl.com")
+                            .build())
+                    .build())
+            .build();
+
+        String result = handler.determineDescription(doc);
+
+        assertEquals("Update document evidence reissued flags after re-issuing further evidence to DWP and attached resized document(s)", result);
+    }
+
+    @Test
+    public void determineNonResizedDescriptionCorrectly() {
+
+        SscsDocument doc = SscsDocument
+            .builder()
+            .value(
+                SscsDocumentDetails.builder().build())
+            .build();
+
+        String result = handler.determineDescription(doc);
+
+        assertEquals("Update document evidence reissued flags after re-issuing further evidence to DWP", result);
+    }
+
+
+    @Test
     @Parameters({"APPELLANT_EVIDENCE, true, true, true",
         "REPRESENTATIVE_EVIDENCE, false, false, true",
         "DWP_EVIDENCE, true, true, true",

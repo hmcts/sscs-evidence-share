@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -116,7 +115,7 @@ public class SscsDocumentServiceTest {
 
     @Test
     public void resizedPdfHandlesWithinSize() throws Exception {
-        when(pdfHelper.isDocumentWithinSize(any(), any())).thenReturn(true);
+        when(pdfHelper.scaleToA4(any())).thenReturn(Optional.empty());
         byte[] pdfContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
         Pdf pdf = new Pdf(pdfContent, "file.pdf");
         Optional<Pdf> result = sscsDocumentService.resizedPdf(pdf);
@@ -126,9 +125,7 @@ public class SscsDocumentServiceTest {
     @Test
     public void resizedPdfReturnsResizedWhenOutsideSizeLimit() throws Exception {
         byte[] pdfContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
-        when(pdfHelper.isDocumentWithinSize(any(), any())).thenReturn(false);
-        when(pdfHelper.calculateScalingFactor(any(), any())).thenReturn(new BigDecimal(0.5f));
-        when(pdfHelper.scaleDownDocumentToPageSize(any(), any(), any())).thenReturn(PDDocument.load(pdfContent));
+        when(pdfHelper.scaleToA4(any())).thenReturn(Optional.of(PDDocument.load(pdfContent)));
         Pdf pdf = new Pdf(pdfContent, "file.pdf");
         Optional<Pdf> result = sscsDocumentService.resizedPdf(pdf);
         assertEquals(true, result.isPresent());
@@ -137,9 +134,7 @@ public class SscsDocumentServiceTest {
 
     @Test(expected = BulkPrintException.class)
     public void resizedPdfPropogatesException() throws Exception {
-        when(pdfHelper.isDocumentWithinSize(any(), any())).thenReturn(false);
-        when(pdfHelper.calculateScalingFactor(any(), any())).thenReturn(new BigDecimal(0.5f));
-        when(pdfHelper.scaleDownDocumentToPageSize(any(), any(), any())).thenThrow(new Exception());
+        when(pdfHelper.scaleToA4(any())).thenThrow(new Exception());
         byte[] pdfContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
         Pdf pdf = new Pdf(pdfContent, "file.pdf");
         sscsDocumentService.resizedPdf(pdf);
