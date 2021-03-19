@@ -91,30 +91,37 @@ public class RequestTranslationService {
     private Map<String, byte[]> downloadEvidence(SscsCaseData sscsCaseData, Long caseId) {
         if (hasEvidence(sscsCaseData)) {
             Map<String, byte[]> map = new HashMap<>();
-            ListUtils.emptyIfNull(sscsCaseData.getSscsDocument()).stream().filter(doc -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(doc.getValue().getDocumentTranslationStatus()))
-                .forEach(doc -> {
-                    doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
-                    final String sscsFilename = getSscsDocumentFileName.apply(doc.getValue());
-                    if (sscsFilename != null) {
-                        map.put(sscsFilename, downloadBinary(doc, caseId));
-                    }
-                });
+            map = buildMapOfEvidence(sscsCaseData.getSscsDocument(), caseId, map);
+            map = buildMapOfEvidence(sscsCaseData.getDwpDocuments(), caseId, map);
 
-            ListUtils.emptyIfNull(sscsCaseData.getDwpDocuments()).stream().filter(doc -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(doc.getValue().getDocumentTranslationStatus()))
-                .forEach(doc -> {
-                    doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
-                    final String sscsFilename = getDwpDocumentFileName.apply(doc.getValue());
-                    if (sscsFilename != null) {
-                        map.put(sscsFilename, downloadBinary(doc, caseId));
-                    }
-                });
             return map;
         } else {
             return Collections.emptyMap();
         }
     }
 
-    private final Function<SscsDocumentDetails, String> getSscsDocumentFileName =
+    private Map<String, byte[]> buildMapOfEvidence(List<? extends AbstractDocument> docs, Long caseId, Map<String, byte[]> map) {
+
+        ListUtils.emptyIfNull(docs).stream().filter(doc -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(doc.getValue().getDocumentTranslationStatus()))
+            .forEach(doc -> {
+                doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
+                if (doc instanceof SscsDocument) {
+                    final String sscsFilename = getDocumentFileName.apply(doc.getValue());
+                    if (sscsFilename != null) {
+                        map.put(sscsFilename, downloadBinary((SscsDocument) doc, caseId));
+                    }
+                } else if (doc instanceof DwpDocument) {
+                    final String sscsFilename = getDwpDocumentFileName.apply((DwpDocumentDetails) doc.getValue());
+                    if (sscsFilename != null) {
+                        map.put(sscsFilename, downloadBinary((DwpDocument) doc, caseId));
+                    }
+                }
+            });
+
+        return map;
+    }
+
+    private final Function<AbstractDocumentDetails, String> getDocumentFileName =
         sscsDocumentDetails -> (sscsDocumentDetails.getDocumentLink() != null
             && sscsDocumentDetails.getDocumentLink().getDocumentFilename() != null
             && sscsDocumentDetails.getDocumentLink().getDocumentUrl() != null)
