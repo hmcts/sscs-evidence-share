@@ -110,9 +110,9 @@ robotics:
 
 wlu:
   email:
-    from: ${WLU_EMAIL_FROM:contactsscs@justice.gov.uk}
+    from: ${WLU_EMAIL_FROM:noreply@mail-sscs-nonprod.platform.hmcts.net}
     from-send-grid: noreply@mail-sscs-nonprod.platform.hmcts.net
-    to: ${WLU_EMAIL_TO:contactsscs@justice.gov.uk}
+    to: ${WLU_EMAIL_TO:sscs-tests@HMCTS.NET}
     subject: ${WLU_EMAIL_SUBJECT:Welsh translation –}
     message: ${WLU_EMAIL_MESSAGE:Please find attached the files along with request translation form.\nThank you
       very much}
