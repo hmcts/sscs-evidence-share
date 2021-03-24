@@ -4,22 +4,15 @@ import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.file;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
@@ -98,28 +91,62 @@ public class RequestTranslationService {
     private Map<String, byte[]> downloadEvidence(SscsCaseData sscsCaseData, Long caseId) {
         if (hasEvidence(sscsCaseData)) {
             Map<String, byte[]> map = new HashMap<>();
-            for (SscsDocument doc : sscsCaseData.getSscsDocument()) {
-                if (doc.getValue().getDocumentTranslationStatus() != null
-                    && doc.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)) {
-                    doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
+            map = buildMapOfEvidence(sscsCaseData.getSscsDocument(), caseId, map);
+            map = buildMapOfEvidence(sscsCaseData.getDwpDocuments(), caseId, map);
 
-                    final String sscsFilename = getSscsDocumentFileName.apply(doc.getValue());
-                    if (sscsFilename != null) {
-                        map.put(sscsFilename, downloadBinary(doc, caseId));
-                    }
-                }
-            }
             return map;
         } else {
             return Collections.emptyMap();
         }
     }
 
-    private Function<SscsDocumentDetails, String> getSscsDocumentFileName =
+    private Map<String, byte[]> buildMapOfEvidence(List<? extends AbstractDocument> docs, Long caseId, Map<String, byte[]> map) {
+
+        ListUtils.emptyIfNull(docs).stream().filter(doc -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(doc.getValue().getDocumentTranslationStatus()))
+            .forEach(doc -> {
+                doc.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED);
+                if (doc instanceof SscsDocument) {
+                    final String sscsFilename = getDocumentFileName.apply(doc.getValue());
+                    if (sscsFilename != null) {
+                        map.put(sscsFilename, downloadBinary((SscsDocument) doc, caseId));
+                    }
+                } else if (doc instanceof DwpDocument) {
+                    final String sscsFilename = getDwpDocumentFileName.apply((DwpDocumentDetails) doc.getValue());
+                    if (sscsFilename != null) {
+                        map.put(sscsFilename, downloadBinary((DwpDocument) doc, caseId));
+                    }
+                }
+            });
+
+        return map;
+    }
+
+    private final Function<AbstractDocumentDetails, String> getDocumentFileName =
         sscsDocumentDetails -> (sscsDocumentDetails.getDocumentLink() != null
             && sscsDocumentDetails.getDocumentLink().getDocumentFilename() != null
             && sscsDocumentDetails.getDocumentLink().getDocumentUrl() != null)
             ? sscsDocumentDetails.getDocumentLink().getDocumentFilename() + "." + System.nanoTime() : null;
+
+    private final Function<DwpDocumentDetails, DocumentLink> getDwpDocumentLink =
+        dwpDocumentDetails ->
+            Optional.ofNullable(dwpDocumentDetails.getRip1DocumentLink()).orElse(dwpDocumentDetails.getDocumentLink());
+
+
+    private final Function<DwpDocumentDetails, String> getDwpDocumentFileName =
+        dwpDocumentDetails -> {
+            DocumentLink documentLink = getDwpDocumentLink.apply(dwpDocumentDetails);
+            return documentLink != null && documentLink.getDocumentUrl() != null ? documentLink.getDocumentFilename() + "." + System.nanoTime() : null;
+        };
+
+    private byte[] downloadBinary(DwpDocument doc, Long caseId) {
+        log.info("About to download binary to attach to wlu for caseId {}", caseId);
+        DocumentLink documentLink = getDwpDocumentLink.apply(doc.getValue());
+        if (documentLink != null && documentLink.getDocumentUrl() != null && documentLink.getDocumentFilename() != null) {
+            return evidenceManagementService.download(URI.create(documentLink.getDocumentUrl()), null);
+        } else {
+            return new byte[0];
+        }
+    }
 
     private byte[] downloadBinary(SscsDocument doc, Long caseId) {
         log.info("About to download binary to attach to wlu for caseId {}", caseId);
@@ -131,7 +158,7 @@ public class RequestTranslationService {
     }
 
     private boolean hasEvidence(SscsCaseData sscsCaseData) {
-        return CollectionUtils.isNotEmpty(sscsCaseData.getSscsDocument());
+        return CollectionUtils.isNotEmpty(sscsCaseData.getSscsDocument()) || CollectionUtils.isNotEmpty(sscsCaseData.getDwpDocuments());
     }
 
     private boolean sendEmailToWlu(long caseId, SscsCaseData caseData, byte[] requestFormPdf,
