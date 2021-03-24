@@ -22,12 +22,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RequestTranslationTemplate;
@@ -66,7 +62,7 @@ public class RequestTranslationServiceTest {
     }
 
     @Test
-    public void givenACaseWithEvidenceToDownload_thenCreateRequestFromWluWithDownloadedEvidence() {
+    public void givenACaseWithEvidenceToDownloadFromSscsDocuments_thenCreateRequestFromWluWithDownloadedEvidence() {
 
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
         byte[] expectedBytes = new byte[]{1, 2, 3};
@@ -100,11 +96,50 @@ public class RequestTranslationServiceTest {
 
         assertThat(caseData.getCaseData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus(),
                 is(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED));
+    }
+
+    @Test
+    public void givenACaseWithEvidenceToDownloadFromDwpDocuments_thenCreateRequestFromWluWithDownloadedEvidence() {
+
+        byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
+        byte[] expectedBytes = new byte[]{1, 2, 3};
+        given(evidenceManagementService.download(any(), any())).willReturn(expectedBytes);
+
+        when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(expectedPdf);
+
+        List<DwpDocument> documents = new ArrayList<>();
+        documents.add(DwpDocument.builder()
+            .value(DwpDocumentDetails.builder()
+                .documentType(DocumentType.AUDIO_DOCUMENT.getValue())
+                .documentFileName("test.jpg")
+                .documentLink(DocumentLink.builder().documentUrl("www.download.com")
+                    .documentBinaryUrl("www.download.com").documentFilename("fileName.pdf").build())
+                .rip1DocumentLink(DocumentLink.builder().documentUrl("www.rip1.com")
+                    .documentBinaryUrl("www.rip1.com/binary").documentFilename("rip1.pdf").build())
+                .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)
+                .build())
+            .build());
+
+        sscsCaseData.setDwpDocuments(documents);
+        CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null);
+
+        requestTranslationService.sendCaseToWlu(caseData);
+
+        verify(requestTranslationTemplate).generateEmail(captor.capture(), anyLong());
+        List<EmailAttachment> attachmentResult = captor.getValue();
+
+        assertThat(attachmentResult.get(0).getFilename(), is("RequestTranslationForm-1.pdf"));
+        assertThat(attachmentResult.get(1).getFilename(), is("rip1.pdf"));
+
+        verify(emailService).sendEmail(eq(1L), any());
+
+        assertThat(caseData.getCaseData().getDwpDocuments().get(0).getValue().getDocumentTranslationStatus(),
+            is(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED));
 
     }
 
     @Test
-    public void givenACaseWithNEvidenceToDownload_thenDoNotSendRequestEmail() {
+    public void givenACaseWithNoEvidenceToDownload_thenDoNotSendRequestEmail() {
 
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
         byte[] expectedBytes = new byte[]{1, 2, 3};
@@ -116,12 +151,13 @@ public class RequestTranslationServiceTest {
 
         requestTranslationService.sendCaseToWlu(caseData);
 
+        verifyNoInteractions(emailService);
         verifyNoInteractions(requestTranslationTemplate);
 
     }
 
     @Test
-    public void givenACaseWithNoEvidenceLinkToDownload_thenCreateRequestFromWluWithDownloadedEvidence() {
+    public void givenACaseWithNoEvidenceLinkToDownload_thenDoNotSendRequestEmail() {
 
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
         byte[] expectedBytes = new byte[]{0};
