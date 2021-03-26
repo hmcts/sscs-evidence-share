@@ -13,32 +13,4 @@
     <cve>CVE-2016-5394</cve>
     <cve>CVE-2016-6798</cve>
   </suppress>
-  <suppress>
-    <notes><![CDATA[
-         file name: sentiment-analysis-parser-0.1.jar
-        ]]></notes>
-    <packageUrl regex="true">^pkg:maven/edu\.usc\.ir/sentiment-analysis-parser@0.*$</packageUrl>
-    <cve>CVE-2018-18749</cve>
-  </suppress>
-  <suppress until="2020-11-30">
-    <notes><![CDATA[
-         file name: tomcat-embed-core-9.0.39.jar/tomcat-embed-websocket-9.0.39.jar
-         Awaiting patch for Tomcat
-        ]]></notes>
-    <cve>CVE-2020-13943</cve>
-  </suppress>
-  <suppress until="2020-11-30">
-    <notes><![CDATA[
-         file name: junit-4.13.1.jar
-         Awaiting patch for Junit
-        ]]></notes>
-    <cve>CVE-2020-15250</cve>
-  </suppress>
-  <suppress until="2021-01-31">
-    <notes><![CDATA[
-   file name: launchdarkly-java-server-sdk-5.2.1.jar (shaded: com.google.guava:guava:28.2-jre)
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
-    <cve>CVE-2020-8908</cve>
-  </suppress>
 </suppressions>
