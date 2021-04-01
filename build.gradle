@@ -284,7 +284,7 @@ dependencyManagement {
     }
 
     // resolves: CVE-2020-9489
-    dependency group: 'org.apache.tika', name: 'tika-core', version: '1.25'
+    dependency group: 'org.apache.tika', name: 'tika-core', version: '1.26'
 
     // solves CVE-2019-12086
     // remove once spring manager incorporates this changes
@@ -293,7 +293,7 @@ dependencyManagement {
       entry 'jackson-databind'
     }
 
-    dependency group: 'org.apache.tika', name: 'tika-core', version: '1.25'
+    dependency group: 'org.apache.tika', name: 'tika-core', version: '1.26'
 
     // CVE-2019-16869 - brought in by qpid-jms-client
     dependencySet(group: 'io.netty', version: '4.1.60.Final') {
