@@ -14,7 +14,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -31,17 +30,14 @@ import uk.gov.hmcts.reform.sscs.model.PdfDocument;
 @Slf4j
 @Service
 public class SscsDocumentService {
-
-    private EvidenceManagementService evidenceManagementService;
-    private PdfHelper pdfHelper;
+    private final EvidenceManagementService evidenceManagementService;
+    private final PdfHelper pdfHelper;
 
     @Autowired
     public SscsDocumentService(EvidenceManagementService evidenceManagementService, PdfHelper pdfHelper) {
         this.evidenceManagementService = evidenceManagementService;
         this.pdfHelper = pdfHelper;
     }
-
-    private static final PDRectangle pdfPageSize = PDRectangle.A4;
 
     public List<PdfDocument> getPdfsForGivenDocTypeNotIssued(List<? extends AbstractDocument> sscsDocuments, DocumentType documentType, boolean isConfidentialCase) {
         Objects.requireNonNull(sscsDocuments);
@@ -129,8 +125,10 @@ public class SscsDocumentService {
 
             if (resizedDoc.isPresent()) {
                 try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                    resizedDoc.get().save(baos);
-                    return Optional.of(new Pdf(baos.toByteArray(), originalPdf.getName()));
+                    try (PDDocument resized = resizedDoc.get()) {
+                        resized.save(baos);
+                        return Optional.of(new Pdf(baos.toByteArray(), originalPdf.getName()));
+                    }
                 }
             } else {
                 return Optional.empty();
