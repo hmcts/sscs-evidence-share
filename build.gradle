@@ -235,7 +235,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.4'
 
   compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.2.42'
-  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.30'
+  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.31'
 
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
@@ -283,17 +283,12 @@ dependencyManagement {
       entry 'tomcat-embed-websocket'
     }
 
-    // resolves: CVE-2020-9489
-    dependency group: 'org.apache.tika', name: 'tika-core', version: '1.25'
-
     // solves CVE-2019-12086
     // remove once spring manager incorporates this changes
     dependencySet(group: 'com.fasterxml.jackson.core', version: '2.11.3') {
       entry 'jackson-core'
       entry 'jackson-databind'
     }
-
-    dependency group: 'org.apache.tika', name: 'tika-core', version: '1.25'
 
     // CVE-2019-16869 - brought in by qpid-jms-client
     dependencySet(group: 'io.netty', version: '4.1.60.Final') {
