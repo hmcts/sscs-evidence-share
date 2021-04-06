@@ -234,7 +234,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.4'
 
-  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.2.42'
+  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.2.43-RC-SSCS-9037'
   compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.31'
 
   //Remove when our dependencies pull in this version or later
