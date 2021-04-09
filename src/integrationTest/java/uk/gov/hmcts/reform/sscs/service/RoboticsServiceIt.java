@@ -288,4 +288,65 @@ public class RoboticsServiceIt {
         assertEquals("No", result.getString("isDigital"));
         verifyNoMoreInteractions(ccdService);
     }
+
+    @Test
+    public void givenSscsCaseDataPip_makeValidRoboticsJsonThatHasRightDwpIssueOffice() {
+        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
+
+        assertThat(result.get("caseId"), is(1234L));
+        assertTrue(result.has("appellant"));
+        assertTrue(result.has("hearingArrangements"));
+        assertTrue(result.has("isReadyToList"));
+        assertThat(result.get("dwpIssuingOffice"), is("DWP PIP (1)"));
+
+        verifyNoMoreInteractions(ccdService);
+    }
+
+    @Test
+    public void givenSscsCaseDataEsa_makeValidRoboticsJsonThatHasRightDwpIssueOffice() {
+        caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("ESA").build());
+        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Milton Keynes DRT").build());
+
+        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
+
+        assertThat(result.get("caseId"), is(1234L));
+        assertTrue(result.has("appellant"));
+        assertTrue(result.has("hearingArrangements"));
+        assertTrue(result.has("isReadyToList"));
+        assertThat(result.get("dwpIssuingOffice"), is("Sheffield Benefit Centre"));
+
+        verifyNoMoreInteractions(ccdService);
+    }
+
+    @Test
+    public void givenSscsCaseDataUc_makeValidRoboticsJsonThatHasRightDwpIssueOffice() {
+        caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("UC").build());
+        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Universal Credit").build());
+
+        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
+
+        assertThat(result.get("caseId"), is(1234L));
+        assertTrue(result.has("appellant"));
+        assertTrue(result.has("hearingArrangements"));
+        assertTrue(result.has("isReadyToList"));
+        assertThat(result.get("dwpIssuingOffice"), is("Universal Credit"));
+
+        verifyNoMoreInteractions(ccdService);
+    }
+
+    @Test
+    public void givenSscsCaseDataDla_makeValidRoboticsJsonThatHasRightDwpIssueOffice() {
+        caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("DLA").build());
+        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Birmingham DRT").build());
+
+        JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
+
+        assertThat(result.get("caseId"), is(1234L));
+        assertTrue(result.has("appellant"));
+        assertTrue(result.has("hearingArrangements"));
+        assertTrue(result.has("isReadyToList"));
+        assertThat(result.get("dwpIssuingOffice"), is("Birmingham DRT"));
+
+        verifyNoMoreInteractions(ccdService);
+    }
 }
