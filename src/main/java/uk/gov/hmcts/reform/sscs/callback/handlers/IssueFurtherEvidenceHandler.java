@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
 
 import java.util.Arrays;
@@ -26,9 +28,9 @@ import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 @Slf4j
 public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
 
-    private FurtherEvidenceService furtherEvidenceService;
-    private CcdService ccdService;
-    private IdamService idamService;
+    private final FurtherEvidenceService furtherEvidenceService;
+    private final CcdService ccdService;
+    private final IdamService idamService;
 
     @Autowired
     public IssueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService, CcdService ccdService,
@@ -51,6 +53,9 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
+
+        log.info("Handling with Issue Further Evidence Handler");
+
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         issueFurtherEvidence(caseData);
@@ -68,32 +73,48 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private void doIssuePerDocumentType(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes,
                                                                                                      DocumentType documentType) {
         try {
+            log.info("Issuing for {} for caseId {}", documentType.getValue(), caseData.getCcdCaseId());
             furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes);
         } catch (Exception e) {
             handleIssueFurtherEvidenceException(caseData, documentType);
             String errorMsg = "Failed sending further evidence for case(%s)...";
             throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
+        log.info("Issued for caseId {}", caseData.getCcdCaseId());
     }
 
     private void postIssueFurtherEvidenceTasks(SscsCaseData caseData) {
+        log.debug("Post Issue Tasks for caseId {}", caseData.getCcdCaseId());
         try {
             if (caseData.getReasonableAdjustmentsLetters() != null) {
                 final SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseData.getCcdCaseId()), idamService.getIdamTokens());
                 caseData = sscsCaseDetails.getData();
             }
 
+            final String description = determineDescription(caseData.getSscsDocument());
+
             setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
+            
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.UPDATE_CASE_ONLY.getCcdType(),
                 "Update case data",
-                "Update issued evidence document flags after issuing further evidence",
+                description,
                 idamService.getIdamTokens());
         } catch (Exception e) {
             String errorMsg = "Failed to update document evidence issued flags after issuing further evidence "
                 + "for case(%s)";
             throw new PostIssueFurtherEvidenceTasksException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
+    }
+
+    public String determineDescription(List<SscsDocument> documents) {
+        final boolean hasResizedDocs = documents.stream().anyMatch(document ->
+            document.getValue().getResizedDocumentLink() != null && document.getValue().getEvidenceIssued().equals(NO.getValue())
+        );
+
+        final String baseDescription = "Update issued evidence document flags after issuing further evidence";
+
+        return !hasResizedDocs ? baseDescription : baseDescription + " and attached resized document(s)";
     }
 
     private void handleIssueFurtherEvidenceException(SscsCaseData caseData, DocumentType documentType) {
@@ -110,7 +131,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             for (SscsDocument doc : sscsDocuments) {
                 if (doc.getValue() != null && doc.getValue().getEvidenceIssued() != null
                     && "No".equalsIgnoreCase(doc.getValue().getEvidenceIssued())) {
-                    doc.getValue().setEvidenceIssued("Yes");
+                    doc.getValue().setEvidenceIssued(YES.getValue());
                 }
             }
         }

@@ -14,6 +14,7 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -97,7 +98,7 @@ public class ReissueFurtherEvidenceServiceIt {
     @Captor
     ArgumentCaptor<PdfDocumentRequest> pdfDocumentRequest;
 
-    private static final String FILE_CONTENT = "Welcome to PDF document service";
+    private byte[] fileContent;
 
     private Session session = Session.getInstance(new Properties());
 
@@ -105,7 +106,7 @@ public class ReissueFurtherEvidenceServiceIt {
     Map<LanguagePreference, Map<String, Map<String, String>>> template =  new HashMap<>();
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
         Map<String, String> nameMap;
         Map<String, Map<String, String>> englishDocs = new HashMap<>();
         nameMap = new HashMap<>();
@@ -141,12 +142,15 @@ public class ReissueFurtherEvidenceServiceIt {
         MimeMessage message = new MimeMessage(session);
         assertNotNull("ReissueFurtherEvidenceHandler must be autowired", handler);
 
+        fileContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
+
+        when(evidenceManagementService.download(any(), any())).thenReturn(fileContent);
     }
 
     @Test
     public void appealWithAppellantAndFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAndNotSend609_98() throws IOException {
 
-        doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
 
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
@@ -175,7 +179,7 @@ public class ReissueFurtherEvidenceServiceIt {
     @Test
     public void appealWithAppellantAndRepFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAnd609_98ToRep() throws IOException {
 
-        doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
@@ -207,7 +211,7 @@ public class ReissueFurtherEvidenceServiceIt {
     @Test
     public void appealWithAppellantAndRepFurtherEvidenceFromRep_shouldSend609_97ToRepAnd609_98ToAppellant() throws IOException {
 
-        doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
@@ -239,7 +243,7 @@ public class ReissueFurtherEvidenceServiceIt {
     @Test
     public void appealWithAppellantFurtherEvidenceAndRepFurtherEvidence_shouldSend609_97ToRepAndAppellantAnd609_98ToAppellantAndRep() throws IOException {
 
-        doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
@@ -281,7 +285,7 @@ public class ReissueFurtherEvidenceServiceIt {
     @Test
     public void appealWithFurtherEvidenceFromDwp_shouldNotSend609_97And609_98ToAppellant() throws IOException {
 
-        doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
@@ -308,7 +312,7 @@ public class ReissueFurtherEvidenceServiceIt {
     @Test
     public void appealWithRepAndFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToRepAndAppellant() throws IOException {
 
-        doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
