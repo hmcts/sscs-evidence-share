@@ -4,9 +4,9 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'org.springframework.boot' version '2.3.5.RELEASE'
-  id 'uk.gov.hmcts.java' version '0.12.6'
+  id 'uk.gov.hmcts.java' version '0.12.8'
   id 'com.github.ben-manes.versions' version '0.38.0'
-  id 'org.owasp.dependencycheck' version '6.1.2'
+  id 'org.owasp.dependencycheck' version '6.1.5'
   id 'org.sonarqube' version '3.1.1'
 }
 
@@ -234,8 +234,8 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.4'
 
-  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.2.43-RC-8855'
-  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.31-RC-SSCS-8855-1'
+  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.2.45'
+  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.32'
 
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
@@ -291,7 +291,7 @@ dependencyManagement {
     }
 
     // CVE-2019-16869 - brought in by qpid-jms-client
-    dependencySet(group: 'io.netty', version: '4.1.60.Final') {
+    dependencySet(group: 'io.netty', version: '4.1.63.Final') {
       entry 'netty-handler'
       entry 'netty-transport-native-epoll'
       entry 'netty-transport-native-kqueue'
@@ -302,15 +302,6 @@ dependencyManagement {
       entry 'netty-buffer'
       entry 'netty-resolver'
       entry 'netty-common'
-    }
-
-    // CVE-2020-13954
-    dependencySet(group: 'org.apache.cxf', version: '3.4.2') {
-        entry 'cxf-core'
-        entry 'cxf-rt-frontend-jaxrs'
-        entry 'cxf-rt-rs-client'
-        entry 'cxf-rt-security'
-        entry 'cxf-rt-transports-http'
     }
 
     //to remove CVE-2018-10237
