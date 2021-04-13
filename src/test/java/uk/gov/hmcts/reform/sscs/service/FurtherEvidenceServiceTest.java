@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
@@ -39,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.model.PdfDocument;
 
 @RunWith(JUnitParamsRunner.class)
 public class FurtherEvidenceServiceTest {
@@ -50,7 +51,7 @@ public class FurtherEvidenceServiceTest {
 
     @Mock
     private CoverLetterService coverLetterService;
-    @Spy
+    @Mock
     private SscsDocumentService sscsDocumentService;
     @Mock
     private BulkPrintService bulkPrintService;
@@ -60,7 +61,9 @@ public class FurtherEvidenceServiceTest {
     private FurtherEvidenceService furtherEvidenceService;
 
     private SscsCaseData caseData;
-    private final List<Pdf> pdfList = Collections.singletonList(new Pdf(new byte[]{}, "some doc name"));
+    private Pdf pdf;
+    private List<Pdf> pdfList;
+    private List<PdfDocument> pdfDocumentList;
 
     private String furtherEvidenceOriginalSenderTemplateName = "TB-SCS-GNO-ENG-00068.doc";
     private String furtherEvidenceOriginalSenderWelshTemplateName = "TB-SCS-GNO-WEL-00469.docx";
@@ -72,7 +75,7 @@ public class FurtherEvidenceServiceTest {
     Map<LanguagePreference, Map<String, Map<String, String>>> template =  new HashMap<>();
 
     @Before
-    public void setup() {
+    public void setup() throws Exception {
         Map<String, String> nameMap;
         Map<String, Map<String, String>> englishDocs = new HashMap<>();
         nameMap = new HashMap<>();
@@ -107,6 +110,11 @@ public class FurtherEvidenceServiceTest {
 
         furtherEvidenceService = new FurtherEvidenceService(coverLetterService, sscsDocumentService, bulkPrintService,
                 docmosisTemplateConfig);
+
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
+        pdf = new Pdf(pdfBytes, "some doc name");
+        pdfList = Collections.singletonList(pdf);
+        pdfDocumentList = Collections.singletonList(PdfDocument.builder().pdf(pdf).document(AbstractDocument.builder().build()).build());
     }
 
     @Test
@@ -260,7 +268,7 @@ public class FurtherEvidenceServiceTest {
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
-        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), any(), any(), any());
     }
 
     @Test
@@ -389,8 +397,10 @@ public class FurtherEvidenceServiceTest {
             .appeal(Appeal.builder().build())
             .build();
 
-        doReturn(pdfList).when(sscsDocumentService).getPdfsForGivenDocTypeNotIssued(
+        doReturn(pdfDocumentList).when(sscsDocumentService).getPdfsForGivenDocTypeNotIssued(
             eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), any(), eq(isConfidentialCase));
+
+        when(sscsDocumentService.sizeNormalisePdfs(any())).thenReturn(pdfDocumentList);
     }
 
     private void withRep() {
@@ -405,6 +415,102 @@ public class FurtherEvidenceServiceTest {
         boolean actual = furtherEvidenceService.canHandleAnyDocument(documentList);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void updateSscsCaseDocumentsWhichHaveResizedDocumentsAndMatchingDocTypeAndMatchingDocIdentifier() {
+
+        DocumentLink resizedDocLink = DocumentLink.builder().documentUrl("resized.com").build();
+
+        SscsDocument updatedDoc = SscsDocument
+            .builder()
+            .value(
+                SscsDocumentDetails
+                    .builder()
+                    .documentType(APPELLANT_EVIDENCE.getValue())
+                    .resizedDocumentLink(resizedDocLink)
+                    .documentLink(DocumentLink.builder().documentBinaryUrl("original.com").build())
+                    .build()).build();
+
+        SscsDocument updatedDoc2 = SscsDocument
+            .builder()
+            .value(
+                SscsDocumentDetails
+                    .builder()
+                    .documentType(APPELLANT_EVIDENCE.getValue())
+                    .resizedDocumentLink(resizedDocLink)
+                    .documentLink(DocumentLink.builder().documentBinaryUrl("original2.com").build())
+                    .build()).build();
+
+        SscsDocument updatedDoc3 = SscsDocument
+            .builder()
+            .value(
+                SscsDocumentDetails
+                    .builder()
+                    .documentType(APPELLANT_EVIDENCE.getValue())
+                    .documentLink(DocumentLink.builder().documentBinaryUrl("original2.com").build())
+                    .build()).build();
+
+        SscsWelshDocument updatedWelshDoc = SscsWelshDocument
+            .builder()
+            .value(
+                SscsWelshDocumentDetails
+                    .builder()
+                    .documentType(APPELLANT_EVIDENCE.getValue())
+                    .resizedDocumentLink(resizedDocLink)
+                    .documentLink(DocumentLink.builder().documentBinaryUrl("welsh.com").build())
+                    .build()).build();
+
+        SscsWelshDocument originalWelshDoc = SscsWelshDocument
+            .builder()
+            .value(
+                SscsWelshDocumentDetails
+                    .builder()
+                    .documentType(APPELLANT_EVIDENCE.getValue())
+                    .documentLink(DocumentLink.builder().documentBinaryUrl("welsh.com").build())
+                    .build()).build();
+
+        SscsDocument originalDoc = SscsDocument
+            .builder()
+            .value(
+                SscsDocumentDetails
+                    .builder()
+                    .documentType(APPELLANT_EVIDENCE.getValue())
+                    .documentLink(DocumentLink.builder().documentBinaryUrl("original.com").build())
+                    .build()).build();
+
+        SscsDocument differentTypeDoc = SscsDocument
+            .builder()
+            .value(
+                SscsDocumentDetails
+                    .builder()
+                    .documentType(REPRESENTATIVE_EVIDENCE.getValue())
+                    .documentLink(DocumentLink.builder().documentBinaryUrl("original.com").build())
+                    .build()).build();
+
+        SscsDocument differentLinkDoc = SscsDocument
+            .builder()
+            .value(
+                SscsDocumentDetails
+                    .builder()
+                    .documentType(APPELLANT_EVIDENCE.getValue())
+                    .documentLink(DocumentLink.builder().documentBinaryUrl("not-original2.com").build())
+                    .build()).build();
+
+        SscsCaseData caseData = SscsCaseData
+            .builder()
+            .sscsDocument(Arrays.asList(originalDoc, differentTypeDoc, differentLinkDoc))
+            .sscsWelshDocuments(Arrays.asList(originalWelshDoc))
+            .build();
+
+        DocumentType docType = APPELLANT_EVIDENCE;
+
+        furtherEvidenceService.updateCaseDocuments(Arrays.asList(updatedDoc, updatedDoc2, updatedDoc3, updatedWelshDoc), caseData, docType);
+
+        assertEquals(resizedDocLink, caseData.getSscsDocument().get(0).getValue().getResizedDocumentLink());
+        assertEquals(null, caseData.getSscsDocument().get(1).getValue().getResizedDocumentLink());
+        assertEquals(null, caseData.getSscsDocument().get(2).getValue().getResizedDocumentLink());
+        assertEquals(null, caseData.getSscsWelshDocuments().get(0).getValue().getResizedDocumentLink());
     }
 
     @SuppressWarnings("unused")
