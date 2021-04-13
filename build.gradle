@@ -227,7 +227,7 @@ dependencies {
 
   compile group: 'org.springframework', name: 'spring-jms'
   compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.57.0'
-  compileOnly 'org.projectlombok:lombok:1.18.18'
+  compileOnly 'org.projectlombok:lombok:1.18.20'
 
   annotationProcessor "org.projectlombok:lombok:1.18.18"
 
@@ -257,7 +257,7 @@ dependencies {
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  e2eCompileOnly 'org.projectlombok:lombok:1.18.16'
+  e2eCompileOnly 'org.projectlombok:lombok:1.18.20'
   e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   integrationTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
