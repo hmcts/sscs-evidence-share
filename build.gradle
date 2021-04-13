@@ -240,7 +240,7 @@ dependencies {
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
-  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.3.0'
+  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.3.1'
 
   integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
