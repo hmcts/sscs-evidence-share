@@ -226,21 +226,21 @@ dependencies {
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.7.RELEASE'
 
   compile group: 'org.springframework', name: 'spring-jms'
-  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.57.0'
-  compileOnly 'org.projectlombok:lombok:1.18.18'
+  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.58.0'
+  compileOnly 'org.projectlombok:lombok:1.18.20'
 
   annotationProcessor "org.projectlombok:lombok:1.18.18"
 
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.4'
 
-  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.2.45-RC-SSCS-9031'
-  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.32-RC-SSCS-9031'
+  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.0'
+  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.33'
 
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
-  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.3.0'
+  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.3.1'
 
   integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
@@ -257,7 +257,7 @@ dependencies {
   testCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
-  e2eCompileOnly 'org.projectlombok:lombok:1.18.16'
+  e2eCompileOnly 'org.projectlombok:lombok:1.18.20'
   e2eAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
   integrationTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -310,7 +310,7 @@ dependencyManagement {
     }
 
     //CVE-2021-22112
-    dependencySet(group: 'org.springframework.security', version: '5.4.5') {
+    dependencySet(group: 'org.springframework.security', version: '5.4.6') {
       entry 'spring-security-crypto'
     }
 
