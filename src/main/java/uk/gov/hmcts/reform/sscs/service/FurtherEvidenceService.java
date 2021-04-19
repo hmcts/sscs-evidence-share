@@ -26,13 +26,13 @@ import uk.gov.hmcts.reform.sscs.model.PdfDocument;
 @Slf4j
 public class FurtherEvidenceService {
 
-    private DocmosisTemplateConfig docmosisTemplateConfig;
+    private final DocmosisTemplateConfig docmosisTemplateConfig;
 
-    private CoverLetterService coverLetterService;
+    private final CoverLetterService coverLetterService;
 
-    private SscsDocumentService sscsDocumentService;
+    private final SscsDocumentService sscsDocumentService;
 
-    private PrintService bulkPrintService;
+    private final PrintService bulkPrintService;
 
     public FurtherEvidenceService(@Autowired CoverLetterService coverLetterService,
                                   @Autowired SscsDocumentService sscsDocumentService,
@@ -50,11 +50,11 @@ public class FurtherEvidenceService {
 
         List<PdfDocument> sizeNormalisedPdfDocuments = sscsDocumentService.sizeNormalisePdfs(pdfDocument);
 
-        updateCaseDocuments(sizeNormalisedPdfDocuments.stream().map(pdfDoc -> pdfDoc.getDocument()).collect(Collectors.toList()), caseData, documentType);
+        updateCaseDocuments(sizeNormalisedPdfDocuments.stream().map(PdfDocument::getDocument).collect(Collectors.toList()), caseData, documentType);
 
-        List<Pdf> pdfs = sizeNormalisedPdfDocuments.stream().map(pdfDoc -> pdfDoc.getPdf()).collect(Collectors.toList());
+        List<Pdf> pdfs = sizeNormalisedPdfDocuments.stream().map(PdfDocument::getPdf).collect(Collectors.toList());
 
-        if (pdfs != null && pdfs.size() > 0) {
+        if (pdfs.size() > 0) {
             send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes);
             send609_98_OtherParty(caseData, documentType, pdfs, allowedLetterTypes);
             log.info("Sending documents to bulk print for ccd Id: {} and document type: {}", caseData.getCcdCaseId(), documentType);
@@ -75,16 +75,17 @@ public class FurtherEvidenceService {
                     sscsCaseDocuments
                         .stream()
                         .filter(d -> d.getValue().getDocumentLink().getDocumentBinaryUrl().equals(doc.getValue().getDocumentLink().getDocumentBinaryUrl()))
-                        .map(d -> {
-                            DocumentLink resizedLink = doc.getValue().getResizedDocumentLink();
-                            d.getValue().setResizedDocumentLink(resizedLink);
-                            log.info("Sending resized document to bulk print link: DocumentLink(documentUrl= {} , documentFilename= {} and caseId {} )",
-                                resizedLink.getDocumentUrl(), resizedLink.getDocumentFilename(), caseData.getCcdCaseId());
-                            return d;
-                        }).findFirst();
+                        .forEach(d -> setResizeLinkOnDocument(caseData, doc, d));
                 }
             }
         }
+    }
+
+    private void setResizeLinkOnDocument(SscsCaseData caseData, AbstractDocument<AbstractDocumentDetails> doc, SscsDocument d) {
+        DocumentLink resizedLink = doc.getValue().getResizedDocumentLink();
+        d.getValue().setResizedDocumentLink(resizedLink);
+        log.info("Sending resized document to bulk print link: DocumentLink(documentUrl= {} , documentFilename= {} and caseId {} )",
+            resizedLink.getDocumentUrl(), resizedLink.getDocumentFilename(), caseData.getCcdCaseId());
     }
 
 
