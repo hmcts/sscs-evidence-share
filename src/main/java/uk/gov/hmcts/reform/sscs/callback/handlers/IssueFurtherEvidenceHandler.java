@@ -1,5 +1,13 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
+import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
+
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,15 +26,6 @@ import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.exception.PostIssueFurtherEvidenceTasksException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
 
 @Service
 @Slf4j
