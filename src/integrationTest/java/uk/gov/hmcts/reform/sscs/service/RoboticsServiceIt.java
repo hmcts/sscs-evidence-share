@@ -337,7 +337,7 @@ public class RoboticsServiceIt {
     @Test
     public void givenSscsCaseDataDla_makeValidRoboticsJsonThatHasRightDwpIssueOffice() {
         caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("DLA").build());
-        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("Birmingham DRT").build());
+        caseDetails.getCaseData().getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice("The Pension Service 11").build());
 
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
 
@@ -345,7 +345,7 @@ public class RoboticsServiceIt {
         assertTrue(result.has("appellant"));
         assertTrue(result.has("hearingArrangements"));
         assertTrue(result.has("isReadyToList"));
-        assertThat(result.get("dwpIssuingOffice"), is("Birmingham DRT"));
+        assertThat(result.get("dwpIssuingOffice"), is("Attendance Allowance & DLA65 DRT"));
 
         verifyNoMoreInteractions(ccdService);
     }
