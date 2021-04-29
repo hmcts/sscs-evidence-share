@@ -45,6 +45,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private static final String DM_STORE_USER_ID = "sscs";
     private static final String SENT_TO_DWP = "Sent to DWP";
+    public static final int DWP_RESPONSE_DUE_IN_DAYS = 35;
     private final DispatchPriority dispatchPriority;
 
     private final DocumentManagementServiceWrapper documentManagementServiceWrapper;
@@ -146,6 +147,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             }
             caseData.setHmctsDwpState("sentToDwp");
             caseData.setDateSentToDwp(LocalDate.now().toString());
+            caseData.setDwpDueDate(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS));
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
                 idamService.getIdamTokens());
@@ -188,6 +190,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
             log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
             caseData.setDateSentToDwp(LocalDate.now().toString());
+            caseData.setDwpDueDate(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS));
 
             Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
 

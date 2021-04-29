@@ -6,11 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.DWP_RESPONSE_DUE_IN_DAYS;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 import feign.FeignException;
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -209,6 +211,8 @@ public class SendToBulkPrintHandlerTest {
         List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
         assertNull(docs.get(0).getValue().getEvidenceIssued());
         assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
+        assertEquals(LocalDate.now().toString(), caseDataCaptor.getValue().getDateSentToDwp());
+        assertEquals(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS), caseDataCaptor.getValue().getDwpDueDate());
         assertNull(caseDataCaptor.getValue().getDwpState());
     }
 
