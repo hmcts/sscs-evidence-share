@@ -212,7 +212,7 @@ public class SendToBulkPrintHandlerTest {
         assertNull(docs.get(0).getValue().getEvidenceIssued());
         assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
         assertEquals(LocalDate.now().toString(), caseDataCaptor.getValue().getDateSentToDwp());
-        assertEquals(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS), caseDataCaptor.getValue().getDwpDueDate());
+        assertEquals(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS).toString(), caseDataCaptor.getValue().getDwpDueDate());
         assertNull(caseDataCaptor.getValue().getDwpState());
     }
 

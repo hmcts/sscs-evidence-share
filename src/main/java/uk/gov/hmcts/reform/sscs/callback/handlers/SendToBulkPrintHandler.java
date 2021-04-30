@@ -147,7 +147,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             }
             caseData.setHmctsDwpState("sentToDwp");
             caseData.setDateSentToDwp(LocalDate.now().toString());
-            caseData.setDwpDueDate(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS));
+            caseData.setDwpDueDate(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS).toString());
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
                 idamService.getIdamTokens());
@@ -186,12 +186,12 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                     || !documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(sscsDocuments)) {
                 throw new NoDl6DocumentException();
             }
-            List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
 
             log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
             caseData.setDateSentToDwp(LocalDate.now().toString());
-            caseData.setDwpDueDate(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS));
+            caseData.setDwpDueDate(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS).toString());
 
+            List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
             Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
 
             if (id.isPresent()) {
