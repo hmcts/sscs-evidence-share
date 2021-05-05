@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.SendToBulkPrintHandler.DWP_RESPONSE_DUE_IN_DAYS;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
@@ -106,7 +105,7 @@ public class SendToBulkPrintHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
         handler = new SendToBulkPrintHandler(documentManagementServiceWrapper,
             documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig,
-            ccdCaseService, idamService);
+            ccdCaseService, idamService, 35);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         placeholders.put("Test", "Value");
@@ -212,7 +211,7 @@ public class SendToBulkPrintHandlerTest {
         assertNull(docs.get(0).getValue().getEvidenceIssued());
         assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
         assertEquals(LocalDate.now().toString(), caseDataCaptor.getValue().getDateSentToDwp());
-        assertEquals(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS).toString(), caseDataCaptor.getValue().getDwpDueDate());
+        assertEquals(LocalDate.now().plusDays(35).toString(), caseDataCaptor.getValue().getDwpDueDate());
         assertNull(caseDataCaptor.getValue().getDwpState());
     }
 

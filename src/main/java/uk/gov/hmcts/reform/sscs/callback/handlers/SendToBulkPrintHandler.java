@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
@@ -45,7 +46,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private static final String DM_STORE_USER_ID = "sscs";
     private static final String SENT_TO_DWP = "Sent to DWP";
-    public static final int DWP_RESPONSE_DUE_IN_DAYS = 35;
     private final DispatchPriority dispatchPriority;
 
     private final DocumentManagementServiceWrapper documentManagementServiceWrapper;
@@ -62,6 +62,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
 
+    private final int dwpResponseDueDays;
+
     @Autowired
     public SendToBulkPrintHandler(DocumentManagementServiceWrapper documentManagementServiceWrapper,
                                   DocumentRequestFactory documentRequestFactory,
@@ -69,7 +71,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                                   PrintService bulkPrintService,
                                   EvidenceShareConfig evidenceShareConfig,
                                   CcdService ccdService,
-                                  IdamService idamService
+                                  IdamService idamService,
+                                  @Value("${dwp.response.due.days}") int dwpResponseDueDays
     ) {
         this.dispatchPriority = DispatchPriority.LATE;
         this.documentManagementServiceWrapper = documentManagementServiceWrapper;
@@ -79,6 +82,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         this.evidenceShareConfig = evidenceShareConfig;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.dwpResponseDueDays = dwpResponseDueDays;
     }
 
     @Override
@@ -147,7 +151,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             }
             caseData.setHmctsDwpState("sentToDwp");
             caseData.setDateSentToDwp(LocalDate.now().toString());
-            caseData.setDwpDueDate(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS).toString());
+            caseData.setDwpDueDate(LocalDate.now().plusDays(dwpResponseDueDays).toString());
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
                 idamService.getIdamTokens());
@@ -189,7 +193,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
             log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
             caseData.setDateSentToDwp(LocalDate.now().toString());
-            caseData.setDwpDueDate(LocalDate.now().plusDays(DWP_RESPONSE_DUE_IN_DAYS).toString());
+            caseData.setDwpDueDate(LocalDate.now().plusDays(dwpResponseDueDays).toString());
 
             List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
             Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
