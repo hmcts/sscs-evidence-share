@@ -100,9 +100,9 @@ robotics:
   email:
     from: ${ROBOTICS_EMAIL_FROM:sscs@hmcts.net}
     from-send-grid: noreply@mail-sscs-nonprod.platform.hmcts.net
-    to: ${ROBOTICS_EMAIL_TO:ryan.dacosta1@hmcts.net}
-    scottishTo: ${ROBOTICS_EMAIL_SCOTTISH_TO:ryan.dacosta1@hmcts.net}
-    pipAeTo: ${ROBOTICS_EMAIL_PIP_AE_TO:ryan.dacosta1@hmcts.net}
+    to: ${ROBOTICS_EMAIL_TO:receiver@hmcts.net}
+    scottishTo: ${ROBOTICS_EMAIL_SCOTTISH_TO:receiver2@hmcts.net}
+    pipAeTo: ${ROBOTICS_EMAIL_PIP_AE_TO:receiver3@hmcts.net}
     message: ${ROBOTICS_EMAIL_MESSAGE:Please find attached the robotics json file \nPlease do not respond to this email}
   schema.resource.location: /schema/sscs-robotics.json
   englishCount: 3
@@ -112,7 +112,7 @@ wlu:
   email:
     from: ${WLU_EMAIL_FROM:noreply@mail-sscs-nonprod.platform.hmcts.net}
     from-send-grid: noreply@mail-sscs-nonprod.platform.hmcts.net
-    to: ${WLU_EMAIL_TO:ryan.dacosta1@HMCTS.NET}
+    to: ${WLU_EMAIL_TO:sscs-tests@HMCTS.NET}
     subject: ${WLU_EMAIL_SUBJECT:Welsh translation –}
     message: ${WLU_EMAIL_MESSAGE:Please find attached the files along with request translation form.\nThank you
       very much}
