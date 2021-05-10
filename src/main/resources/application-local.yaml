@@ -25,3 +25,10 @@ send-letter:
 amqp:
   password: ${AMQP_PASSWORD:guest}
 
+send-grid:
+  host: smtp.sendgrid.net
+  port: 587
+  api-key: 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
+ld:
+  user-key: sscs-evidence-share
+  sdk-key: sdk-e55169f5-fe58-4f50-9496-ebcefc374c1c
