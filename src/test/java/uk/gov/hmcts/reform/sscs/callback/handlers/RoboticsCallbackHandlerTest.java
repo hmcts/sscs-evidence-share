@@ -53,6 +53,9 @@ public class RoboticsCallbackHandlerTest {
     private CaseDetails caseDetails;
 
     @Mock
+    private SscsCaseDetails sscsCaseDetails;
+
+    @Mock
     private SscsCaseData caseData;
 
     private RoboticsCallbackHandler handler;
@@ -67,6 +70,8 @@ public class RoboticsCallbackHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(caseData.isTranslationWorkOutstanding()).thenReturn(Boolean.FALSE);
+        when(ccdService.getByCaseId(any(), any())).thenReturn(sscsCaseDetails);
+        when(sscsCaseDetails.getData()).thenReturn(caseData);
     }
 
     @Test
@@ -96,7 +101,8 @@ public class RoboticsCallbackHandlerTest {
         verify(roboticsService).sendCaseToRobotics(any());
 
         assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getDateCaseSentToGaps());
-        verifyNoInteractions(ccdService);
+        verify(ccdService).getByCaseId(any(), any());
+        verifyNoMoreInteractions(ccdService);
     }
 
     @Test
@@ -139,6 +145,32 @@ public class RoboticsCallbackHandlerTest {
 
     @Test
     public void givenARoboticsRequestAndCreatedInGapsFieldIsBlank_thenSendCaseToRobotics() {
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, null);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(roboticsService).sendCaseToRobotics(any());
+    }
+
+    @Test
+    public void givenARoboticsRequestAndCreatedInGapsFieldIsBlankAndAlreadySentInLast24Hours_thenDoNotSendCaseToRobotics() {
+
+        when(caseData.getDateTimeSentTooGaps()).thenReturn(Optional.of(LocalDateTime.now().minusHours(23)));
+
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, null);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
+
+        handler.handle(SUBMITTED, callback);
+
+        verifyNoInteractions(roboticsService);
+    }
+
+    @Test
+    public void givenARoboticsRequestAndCreatedInGapsFieldIsBlankAndAlreadySentOutsideLast24Hours_thenDoSendCaseToRobotics() {
+
+        when(caseData.getDateTimeSentTooGaps()).thenReturn(Optional.of(LocalDateTime.now().minusHours(25)));
+
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, null);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 

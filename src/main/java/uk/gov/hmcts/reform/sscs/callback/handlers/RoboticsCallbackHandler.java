@@ -5,6 +5,8 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,8 +72,12 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         log.info("Processing robotics for case id {} in evidence share service", callback.getCaseDetails().getId());
 
+        // Pull case fresh from CCD in case of duplicate race condition.
+        // get
+        SscsCaseDetails latestCase =  ccdService.getByCaseId(callback.getCaseDetails().getId(), idamService.getIdamTokens());
+
         try {
-            boolean isCaseValidToSendToRobotics = checkCaseValidToSendToRobotics(callback);
+            boolean isCaseValidToSendToRobotics = checkCaseValidToSendToRobotics(callback, latestCase);
             log.info("Is case valid to send to robotics {} for case id {}", isCaseValidToSendToRobotics, callback.getCaseDetails().getId());
 
             if (isCaseValidToSendToRobotics) {
@@ -118,14 +124,38 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         }
     }
 
-    private boolean checkCaseValidToSendToRobotics(Callback<SscsCaseData> callback) {
+    private boolean checkCaseValidToSendToRobotics(Callback<SscsCaseData> callback, SscsCaseDetails latestCaseDetails) {
 
         log.info("The callback event is {} and the createdInGapsFrom field is {} for case id {}", callback.getEvent(), callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getId());
 
-        return callback.getEvent() == RESEND_CASE_TO_GAPS2
-            || (callback.getEvent() == DWP_RAISE_EXCEPTION)
-            || callback.getCaseDetails().getCaseData().getCreatedInGapsFrom() == null
-            || equalsIgnoreCase(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getState().getId());
+        if (callback.getEvent() == RESEND_CASE_TO_GAPS2
+            || (callback.getEvent() == DWP_RAISE_EXCEPTION)) {
+            return true;
+        }
+
+
+        if (!notSentToRoboticsWithinThreshold(latestCaseDetails)) {
+            log.info("Case {} already sent to robotics within last 24 hours. Skipping sending to robotics", callback.getCaseDetails().getId());
+            return false;
+
+        }
+
+        return (callback.getCaseDetails().getCaseData().getCreatedInGapsFrom() == null
+            || equalsIgnoreCase(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getState().getId()));
+    }
+
+    private boolean notSentToRoboticsWithinThreshold(SscsCaseDetails latestCaseDetails) {
+
+        Optional<LocalDateTime> sentToGapsO = latestCaseDetails.getData().getDateTimeSentTooGaps();
+
+        boolean result = sentToGapsO.map(sentToGaps -> {
+
+            LocalDateTime maxCutOff = LocalDateTime.now().minusHours(24);
+            return sentToGaps.isBefore(maxCutOff);
+
+        }).orElse(true);
+
+        return result;
     }
 
     @Override
