@@ -71,9 +71,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         }
 
         log.info("Processing robotics for case id {} in evidence share service", callback.getCaseDetails().getId());
-
-        // Pull case fresh from CCD in case of duplicate race condition.
-        // get
+        
         SscsCaseDetails latestCase =  ccdService.getByCaseId(callback.getCaseDetails().getId(), idamService.getIdamTokens());
 
         try {
