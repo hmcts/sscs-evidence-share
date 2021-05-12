@@ -146,16 +146,20 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
     private boolean notSentToRoboticsWithinThreshold(SscsCaseDetails latestCaseDetails) {
 
-        Optional<LocalDateTime> sentToGapsO = latestCaseDetails.getData().getDateTimeSentTooGaps();
+        boolean canSend = true;
 
-        boolean result = sentToGapsO.map(sentToGaps -> {
+        if (latestCaseDetails != null && latestCaseDetails.getData() != null) {
+            Optional<LocalDateTime> sentToGapsO = latestCaseDetails.getData().getDateTimeSentTooGaps();
 
-            LocalDateTime maxCutOff = LocalDateTime.now().minusHours(24);
-            return sentToGaps.isBefore(maxCutOff);
+            canSend = sentToGapsO.map(sentToGaps -> {
 
-        }).orElse(true);
+                LocalDateTime maxCutOff = LocalDateTime.now().minusHours(24);
+                return sentToGaps.isBefore(maxCutOff);
 
-        return result;
+            }).orElse(true);
+
+        }
+        return canSend;
     }
 
     @Override
