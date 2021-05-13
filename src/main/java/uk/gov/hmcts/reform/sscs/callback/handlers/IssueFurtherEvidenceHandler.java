@@ -16,7 +16,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
@@ -65,7 +68,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     }
 
     private void issueFurtherEvidence(SscsCaseData caseData) {
-        List<DocumentType> documentTypes = Arrays.asList(APPELLANT_EVIDENCE, REPRESENTATIVE_EVIDENCE, DWP_EVIDENCE, JOINT_PARTY_EVIDENCE);
+        List<DocumentType> documentTypes = Arrays.asList(APPELLANT_EVIDENCE, REPRESENTATIVE_EVIDENCE, DWP_EVIDENCE, JOINT_PARTY_EVIDENCE, HMCTS_EVIDENCE);
         List<FurtherEvidenceLetterType> allowedLetterTypes = Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER);
         documentTypes.forEach(documentType -> doIssuePerDocumentType(caseData, allowedLetterTypes, documentType));
     }
@@ -94,7 +97,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             final String description = determineDescription(caseData.getSscsDocument());
 
             setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
-            
+
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.UPDATE_CASE_ONLY.getCcdType(),
                 "Update case data",

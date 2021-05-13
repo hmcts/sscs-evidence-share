@@ -169,6 +169,8 @@ public class IssueFurtherEvidenceHandlerTest {
             eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER)));
         verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()),
             eq(caseData), eq(DWP_EVIDENCE), eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER)));
+        verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()),
+            eq(caseData), eq(HMCTS_EVIDENCE), eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER)));
         verify(furtherEvidenceService).canHandleAnyDocument(caseData.getSscsDocument());
 
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
