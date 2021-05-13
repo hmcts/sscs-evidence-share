@@ -155,3 +155,8 @@ feature:
 pdf:
   api:
     url: ${PDF_API_URL:http://localhost:5500}
+
+dwp:
+  response:
+    due:
+      days: ${DWP_RESPONSE_DUE_DAYS:35}
