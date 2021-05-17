@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 import feign.FeignException;
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -104,7 +105,7 @@ public class SendToBulkPrintHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
         handler = new SendToBulkPrintHandler(documentManagementServiceWrapper,
             documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig,
-            ccdCaseService, idamService);
+            ccdCaseService, idamService, 35);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         placeholders.put("Test", "Value");
@@ -209,6 +210,8 @@ public class SendToBulkPrintHandlerTest {
         List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
         assertNull(docs.get(0).getValue().getEvidenceIssued());
         assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
+        assertEquals(LocalDate.now().toString(), caseDataCaptor.getValue().getDateSentToDwp());
+        assertEquals(LocalDate.now().plusDays(35).toString(), caseDataCaptor.getValue().getDwpDueDate());
         assertNull(caseDataCaptor.getValue().getDwpState());
     }
 
