@@ -9,8 +9,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.session.web.http.CookieSerializer;
-import org.springframework.session.web.http.DefaultCookieSerializer;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 
 @SpringBootApplication(
@@ -42,13 +40,6 @@ public class SscsEvidenceShareApplication {
             .caseTypeId(coreCaseDataCaseTypeId)
             .jurisdictionId(coreCaseDataJurisdictionId)
             .build();
-    }
-
-    @Bean
-    public CookieSerializer defaultCookieSerializer() {
-        DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();
-        cookieSerializer.setSameSite("lax");
-        return cookieSerializer;
     }
 
     public static void main(final String[] args) {
