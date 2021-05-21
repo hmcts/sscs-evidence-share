@@ -174,6 +174,7 @@ def versions = [
   junitPlatform   : '1.7.2',
   reformLogging: '5.1.7',
   springBoot: springBoot.class.package.implementationVersion,
+  springfoxSwagger: '2.9.2',
   lombok: '1.18.16',
   restAssured: '4.3.1'
 ]
@@ -206,15 +207,16 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+  compile group: 'org.springframework.session', name: 'spring-session-core', version: '2.5.0'
 
+  compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   compile group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   compile group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   compile group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
   compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.12.1'
 
-  compile group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.5.8'
-
+  compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.1.0'
   compile group: 'com.github.hmcts', name: 'java-logging', version: versions.reformLogging
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.8.RELEASE'
