@@ -156,7 +156,7 @@ public class RoboticsCallbackHandlerTest {
     @Test
     public void givenARoboticsRequestAndCreatedInGapsFieldIsBlankAndAlreadySentInLast24Hours_thenDoNotSendCaseToRobotics() {
 
-        when(caseData.getDateTimeSentTooGaps()).thenReturn(Optional.of(LocalDateTime.now().minusHours(23)));
+        when(caseData.getDateTimeSentToGaps()).thenReturn(Optional.of(LocalDateTime.now().minusHours(23)));
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, null);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
@@ -169,7 +169,7 @@ public class RoboticsCallbackHandlerTest {
     @Test
     public void givenARoboticsRequestAndCreatedInGapsFieldIsBlankAndAlreadySentOutsideLast24Hours_thenDoSendCaseToRobotics() {
 
-        when(caseData.getDateTimeSentTooGaps()).thenReturn(Optional.of(LocalDateTime.now().minusHours(25)));
+        when(caseData.getDateTimeSentToGaps()).thenReturn(Optional.of(LocalDateTime.now().minusHours(25)));
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, null);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);

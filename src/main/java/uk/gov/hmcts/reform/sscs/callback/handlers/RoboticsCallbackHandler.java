@@ -147,7 +147,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         boolean canSend = true;
 
         if (latestCaseDetails != null && latestCaseDetails.getData() != null) {
-            Optional<LocalDateTime> sentToGapsO = latestCaseDetails.getData().getDateTimeSentTooGaps();
+            Optional<LocalDateTime> sentToGapsO = latestCaseDetails.getData().getDateTimeSentToGaps();
 
             canSend = sentToGapsO.map(sentToGaps -> {
 
