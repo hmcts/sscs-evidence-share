@@ -27,7 +27,8 @@ public class RootController {
     @GetMapping("/")
     public ResponseEntity<String> welcome(HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from("myCookie", "myCookieValue")
-            .sameSite("Lax")
+            .sameSite("Strict")
+            .path("/")
             .build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
