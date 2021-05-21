@@ -2,6 +2,10 @@ package uk.gov.hmcts.reform.sscs.controllers;
 
 import static org.springframework.http.ResponseEntity.ok;
 
+import java.time.Duration;
+import javax.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +26,17 @@ public class RootController {
      * @return Welcome message from the service.
      */
     @GetMapping("/")
-    public ResponseEntity<String> welcome() {
+    public ResponseEntity<String> welcome(HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from("myCookie", "myCookieValue")
+            .httpOnly(true)
+            .secure(false)
+            .domain("localhost")
+            .path("/")
+            .maxAge(Duration.ofHours(1))
+            .sameSite("Lax")
+            .build();
+
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return ok("Welcome to sscs-evidence-share");
     }
 }
