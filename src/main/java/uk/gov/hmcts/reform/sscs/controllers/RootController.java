@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.controllers;
 
 import static org.springframework.http.ResponseEntity.ok;
 
-import java.time.Duration;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -28,11 +27,6 @@ public class RootController {
     @GetMapping("/")
     public ResponseEntity<String> welcome(HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from("myCookie", "myCookieValue")
-            .httpOnly(true)
-            .secure(false)
-            .domain("localhost")
-            .path("/")
-            .maxAge(Duration.ofHours(1))
             .sameSite("Lax")
             .build();
 
