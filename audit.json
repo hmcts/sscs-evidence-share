@@ -23,7 +23,7 @@
 "10035_Strict-Transport-Security Header Not Set_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/_GET" : "ignore",
 "10035_Strict-Transport-Security Header Not Set_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/v2/api-docs_GET" : "ignore",
 "10035_Strict-Transport-Security Header Not Set_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/send_POST" : "ignore",
-"100001_Unexpected Content-Type was returned_https://****-evidence-share-pr-976.service.core-compute-preview.internal/_GET" : "ignore",
-"100000_A Server Error response code was returned by the server_https://****-evidence-share-pr-976.service.core-compute-preview.internal/send_POST" : "ignore",
-"90022_Application Error Disclosure_https://****-evidence-share-pr-976.service.core-compute-preview.internal/send_POST" : "ignore"
+"100001_Unexpected Content-Type was returned_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/_GET" : "ignore",
+"100000_A Server Error response code was returned by the server_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/send_POST" : "ignore",
+"90022_Application Error Disclosure_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/send_POST" : "ignore"
 }
