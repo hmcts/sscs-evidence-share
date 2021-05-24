@@ -14,7 +14,16 @@
 "100000_A Server Error response code was returned by the server_http://sscs-evidence-share-aat.service.core-compute-aat.internal/send_POST" : "ignore",
 "10096_Timestamp Disclosure - Unix_http://sscs-evidence-share-aat.service.core-compute-aat.internal/_GET" : "ignore",
 "10096_Timestamp Disclosure - Unix_http://sscs-evidence-share-aat.service.core-compute-aat.internal/send_POST" : "ignore",
-"10096_Timestamp Disclosure - Unix_http://sscs-evidence-share-aat.service.core-compute-aat.internal/v2/api-docs_GET" : "ignore"
-
-
+"10096_Timestamp Disclosure - Unix_http://sscs-evidence-share-aat.service.core-compute-aat.internal/v2/api-docs_GET" : "ignore",
+"10015_Incomplete or No Cache-control Header Set_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/v2/api-docs_GET": "ignore",
+"10015_Incomplete or No Cache-control Header Set_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/_GET" : "ignore",
+"10023_Information Disclosure - Debug Error Messages_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/send_POST" : "ignore",
+"10021_X-Content-Type-Options Header Missing_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/_GET" : "ignore",
+"10021_X-Content-Type-Options Header Missing_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/v2/api-docs_GET" : "ignore",
+"10035_Strict-Transport-Security Header Not Set_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/_GET" : "ignore",
+"10035_Strict-Transport-Security Header Not Set_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/v2/api-docs_GET" : "ignore",
+"10035_Strict-Transport-Security Header Not Set_https://sscs-evidence-share-pr-976.service.core-compute-preview.internal/send_POST" : "ignore",
+"100001_Unexpected Content-Type was returned_https://****-evidence-share-pr-976.service.core-compute-preview.internal/_GET" : "ignore",
+"100000_A Server Error response code was returned by the server_https://****-evidence-share-pr-976.service.core-compute-preview.internal/send_POST" : "ignore",
+"90022_Application Error Disclosure_https://****-evidence-share-pr-976.service.core-compute-preview.internal/send_POST" : "ignore"
 }
