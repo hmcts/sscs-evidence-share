@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Duration;
+
 /**
  * Default endpoints per application.
  */
@@ -31,6 +33,7 @@ public class RootController {
             .path("/")
             .secure(true)
             .httpOnly(true)
+            .maxAge(Duration.ofHours(1))
             .build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
