@@ -2,14 +2,13 @@ package uk.gov.hmcts.reform.sscs.controllers;
 
 import static org.springframework.http.ResponseEntity.ok;
 
+import java.time.Duration;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.Duration;
 
 /**
  * Default endpoints per application.
