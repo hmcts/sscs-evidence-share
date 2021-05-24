@@ -29,6 +29,8 @@ public class RootController {
         ResponseCookie cookie = ResponseCookie.from("myCookie", "myCookieValue")
             .sameSite("Strict")
             .path("/")
+            .secure(true)
+            .httpOnly(true)
             .build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
