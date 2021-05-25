@@ -71,7 +71,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         }
 
         log.info("Processing robotics for case id {} in evidence share service", callback.getCaseDetails().getId());
-        
+
         SscsCaseDetails latestCase =  ccdService.getByCaseId(callback.getCaseDetails().getId(), idamService.getIdamTokens());
 
         try {
@@ -88,6 +88,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
                 // For events that are handled in the SendToBulkPrintHandler then just update the case data here, as the case would be saved to CCD further down the chain as part of the sentToDwp event in SendToBulkPrintHandler.
 
                 callback.getCaseDetails().getCaseData().setDateCaseSentToGaps(LocalDate.now().toString());
+                callback.getCaseDetails().getCaseData().setDateTimeCaseSentToGaps(LocalDateTime.now().toString());
 
                 String ccdEventType = null;
                 if (callback.getEvent() == DWP_RAISE_EXCEPTION) {
@@ -150,7 +151,6 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             Optional<LocalDateTime> sentToGapsO = latestCaseDetails.getData().getDateTimeSentToGaps();
 
             canSend = sentToGapsO.map(sentToGaps -> {
-
                 LocalDateTime maxCutOff = LocalDateTime.now().minusHours(24);
                 return sentToGaps.isBefore(maxCutOff);
 
