@@ -221,7 +221,7 @@ dependencies {
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.8.RELEASE'
 
   compile group: 'org.springframework', name: 'spring-jms'
-  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.58.0'
+  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.0.0'
   compileOnly 'org.projectlombok:lombok:1.18.20'
 
   annotationProcessor "org.projectlombok:lombok:1.18.18"
@@ -229,7 +229,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
-  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.22-RC4-SSCS-8808'
+  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.23'
   compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
 
   //Remove when our dependencies pull in this version or later
@@ -267,7 +267,7 @@ dependencyManagement {
     dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
 
     // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103
-    dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.0') {
+    dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.10') {
       entry 'kotlin-stdlib'
     }
 
@@ -286,7 +286,7 @@ dependencyManagement {
     }
 
     // CVE-2019-16869 - brought in by qpid-jms-client
-    dependencySet(group: 'io.netty', version: '4.1.63.Final') {
+    dependencySet(group: 'io.netty', version: '4.1.65.Final') {
       entry 'netty-handler'
       entry 'netty-transport-native-epoll'
       entry 'netty-transport-native-kqueue'
@@ -305,7 +305,7 @@ dependencyManagement {
     }
 
     //CVE-2021-22112
-    dependencySet(group: 'org.springframework.security', version: '5.4.6') {
+    dependencySet(group: 'org.springframework.security', version: '5.5.0') {
       entry 'spring-security-crypto'
     }
 

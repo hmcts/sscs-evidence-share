@@ -56,7 +56,6 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             || callback.getEvent() == EventType.READY_TO_LIST
             || callback.getEvent() == EventType.VALID_APPEAL
             || callback.getEvent() == INTERLOC_VALID_APPEAL
-            || isValidStateForConfidentialityRequest(callback)
             || callback.getEvent() == EventType.SEND_TO_DWP
             || callback.getEvent() == EventType.DWP_RAISE_EXCEPTION)
             && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding())
@@ -87,8 +86,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
                 callback.getCaseDetails().getCaseData().setDateCaseSentToGaps(LocalDate.now().toString());
 
                 String ccdEventType = null;
-                if (callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST
-                    || (callback.getEvent() == DWP_RAISE_EXCEPTION)) {
+                if (callback.getEvent() == DWP_RAISE_EXCEPTION) {
                     ccdEventType = NOT_LISTABLE.getCcdType();
                 } else if (callback.getEvent() == EventType.READY_TO_LIST
                     || callback.getEvent() == RESEND_CASE_TO_GAPS2) {
@@ -125,18 +123,9 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         log.info("The callback event is {} and the createdInGapsFrom field is {} for case id {}", callback.getEvent(), callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getId());
 
         return callback.getEvent() == RESEND_CASE_TO_GAPS2
-            || callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST
             || (callback.getEvent() == DWP_RAISE_EXCEPTION)
             || callback.getCaseDetails().getCaseData().getCreatedInGapsFrom() == null
             || equalsIgnoreCase(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom(), callback.getCaseDetails().getState().getId());
-    }
-
-    private boolean isValidStateForConfidentialityRequest(Callback<SscsCaseData> callback) {
-        return callback.getEvent() == REVIEW_CONFIDENTIALITY_REQUEST
-            && State.RESPONSE_RECEIVED.equals(callback.getCaseDetails().getState())
-            && ((callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeAppellant() != null && RequestOutcome.GRANTED.equals(callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeAppellant().getRequestOutcome()))
-                || (callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeJointParty() != null && RequestOutcome.GRANTED.equals(callback.getCaseDetails().getCaseData().getConfidentialityRequestOutcomeJointParty().getRequestOutcome())));
-
     }
 
     @Override
