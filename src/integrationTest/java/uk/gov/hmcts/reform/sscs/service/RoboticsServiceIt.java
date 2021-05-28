@@ -5,7 +5,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -60,6 +63,9 @@ public class RoboticsServiceIt {
     @Captor
     private ArgumentCaptor<SscsCaseData> caseDataCaptor;
 
+    @Mock
+    private SscsCaseDetails sscsCaseDetails;
+
     @Before
     public void setup() {
         caseData = SscsCaseData.builder()
@@ -81,6 +87,10 @@ public class RoboticsServiceIt {
             .build();
 
         caseDetails = new CaseDetails<>(1234L, "sscs", APPEAL_CREATED, caseData, null);
+
+
+        when(ccdService.getByCaseId(any(), any())).thenReturn(sscsCaseDetails);
+        when(sscsCaseDetails.getData()).thenReturn(caseData);
     }
 
     @Test
