@@ -35,6 +35,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
         json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
 
@@ -59,6 +60,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", "");
         json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
@@ -76,6 +78,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
         json = json.replace("CREATED_IN_GAPS_FROM", State.VALID_APPEAL.getId());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
@@ -99,6 +102,7 @@ public class EvidenceShareFunctionalTest extends AbstractFunctionalTest {
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().toString());
         json = json.replace("CREATED_IN_GAPS_FROM", State.READY_TO_LIST.getId());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
         simulateCcdCallback(json);
 

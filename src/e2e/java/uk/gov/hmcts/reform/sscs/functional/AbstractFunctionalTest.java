@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.functional;
 import static io.restassured.RestAssured.baseURI;
 import static org.slf4j.LoggerFactory.getLogger;
 
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
 import helper.EnvironmentProfileValueSource;
 import io.restassured.RestAssured;
 import java.io.File;
@@ -107,6 +108,10 @@ public abstract class AbstractFunctionalTest {
         String resource = fileName + "Callback.json";
         String file = Objects.requireNonNull(getClass().getClassLoader().getResource(resource)).getFile();
         return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
+    }
+
+    public static String getRandomNino() {
+        return RandomStringUtils.random(9, true, true).toUpperCase();
     }
 
     public void simulateCcdCallback(String json) {

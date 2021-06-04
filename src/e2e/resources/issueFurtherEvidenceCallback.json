@@ -25,7 +25,7 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "evidencePresent": "No",
-      "generatedNino": "JJ123457A",
+      "generatedNino": "NINO_TO_BE_REPLACED",
       "subscriptions": {
         "appellantSubscription": {
           "tya": null,
@@ -125,7 +125,7 @@
           },
           "identity": {
             "dob": "1979-12-09",
-            "nino": "JJ123457A"
+            "nino": "NINO_TO_BE_REPLACED"
           },
           "appointee": {
             "name": {
@@ -147,7 +147,7 @@
             },
             "identity": {
               "dob": "1976-11-11",
-              "nino": "JJ123457A"
+              "nino": "NINO_TO_BE_REPLACED"
             }
           },
           "isAppointee": "No",
