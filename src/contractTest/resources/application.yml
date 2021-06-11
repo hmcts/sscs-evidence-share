@@ -1,0 +1,147 @@
+amqp:
+    host: ${AMQP_HOST:localhost}
+    password: ${AMQP_PASSWORD:}
+    subscription: ${SUBSCRIPTION_NAME:test.queue}
+    topic: ${TOPIC_NAME:test.topic}
+    trustAllCerts: ${TRUST_ALL_CERTS:true}
+    username: ${AMQP_USERNAME:guest}
+appeal:
+    email:
+        host: ${EMAIL_SERVER_HOST:localhost}
+        port: ${EMAIL_SERVER_PORT:1025}
+        smtp:
+            ssl:
+                trust: ${EMAIL_SMTP_SSL_TRUST:*}
+            tls:
+                enabled: ${EMAIL_SMTP_TLS_ENABLED:true}
+core_case_data:
+    api:
+        url: ${CORE_CASE_DATA_API_URL:http://localhost:4452}
+    caseTypeId: ${CORE_CASE_DATA_CASE_TYPE_ID:Benefit}
+    jurisdictionId: ${CORE_CASE_DATA_JURISDICTION_ID:SSCS}
+docmosis:
+    template:
+        english:
+            d609-97:
+                name: TB-SCS-GNO-ENG-00068.doc
+            d609-98:
+                name: TB-SCS-GNO-ENG-00069.doc
+            dl16:
+                name: TB-SCS-GNO-ENG-00011.doc
+            dl6:
+                name: TB-SCS-GNO-ENG-00010.doc
+        welsh:
+            d609-97:
+                name: TB-SCS-GNO-WEL-00469.docx
+            d609-98:
+                name: TB-SCS-GNO-WEL-00470.docx
+            dl16:
+                name: TB-SCS-GNO-ENG-00011.doc
+            dl6:
+                name: TB-SCS-GNO-ENG-00010.doc
+document:
+    pdf:
+        hmctsImgKey: hmcts2
+        hmctsImgVal: '[userImage:hmcts.png]'
+        hmctsWelshImgKey: welshhmcts2
+        hmctsWelshImgVal: '[userImage:welshhmcts.png]'
+document_management:
+    url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:5005}
+dwp:
+    response:
+        due:
+            days: ${DWP_RESPONSE_DUE_DAYS:35}
+evidence-share:
+    submit-types: '[PAPER]'
+exela:
+    addressLine1: HMCTS SSCS
+    addressLine2: PO BOX 12626
+    addressLine3: Harlow
+    addressPostcode: CM20 9QF
+feature:
+    urgent-hearing:
+        enabled: ${URGENT_HEARING_ENABLED:false}
+http:
+    connect:
+        read:
+            timeout: 5000
+        request:
+            timeout: 5000
+        timeout: 5000
+idam:
+    api:
+        url: ${IDAM_API_URL:http://localhost:5000}
+    client:
+        id: ${IDAM_OAUTH2_CLIENT_ID:sscs}
+        redirect_url: ${IDAM_OAUTH2_REDIRECT_URL:https://localhost:3000/authenticated}
+        secret: ${IDAM_OAUTH2_CLIENT_SECRET:QM5RQQ53LZFOSIXJ}
+    oauth2:
+        client:
+            id: ${IDAM_OAUTH2_CLIENT_ID:sscs}
+            secret: ${IDAM_OAUTH2_CLIENT_SECRET:QM5RQQ53LZFOSIXJ}
+        jwkUrl: ${IDAM_API_JWK_URL:http://localhost:5000/jwks}
+        redirectUrl: ${IDAM_OAUTH2_REDIRECT_URL:https://localhost:3000/authenticated}
+        user:
+            email: ${IDAM_SSCS_SYSTEMUPDATE_USER:system.update@hmcts.net}
+            password: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD:Pa55word11}
+    s2s-auth:
+        microservice: ${IDAM_S2S_AUTH_MICROSERVICE:sscs}
+        totp_secret: ${IDAM_S2S_AUTH_TOTP_SECRET:AAAAAAAAAAAAAAAC}
+        url: ${IDAM_S2S_AUTH:http://localhost:4502}
+    url: ${IDAM_API_URL:http://localhost:5000}
+ld:
+    user-key: sscs-evidence-share
+management:
+    endpoint:
+        health:
+            show-details: always
+    endpoints:
+        web:
+            base-path: /
+pdf:
+    api:
+        url: ${PDF_API_URL:http://localhost:5500}
+robotics:
+    email:
+        from: ${ROBOTICS_EMAIL_FROM:sscs@hmcts.net}
+        from-send-grid: noreply@mail-sscs-nonprod.platform.hmcts.net
+        message: "${ROBOTICS_EMAIL_MESSAGE:Please find attached the robotics json\
+            \ file \nPlease do not respond to this email}"
+        pipAeTo: ${ROBOTICS_EMAIL_PIP_AE_TO:receiver3@hmcts.net}
+        scottishTo: ${ROBOTICS_EMAIL_SCOTTISH_TO:receiver2@hmcts.net}
+        to: ${ROBOTICS_EMAIL_TO:receiver@hmcts.net}
+    englishCount: 3
+    schema:
+        resource:
+            location: /schema/sscs-robotics.json
+    scottishCount: 1
+send-grid:
+    host: smtp.sendgrid.net
+    port: 587
+send-letter:
+    enabled: ${SEND_LETTER_SERVICE_ENABLED:true}
+    maxRetryAttempts: ${MAX_RETRY_ATTEMPTS:3}
+    url: ${SEND_LETTER_SERVICE_BASEURL:http://localhost:4021}
+server:
+    port: 8091
+service:
+    pdf-service:
+        accessKey: ${PDF_SERVICE_ACCESS_KEY:}
+        health:
+            uri: ${PDF_SERVICE_HEALTH_URL:https://docmosis.aat.platform.hmcts.net/rs/status}
+        uri: ${PDF_SERVICE_BASE_URL:https://docmosis.aat.platform.hmcts.net/rs/render}
+spring:
+    application:
+        name: sscs evidence share
+    main:
+        allow-bean-definition-overriding: true
+wlu:
+    email:
+        dateOfReturn: ${WLU_RETURN_DATE:24 hours from requested date.}
+        from: ${WLU_EMAIL_FROM:noreply@mail-sscs-nonprod.platform.hmcts.net}
+        from-send-grid: noreply@mail-sscs-nonprod.platform.hmcts.net
+        message: |-
+            ${WLU_EMAIL_MESSAGE:Please find attached the files along with request translation form.
+            Thank you very much}
+        subject: ${WLU_EMAIL_SUBJECT:Welsh translation –}
+        to: ${WLU_EMAIL_TO:sscs-tests@HMCTS.NET}
