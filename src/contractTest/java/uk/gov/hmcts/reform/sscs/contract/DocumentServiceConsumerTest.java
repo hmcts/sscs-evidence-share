@@ -19,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -69,7 +68,7 @@ public class DocumentServiceConsumerTest {
     public void verifyPactFragment() throws JSONException {
         when(authTokenGenerator.generate()).thenReturn(SOME_SERVICE_AUTHORIZATION_TOKEN);
         ResponseEntity<?> response = deleteApi.downloadBinary(AUTH_TOKEN, SOME_SERVICE_AUTHORIZATION_TOKEN, USER_ROLES, USER_ID,
-            "/documents/" + DOCUMENT_ID+ "/binary");
+            "/documents/" + DOCUMENT_ID + "/binary");
         Assertions.assertTrue(response.getStatusCode().is2xxSuccessful());
     }
 }
