@@ -129,16 +129,12 @@ public class RequestTranslationService {
 
 
     private final Function<DwpDocumentDetails, String> getDwpDocumentFileName =
-        dwpDocumentDetails -> {
-            DocumentLink documentLink = dwpDocumentDetails.getDocumentLink();;
-            return documentLink != null && documentLink.getDocumentUrl() != null ? documentLink.getDocumentFilename() + "." + System.nanoTime() : null;
-        };
+        dwpDocumentDetails -> dwpDocumentDetails.getDocumentLink() != null && dwpDocumentDetails.getDocumentLink().getDocumentUrl() != null ? dwpDocumentDetails.getDocumentLink().getDocumentFilename() + "." + System.nanoTime() : null;
 
     private byte[] downloadBinary(DwpDocument doc, Long caseId) {
         log.info("About to download binary to attach to wlu for caseId {}", caseId);
-        DocumentLink documentLink = doc.getValue().getDocumentLink();;
-        if (documentLink != null && documentLink.getDocumentUrl() != null && documentLink.getDocumentFilename() != null) {
-            return evidenceManagementService.download(URI.create(documentLink.getDocumentUrl()), null);
+        if (doc.getValue().getDocumentLink() != null && doc.getValue().getDocumentLink().getDocumentUrl() != null && doc.getValue().getDocumentLink().getDocumentFilename() != null) {
+            return evidenceManagementService.download(URI.create(doc.getValue().getDocumentLink().getDocumentUrl()), null);
         } else {
             return new byte[0];
         }
