@@ -128,8 +128,7 @@ public class RequestTranslationService {
             ? sscsDocumentDetails.getDocumentLink().getDocumentFilename() + "." + System.nanoTime() : null;
 
     private final Function<DwpDocumentDetails, DocumentLink> getDwpDocumentLink =
-        dwpDocumentDetails ->
-            Optional.ofNullable(dwpDocumentDetails.getRip1DocumentLink()).orElse(dwpDocumentDetails.getDocumentLink());
+        dwpDocumentDetails -> dwpDocumentDetails.getDocumentLink();
 
 
     private final Function<DwpDocumentDetails, String> getDwpDocumentFileName =
