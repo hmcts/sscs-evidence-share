@@ -127,19 +127,16 @@ public class RequestTranslationService {
             && sscsDocumentDetails.getDocumentLink().getDocumentUrl() != null)
             ? sscsDocumentDetails.getDocumentLink().getDocumentFilename() + "." + System.nanoTime() : null;
 
-    private final Function<DwpDocumentDetails, DocumentLink> getDwpDocumentLink =
-        dwpDocumentDetails -> dwpDocumentDetails.getDocumentLink();
-
 
     private final Function<DwpDocumentDetails, String> getDwpDocumentFileName =
         dwpDocumentDetails -> {
-            DocumentLink documentLink = getDwpDocumentLink.apply(dwpDocumentDetails);
+            DocumentLink documentLink = dwpDocumentDetails.getDocumentLink();;
             return documentLink != null && documentLink.getDocumentUrl() != null ? documentLink.getDocumentFilename() + "." + System.nanoTime() : null;
         };
 
     private byte[] downloadBinary(DwpDocument doc, Long caseId) {
         log.info("About to download binary to attach to wlu for caseId {}", caseId);
-        DocumentLink documentLink = getDwpDocumentLink.apply(doc.getValue());
+        DocumentLink documentLink = doc.getValue().getDocumentLink();;
         if (documentLink != null && documentLink.getDocumentUrl() != null && documentLink.getDocumentFilename() != null) {
             return evidenceManagementService.download(URI.create(documentLink.getDocumentUrl()), null);
         } else {
