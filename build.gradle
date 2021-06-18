@@ -6,7 +6,7 @@ plugins {
   id 'org.springframework.boot' version '2.3.5.RELEASE'
   id 'uk.gov.hmcts.java' version '0.12.12'
   id 'com.github.ben-manes.versions' version '0.39.0'
-  id 'org.owasp.dependencycheck' version '6.2.1'
+  id 'org.owasp.dependencycheck' version '6.2.2'
   id 'org.sonarqube' version '3.2.0'
   id 'au.com.dius.pact' version '4.1.0'
   id 'io.freefair.lombok' version '5.3.0'
@@ -284,13 +284,13 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
-  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.34'
+  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.37'
   compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
 
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
-  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.4.0'
+  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.5.0'
 
   integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
