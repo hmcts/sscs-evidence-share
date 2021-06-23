@@ -1,6 +1,8 @@
 #!groovy
 @Library("Infrastructure") _
 
+import uk.gov.hmcts.contino.AppPipelineDsl
+
 properties([
   [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/sscs-evidence-share'],
   pipelineTriggers([[$class: 'GitHubPushTrigger']])
@@ -46,6 +48,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
+  env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
 
   before('functionalTest:preview') {
     withAksClient('nonprod', product) {
@@ -65,5 +68,12 @@ withPipeline(type, product, component) {
   enableSlackNotifications('#sscs-tech')
   enableAksStagingDeployment()
   disableLegacyDeployment()
+
+  onMaster() {
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+  }
+  onPR() {
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER])
+  }
 }
 

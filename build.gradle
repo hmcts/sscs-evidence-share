@@ -7,7 +7,9 @@ plugins {
   id 'uk.gov.hmcts.java' version '0.12.12'
   id 'com.github.ben-manes.versions' version '0.39.0'
   id 'org.owasp.dependencycheck' version '6.2.2'
-  id 'org.sonarqube' version '3.2.0'
+  id 'org.sonarqube' version '3.3'
+  id 'au.com.dius.pact' version '4.1.0'
+  id 'io.freefair.lombok' version '5.3.0'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -42,6 +44,15 @@ sourceSets {
       srcDir file('src/smokeTest/java')
     }
     resources.srcDir file('src/smokeTest/resources')
+  }
+  contractTest {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      java.srcDir 'src/contractTest/java'
+      resources.srcDir 'src/contractTest/resources'
+    }
+    resources.srcDir file('src/contractTest/resources')
   }
 }
 
@@ -87,6 +98,9 @@ configurations {
   testRuntime.exclude module: "android-json"
   integrationTestCompile.exclude module: "android-json"
   integrationTestRuntime.exclude module: "android-json"
+
+  contractTestCompile.extendsFrom testCompile
+  contractTestRuntime.extendsFrom testRuntime
 }
 
 pmd {
@@ -167,6 +181,46 @@ repositories {
   }
 }
 
+project.ext {
+  pacticipant = 'sscs_evidenceShare'
+  pacticipantVersion = getCheckedOutGitCommitHash()
+}
+
+def getCheckedOutGitCommitHash() {
+  'git rev-parse --verify --shirt HEAD'.execute().text.trim()
+}
+
+task runContractTests(type: Test, description: 'Runs contract tests.', group: 'Verification') {
+  onlyIf {
+    return System.env.SKIP_CONTRACT_TESTS == null || System.env.SKIP_CONTRACT_TESTS == 'false'
+  }
+  useJUnitPlatform()
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  systemProperty 'pact.rootDir', "pacts"
+  testLogging.showStandardStreams = true
+}
+
+task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
+  logger.lifecycle("Runs pact consumer Tests")
+
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+}
+
+runAndPublishConsumerPactTests.finalizedBy pactPublish
+
+pact {
+  broker {
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+  }
+  publish {
+    pactDirectory = 'pacts'
+    tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+    version = project.pacticipantVersion
+  }
+}
+
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
 // enforces it's own (older) version which is not recommended.
 def versions = [
@@ -176,7 +230,8 @@ def versions = [
   springBoot: springBoot.class.package.implementationVersion,
   springfoxSwagger: '2.9.2',
   lombok: '1.18.16',
-  restAssured: '4.3.1'
+  restAssured: '4.3.1',
+  pact_version: '4.1.7'
 ]
 
 configurations.all {
@@ -258,6 +313,22 @@ dependencies {
   integrationTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
+
+  // Contract Tests
+  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
+  contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.9.RELEASE'
+  contractTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
+  contractTestRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit_jupiter
+  contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
+  contractTestRuntime group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.7.0'
+  contractTestImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
+  contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
+  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '2.2.7.RELEASE'
+  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.7.RELEASE'
+
+  contractTestImplementation sourceSets.main.runtimeClasspath
+  contractTestImplementation sourceSets.test.runtimeClasspath
 }
 
 dependencyManagement {

@@ -12,10 +12,7 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -31,7 +28,6 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                                     IdamService idamService) {
         this.ccdService = ccdService;
         this.idamService = idamService;
-
     }
 
     @Override
@@ -40,26 +36,22 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE
-            && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
+            && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom())
+            && callback.getCaseDetails().getCaseData().getAppeal() != null
+            && callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() != null
+            && !StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode(), Benefit.IIDB.getShortName());
     }
 
     @Override
     public void handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         if (!canHandle(callbackType, callback)) {
-            log.info("Cannot handle this event");
-            throw new IllegalStateException("Cannot handle callback");
-        }
-
-        if (callback.getCaseDetails().getCaseData().getAppeal() == null
-            || callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() == null) {
-            log.info("Cannot handle this event as no data");
+            log.info("Cannot handle this event for case id: {}", callback.getCaseDetails().getId());
             throw new IllegalStateException("Cannot handle callback");
         }
 
         BenefitType benefitType = callback.getCaseDetails().getCaseData().getAppeal().getBenefitType();
-        log.info("BenefitType" + benefitType);
 
-        if (StringUtils.equalsIgnoreCase(benefitType.getCode(), "uc")) {
+        if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName())) {
             handleUc(callback);
         } else {
             handleNonUc(callback);
@@ -68,19 +60,9 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
     private void handleNonUc(Callback<SscsCaseData> callback) {
         if ("Yes".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getUrgentCase())) {
-            log.info("urgent case updating to responseReceived");
-            SscsCaseData caseData = setDwpState(callback);
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.DWP_RESPOND.getCcdType(), "Response received",
-                "urgent hearing set to response received event", idamService.getIdamTokens());
+            triggerDwpRespondEventForUrgentCase(callback);
         } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no")) {
-            log.info("updating to ready to list");
-
-            SscsCaseData caseData = setDwpState(callback);
-
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.READY_TO_LIST.getCcdType(), "ready to list",
-                "update to ready to list event as there is no further information to assist the tribunal and no dispute.", idamService.getIdamTokens());
+            triggerReadyToListEvent(callback);
         }
     }
 
@@ -103,48 +85,55 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         if ("Yes".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getUrgentCase())) {
-            log.info("urgent case updating to responseReceived");
-            caseData = setDwpState(callback);
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.DWP_RESPOND.getCcdType(), "Response received",
-                "urgent hearing set to response received event", idamService.getIdamTokens());
-
-        } else if (!dwpFurtherInfo
-            && !disputedDecision) {
-            log.info("updating to ready to list");
-
-            caseData = setDwpState(callback);
-
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.READY_TO_LIST.getCcdType(), "ready to list",
-                "update to ready to list event as there is no further information to assist the tribunal and no dispute.", idamService.getIdamTokens());
+            triggerDwpRespondEventForUrgentCase(callback);
+        } else if (!dwpFurtherInfo && !disputedDecision) {
+            triggerReadyToListEvent(callback);
         } else {
-            log.info("updating to response received");
-
-            String description = null;
-            if (dwpFurtherInfo && disputedDecision) {
-                description = "update to response received event as there is further information to "
-                    + "assist the tribunal and there is a dispute.";
-            } else if (dwpFurtherInfo) {
-                description = "update to response received event as there is further information to "
-                    + "assist the tribunal.";
-            } else {
-                description = "update to response received event as there is a dispute.";
-            }
-
-            caseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
-
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.DWP_RESPOND.getCcdType(), "Response received",
-                description, idamService.getIdamTokens());
+            triggerDwpRespondEventForUc(callback, dwpFurtherInfo, disputedDecision, caseData);
         }
 
         if (isANewJointParty(callback, caseData)) {
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
-                "A joint party was added to the appeal", idamService.getIdamTokens());
-            log.info("jointPartyAdded event updated");
+            updateEventDetails(caseData, callback.getCaseDetails().getId(), EventType.JOINT_PARTY_ADDED, "Joint party added", "A joint party was added to the appeal");
         }
+    }
+
+    private void triggerDwpRespondEventForUc(Callback<SscsCaseData> callback, boolean dwpFurtherInfo, boolean disputedDecision, SscsCaseData caseData) {
+        log.info("updating to response received for case id: ", caseData.getCcdCaseId());
+
+        String description;
+        if (dwpFurtherInfo && disputedDecision) {
+            description = "update to response received event as there is further information to "
+                + "assist the tribunal and there is a dispute.";
+        } else if (dwpFurtherInfo) {
+            description = "update to response received event as there is further information to "
+                + "assist the tribunal.";
+        } else {
+            description = "update to response received event as there is a dispute.";
+        }
+
+        caseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
+
+        updateEventDetails(caseData, callback.getCaseDetails().getId(), EventType.DWP_RESPOND, "Response received", description);
+    }
+
+    private void triggerDwpRespondEventForUrgentCase(Callback<SscsCaseData> callback) {
+        SscsCaseData caseData = setDwpState(callback);
+
+        updateEventDetails(caseData, callback.getCaseDetails().getId(), EventType.DWP_RESPOND, "Response received", "urgent hearing set to response received event");
+    }
+
+    private void triggerReadyToListEvent(Callback<SscsCaseData> callback) {
+        SscsCaseData caseData = setDwpState(callback);
+
+        updateEventDetails(caseData, callback.getCaseDetails().getId(), EventType.READY_TO_LIST, "ready to list", "update to ready to list event as there is no further information to assist the tribunal and no dispute.");
+    }
+
+    private void updateEventDetails(SscsCaseData caseData, Long caseId, EventType eventType, String summary, String description) {
+
+        log.info("updating to {} for case id: {}", eventType.getCcdType(), caseId);
+
+        ccdService.updateCase(caseData, caseId,
+            eventType.getCcdType(), summary, description, idamService.getIdamTokens());
     }
 
     @Override
