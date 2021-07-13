@@ -75,12 +75,12 @@ public class DwpUploadResponseHandlerTest {
     @Test(expected = IllegalStateException.class)
     @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenBenefitCodeIsNullEvidence_willThrowAnException(EventType eventType) {
-        buildTestCallbackForGivenData(
+        Callback<SscsCaseData> sscsCaseData = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
                 .benefitType(null)
                 .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
-        handler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(State.READY_TO_LIST.getId()).appeal(null).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE));
+        handler.handle(CallbackType.SUBMITTED, sscsCaseData);
     }
 
     @Test(expected = RequiredFieldMissingException.class)
@@ -97,7 +97,7 @@ public class DwpUploadResponseHandlerTest {
 
     @Test
     public void givenCallbackIsOkay_thenCanHandleIsTrue() {
-        assertTrue(handler.canHandle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(State.READY_TO_LIST.getId()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
+        assertTrue(handler.canHandle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(SscsCaseData.builder().createdInGapsFrom(State.READY_TO_LIST.getId()).appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE)));
     }
 
     @Test
@@ -337,6 +337,17 @@ public class DwpUploadResponseHandlerTest {
         verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
             eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.JOINT_PARTY_ADDED.getCcdType()), anyString(), anyString(), any());
 
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithIidbBenefitType_thenDoNothing() {
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
+                .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code(Benefit.IIDB.getShortName()).build())
+                .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
+
+        assertFalse(handler.canHandle(CallbackType.SUBMITTED, callback));
     }
 
 
