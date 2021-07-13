@@ -4,10 +4,12 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'org.springframework.boot' version '2.3.5.RELEASE'
-  id 'uk.gov.hmcts.java' version '0.12.9'
-  id 'com.github.ben-manes.versions' version '0.38.0'
-  id 'org.owasp.dependencycheck' version '6.1.6'
-  id 'org.sonarqube' version '3.2.0'
+  id 'uk.gov.hmcts.java' version '0.12.12'
+  id 'com.github.ben-manes.versions' version '0.39.0'
+  id 'org.owasp.dependencycheck' version '6.2.2'
+  id 'org.sonarqube' version '3.3'
+  id 'au.com.dius.pact' version '4.2.7'
+  id 'io.freefair.lombok' version '5.3.3.3'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -42,6 +44,15 @@ sourceSets {
       srcDir file('src/smokeTest/java')
     }
     resources.srcDir file('src/smokeTest/resources')
+  }
+  contractTest {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      java.srcDir 'src/contractTest/java'
+      resources.srcDir 'src/contractTest/resources'
+    }
+    resources.srcDir file('src/contractTest/resources')
   }
 }
 
@@ -93,6 +104,9 @@ configurations {
   testRuntime.exclude module: "android-json"
   integrationTestCompile.exclude module: "android-json"
   integrationTestRuntime.exclude module: "android-json"
+
+  contractTestCompile.extendsFrom testCompile
+  contractTestRuntime.extendsFrom testRuntime
 }
 
 pmd {
@@ -173,6 +187,46 @@ repositories {
   }
 }
 
+project.ext {
+  pacticipant = 'sscs_evidenceShare'
+  pacticipantVersion = getCheckedOutGitCommitHash()
+}
+
+def getCheckedOutGitCommitHash() {
+  'git rev-parse --verify --shirt HEAD'.execute().text.trim()
+}
+
+task runContractTests(type: Test, description: 'Runs contract tests.', group: 'Verification') {
+  onlyIf {
+    return System.env.SKIP_CONTRACT_TESTS == null || System.env.SKIP_CONTRACT_TESTS == 'false'
+  }
+  useJUnitPlatform()
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  systemProperty 'pact.rootDir', "pacts"
+  testLogging.showStandardStreams = true
+}
+
+task runAndPublishConsumerPactTests(type: Test, description: 'Publish pact test to broker.', group: 'Verification') {
+  logger.lifecycle("Runs pact consumer Tests")
+
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+}
+
+runAndPublishConsumerPactTests.finalizedBy pactPublish
+
+pact {
+  broker {
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+  }
+  publish {
+    pactDirectory = 'pacts'
+    tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+    version = project.pacticipantVersion
+  }
+}
+
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
 // enforces it's own (older) version which is not recommended.
 def versions = [
@@ -182,7 +236,8 @@ def versions = [
   springBoot: springBoot.class.package.implementationVersion,
   springfoxSwagger: '2.9.2',
   lombok: '1.18.16',
-  restAssured: '4.3.1'
+  restAssured: '4.3.1',
+  pact_version: '4.1.7'
 ]
 
 configurations.all {
@@ -221,15 +276,15 @@ dependencies {
   compile group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   compile group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   compile group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
-  compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.12.1'
+  compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.13.3'
 
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.1.0'
   compile group: 'com.github.hmcts', name: 'java-logging', version: versions.reformLogging
-  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.8.RELEASE'
+  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.9.RELEASE'
 
   compile group: 'org.springframework', name: 'spring-jms'
-  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '0.58.0'
+  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.1.0'
   compileOnly 'org.projectlombok:lombok:1.18.20'
 
   annotationProcessor "org.projectlombok:lombok:1.18.18"
@@ -237,14 +292,13 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
-
-  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.21'
-  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.35'
+  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.4.43'
+  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.37'
 
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
-  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.4.0'
+  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.6.1'
 
   integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
@@ -252,7 +306,7 @@ dependencies {
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
   testCompile 'pl.pragmatists:JUnitParams:1.1.1'
-  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.10.0'
+  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
   testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
@@ -267,6 +321,22 @@ dependencies {
   integrationTestCompileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
+
+  // Contract Tests
+  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
+  contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
+  contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.5.2'
+  contractTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
+  contractTestRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit_jupiter
+  contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
+  contractTestRuntime group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.7.0'
+  contractTestImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
+  contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
+  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.0.3'
+  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.9.RELEASE'
+
+  contractTestImplementation sourceSets.main.runtimeClasspath
+  contractTestImplementation sourceSets.test.runtimeClasspath
 }
 
 dependencyManagement {
@@ -276,7 +346,7 @@ dependencyManagement {
     dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
 
     // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103
-    dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.0') {
+    dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.20') {
       entry 'kotlin-stdlib'
     }
 
@@ -319,7 +389,7 @@ dependencyManagement {
     }
 
     //CVE-2021-27807
-    dependencySet(group: 'org.apache.pdfbox', version: '2.0.23') {
+    dependencySet(group: 'org.apache.pdfbox', version: '2.0.24') {
       entry 'pdfbox-tools'
       entry 'preflight'
     }
@@ -328,8 +398,42 @@ dependencyManagement {
       entry 'batik-all'
     }
 
+    //CVE-2021-22118
+    dependencySet(group: 'org.springframework', version: '5.2.15.RELEASE') {
+      entry 'spring-aop'
+      entry 'spring-aspects'
+      entry 'spring-beans'
+      entry 'spring-context'
+      entry 'spring-context-support'
+      entry 'spring-core'
+      entry 'spring-expression'
+      entry 'spring-jcl'
+      entry 'spring-jdbc'
+      entry 'spring-jms'
+      entry 'spring-messaging'
+      entry 'spring-orm'
+      entry 'spring-tx'
+      entry 'spring-web'
+      entry 'spring-webmvc'
+    }
+
+    //CVE-2021-27568
+    dependencySet(group: 'net.minidev', version: '2.4.7') {
+      entry 'json-smart'
+      entry 'accessors-smart'
+    }
+
+    //CVE-2021-30468
+    dependencySet(group: 'org.apache.cxf', version: '3.4.4') {
+      entry 'cxf-core'
+      entry 'cxf-rt-frontend-jaxrs'
+      entry 'cxf-rt-rs-client'
+      entry 'cxf-rt-security'
+      entry 'cxf-rt-transports-http'
+    }
+
     imports {
-      mavenBom "org.springframework.cloud:spring-cloud-dependencies:Hoxton.SR11"
+      mavenBom "org.springframework.cloud:spring-cloud-dependencies:Hoxton.SR12"
     }
   }
 }

@@ -58,6 +58,7 @@ public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest exten
         json = json.replaceAll("CASE_ID_TO_BE_REPLACED", ccdCaseId);
         json = json.replaceAll("EVIDENCE_DOCUMENT_URL_PLACEHOLDER", docUrl);
         json = json.replace("CREATED_IN_GAPS_FROM", State.READY_TO_LIST.getId());
+        json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
         return json.replaceAll("EVIDENCE_DOCUMENT_BINARY_URL_PLACEHOLDER", docUrl + "/binary");
     }
 
