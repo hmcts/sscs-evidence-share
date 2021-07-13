@@ -75,6 +75,12 @@ task smoke(type: Test) {
   classpath = sourceSets.smokeTest.runtimeClasspath
 }
 
+task fortifyScan(type: JavaExec)  {
+  main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+  classpath += sourceSets.test.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
 configurations {
   integrationTestCompile.extendsFrom(testCompile)
   integrationTestRuntime.extendsFrom(testRuntime)
@@ -207,6 +213,8 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+
+  testCompile 'com.github.hmcts:fortify-client:1.0.1:all'
 
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'org.projectlombok', name: 'lombok', version: versions.lombok
