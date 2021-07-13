@@ -273,10 +273,10 @@ dependencies {
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.1.0'
   compile group: 'com.github.hmcts', name: 'java-logging', version: versions.reformLogging
-  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.8.RELEASE'
+  compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.9.RELEASE'
 
   compile group: 'org.springframework', name: 'spring-jms'
-  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.0.0'
+  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.1.0'
   compileOnly 'org.projectlombok:lombok:1.18.20'
 
   annotationProcessor "org.projectlombok:lombok:1.18.18"
@@ -284,8 +284,8 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
-  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.3.43-RC-SSCS-8924'
-  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.36'
+  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.4.45'
+  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.37'
 
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
@@ -325,7 +325,7 @@ dependencies {
   contractTestImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
   contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
   contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.0.3'
-  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.8.RELEASE'
+  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.9.RELEASE'
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
