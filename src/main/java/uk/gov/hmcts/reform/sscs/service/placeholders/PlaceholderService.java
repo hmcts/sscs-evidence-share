@@ -93,13 +93,23 @@ public class PlaceholderService {
             placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate);
         }
 
-        placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getAddressLine1());
-        placeholders.put(EXELA_ADDRESS_LINE2_LITERAL, exelaAddressConfig.getAddressLine2());
-        placeholders.put(EXELA_ADDRESS_LINE3_LITERAL, exelaAddressConfig.getAddressLine3());
-        placeholders.put(EXELA_ADDRESS_POSTCODE_LITERAL, exelaAddressConfig.getAddressPostcode());
+        buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
 
         populateRpcPlaceHolders(caseData, placeholders);
         buildRecipientAddressPlaceholders(address, placeholders);
+    }
+
+    private void buildExcelaAddress(String isScottish, Map<String, Object> placeholders) {
+        placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getAddressLine1());
+        placeholders.put(EXELA_ADDRESS_LINE3_LITERAL, exelaAddressConfig.getAddressLine3());
+
+        if ("Yes".equalsIgnoreCase(isScottish)) {
+            placeholders.put(EXELA_ADDRESS_LINE2_LITERAL, exelaAddressConfig.getScottishAddressLine2());
+            placeholders.put(EXELA_ADDRESS_POSTCODE_LITERAL, exelaAddressConfig.getScottishPostcode());
+        } else {
+            placeholders.put(EXELA_ADDRESS_LINE2_LITERAL, exelaAddressConfig.getAddressLine2());
+            placeholders.put(EXELA_ADDRESS_POSTCODE_LITERAL, exelaAddressConfig.getAddressPostcode());
+        }
     }
 
     private void populateRpcPlaceHolders(SscsCaseData caseData, Map<String, Object> placeholders) {

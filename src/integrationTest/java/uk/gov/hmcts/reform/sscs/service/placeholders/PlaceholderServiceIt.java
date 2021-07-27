@@ -80,6 +80,25 @@ public class PlaceholderServiceIt {
     }
 
     @Test
+    public void givenAScottishCase_thenSetExcelaAddressCorrectly() {
+        Address address = Address.builder().line1("123 The Road").town("Brentwood").postcode("CM12 1TH").build();
+
+        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
+            .name("Liverpool").address1(RPC_ADDRESS1).address2(RPC_ADDRESS2).address3(RPC_ADDRESS3)
+            .address4(RPC_ADDRESS4).city(RPC_CITY).postcode(POSTCODE).phoneNumber(PHONE).build();
+
+        Map<String, Object> placeholders = new HashMap<>();
+        caseData = buildCaseData(rpc);
+        caseData.setIsScottishCase("Yes");
+        placeholderService.build(caseData, placeholders, address, now);
+
+        assertEquals("HMCTS SSCS", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
+        assertEquals("PO BOX 13150", placeholders.get(EXELA_ADDRESS_LINE2_LITERAL));
+        assertEquals("Harlow", placeholders.get(EXELA_ADDRESS_LINE3_LITERAL));
+        assertEquals("CM20 9TT", placeholders.get(EXELA_ADDRESS_POSTCODE_LITERAL));
+    }
+
+    @Test
     public void givenACaseDataWithNoRpc_thenGenerateThePlaceholderMappingsWithoutRpc() {
         Address address = Address.builder().line1("123 The Road").town("Brentwood").postcode("CM12 1TH").build();
         caseData = buildCaseData(null);
