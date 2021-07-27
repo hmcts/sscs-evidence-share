@@ -63,7 +63,7 @@ public class PlaceholderService {
         String description = appeal.getBenefitType() != null ? appeal.getBenefitType().getDescription() : null;
 
         if (description == null && appeal.getBenefitType() != null && appeal.getBenefitType().getCode() != null) {
-            description = Benefit.getBenefitByCode(appeal.getBenefitType().getCode()).getDescription();
+            description = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode()).map(Benefit::getDescription).orElse(StringUtils.EMPTY);
         }
         if (description != null) {
             description = description.toUpperCase();
