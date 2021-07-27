@@ -317,7 +317,7 @@ dependencies {
   // Contract Tests
   contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
   contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
-  contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.5.2'
+  contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.5.3'
   contractTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
   contractTestRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit_jupiter
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
@@ -422,6 +422,11 @@ dependencyManagement {
       entry 'cxf-rt-rs-client'
       entry 'cxf-rt-security'
       entry 'cxf-rt-transports-http'
+    }
+
+    //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
+    dependencySet(group: 'org.apache.commons', version: '1.21') {
+      entry 'commons-compress'
     }
 
     imports {
