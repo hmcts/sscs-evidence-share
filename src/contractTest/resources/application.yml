@@ -58,6 +58,8 @@ exela:
     addressLine2: PO BOX 12626
     addressLine3: Harlow
     addressPostcode: CM20 9QF
+    scottishAddressLine2: PO BOX 13150
+    scottishPostcode: CM20 9TT
 feature:
     urgent-hearing:
         enabled: ${URGENT_HEARING_ENABLED:false}
