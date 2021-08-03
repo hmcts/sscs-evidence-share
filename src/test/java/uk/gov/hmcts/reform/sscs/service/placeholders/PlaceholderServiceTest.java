@@ -71,7 +71,7 @@ public class PlaceholderServiceTest {
         now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());
         welshDate = "2001-12-02";
         caseData = buildCaseData();
-        service = new PlaceholderService(pdfDocumentConfig, exelaAddressConfig);
+        service = new PlaceholderService(pdfDocumentConfig, exelaAddressConfig, false);
         placeholders = new HashMap<>();
 
         given(pdfDocumentConfig.getHmctsWelshImgKey()).willReturn("hmctsWelshImgKey");

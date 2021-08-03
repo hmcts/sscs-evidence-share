@@ -150,9 +150,12 @@ exela:
   addressLine2: PO BOX 12626
   addressLine3: Harlow
   addressPostcode: CM20 9QF
+  scottishAddressLine2: PO BOX 13150
+  scottishPostcode: CM20 9TT
 
 feature:
   urgent-hearing.enabled: ${URGENT_HEARING_ENABLED:false}
+  scottish-po-box.enabled: ${SCOTTISH_PO_BOX_ENABLED:false}
   secure-doc-store.enabled: ${SECURE_DOC_STORE_FEATURE:false}
 
 case_document_am.url: ${CASE_DOCUMENT_AM_URL:}

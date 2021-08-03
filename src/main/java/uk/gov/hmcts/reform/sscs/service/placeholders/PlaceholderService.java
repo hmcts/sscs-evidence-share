@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
@@ -51,11 +52,15 @@ public class PlaceholderService {
 
     private final PdfDocumentConfig pdfDocumentConfig;
     private final ExelaAddressConfig exelaAddressConfig;
+    private final boolean scottishPoBoxEnabled;
 
     @Autowired
-    public PlaceholderService(PdfDocumentConfig pdfDocumentConfig, ExelaAddressConfig exelaAddressConfig) {
+    public PlaceholderService(PdfDocumentConfig pdfDocumentConfig,
+                              ExelaAddressConfig exelaAddressConfig,
+                              @Value("${feature.scottish-po-box.enabled}") boolean scottishPoBoxEnabled) {
         this.pdfDocumentConfig = pdfDocumentConfig;
         this.exelaAddressConfig = exelaAddressConfig;
+        this.scottishPoBoxEnabled = scottishPoBoxEnabled;
     }
 
     public void build(SscsCaseData caseData, Map<String, Object> placeholders, Address address, String caseCreatedDate) {
@@ -93,13 +98,23 @@ public class PlaceholderService {
             placeholders.put(CASE_CREATED_DATE_LITERAL, caseCreatedDate);
         }
 
-        placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getAddressLine1());
-        placeholders.put(EXELA_ADDRESS_LINE2_LITERAL, exelaAddressConfig.getAddressLine2());
-        placeholders.put(EXELA_ADDRESS_LINE3_LITERAL, exelaAddressConfig.getAddressLine3());
-        placeholders.put(EXELA_ADDRESS_POSTCODE_LITERAL, exelaAddressConfig.getAddressPostcode());
+        buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
 
         populateRpcPlaceHolders(caseData, placeholders);
         buildRecipientAddressPlaceholders(address, placeholders);
+    }
+
+    private void buildExcelaAddress(String isScottish, Map<String, Object> placeholders) {
+        placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getAddressLine1());
+        placeholders.put(EXELA_ADDRESS_LINE3_LITERAL, exelaAddressConfig.getAddressLine3());
+
+        if ("Yes".equalsIgnoreCase(isScottish) && scottishPoBoxEnabled) {
+            placeholders.put(EXELA_ADDRESS_LINE2_LITERAL, exelaAddressConfig.getScottishAddressLine2());
+            placeholders.put(EXELA_ADDRESS_POSTCODE_LITERAL, exelaAddressConfig.getScottishPostcode());
+        } else {
+            placeholders.put(EXELA_ADDRESS_LINE2_LITERAL, exelaAddressConfig.getAddressLine2());
+            placeholders.put(EXELA_ADDRESS_POSTCODE_LITERAL, exelaAddressConfig.getAddressPostcode());
+        }
     }
 
     private void populateRpcPlaceHolders(SscsCaseData caseData, Map<String, Object> placeholders) {

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(SpringRunner.class)
@@ -73,6 +74,48 @@ public class PlaceholderServiceIt {
         assertEquals("123456", placeholders.get(CASE_ID_LITERAL));
         assertEquals("JT0123456B", placeholders.get(NINO_LITERAL));
         assertEquals("https://www.gov.uk/appeal-benefit-decision", placeholders.get(SSCS_URL_LITERAL));
+        assertEquals("HMCTS SSCS", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
+        assertEquals("PO BOX 12626", placeholders.get(EXELA_ADDRESS_LINE2_LITERAL));
+        assertEquals("Harlow", placeholders.get(EXELA_ADDRESS_LINE3_LITERAL));
+        assertEquals("CM20 9QF", placeholders.get(EXELA_ADDRESS_POSTCODE_LITERAL));
+    }
+
+    @Test
+    public void givenAScottishCaseAndPoBoxFeatureOn_thenSetExcelaAddressCorrectly() {
+        ReflectionTestUtils.setField(placeholderService, "scottishPoBoxEnabled", true);
+
+        Address address = Address.builder().line1("123 The Road").town("Brentwood").postcode("CM12 1TH").build();
+
+        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
+            .name("Liverpool").address1(RPC_ADDRESS1).address2(RPC_ADDRESS2).address3(RPC_ADDRESS3)
+            .address4(RPC_ADDRESS4).city(RPC_CITY).postcode(POSTCODE).phoneNumber(PHONE).build();
+
+        Map<String, Object> placeholders = new HashMap<>();
+        caseData = buildCaseData(rpc);
+        caseData.setIsScottishCase("Yes");
+        placeholderService.build(caseData, placeholders, address, now);
+
+        assertEquals("HMCTS SSCS", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
+        assertEquals("PO BOX 13150", placeholders.get(EXELA_ADDRESS_LINE2_LITERAL));
+        assertEquals("Harlow", placeholders.get(EXELA_ADDRESS_LINE3_LITERAL));
+        assertEquals("CM20 9TT", placeholders.get(EXELA_ADDRESS_POSTCODE_LITERAL));
+    }
+
+    @Test
+    public void givenAScottishCaseAndPoBoxFeatureOff_thenSetExcelaAddressCorrectly() {
+        ReflectionTestUtils.setField(placeholderService, "scottishPoBoxEnabled", false);
+
+        Address address = Address.builder().line1("123 The Road").town("Brentwood").postcode("CM12 1TH").build();
+
+        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
+            .name("Liverpool").address1(RPC_ADDRESS1).address2(RPC_ADDRESS2).address3(RPC_ADDRESS3)
+            .address4(RPC_ADDRESS4).city(RPC_CITY).postcode(POSTCODE).phoneNumber(PHONE).build();
+
+        Map<String, Object> placeholders = new HashMap<>();
+        caseData = buildCaseData(rpc);
+        caseData.setIsScottishCase("Yes");
+        placeholderService.build(caseData, placeholders, address, now);
+
         assertEquals("HMCTS SSCS", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
         assertEquals("PO BOX 12626", placeholders.get(EXELA_ADDRESS_LINE2_LITERAL));
         assertEquals("Harlow", placeholders.get(EXELA_ADDRESS_LINE3_LITERAL));
