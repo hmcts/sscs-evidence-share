@@ -304,7 +304,7 @@ dependencies {
   testCompile 'com.github.hmcts:fortify-client:1.2.1:all'
 
   testCompile 'pl.pragmatists:JUnitParams:1.1.1'
-  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.11.2'
+  testCompile group: 'org.mockito', name: 'mockito-core', version: '3.12.1'
   testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
 
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
