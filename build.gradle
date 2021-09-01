@@ -337,6 +337,7 @@ dependencies {
   testCompile 'pl.pragmatists:JUnitParams:1.1.1'
   testCompile group: 'org.mockito', name: 'mockito-core', version: '3.12.4'
   testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
+  testCompile group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
 
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
