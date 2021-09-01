@@ -175,7 +175,7 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void givenNonDigitalCase_shouldGenerateDLDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
+    public void givenNonDigitalCaseAndSecureDocstoreOff_shouldGenerateDLDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
         //FIXME: Remove this test once secureDocStoreEnabled feature switched on
         ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", false);
 
@@ -217,6 +217,8 @@ public class EvidenceShareServiceIt {
 
     @Test
     public void givenNonDigitalCaseAndSecureDocStoreOn_shouldGenerateDLDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
+        ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", true);
+
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
