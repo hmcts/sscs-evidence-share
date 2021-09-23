@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +45,7 @@ public class SscsDocumentServiceTest {
     public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
-    private EvidenceManagementService evidenceManagementService;
+    private PdfStoreService pdfStoreService;
 
     @Mock
     private PdfHelper pdfHelper;
@@ -78,7 +77,7 @@ public class SscsDocumentServiceTest {
     public void getPdfsForGivenDocType(DocumentType documentType, String expectedDocName, boolean editedDocument) {
 
         String expectedDocumentUrl = editedDocument ? "http://editedDocumentUrl" : "http://documentUrl";
-        given(evidenceManagementService.download(eq(URI.create(expectedDocumentUrl)), eq("sscs")))
+        given(pdfStoreService.download(eq(expectedDocumentUrl)))
             .willReturn(new byte[]{'a'});
 
         List<SscsDocument> testDocs = createTestData(editedDocument);
@@ -94,9 +93,10 @@ public class SscsDocumentServiceTest {
     public void savesAndUpdatesDocumentCorrectly() {
 
         String resizedHref = "somelink.com";
-        UploadResponse uploadResponse = createUploadResponse(resizedHref);
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentLink(DocumentLink.builder().documentUrl(resizedHref).build()).build()).build();
 
-        when(evidenceManagementService.upload(any(), any())).thenReturn(uploadResponse);
+        when(pdfStoreService.storeDocument(any())).thenReturn(sscsDocument);
         Pdf pdf = new Pdf("".getBytes(), "file.pdf");
         SscsDocument testDoc = createTestData(false).get(0);
         AbstractDocument result = sscsDocumentService.saveAndUpdateDocument(pdf, testDoc);
@@ -106,7 +106,7 @@ public class SscsDocumentServiceTest {
     @Test
     public void savesAndUpdatesDocumentHandlesFailure() {
 
-        when(evidenceManagementService.upload(any(), any())).thenThrow(new UnsupportedDocumentTypeException(new Exception()));
+        when(pdfStoreService.storeDocument(any())).thenThrow(new UnsupportedDocumentTypeException(new Exception()));
         Pdf pdf = new Pdf("".getBytes(), "file.pdf");
         SscsDocument testDoc = createTestData(false).get(0);
         AbstractDocument result = sscsDocumentService.saveAndUpdateDocument(pdf, testDoc);

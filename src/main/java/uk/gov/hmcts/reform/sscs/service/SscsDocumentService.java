@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static java.util.Collections.singletonList;
 import static java.util.Optional.*;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import java.io.ByteArrayOutputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -108,7 +105,6 @@ public class SscsDocumentService {
 
         try {
             SscsDocument sscsDocument = pdfStoreService.storeDocument(file.getContent());
-            //UploadResponse upload = evidenceManagementService.upload(singletonList(file), "sscs");
             String location = sscsDocument.getValue().getDocumentLink().getDocumentUrl();
             DocumentLink documentLink = DocumentLink.builder().documentUrl(location).build();
             document.getValue().setResizedDocumentLink(documentLink);

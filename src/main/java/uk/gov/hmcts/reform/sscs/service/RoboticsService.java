@@ -5,7 +5,6 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.*;
 
-import java.net.URI;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;

@@ -9,7 +9,6 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -42,7 +41,7 @@ public class RoboticsServiceTest {
     RoboticsService roboticsService;
 
     @Mock
-    EvidenceManagementService evidenceManagementService;
+    PdfStoreService pdfStoreService;
 
     @Mock
     EmailService emailService;
@@ -94,7 +93,7 @@ public class RoboticsServiceTest {
         convertService = new SscsCcdConvertService();
 
         roboticsService = new RoboticsService(
-            evidenceManagementService,
+            pdfStoreService,
             emailService,
             emailHelper,
             roboticsJsonMapper,
@@ -125,7 +124,7 @@ public class RoboticsServiceTest {
 
         sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name(rpcName).build());
 
-        given(evidenceManagementService.download(any(), eq(null))).willReturn(null);
+        given(pdfStoreService.download(any())).willReturn(null);
 
         CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
         roboticsService.sendCaseToRobotics(caseData);
@@ -150,7 +149,7 @@ public class RoboticsServiceTest {
         errorSet.add("Surname is missing");
         sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name(rpcName).build());
 
-        given(evidenceManagementService.download(any(), eq(null))).willReturn(null);
+        given(pdfStoreService.download(any())).willReturn(null);
 
         CaseDetails<SscsCaseData> caseData = new CaseDetails<>(1L, null, APPEAL_CREATED, sscsCaseData, null, "Benefit");
         caseData.getCaseData().getAppeal().getAppellant().getName().setLastName("");
@@ -175,7 +174,7 @@ public class RoboticsServiceTest {
     public void givenACaseWithEvidenceToDownload_thenCreateRoboticsFileWithDownloadedEvidence(String receivedVia) {
 
         byte[] expectedBytes = {1, 2, 3};
-        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
+        given(pdfStoreService.download("www.download.com")).willReturn(expectedBytes);
 
         List<SscsDocument> documents = new ArrayList<>();
         documents.add(SscsDocument.builder()
@@ -214,7 +213,7 @@ public class RoboticsServiceTest {
     public void givenAdditionalEvidenceHasEmptyFileName_doNotDownloadAdditionalEvidenceAndStillGenerateRoboticsAndSendEmail() {
 
         byte[] expectedBytes = {1, 2, 3};
-        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
+        given(pdfStoreService.download("www.download.com")).willReturn(expectedBytes);
 
         Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
         expectedAdditionalEvidence.put("test.jpg", expectedBytes);
@@ -250,7 +249,7 @@ public class RoboticsServiceTest {
     public void givenAdditionalEvidenceHasEmptyFileNameAndIsPipAeTrue_doNotDownloadAdditionalEvidenceAndStillGenerateRoboticsAndSendEmail() {
 
         byte[] expectedBytes = {1, 2, 3};
-        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
+        given(pdfStoreService.download("www.download.com")).willReturn(expectedBytes);
 
         Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
         expectedAdditionalEvidence.put("test.jpg", expectedBytes);
@@ -287,7 +286,7 @@ public class RoboticsServiceTest {
     public void givenNonDigitalCaseAndHasAdditionalEvidenceAndIsPipAeTrue_DownloadAdditionalEvidenceAndGenerateRoboticsAndSendEmail() {
 
         byte[] expectedBytes = {1, 2, 3};
-        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
+        given(pdfStoreService.download("www.download.com")).willReturn(expectedBytes);
 
         Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
         expectedAdditionalEvidence.put("test.jpg", expectedBytes);
@@ -324,7 +323,7 @@ public class RoboticsServiceTest {
     public void givenCaseIsDigitalAndHasAdditionalEvidenceAndIsPipAeTrue_doNotDownloadAdditionalEvidenceAndStillGenerateRoboticsAndSendEmail() {
 
         byte[] expectedBytes = {1, 2, 3};
-        given(evidenceManagementService.download(URI.create("www.download.com"), null)).willReturn(expectedBytes);
+        given(pdfStoreService.download("www.download.com")).willReturn(expectedBytes);
 
         Map<String, byte[]> expectedAdditionalEvidence = new HashMap<>();
         expectedAdditionalEvidence.put("test.jpg", expectedBytes);

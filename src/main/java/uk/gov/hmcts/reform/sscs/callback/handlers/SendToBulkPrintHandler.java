@@ -5,7 +5,6 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import feign.FeignException;
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Supplier;
@@ -32,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.BulkPrintInfo;
 import uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.PrintService;
 

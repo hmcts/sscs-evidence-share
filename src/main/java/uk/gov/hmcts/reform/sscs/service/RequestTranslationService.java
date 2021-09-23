@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.service;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.file;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 
-import java.net.URI;
 import java.util.*;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;

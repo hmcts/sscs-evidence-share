@@ -34,7 +34,7 @@ public class RequestTranslationServiceTest {
 
     private RequestTranslationService requestTranslationService;
     @Mock
-    EvidenceManagementService evidenceManagementService;
+    PdfStoreService pdfStoreService;
     @Mock
     EmailService emailService;
     @Mock
@@ -50,7 +50,7 @@ public class RequestTranslationServiceTest {
     @Before
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        requestTranslationService = new RequestTranslationService(evidenceManagementService,
+        requestTranslationService = new RequestTranslationService(pdfStoreService,
                 emailService,
                 requestTranslationTemplate,
                 docmosisPdfGenerationService,
@@ -66,7 +66,7 @@ public class RequestTranslationServiceTest {
 
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
         byte[] expectedBytes = new byte[]{1, 2, 3};
-        given(evidenceManagementService.download(any(), any())).willReturn(expectedBytes);
+        given(pdfStoreService.download(any())).willReturn(expectedBytes);
 
         when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(expectedPdf);
 
@@ -103,7 +103,7 @@ public class RequestTranslationServiceTest {
 
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
         byte[] expectedBytes = new byte[]{1, 2, 3};
-        given(evidenceManagementService.download(any(), any())).willReturn(expectedBytes);
+        given(pdfStoreService.download(any())).willReturn(expectedBytes);
 
         when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(expectedPdf);
 
@@ -143,7 +143,7 @@ public class RequestTranslationServiceTest {
 
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
         byte[] expectedBytes = new byte[]{1, 2, 3};
-        given(evidenceManagementService.download(any(), any())).willReturn(expectedBytes);
+        given(pdfStoreService.download(any())).willReturn(expectedBytes);
 
         when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(expectedPdf);
         sscsCaseData.setSscsDocument(new ArrayList<>());
@@ -161,7 +161,7 @@ public class RequestTranslationServiceTest {
 
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
         byte[] expectedBytes = new byte[]{0};
-        given(evidenceManagementService.download(any(), any())).willReturn(expectedBytes);
+        given(pdfStoreService.download(any())).willReturn(expectedBytes);
 
         when(docmosisPdfGenerationService.generatePdf(any())).thenReturn(expectedPdf);
 
