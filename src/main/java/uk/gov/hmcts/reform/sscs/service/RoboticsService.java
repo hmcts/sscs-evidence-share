@@ -187,7 +187,6 @@ public class RoboticsService {
             for (SscsDocument doc : sscsCaseData.getSscsDocument()) {
                 if (doc.getValue().getDocumentType() == null || doc.getValue().getDocumentType().equalsIgnoreCase("appellantEvidence")) {
                     map.put(doc, downloadBinary(doc, caseId));
-                    System.out.println("Download doc " + doc.getValue().getDocumentLink().getDocumentUrl());
                 }
             }
             return map;

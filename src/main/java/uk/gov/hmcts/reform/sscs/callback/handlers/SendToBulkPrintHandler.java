@@ -236,12 +236,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private boolean isAllowedReceivedTypeForBulkPrint(SscsCaseData caseData) {
-        System.out.println("nonNull(caseData)" + nonNull(caseData));
-        System.out.println("nonNull(caseData)" + nonNull(caseData));
-        System.out.println("nonNull(caseData.getAppeal().getReceivedVia())" + nonNull(caseData.getAppeal().getReceivedVia()));
-        System.out.println("nonNull(caseData.getCreatedInGapsFrom())" + nonNull(caseData.getCreatedInGapsFrom()));
-        System.out.println("!caseData.getCreatedInGapsFrom().equals(State.READY_TO_LIST.getId())" + !caseData.getCreatedInGapsFrom().equals(State.READY_TO_LIST.getId()));
-        System.out.println("evidenceShareConfig.getSubmitTypes().stream().anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase)" + evidenceShareConfig.getSubmitTypes().stream().anyMatch(caseData.getAppeal().getReceivedVia()::equalsIgnoreCase));
         return nonNull(caseData)
             && nonNull(caseData.getAppeal())
             && nonNull(caseData.getAppeal().getReceivedVia())
