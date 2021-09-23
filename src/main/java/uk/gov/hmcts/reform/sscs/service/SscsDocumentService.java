@@ -30,12 +30,12 @@ import uk.gov.hmcts.reform.sscs.model.PdfDocument;
 @Slf4j
 @Service
 public class SscsDocumentService {
-    private final EvidenceManagementService evidenceManagementService;
+    private final PdfStoreService pdfStoreService;
     private final PdfHelper pdfHelper;
 
     @Autowired
-    public SscsDocumentService(EvidenceManagementService evidenceManagementService, PdfHelper pdfHelper) {
-        this.evidenceManagementService = evidenceManagementService;
+    public SscsDocumentService(PdfStoreService pdfStoreService, PdfHelper pdfHelper) {
+        this.pdfStoreService = pdfStoreService;
         this.pdfHelper = pdfHelper;
     }
 
@@ -57,7 +57,7 @@ public class SscsDocumentService {
     private byte[] getContentForGivenDoc(AbstractDocument sscsDocument, boolean isConfidentialCase) {
         final DocumentLink documentLink = isConfidentialCase ? ofNullable(sscsDocument.getValue().getEditedDocumentLink())
             .orElse(sscsDocument.getValue().getDocumentLink()) : sscsDocument.getValue().getDocumentLink();
-        return evidenceManagementService.download(URI.create(documentLink.getDocumentUrl()), "sscs");
+        return pdfStoreService.download(documentLink.getDocumentUrl());
     }
 
     public void filterByDocTypeAndApplyAction(List<SscsDocument> sscsDocument, DocumentType documentType,
@@ -107,8 +107,9 @@ public class SscsDocumentService {
         log.info("About to upload resized document [" + pdfFileName + "]");
 
         try {
-            UploadResponse upload = evidenceManagementService.upload(singletonList(file), "sscs");
-            String location = upload.getEmbedded().getDocuments().get(0).links.self.href;
+            SscsDocument sscsDocument = pdfStoreService.storeDocument(file.getContent());
+            //UploadResponse upload = evidenceManagementService.upload(singletonList(file), "sscs");
+            String location = sscsDocument.getValue().getDocumentLink().getDocumentUrl();
             DocumentLink documentLink = DocumentLink.builder().documentUrl(location).build();
             document.getValue().setResizedDocumentLink(documentLink);
 

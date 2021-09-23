@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 @Slf4j
 public class RequestTranslationService {
 
-    private final EvidenceManagementService evidenceManagementService;
+    private final PdfStoreService pdfStoreService;
     private final EmailService emailService;
     private final RequestTranslationTemplate requestTranslationTemplate;
     private DocmosisPdfGenerationService pdfGenerationService;
@@ -38,12 +38,12 @@ public class RequestTranslationService {
 
     @Autowired
     public RequestTranslationService(
-        EvidenceManagementService evidenceManagementService,
+        PdfStoreService pdfStoreService,
         EmailService emailService,
         RequestTranslationTemplate requestTranslationTemplate,
         DocmosisPdfGenerationService pdfGenerationService,
         IdamService idamService) {
-        this.evidenceManagementService = evidenceManagementService;
+        this.pdfStoreService = pdfStoreService;
         this.emailService = emailService;
         this.requestTranslationTemplate = requestTranslationTemplate;
         this.pdfGenerationService = pdfGenerationService;
@@ -134,7 +134,7 @@ public class RequestTranslationService {
     private byte[] downloadBinary(DwpDocument doc, Long caseId) {
         log.info("About to download binary to attach to wlu for caseId {}", caseId);
         if (doc.getValue().getDocumentLink() != null && doc.getValue().getDocumentLink().getDocumentUrl() != null && doc.getValue().getDocumentLink().getDocumentFilename() != null) {
-            return evidenceManagementService.download(URI.create(doc.getValue().getDocumentLink().getDocumentUrl()), null);
+            return pdfStoreService.download(doc.getValue().getDocumentLink().getDocumentUrl());
         } else {
             return new byte[0];
         }
@@ -143,7 +143,7 @@ public class RequestTranslationService {
     private byte[] downloadBinary(SscsDocument doc, Long caseId) {
         log.info("About to download binary to attach to wlu for caseId {}", caseId);
         if (doc.getValue().getDocumentLink() != null && doc.getValue().getDocumentLink().getDocumentUrl() != null && doc.getValue().getDocumentLink().getDocumentFilename() != null) {
-            return evidenceManagementService.download(URI.create(doc.getValue().getDocumentLink().getDocumentUrl()), null);
+            return pdfStoreService.download(doc.getValue().getDocumentLink().getDocumentUrl());
         } else {
             return new byte[0];
         }
