@@ -93,18 +93,11 @@ public class SscsDocumentService {
     public AbstractDocument saveAndUpdateDocument(Pdf pdf, AbstractDocument document) {
 
         String pdfFileName = document.getValue().getDocumentFileName() + ".pdf";
-
-        ByteArrayMultipartFile file = ByteArrayMultipartFile
-            .builder()
-            .content(pdf.getContent())
-            .name(pdfFileName)
-            .contentType(APPLICATION_PDF)
-            .build();
-
+        
         log.info("About to upload resized document [" + pdfFileName + "]");
 
         try {
-            SscsDocument sscsDocument = pdfStoreService.storeDocument(file.getContent());
+            SscsDocument sscsDocument = pdfStoreService.storeDocument(pdf.getContent(), pdfFileName, null);
             String location = sscsDocument.getValue().getDocumentLink().getDocumentUrl();
             DocumentLink documentLink = DocumentLink.builder().documentUrl(location).build();
             document.getValue().setResizedDocumentLink(documentLink);
