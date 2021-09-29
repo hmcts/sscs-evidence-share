@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Optional.*;
-import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -19,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.helper.PdfHelper;
 import uk.gov.hmcts.reform.sscs.model.PdfDocument;
@@ -93,7 +91,7 @@ public class SscsDocumentService {
     public AbstractDocument saveAndUpdateDocument(Pdf pdf, AbstractDocument document) {
 
         String pdfFileName = document.getValue().getDocumentFileName() + ".pdf";
-        
+
         log.info("About to upload resized document [" + pdfFileName + "]");
 
         try {

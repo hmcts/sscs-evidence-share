@@ -96,7 +96,7 @@ public class SscsDocumentServiceTest {
         SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
             .documentLink(DocumentLink.builder().documentUrl(resizedHref).build()).build()).build();
 
-        when(pdfStoreService.storeDocument(any())).thenReturn(sscsDocument);
+        when(pdfStoreService.storeDocument(any(), any(), any())).thenReturn(sscsDocument);
         Pdf pdf = new Pdf("".getBytes(), "file.pdf");
         SscsDocument testDoc = createTestData(false).get(0);
         AbstractDocument result = sscsDocumentService.saveAndUpdateDocument(pdf, testDoc);
