@@ -433,7 +433,8 @@ public class SendToBulkPrintHandlerTest {
             "jurisdiction",
             state,
             caseData,
-            now
+            now,
+            "Benefit"
         );
     }
 }
