@@ -121,7 +121,7 @@ public class RequestTranslationCallbackHandlerTest {
                 .languagePreferenceWelsh(languagePreference)
                 .build();
 
-        return new CaseDetails<>(123L, "jurisdiction", APPEAL_CREATED, caseData,  LocalDateTime.now());
+        return new CaseDetails<>(123L, "jurisdiction", APPEAL_CREATED, caseData,  LocalDateTime.now(), "Benefit");
     }
 
 }

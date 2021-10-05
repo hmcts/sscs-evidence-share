@@ -315,7 +315,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
-  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.4.64'
+  compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.5.0'
   compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.41'
 
   //Remove when our dependencies pull in this version or later
@@ -372,6 +372,9 @@ dependencyManagement {
     dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
     dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
     dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
+    
+    //CVE-2021-40690
+     dependency group: 'org.apache.santuario', name: 'xmlsec', version: '2.2.3'
 
     // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103
     dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.30') {
