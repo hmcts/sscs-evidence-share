@@ -115,7 +115,8 @@ public class TopicConsumerTest {
             "jurisdiction",
             null,
             SscsCaseData.builder().build(),
-            null
+            null,
+            "Benefit"
         );
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.EVIDENCE_RECEIVED, false);
         when(deserializer.deserialize(any())).thenReturn(callback);
