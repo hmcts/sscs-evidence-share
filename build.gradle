@@ -253,7 +253,7 @@ pact {
 // enforces it's own (older) version which is not recommended.
 def versions = [
   junit           : '5.7.2',
-  junitPlatform   : '1.7.2',
+  junitPlatform   : '1.8.1',
   reformLogging: '5.1.7',
   springBoot: springBoot.class.package.implementationVersion,
   springfoxSwagger: '2.9.2',
@@ -299,7 +299,7 @@ dependencies {
   compile group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   compile group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   compile group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
-  compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.14.0'
+  compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.0'
 
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.1.0'
@@ -357,7 +357,7 @@ dependencies {
   contractTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
   contractTestRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit_jupiter
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
-  contractTestRuntime group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.7.0'
+  contractTestRuntime group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.8.1'
   contractTestImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
   contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
   contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.0.3'
