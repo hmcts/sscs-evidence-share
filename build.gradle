@@ -252,7 +252,7 @@ pact {
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
 // enforces it's own (older) version which is not recommended.
 def versions = [
-  junit           : '5.7.2',
+  junit           : '5.8.1',
   junitPlatform   : '1.8.1',
   reformLogging: '5.1.7',
   springBoot: springBoot.class.package.implementationVersion,
