@@ -62,6 +62,7 @@ withNightlyPipeline(type, product, component) {
   enableSecurityScan()
   enableSlackNotifications('#sscs-tech')
   enableFortifyScan()
+  enableMutationTest()
   enableFullFunctionalTest()
 
   after('fortify-scan') {
