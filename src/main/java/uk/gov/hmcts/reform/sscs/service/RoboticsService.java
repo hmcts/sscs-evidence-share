@@ -232,9 +232,6 @@ public class RoboticsService {
     }
 
     private void sendJsonByEmail(long caseId, SscsCaseData caseData, JSONObject json, byte[] pdf, Map<SscsDocument, byte[]> additionalEvidence) {
-
-        log.info("JSON {}", json.toString(2));
-
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
         boolean isPipAeTo = Optional.ofNullable(caseData.getAppeal().getMrnDetails()).map(m -> equalsIgnoreCase(m.getDwpIssuingOffice(), PIP_AE)).orElse(false);
         boolean isDigitalCase = Optional.ofNullable(caseData.getCreatedInGapsFrom()).map(d -> equalsIgnoreCase(d, READY_TO_LIST.getId())).orElse(false);
