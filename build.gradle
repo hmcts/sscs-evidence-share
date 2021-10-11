@@ -252,8 +252,8 @@ pact {
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
 // enforces it's own (older) version which is not recommended.
 def versions = [
-  junit           : '5.7.2',
-  junitPlatform   : '1.7.2',
+  junit           : '5.8.1',
+  junitPlatform   : '1.8.1',
   reformLogging: '5.1.7',
   springBoot: springBoot.class.package.implementationVersion,
   springfoxSwagger: '2.9.2',
@@ -299,7 +299,7 @@ dependencies {
   compile group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   compile group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   compile group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
-  compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.14.0'
+  compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.0'
 
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.1.0'
@@ -307,13 +307,14 @@ dependencies {
   compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.9.RELEASE'
 
   compile group: 'org.springframework', name: 'spring-jms'
-  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.1.0'
+  compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.2.0'
   compileOnly 'org.projectlombok:lombok:1.18.20'
 
   annotationProcessor "org.projectlombok:lombok:1.18.18"
 
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
+
 
   compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.5.3'
   compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.41'
@@ -357,10 +358,10 @@ dependencies {
   contractTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
   contractTestRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit_jupiter
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
-  contractTestRuntime group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.7.0'
+  contractTestRuntime group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.8.1'
   contractTestImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
   contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
-  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.0.3'
+  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.0.4'
   contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.9.RELEASE'
 
   contractTestImplementation sourceSets.main.runtimeClasspath
@@ -396,7 +397,7 @@ dependencyManagement {
     }
 
     // CVE-2019-16869 - brought in by qpid-jms-client
-    dependencySet(group: 'io.netty', version: '4.1.67.Final') {
+    dependencySet(group: 'io.netty', version: '4.1.68.Final') {
       entry 'netty-handler'
       entry 'netty-transport-native-epoll'
       entry 'netty-transport-native-kqueue'
@@ -464,7 +465,7 @@ dependencyManagement {
     }
 
     //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
-    dependency group: 'org.glassfish', name: 'jakarta.el', version: '4.0.1'
+    dependency group: 'org.glassfish', name: 'jakarta.el', version: '4.0.2'
 
     //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
     dependency group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
