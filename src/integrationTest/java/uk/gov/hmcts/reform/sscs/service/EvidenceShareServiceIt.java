@@ -28,6 +28,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -79,6 +80,9 @@ public class EvidenceShareServiceIt {
     private EvidenceManagementService evidenceManagementService;
 
     @MockBean
+    private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
+
+    @MockBean
     private CcdService ccdService;
 
     @MockBean
@@ -104,6 +108,9 @@ public class EvidenceShareServiceIt {
 
     @Autowired
     private TopicConsumer topicConsumer;
+
+    @Autowired
+    private PdfStoreService pdfStoreService;
 
     @Captor
     ArgumentCaptor<ArrayList<Pdf>> documentCaptor;
@@ -168,7 +175,10 @@ public class EvidenceShareServiceIt {
     }
 
     @Test
-    public void givenNonDigitalCase_shouldGenerateDLDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
+    public void givenNonDigitalCaseAndSecureDocstoreOff_shouldGenerateDLDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
+        //FIXME: Remove this test once secureDocStoreEnabled feature switched on
+        ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", false);
+
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
             .getResource("validAppealCreatedCallbackWithMrn.json")).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -198,6 +208,46 @@ public class EvidenceShareServiceIt {
 
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(), eq("sscs"));
+        verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any());
+        verify(bulkPrintService).sendToBulkPrint(any(), any());
+        verify(emailService).sendEmail(anyLong(), any());
+
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
+    }
+
+    @Test
+    public void givenNonDigitalCaseAndSecureDocStoreOn_shouldGenerateDLDocumentTemplateAndAndAddToCaseInCcdAndSendToRoboticsAndBulkPrint() throws IOException {
+        ReflectionTestUtils.setField(pdfStoreService, "secureDocStoreEnabled", true);
+
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource("validAppealCreatedCallbackWithMrn.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replace("MRN_DATE_TO_BE_REPLACED", LocalDate.now().minusDays(31).toString());
+        json = json.replace("CASE_STATE", "validAppeal");
+        json = json.replace("CCD_EVENT_ID", "validAppealCreated");
+        json = json.replace("CREATED_IN_GAPS_FROM", "validAppeal");
+
+        doReturn(new ResponseEntity<>(FILE_CONTENT.getBytes(), HttpStatus.OK))
+            .when(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
+
+        uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse uploadResponse = createSecureUploadResponse();
+        when(evidenceManagementSecureDocStoreService.upload(any(), any())).thenReturn(uploadResponse);
+        when(ccdService.updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
+
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
+
+        String documentList = "Case has been sent to the DWP via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
+        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
+
+        topicConsumer.onMessage(json, "1");
+
+        Assert.assertEquals(3, documentCaptor.getValue().size());
+        Assert.assertEquals("dl16-12345656789.pdf", documentCaptor.getValue().get(0).getName());
+        Assert.assertEquals("sscs1.pdf", documentCaptor.getValue().get(1).getName());
+        Assert.assertEquals("filename1.pdf", documentCaptor.getValue().get(2).getName());
+
+        verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
+        verify(evidenceManagementSecureDocStoreService).upload(any(), any());
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any());
         verify(bulkPrintService).sendToBulkPrint(any(), any());
         verify(emailService).sendEmail(anyLong(), any());
@@ -292,6 +342,13 @@ public class EvidenceShareServiceIt {
         return response;
     }
 
+    private uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse createSecureUploadResponse() {
+        uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse response = mock(uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse.class);
+        uk.gov.hmcts.reform.ccd.document.am.model.Document document = createSecureDocument();
+        when(response.getDocuments()).thenReturn(Collections.singletonList(document));
+        return response;
+    }
+
     private Document createDocument() {
         Document document = new Document();
         Document.Links links = new Document.Links();
@@ -299,6 +356,17 @@ public class EvidenceShareServiceIt {
         link.href = "http://link.com";
         links.self = link;
         document.links = links;
+        return document;
+    }
+
+    private uk.gov.hmcts.reform.ccd.document.am.model.Document createSecureDocument() {
+
+        uk.gov.hmcts.reform.ccd.document.am.model.Document.Links links = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Links();
+        uk.gov.hmcts.reform.ccd.document.am.model.Document.Link link = new uk.gov.hmcts.reform.ccd.document.am.model.Document.Link();
+        link.href = "http://link.com";
+        links.self = link;
+        uk.gov.hmcts.reform.ccd.document.am.model.Document document = uk.gov.hmcts.reform.ccd.document.am.model.Document.builder().links(links).build();
+
         return document;
     }
 }

@@ -5,7 +5,6 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.*;
 
-import java.net.URI;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,7 +32,7 @@ public class RoboticsService {
 
     private static final String GLASGOW = "GLASGOW";
     private static final String PIP_AE = "DWP PIP (AE)";
-    private final EvidenceManagementService evidenceManagementService;
+    private final PdfStoreService pdfStoreService;
     private final EmailService emailService;
     private final EmailHelper emailHelper;
     private final RoboticsJsonMapper roboticsJsonMapper;
@@ -51,7 +50,7 @@ public class RoboticsService {
 
     @Autowired
     public RoboticsService(
-        EvidenceManagementService evidenceManagementService,
+        PdfStoreService pdfStoreService,
         EmailService emailService,
         EmailHelper emailHelper,
         RoboticsJsonMapper roboticsJsonMapper,
@@ -64,7 +63,7 @@ public class RoboticsService {
         @Value("${robotics.englishCount}") int englishRoboticCount,
         @Value("${robotics.scottishCount}") int scottishRoboticCount
     ) {
-        this.evidenceManagementService = evidenceManagementService;
+        this.pdfStoreService = pdfStoreService;
         this.emailService = emailService;
         this.emailHelper = emailHelper;
         this.roboticsJsonMapper = roboticsJsonMapper;
@@ -207,7 +206,7 @@ public class RoboticsService {
     private byte[] downloadBinary(SscsDocument doc, Long caseId) {
         log.info("About to download binary to attach to robotics for caseId {}", caseId);
         if (doc.getValue().getDocumentLink() != null) {
-            return evidenceManagementService.download(URI.create(doc.getValue().getDocumentLink().getDocumentUrl()), null);
+            return pdfStoreService.download(doc.getValue().getDocumentLink().getDocumentUrl());
         } else {
             return new byte[0];
         }
@@ -233,7 +232,6 @@ public class RoboticsService {
     }
 
     private void sendJsonByEmail(long caseId, SscsCaseData caseData, JSONObject json, byte[] pdf, Map<SscsDocument, byte[]> additionalEvidence) {
-
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
         boolean isPipAeTo = Optional.ofNullable(caseData.getAppeal().getMrnDetails()).map(m -> equalsIgnoreCase(m.getDwpIssuingOffice(), PIP_AE)).orElse(false);
         boolean isDigitalCase = Optional.ofNullable(caseData.getCreatedInGapsFrom()).map(d -> equalsIgnoreCase(d, READY_TO_LIST.getId())).orElse(false);

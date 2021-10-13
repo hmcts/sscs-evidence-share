@@ -5,7 +5,6 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import feign.FeignException;
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Supplier;
@@ -32,7 +31,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.BulkPrintInfo;
 import uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.PrintService;
 
 /*
@@ -52,7 +51,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private final DocumentRequestFactory documentRequestFactory;
 
-    private final EvidenceManagementService evidenceManagementService;
+    private final PdfStoreService pdfStoreService;
 
     private final PrintService bulkPrintService;
 
@@ -67,7 +66,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     @Autowired
     public SendToBulkPrintHandler(DocumentManagementServiceWrapper documentManagementServiceWrapper,
                                   DocumentRequestFactory documentRequestFactory,
-                                  EvidenceManagementService evidenceManagementService,
+                                  PdfStoreService pdfStoreService,
                                   PrintService bulkPrintService,
                                   EvidenceShareConfig evidenceShareConfig,
                                   CcdService ccdService,
@@ -77,7 +76,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         this.dispatchPriority = DispatchPriority.LATE;
         this.documentManagementServiceWrapper = documentManagementServiceWrapper;
         this.documentRequestFactory = documentRequestFactory;
-        this.evidenceManagementService = evidenceManagementService;
+        this.pdfStoreService = pdfStoreService;
         this.bulkPrintService = bulkPrintService;
         this.evidenceShareConfig = evidenceShareConfig;
         this.ccdService = ccdService;
@@ -287,10 +286,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private byte[] toBytes(SscsDocument sscsDocument) {
         try {
-            return evidenceManagementService.download(
-                URI.create(sscsDocument.getValue().getDocumentLink().getDocumentUrl()),
-                DM_STORE_USER_ID
-            );
+            return pdfStoreService.download(sscsDocument.getValue().getDocumentLink().getDocumentUrl());
         } catch (FeignException e) {
             throw new UnableToContactThirdPartyException("dm-store", e);
         }

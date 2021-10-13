@@ -1,11 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static java.util.Collections.singletonList;
 import static java.util.Optional.*;
-import static org.springframework.http.MediaType.APPLICATION_PDF;
 
 import java.io.ByteArrayOutputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,13 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
-import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.helper.PdfHelper;
 import uk.gov.hmcts.reform.sscs.model.PdfDocument;
@@ -30,12 +25,12 @@ import uk.gov.hmcts.reform.sscs.model.PdfDocument;
 @Slf4j
 @Service
 public class SscsDocumentService {
-    private final EvidenceManagementService evidenceManagementService;
+    private final PdfStoreService pdfStoreService;
     private final PdfHelper pdfHelper;
 
     @Autowired
-    public SscsDocumentService(EvidenceManagementService evidenceManagementService, PdfHelper pdfHelper) {
-        this.evidenceManagementService = evidenceManagementService;
+    public SscsDocumentService(PdfStoreService pdfStoreService, PdfHelper pdfHelper) {
+        this.pdfStoreService = pdfStoreService;
         this.pdfHelper = pdfHelper;
     }
 
@@ -57,7 +52,7 @@ public class SscsDocumentService {
     private byte[] getContentForGivenDoc(AbstractDocument sscsDocument, boolean isConfidentialCase) {
         final DocumentLink documentLink = isConfidentialCase ? ofNullable(sscsDocument.getValue().getEditedDocumentLink())
             .orElse(sscsDocument.getValue().getDocumentLink()) : sscsDocument.getValue().getDocumentLink();
-        return evidenceManagementService.download(URI.create(documentLink.getDocumentUrl()), "sscs");
+        return pdfStoreService.download(documentLink.getDocumentUrl());
     }
 
     public void filterByDocTypeAndApplyAction(List<SscsDocument> sscsDocument, DocumentType documentType,
@@ -97,18 +92,11 @@ public class SscsDocumentService {
 
         String pdfFileName = document.getValue().getDocumentFileName() + ".pdf";
 
-        ByteArrayMultipartFile file = ByteArrayMultipartFile
-            .builder()
-            .content(pdf.getContent())
-            .name(pdfFileName)
-            .contentType(APPLICATION_PDF)
-            .build();
-
         log.info("About to upload resized document [" + pdfFileName + "]");
 
         try {
-            UploadResponse upload = evidenceManagementService.upload(singletonList(file), "sscs");
-            String location = upload.getEmbedded().getDocuments().get(0).links.self.href;
+            SscsDocument sscsDocument = pdfStoreService.storeDocument(pdf.getContent(), pdfFileName, null);
+            String location = sscsDocument.getValue().getDocumentLink().getDocumentUrl();
             DocumentLink documentLink = DocumentLink.builder().documentUrl(location).build();
             document.getValue().setResizedDocumentLink(documentLink);
 

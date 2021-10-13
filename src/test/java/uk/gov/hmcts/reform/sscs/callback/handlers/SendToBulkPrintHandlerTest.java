@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 import feign.FeignException;
-import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,7 +39,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @RunWith(JUnitParamsRunner.class)
 public class SendToBulkPrintHandlerTest {
@@ -58,7 +57,7 @@ public class SendToBulkPrintHandlerTest {
     private BulkPrintService bulkPrintService;
 
     @Mock
-    private EvidenceManagementService evidenceManagementService;
+    private PdfStoreService pdfStoreService;
 
     @Mock
     private EvidenceShareConfig evidenceShareConfig;
@@ -104,7 +103,7 @@ public class SendToBulkPrintHandlerTest {
     public void setUp() {
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
         handler = new SendToBulkPrintHandler(documentManagementServiceWrapper,
-            documentRequestFactory, evidenceManagementService, bulkPrintService, evidenceShareConfig,
+            documentRequestFactory, pdfStoreService, bulkPrintService, evidenceShareConfig,
             ccdCaseService, idamService, 35);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -185,7 +184,7 @@ public class SendToBulkPrintHandlerTest {
                 .documentFileName("filtered out as there is no documentLink object.pfd")
                 .build()).build()), APPEAL_CREATED);
 
-        when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenReturn(docPdf.getContent());
+        when(pdfStoreService.download(eq(docUrl))).thenReturn(docPdf.getContent());
         when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(true);
 
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
@@ -201,7 +200,7 @@ public class SendToBulkPrintHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(evidenceManagementService, times(2)).download(eq(URI.create(docUrl)), any());
+        verify(pdfStoreService, times(2)).download(eq(docUrl));
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any());
 
         String documentList = "Case has been sent to the DWP via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: evidence1.pdf, evidence2.pdf";
@@ -220,7 +219,7 @@ public class SendToBulkPrintHandlerTest {
         placeholders.put("Test", "Value");
         Template template = new Template("bla", "bla2");
 
-        when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenReturn(docPdf.getContent());
+        when(pdfStoreService.download(eq(docUrl))).thenReturn(docPdf.getContent());
         when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(true);
 
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
@@ -298,7 +297,7 @@ public class SendToBulkPrintHandlerTest {
 
         final FeignException feignException = mock(FeignException.class);
         when(feignException.getMessage()).thenReturn("error");
-        when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenThrow(feignException);
+        when(pdfStoreService.download(eq(docUrl))).thenThrow(feignException);
         when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(true);
 
         handler.handle(CallbackType.SUBMITTED, callback);
@@ -394,7 +393,7 @@ public class SendToBulkPrintHandlerTest {
                 .build()).build()
             ), APPEAL_CREATED);
 
-        when(evidenceManagementService.download(eq(URI.create(docUrl)), any())).thenReturn(docPdf.getContent());
+        when(pdfStoreService.download(eq(docUrl))).thenReturn(docPdf.getContent());
         when(documentManagementServiceWrapper.checkIfDlDocumentAlreadyExists(anyList())).thenReturn(true);
 
         DocumentHolder holder = DocumentHolder.builder().placeholders(placeholders).template(template).build();
