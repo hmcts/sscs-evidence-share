@@ -308,9 +308,9 @@ dependencies {
 
   compile group: 'org.springframework', name: 'spring-jms'
   compile group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.2.0'
-  compileOnly 'org.projectlombok:lombok:1.18.20'
+  compileOnly 'org.projectlombok:lombok:1.18.22'
 
-  annotationProcessor "org.projectlombok:lombok:1.18.18"
+  annotationProcessor "org.projectlombok:lombok:1.18.22"
 
   compile group: 'uk.gov.hmcts.reform', name: 'send-letter-client', version: '3.0.3'
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
