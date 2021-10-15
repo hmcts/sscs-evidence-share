@@ -299,7 +299,7 @@ dependencies {
   compile group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   compile group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   compile group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
-  compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.0'
+  compile group: 'org.elasticsearch', name: 'elasticsearch', version: '7.15.1'
 
   compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.1.0'
@@ -397,7 +397,7 @@ dependencyManagement {
     }
 
     // CVE-2019-16869 - brought in by qpid-jms-client
-    dependencySet(group: 'io.netty', version: '4.1.68.Final') {
+    dependencySet(group: 'io.netty', version: '4.1.69.Final') {
       entry 'netty-handler'
       entry 'netty-transport-native-epoll'
       entry 'netty-transport-native-kqueue'
