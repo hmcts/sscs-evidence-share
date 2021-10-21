@@ -39,6 +39,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom())
             && callback.getCaseDetails().getCaseData().getAppeal() != null
             && callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() != null
+            && !StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode(), Benefit.CHILD_SUPPORT.getShortName())
             && !StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode(), Benefit.IIDB.getShortName());
     }
 

@@ -340,15 +340,14 @@ public class DwpUploadResponseHandlerTest {
     }
 
     @Test
-    public void givenADwpUploadResponseEventWithIidbBenefitType_thenDoNothing() {
+    @Parameters({"industrialInjuriesDisablement", "childSupport"})
+    public void givenADwpUploadResponseEventWithIidbBenefitType_thenDoNothing(String benefitShortName) {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code(Benefit.IIDB.getShortName()).build())
+                .benefitType(BenefitType.builder().code(benefitShortName).build())
                 .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
 
         assertFalse(handler.canHandle(CallbackType.SUBMITTED, callback));
     }
-
-
 }
