@@ -8,8 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.WITH_DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -78,8 +77,8 @@ public class DwpUploadResponseHandlerTest {
         Callback<SscsCaseData> sscsCaseData = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
-                .benefitType(null)
-                .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
+                    .benefitType(null)
+                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
         handler.handle(CallbackType.SUBMITTED, sscsCaseData);
     }
 
@@ -111,8 +110,8 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("PIP").build())
-                .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
+                    .benefitType(BenefitType.builder().code("PIP").build())
+                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
@@ -130,8 +129,8 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("Yes")
                 .elementsDisputedIsDecisionDisputedByOthers(null).appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("PIP").build())
-                .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
+                    .benefitType(BenefitType.builder().code("PIP").build())
+                    .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
@@ -143,8 +142,8 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers(null).appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("PIP").build())
-                .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
+                    .benefitType(BenefitType.builder().code("PIP").build())
+                    .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L).state(State.READY_TO_LIST.getId())
@@ -162,8 +161,8 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers(null).appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("ESA").build())
-                .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
+                    .benefitType(BenefitType.builder().code("ESA").build())
+                    .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L).state(State.READY_TO_LIST.getId())
@@ -181,8 +180,8 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers("yes").appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("UC").build())
-                .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
+                    .benefitType(BenefitType.builder().code("UC").build())
+                    .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L).state(State.RESPONSE_RECEIVED.getId())
@@ -200,8 +199,8 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("Yes")
                 .elementsDisputedIsDecisionDisputedByOthers("Yes").appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("UC").build())
-                .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
+                    .benefitType(BenefitType.builder().code("UC").build())
+                    .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
 
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
@@ -220,8 +219,8 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("UC").build())
-                .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
+                    .benefitType(BenefitType.builder().code("UC").build())
+                    .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
 
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
@@ -241,7 +240,7 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("PIP").build()).build())
+                    .benefitType(BenefitType.builder().code("PIP").build()).build())
                 .urgentCase("No")
                 .build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
 
@@ -262,7 +261,7 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("PIP").build()).build())
+                    .benefitType(BenefitType.builder().code("PIP").build()).build())
                 .urgentCase("Yes")
                 .build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
 
@@ -283,8 +282,8 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("UC").build())
-                .build()).urgentCase("Yes").build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
+                    .benefitType(BenefitType.builder().code("UC").build())
+                    .build()).urgentCase("Yes").build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L).state(State.RESPONSE_RECEIVED.getId())
@@ -303,8 +302,8 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("UC").build())
-                .build()).urgentCase("No").build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
+                    .benefitType(BenefitType.builder().code("UC").build())
+                    .build()).urgentCase("No").build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L).state(State.RESPONSE_RECEIVED.getId())
@@ -322,8 +321,8 @@ public class DwpUploadResponseHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .jointParty("Yes").elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("UC").build())
-                .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
+                    .benefitType(BenefitType.builder().code("UC").build())
+                    .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
@@ -340,14 +339,52 @@ public class DwpUploadResponseHandlerTest {
     }
 
     @Test
-    @Parameters({"industrialInjuriesDisablement", "childSupport"})
-    public void givenADwpUploadResponseEventWithIidbBenefitType_thenDoNothing(String benefitShortName) {
+    public void givenADwpUploadResponseEventWithIidbBenefitType_thenDoNothing() {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code(benefitShortName).build())
-                .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
+                    .benefitType(BenefitType.builder().code(Benefit.IIDB.getShortName()).build())
+                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, DWP_UPLOAD_RESPONSE);
 
         assertFalse(handler.canHandle(CallbackType.SUBMITTED, callback));
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventChildSupportAndContainsFurtherInformationIsYesThenResponseReceived() {
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("Yes")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build())
+                .build(), RESPONSE_RECEIVED, DWP_UPLOAD_RESPONSE);
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
+            .data(callback.getCaseDetails().getCaseData()).build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService).getIdamTokens();
+        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
+            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.DWP_RESPOND.getCcdType()), anyString(), anyString(), any());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventChildSupportAndContainsFurtherInformationIsNoThenNotListable() {
+
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build())
+                .build(), RESPONSE_RECEIVED, DWP_UPLOAD_RESPONSE);
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+        when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
+            .data(callback.getCaseDetails().getCaseData()).build());
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService).getIdamTokens();
+        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
+            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 }

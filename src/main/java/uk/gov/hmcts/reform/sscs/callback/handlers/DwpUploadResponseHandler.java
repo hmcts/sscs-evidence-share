@@ -39,7 +39,6 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom())
             && callback.getCaseDetails().getCaseData().getAppeal() != null
             && callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() != null
-            && !StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode(), Benefit.CHILD_SUPPORT.getShortName())
             && !StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getBenefitType().getCode(), Benefit.IIDB.getShortName());
     }
 
@@ -54,8 +53,25 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
         if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName())) {
             handleUc(callback);
+        } else if(StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName())){
+            handleChildSupport(callback);
         } else {
             handleNonUc(callback);
+        }
+    }
+
+    //TODO: ADD THE CORRESPONDENT DESCRIPTIONS
+    private void handleChildSupport(Callback<SscsCaseData> callback) {
+        if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "Yes")) {
+            SscsCaseData caseData = setDwpState(callback);
+            caseData.setInterlocReviewState("awaitingAdminAction");
+            updateEventDetails(caseData, callback.getCaseDetails().getId(),
+                EventType.DWP_RESPOND, "Response received", "");
+        } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "No")) {
+            SscsCaseData caseData = setDwpState(callback);
+            caseData.setInterlocReviewState("reviewByJudge");
+            updateEventDetails(caseData, callback.getCaseDetails().getId(),
+                EventType.NOT_LISTABLE, "Not Listable", "");
         }
     }
 
