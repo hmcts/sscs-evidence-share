@@ -60,18 +60,17 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         }
     }
 
-    //TODO: ADD THE CORRESPONDENT DESCRIPTIONS
     private void handleChildSupport(Callback<SscsCaseData> callback) {
         if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "Yes")) {
             SscsCaseData caseData = setDwpState(callback);
             caseData.setInterlocReviewState("awaitingAdminAction");
             updateEventDetails(caseData, callback.getCaseDetails().getId(),
-                EventType.DWP_RESPOND, "Response received", "");
+                EventType.DWP_RESPOND, "Response received", "Update to response received Admin has to review the case ");
         } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "No")) {
             SscsCaseData caseData = setDwpState(callback);
             caseData.setInterlocReviewState("reviewByJudge");
             updateEventDetails(caseData, callback.getCaseDetails().getId(),
-                EventType.NOT_LISTABLE, "Not Listable", "");
+                EventType.NOT_LISTABLE, "Not Listable", "Update to Not Listable as a Judge has to review the case");
         }
     }
 
