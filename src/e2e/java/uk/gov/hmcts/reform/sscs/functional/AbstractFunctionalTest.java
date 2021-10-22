@@ -4,7 +4,6 @@ import static io.restassured.RestAssured.baseURI;
 import static java.util.Collections.singletonList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
@@ -147,8 +146,9 @@ public abstract class AbstractFunctionalTest {
     }
 
     protected String createTestData(String fileName) throws IOException {
-        String docUrl = uploadDocToDocMgmtStore(EVIDENCE_DOCUMENT_PDF);
-        String existingDocUrl = uploadDocToDocMgmtStore(EXISTING_DOCUMENT_PDF);
+        final String docUrl = uploadDocToDocMgmtStore(EVIDENCE_DOCUMENT_PDF);
+        final String existingDocUrl = uploadDocToDocMgmtStore(EXISTING_DOCUMENT_PDF);
+
         createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
         String json = getJson(fileName);
         json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);

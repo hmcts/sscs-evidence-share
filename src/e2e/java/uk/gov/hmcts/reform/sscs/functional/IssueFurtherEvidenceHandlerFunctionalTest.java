@@ -1,24 +1,13 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
-import static java.util.Collections.singletonList;
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
-import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
 
