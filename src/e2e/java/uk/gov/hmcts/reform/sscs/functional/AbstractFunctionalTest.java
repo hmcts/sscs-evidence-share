@@ -6,7 +6,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,18 +33,13 @@ import org.springframework.test.annotation.ProfileValueSourceConfiguration;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.ccd.document.am.model.UploadResponse;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementSecureDocStoreService;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
-import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 
 @RunWith(JUnitParamsRunner.class)
 @SpringBootTest
@@ -73,9 +67,6 @@ public abstract class AbstractFunctionalTest {
 
     @Autowired
     private CcdService ccdService;
-
-    @Autowired
-    private EvidenceManagementService evidenceManagementService;
 
     @Autowired
     private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
@@ -166,7 +157,7 @@ public abstract class AbstractFunctionalTest {
         SscsCaseDetails caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
 
         String json = getJson(fileName);
-        json = json.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId);
+        json = json.replace("CASE_ID_TO_BE_REPLACED", String.valueOf(caseDetails.getId()));
         json = json.replace("CREATED_IN_GAPS_FROM", State.READY_TO_LIST.getId());
         json = json.replaceAll("NINO_TO_BE_REPLACED", getRandomNino());
 
@@ -195,12 +186,11 @@ public abstract class AbstractFunctionalTest {
         UploadResponse upload = uploadDocToDocMgmtStore(name);
 
         String location = upload.getDocuments().get(0).links.self.href;
-        String hash = upload.getDocuments().get(0).hashToken;
-
         log.info("Document created {} for {}", location, name);
-
         json = json.replace(type + "_PLACEHOLDER", location);
         json = json.replace(type + "_BINARY_PLACEHOLDER", location + "/binary");
+
+        String hash = upload.getDocuments().get(0).hashToken;
         return json.replace(type + "_HASH_PLACEHOLDER", hash);
     }
 

@@ -67,7 +67,7 @@ public class ReissueFurtherEvidenceServiceIt {
 
     @MockBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
-    private EvidenceManagementService evidenceManagementService;
+    private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
 
     @MockBean
     @SuppressWarnings({"PMD.UnusedPrivateField"})
@@ -144,7 +144,7 @@ public class ReissueFurtherEvidenceServiceIt {
 
         fileContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
 
-        when(evidenceManagementService.download(any(), any())).thenReturn(fileContent);
+        when(evidenceManagementSecureDocStoreService.download(any(), any())).thenReturn(fileContent);
     }
 
     @Test
