@@ -169,3 +169,4 @@ dwp:
   response:
     due:
       days: ${DWP_RESPONSE_DUE_DAYS:35}
+      days-child-support: ${DWP_RESPONSE_DUE_DAYS_CHILD_SUPPORT:42}

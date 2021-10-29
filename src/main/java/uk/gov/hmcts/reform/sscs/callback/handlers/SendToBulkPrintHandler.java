@@ -63,6 +63,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private final int dwpResponseDueDays;
 
+    private final int dwpResponseDueDaysChildSupport;
+
     @Autowired
     public SendToBulkPrintHandler(DocumentManagementServiceWrapper documentManagementServiceWrapper,
                                   DocumentRequestFactory documentRequestFactory,
@@ -71,7 +73,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                                   EvidenceShareConfig evidenceShareConfig,
                                   CcdService ccdService,
                                   IdamService idamService,
-                                  @Value("${dwp.response.due.days}") int dwpResponseDueDays
+                                  @Value("${dwp.response.due.days}") int dwpResponseDueDays,
+                                  @Value("${dwp.response.due.days-child-support}") int dwpResponseDueDaysChildSupport
     ) {
         this.dispatchPriority = DispatchPriority.LATE;
         this.documentManagementServiceWrapper = documentManagementServiceWrapper;
@@ -82,6 +85,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.dwpResponseDueDays = dwpResponseDueDays;
+        this.dwpResponseDueDaysChildSupport = dwpResponseDueDaysChildSupport;
     }
 
     @Override
@@ -140,17 +144,13 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
     private void updateCaseToSentToDwp(Callback<SscsCaseData> sscsCaseDataCallback, SscsCaseData caseData,
                                        BulkPrintInfo bulkPrintInfo) {
         if (bulkPrintInfo != null) {
-            BulkPrintInfo info = BulkPrintInfo.builder()
-                .uuid(null)
-                .allowedTypeForBulkPrint(false)
-                .desc("Case state is now sent to DWP")
-                .build();
             if (State.READY_TO_LIST.getId().equals(caseData.getCreatedInGapsFrom())) {
                 caseData.setDwpState(DwpState.UNREGISTERED.getId());
             }
             caseData.setHmctsDwpState("sentToDwp");
             caseData.setDateSentToDwp(LocalDate.now().toString());
-            caseData.setDwpDueDate(LocalDate.now().plusDays(dwpResponseDueDays).toString());
+            caseData.setDwpDueDate(LocalDate.now().plusDays(getResponseDueDays(caseData)).toString());
+
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                 EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
                 idamService.getIdamTokens());
@@ -191,8 +191,6 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             }
 
             log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
-            caseData.setDateSentToDwp(LocalDate.now().toString());
-            caseData.setDwpDueDate(LocalDate.now().plusDays(dwpResponseDueDays).toString());
 
             List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
             Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
@@ -220,6 +218,12 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                 .desc("Case state is now sent to DWP")
                 .build();
         }
+    }
+
+    private int getResponseDueDays(SscsCaseData caseData) {
+        return caseData.getAppeal().getBenefitType() != null
+            && caseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase(Benefit.CHILD_SUPPORT.getShortName())
+            ? dwpResponseDueDaysChildSupport : dwpResponseDueDays;
     }
 
     private String buildEventDescription(List<Pdf> pdfs, UUID bulkPrintId) {

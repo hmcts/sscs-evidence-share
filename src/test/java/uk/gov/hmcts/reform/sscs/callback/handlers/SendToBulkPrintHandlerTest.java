@@ -104,7 +104,7 @@ public class SendToBulkPrintHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
         handler = new SendToBulkPrintHandler(documentManagementServiceWrapper,
             documentRequestFactory, pdfStoreService, bulkPrintService, evidenceShareConfig,
-            ccdCaseService, idamService, 35);
+            ccdCaseService, idamService, 35, 42);
         when(evidenceShareConfig.getSubmitTypes()).thenReturn(singletonList("paper"));
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         placeholders.put("Test", "Value");
@@ -158,9 +158,10 @@ public class SendToBulkPrintHandlerTest {
     }
 
     @Test
-    public void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint() {
+    @Parameters({"pip, 35", "childSupport, 42"})
+    public void givenAMessageWhichFindsATemplate_thenConvertToSscsCaseDataAndAddPdfToCaseAndSendToBulkPrint(String benefitType, int expectedResponseDays) {
 
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("PIP", "Paper", Arrays.asList(
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(benefitType, "Paper", Arrays.asList(
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(docPdf.getName())
                 .documentType("sscs1")
@@ -210,7 +211,7 @@ public class SendToBulkPrintHandlerTest {
         assertNull(docs.get(0).getValue().getEvidenceIssued());
         assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
         assertEquals(LocalDate.now().toString(), caseDataCaptor.getValue().getDateSentToDwp());
-        assertEquals(LocalDate.now().plusDays(35).toString(), caseDataCaptor.getValue().getDwpDueDate());
+        assertEquals(LocalDate.now().plusDays(expectedResponseDays).toString(), caseDataCaptor.getValue().getDwpDueDate());
         assertNull(caseDataCaptor.getValue().getDwpState());
     }
 
