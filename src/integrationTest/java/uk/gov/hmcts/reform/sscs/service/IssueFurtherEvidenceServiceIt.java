@@ -66,7 +66,7 @@ public class IssueFurtherEvidenceServiceIt {
     private CcdClient ccdClient;
 
     @MockBean
-    private EvidenceManagementService evidenceManagementService;
+    private EvidenceManagementSecureDocStoreService evidenceManagementSecureDocStoreService;
 
     @MockBean
     private CcdService ccdService;
@@ -144,7 +144,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         fileContent = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
 
-        when(evidenceManagementService.download(any(), any())).thenReturn(fileContent);
+        when(evidenceManagementSecureDocStoreService.download(any(), any())).thenReturn(fileContent);
     }
 
     @Test
