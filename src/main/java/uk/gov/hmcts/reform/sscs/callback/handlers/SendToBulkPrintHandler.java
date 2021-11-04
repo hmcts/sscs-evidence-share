@@ -222,7 +222,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private int getResponseDueDays(SscsCaseData caseData) {
         return caseData.getAppeal().getBenefitType() != null
-            && caseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase(Benefit.CHILD_SUPPORT.getShortName())
+            && Benefit.CHILD_SUPPORT.getShortName().equalsIgnoreCase(caseData.getAppeal().getBenefitType().getCode())
             ? dwpResponseDueDaysChildSupport : dwpResponseDueDays;
     }
 
