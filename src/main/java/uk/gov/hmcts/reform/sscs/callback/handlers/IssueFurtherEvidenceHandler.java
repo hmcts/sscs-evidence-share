@@ -57,12 +57,11 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        log.info("Handling with Issue Further Evidence Handler");
-
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        issueFurtherEvidence(caseData);
+        log.info("Handling with Issue Further Evidence Handler for caseId {}", caseData.getCcdCaseId());
 
+        issueFurtherEvidence(caseData);
 
         postIssueFurtherEvidenceTasks(caseData);
     }
