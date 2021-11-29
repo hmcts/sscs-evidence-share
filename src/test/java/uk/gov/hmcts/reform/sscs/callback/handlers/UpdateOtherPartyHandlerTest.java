@@ -74,7 +74,7 @@ public class UpdateOtherPartyHandlerTest {
             SscsCaseData.builder()
                 .ccdCaseId("1")
                 .isFqpmRequired(YesNo.YES)
-                .dwpDueDate(LocalDate.now().toString())
+                .directionDueDate(LocalDate.now().toString())
                 .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherPartyWithHearing("1")))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA)));
@@ -88,7 +88,7 @@ public class UpdateOtherPartyHandlerTest {
             SscsCaseData.builder()
                 .ccdCaseId("1")
                 .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO)
-                .dwpDueDate(LocalDate.now().toString())
+                .directionDueDate(LocalDate.now().toString())
                 .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherPartyWithHearing("1")))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA);
@@ -99,7 +99,7 @@ public class UpdateOtherPartyHandlerTest {
             eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
             eq(EventType.READY_TO_LIST.getCcdType()), anyString(), anyString(), any());
 
-        assertThat(captor.getValue().getDwpDueDate(), is(nullValue()));
+        assertThat(captor.getValue().getDirectionDueDate(), is(nullValue()));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class UpdateOtherPartyHandlerTest {
             SscsCaseData.builder()
                 .ccdCaseId("1")
                 .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO)
-                .dwpDueDate(null)
+                .directionDueDate(null)
                 .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherPartyWithHearing("1")))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA);
@@ -130,7 +130,7 @@ public class UpdateOtherPartyHandlerTest {
             SscsCaseData.builder()
                 .ccdCaseId("1")
                 .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO)
-                .dwpDueDate(null)
+                .directionDueDate(null)
                 .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherParty("1", null)))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA);
@@ -150,7 +150,7 @@ public class UpdateOtherPartyHandlerTest {
             SscsCaseData.builder()
                 .ccdCaseId("1")
                 .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO)
-                .dwpDueDate(LocalDate.now().toString())
+                .directionDueDate(LocalDate.now().toString())
                 .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherParty("1", null)))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA);
@@ -169,7 +169,7 @@ public class UpdateOtherPartyHandlerTest {
             SscsCaseData.builder()
                 .ccdCaseId("1")
                 .isFqpmRequired(null)
-                .dwpDueDate(null)
+                .directionDueDate(null)
                 .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherParty("1", null)))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA);
@@ -188,7 +188,7 @@ public class UpdateOtherPartyHandlerTest {
             SscsCaseData.builder()
                 .ccdCaseId("1")
                 .isFqpmRequired(null)
-                .dwpDueDate(LocalDate.now().toString())
+                .directionDueDate(LocalDate.now().toString())
                 .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherParty("1", null)))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA);
@@ -207,7 +207,7 @@ public class UpdateOtherPartyHandlerTest {
             SscsCaseData.builder()
                 .ccdCaseId("1")
                 .isFqpmRequired(null)
-                .dwpDueDate(null)
+                .directionDueDate(null)
                 .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherPartyWithHearing("1")))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA);
