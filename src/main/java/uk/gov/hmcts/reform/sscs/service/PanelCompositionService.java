@@ -5,9 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -47,9 +45,24 @@ public class PanelCompositionService {
 
     private boolean everyOtherPartyHasAtLeastOneHearingOption(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getOtherParties() != null && !sscsCaseData.getOtherParties().isEmpty()) {
-            return sscsCaseData.getOtherParties().stream().noneMatch(otherParty -> otherParty.getValue().getHearingOptions() == null);
+            return sscsCaseData.getOtherParties().stream().noneMatch(this::hasNoHearingOption);
         } else {
             return false;
         }
+    }
+
+    private boolean hasNoHearingOption(CcdValue<OtherParty> otherPartyCcdValue) {
+        HearingOptions hearingOptions = otherPartyCcdValue.getValue().getHearingOptions();
+        return hearingOptions == null
+            || (StringUtils.isBlank(hearingOptions.getWantsToAttend())
+            && StringUtils.isBlank(hearingOptions.getWantsSupport())
+            && StringUtils.isBlank(hearingOptions.getLanguageInterpreter())
+            && StringUtils.isBlank(hearingOptions.getLanguages())
+            && StringUtils.isBlank(hearingOptions.getSignLanguageType())
+            && (hearingOptions.getArrangements() == null || hearingOptions.getArrangements().isEmpty())
+            && StringUtils.isBlank(hearingOptions.getScheduleHearing())
+            && (hearingOptions.getExcludeDates() == null || hearingOptions.getExcludeDates().isEmpty())
+            && StringUtils.isBlank(hearingOptions.getAgreeLessNotice())
+            && StringUtils.isBlank(hearingOptions.getOther()));
     }
 }
