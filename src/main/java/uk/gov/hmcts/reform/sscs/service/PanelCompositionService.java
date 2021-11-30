@@ -46,7 +46,7 @@ public class PanelCompositionService {
     }
 
     private boolean everyOtherPartyHasAtLeastOneHearingOption(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getOtherParties() != null) {
+        if (sscsCaseData.getOtherParties() != null && !sscsCaseData.getOtherParties().isEmpty()) {
             return sscsCaseData.getOtherParties().stream().noneMatch(otherParty -> otherParty.getValue().getHearingOptions() == null);
         } else {
             return false;
