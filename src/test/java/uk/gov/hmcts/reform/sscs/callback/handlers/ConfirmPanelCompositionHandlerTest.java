@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -149,6 +150,36 @@ public class ConfirmPanelCompositionHandlerTest {
 
         verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
             eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
+    }
+
+    @Test
+    @Parameters(method = "generateOtherPartyOptions")
+    public void givenFqpmSetAndDueDateSetAndNoOtherParty_thenCaseStateIsNotListable(List<CcdValue<OtherParty>> otherParties) {
+
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder()
+                .ccdCaseId("1")
+                .isFqpmRequired(YesNo.YES)
+                .directionDueDate(LocalDate.now().toString())
+                .otherParties(otherParties)
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
+                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, CONFIRM_PANEL_COMPOSITION);
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
+            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
+    }
+
+    private Object[] generateOtherPartyOptions() {
+        return new Object[]{
+            new Object[]{
+                null
+            },
+            new Object[]{
+                Collections.emptyList()
+            }
+        };
     }
 
     private Object[] generateAllPossibleOtherPartyWithHearingOptions() {
