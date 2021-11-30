@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STA
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -129,9 +130,10 @@ public class UpdateOtherPartyHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder()
                 .ccdCaseId("1")
-                .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO)
+                .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YES : YesNo.NO)
                 .directionDueDate(null)
-                .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherParty("1", null)))
+                .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherParty("1",
+                    HearingOptions.builder().build())))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA);
 
@@ -149,9 +151,10 @@ public class UpdateOtherPartyHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder()
                 .ccdCaseId("1")
-                .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YesNo.YES : YesNo.NO)
+                .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YES : YesNo.NO)
                 .directionDueDate(LocalDate.now().toString())
-                .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherParty("1", null)))
+                .otherParties(Arrays.asList(buildOtherPartyWithHearing("2"), buildOtherParty("1",
+                    HearingOptions.builder().excludeDates(new ArrayList<>()).build())))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA);
 
