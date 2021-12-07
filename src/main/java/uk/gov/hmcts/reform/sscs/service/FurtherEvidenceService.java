@@ -142,7 +142,7 @@ public class FurtherEvidenceService {
                 }
                 if (otherParty.getValue().getRep() != null
                     && ((otherPartyOriginalSenderId == null && YesNo.YES.getValue().equals(otherParty.getValue().getRep().getHasRepresentative())
-                        || (!otherPartyOriginalSenderId.equals(otherParty.getValue().getRep().getId()) && YesNo.YES.getValue().equals(otherParty.getValue().getRep().getHasRepresentative()))))) {
+                        || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getRep().getId()) && YesNo.YES.getValue().equals(otherParty.getValue().getRep().getHasRepresentative()))))) {
                     partiesMap.put(OTHER_PARTY_REP_LETTER, otherParty.getValue().getRep().getId());
                 }
             }
