@@ -38,14 +38,12 @@ public class SscsDocumentService {
         Objects.requireNonNull(sscsDocuments);
         Objects.requireNonNull(documentType);
 
-        List<PdfDocument> test =  sscsDocuments.stream()
+        return sscsDocuments.stream()
             .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType())
                     && "No".equals(doc.getValue().getEvidenceIssued()))
             .filter(doc -> otherPartyOriginalSenderId == null || (otherPartyOriginalSenderId != null && otherPartyOriginalSenderId.equals(doc.getValue().getOriginalSenderOtherPartyId())))
             .map(doc -> PdfDocument.builder().pdf(toPdf(doc, isConfidentialCase)).document(doc).build())
             .collect(Collectors.toList());
-
-        return test;
     }
 
     private Pdf toPdf(AbstractDocument sscsDocument, boolean isConfidentialCase) {

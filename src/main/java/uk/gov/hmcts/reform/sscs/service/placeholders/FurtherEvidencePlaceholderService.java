@@ -55,7 +55,7 @@ public class FurtherEvidencePlaceholderService {
         } else if (FurtherEvidenceLetterType.JOINT_PARTY_LETTER.getValue().equals(letterType.getValue())) {
             return extractNameJointParty(caseData);
         } else if (FurtherEvidenceLetterType.OTHER_PARTY_LETTER.getValue().equals(letterType.getValue()) || FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER.getValue().equals(letterType.getValue())) {
-            return getNameOtherPartyAddress(caseData, otherPartyId);
+            return getOtherPartyName(caseData, otherPartyId);
         }
         return null;
     }
@@ -96,7 +96,7 @@ public class FurtherEvidencePlaceholderService {
             .orElse("Sir/Madam");
     }
 
-    private String getNameOtherPartyAddress(SscsCaseData caseData, String otherPartyId) {
+    private String getOtherPartyName(SscsCaseData caseData, String otherPartyId) {
         if (otherPartyId != null) {
             for (CcdValue<OtherParty> otherParty : caseData.getOtherParties()) {
                 if (otherPartyId.equals(otherParty.getValue().getId())

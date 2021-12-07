@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerUtils.distinctByKey;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
@@ -69,17 +70,23 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private void issueFurtherEvidence(SscsCaseData caseData) {
         List<DocumentType> documentTypes = Arrays.asList(APPELLANT_EVIDENCE, REPRESENTATIVE_EVIDENCE, DWP_EVIDENCE, JOINT_PARTY_EVIDENCE, HMCTS_EVIDENCE);
         List<FurtherEvidenceLetterType> allowedLetterTypes = Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER);
-        documentTypes.forEach(documentType -> doIssuePerDocumentType(caseData, allowedLetterTypes, documentType, null));
 
-        List<SscsDocument> groupedOtherPartyDocuments = groupUniqueOtherPartyDocumentsByOtherPartyId(caseData.getSscsDocument());
+        documentTypes.forEach(documentType -> issueEvidencePerDocumentType(caseData, allowedLetterTypes, documentType, null));
+        issueFurtherEvidenceForEachOtherPartyThatIsOriginalSender(caseData, allowedLetterTypes);
+    }
+
+    private void issueFurtherEvidenceForEachOtherPartyThatIsOriginalSender(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes) {
+        List<SscsDocument> groupedOtherPartyDocuments = findUniqueOtherPartyDocumentsByOtherPartyId(caseData.getSscsDocument());
 
         if (groupedOtherPartyDocuments != null && groupedOtherPartyDocuments.size() > 0) {
-            groupedOtherPartyDocuments.forEach(doc -> doIssuePerDocumentType(caseData, allowedLetterTypes, DocumentType.fromValue(doc.getValue().getDocumentType()), doc.getValue().getOriginalSenderOtherPartyId()));
+            groupedOtherPartyDocuments.forEach(doc -> issueEvidencePerDocumentType(caseData, allowedLetterTypes, DocumentType.fromValue(doc.getValue().getDocumentType()), doc.getValue().getOriginalSenderOtherPartyId()));
         }
     }
 
-    private List<SscsDocument> groupUniqueOtherPartyDocumentsByOtherPartyId(List<SscsDocument> sscsDocuments) {
-
+    private List<SscsDocument> findUniqueOtherPartyDocumentsByOtherPartyId(List<SscsDocument> sscsDocuments) {
+        // We need to find all the unissued other party documents for a given other party by Id, so we can iterate through and issue evidence for each other party that has unissued evidence.
+        // To prevent multiple documents going to the same other party, we only need to find one distinct document as the document type and original sender id is all we care about here and they will always be the same if there were multiple documents for the same other party.
+        // Further down the line, in the FurtherEvidenceService, we work out what documents to actually issue out.
         return sscsDocuments.stream()
             .filter(doc -> OTHER_PARTY_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()) || OTHER_PARTY_REPRESENTATIVE_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()))
             .filter(d -> "No".equals(d.getValue().getEvidenceIssued()))
@@ -87,13 +94,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             .collect(Collectors.toList());
     }
 
-    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
-    }
-
-    private void doIssuePerDocumentType(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes,
-                                                                                                     DocumentType documentType, String otherPartyOriginalSenderId) {
+    private void issueEvidencePerDocumentType(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes,
+                                                 DocumentType documentType, String otherPartyOriginalSenderId) {
         try {
             log.info("Issuing for {} for caseId {}", documentType.getValue(), caseData.getCcdCaseId());
             furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes, otherPartyOriginalSenderId);

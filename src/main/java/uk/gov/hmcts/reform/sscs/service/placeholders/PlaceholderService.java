@@ -40,7 +40,7 @@ public class PlaceholderService {
         if (description == null && appeal.getBenefitType() != null && appeal.getBenefitType().getCode() != null) {
             description = Benefit.getBenefitOptionalByCode(appeal.getBenefitType().getCode()).map(Benefit::getDescription).orElse(StringUtils.EMPTY);
         }
-        String shouldHideNino = Benefit.CHILD_SUPPORT.getDescription().equals(description) ? YesNo.YES.getValue() : YesNo.NO.getValue();
+        String shouldHideNino = Benefit.CHILD_SUPPORT.getShortName().equals(appeal.getBenefitType().getCode()) ? YesNo.YES.getValue() : YesNo.NO.getValue();
 
         if (description != null) {
             description = description.toUpperCase();

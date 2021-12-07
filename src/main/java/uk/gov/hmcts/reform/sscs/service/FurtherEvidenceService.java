@@ -102,9 +102,9 @@ public class FurtherEvidenceService {
     protected void send609_98_partiesOnCase(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                          List<FurtherEvidenceLetterType> allowedLetterTypes, String otherPartyOriginalSenderId) {
 
-        Multimap<FurtherEvidenceLetterType, String> otherPartiesList = buildPartiesList(caseData, documentType, otherPartyOriginalSenderId);
+        Multimap<FurtherEvidenceLetterType, String> otherPartiesMap = buildMapOfPartiesFor609_98(caseData, documentType, otherPartyOriginalSenderId);
 
-        for (Map.Entry<FurtherEvidenceLetterType, String> party : otherPartiesList.entries()) {
+        for (Map.Entry<FurtherEvidenceLetterType, String> party : otherPartiesMap.entries()) {
             String docName = party.getKey() == DWP_LETTER ? "609-98-template (DWP)" : "609-98-template (other parties)";
 
             if (allowedLetterTypes.contains(party.getKey())) {
@@ -117,7 +117,7 @@ public class FurtherEvidenceService {
         }
     }
 
-    private Multimap<FurtherEvidenceLetterType, String> buildPartiesList(SscsCaseData caseData, DocumentType documentType, String otherPartyOriginalSenderId) {
+    private Multimap<FurtherEvidenceLetterType, String> buildMapOfPartiesFor609_98(SscsCaseData caseData, DocumentType documentType, String otherPartyOriginalSenderId) {
         Multimap<FurtherEvidenceLetterType, String> partiesMap = LinkedHashMultimap.create();
 
         if (documentType != APPELLANT_EVIDENCE) {
@@ -132,22 +132,30 @@ public class FurtherEvidenceService {
 
         if (caseData.getOtherParties() != null && caseData.getOtherParties().size() > 0) {
             for (CcdValue<OtherParty> otherParty : caseData.getOtherParties()) {
-                if ((otherPartyOriginalSenderId == null && !YesNo.YES.getValue().equals(otherParty.getValue().getIsAppointee()))
-                    || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getId()) && !YesNo.YES.getValue().equals(otherParty.getValue().getIsAppointee()))) {
-                    partiesMap.put(OTHER_PARTY_LETTER, otherParty.getValue().getId());
-                } else if (otherParty.getValue().getAppointee() != null
-                    && ((otherPartyOriginalSenderId == null && YesNo.YES.getValue().equals(otherParty.getValue().getIsAppointee())
-                        || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getAppointee().getId()) && YesNo.YES.getValue().equals(otherParty.getValue().getIsAppointee()))))) {
-                    partiesMap.put(OTHER_PARTY_LETTER, otherParty.getValue().getAppointee().getId());
-                }
-                if (otherParty.getValue().getRep() != null
-                    && ((otherPartyOriginalSenderId == null && YesNo.YES.getValue().equals(otherParty.getValue().getRep().getHasRepresentative())
-                        || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getRep().getId()) && YesNo.YES.getValue().equals(otherParty.getValue().getRep().getHasRepresentative()))))) {
-                    partiesMap.put(OTHER_PARTY_REP_LETTER, otherParty.getValue().getRep().getId());
-                }
+                addOtherPartyOrAppointeeTo609_98Map(otherPartyOriginalSenderId, otherParty, partiesMap);
+                addOtherPartyRepTo609_98Map(otherPartyOriginalSenderId, otherParty, partiesMap);
             }
         }
         return partiesMap;
+    }
+
+    private void addOtherPartyOrAppointeeTo609_98Map(String otherPartyOriginalSenderId, CcdValue<OtherParty> otherParty, Multimap<FurtherEvidenceLetterType, String> partiesMap) {
+        if ((otherPartyOriginalSenderId == null && YesNo.isYes(otherParty.getValue().getIsAppointee()))
+            || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getId()) && !YesNo.isYes(otherParty.getValue().getIsAppointee()))) {
+            partiesMap.put(OTHER_PARTY_LETTER, otherParty.getValue().getId());
+        } else if (otherParty.getValue().getAppointee() != null
+            && ((otherPartyOriginalSenderId == null && YesNo.isYes(otherParty.getValue().getIsAppointee())
+            || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getAppointee().getId()) && YesNo.isYes(otherParty.getValue().getIsAppointee()))))) {
+            partiesMap.put(OTHER_PARTY_LETTER, otherParty.getValue().getAppointee().getId());
+        }
+    }
+
+    private void addOtherPartyRepTo609_98Map(String otherPartyOriginalSenderId, CcdValue<OtherParty> otherParty, Multimap<FurtherEvidenceLetterType, String> partiesMap) {
+        if (otherParty.getValue().getRep() != null
+            && ((otherPartyOriginalSenderId == null && YesNo.isYes(otherParty.getValue().getRep().getHasRepresentative())
+            || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getRep().getId()) && YesNo.isYes(otherParty.getValue().getRep().getHasRepresentative()))))) {
+            partiesMap.put(OTHER_PARTY_REP_LETTER, otherParty.getValue().getRep().getId());
+        }
     }
 
     private boolean checkRepExists(SscsCaseData caseData) {
