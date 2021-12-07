@@ -12,15 +12,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDEN
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -72,6 +72,11 @@ public class IssueFurtherEvidenceHandlerTest {
         .sscsDocument(Collections.singletonList(sscsDocumentNotIssued))
         .appeal(Appeal.builder().build())
         .build();
+
+    @Before
+    public void setup() {
+        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
+    }
 
     @Test(expected = NullPointerException.class)
     public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException() {
@@ -119,7 +124,6 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test(expected = PostIssueFurtherEvidenceTasksException.class)
     public void givenExceptionWhenPostIssueFurtherEvidenceTasks_shouldHandleIt() {
-        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
         doThrow(RuntimeException.class).when(ccdService).updateCase(any(), any(),
             eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any());
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
@@ -130,8 +134,7 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test
     public void givenExceptionWhenIssuingFurtherEvidence_shouldHandleItAppropriately() {
-        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
-        doThrow(RuntimeException.class).when(furtherEvidenceService).issue(any(), any(), any(), any());
+        doThrow(RuntimeException.class).when(furtherEvidenceService).issue(any(), any(), any(), any(), eq(null));
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         try {
@@ -156,21 +159,19 @@ public class IssueFurtherEvidenceHandlerTest {
     public void givenIssueFurtherEvidenceCallback_shouldIssueEvidenceForAppellantAndRepAndJointParty() {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
-        given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(true);
-
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
 
         verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(APPELLANT_EVIDENCE),
-            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER)));
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq(null));
         verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(REPRESENTATIVE_EVIDENCE),
-            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER)));
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq(null));
         verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(JOINT_PARTY_EVIDENCE),
-            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER)));
-        verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()),
-            eq(caseData), eq(DWP_EVIDENCE), eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER)));
-        verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()),
-            eq(caseData), eq(HMCTS_EVIDENCE), eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER)));
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq(null));
+        verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(DWP_EVIDENCE),
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq(null));
+        verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(HMCTS_EVIDENCE),
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq(null));
         verify(furtherEvidenceService).canHandleAnyDocument(caseData.getSscsDocument());
 
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
@@ -193,7 +194,7 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test
     public void shouldReturnBaseDescriptionWhenHasResizedDocuments() {
-        SscsDocument doc = buildSscsDocument(NO);
+        SscsDocument doc = buildSscsDocument(NO, "resized.pdf", "appellantEvidence", null);
 
         String result = issueFurtherEvidenceHandler.determineDescription(List.of(doc));
         assertEquals("Update issued evidence document flags after issuing further evidence and attached resized document(s)", result);
@@ -201,20 +202,110 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test
     public void shouldReturnBaseDescriptionWhenItHasNottHasResizedDocuments() {
-        SscsDocument resizedDoc = buildSscsDocument(YES);
-        SscsDocument noResizedDoc = buildSscsDocument(NO);
+        SscsDocument resizedDoc = buildSscsDocument(YES, "resized.pdf", "appellantEvidence", null);
+        SscsDocument noResizedDoc = buildSscsDocument(NO, "resized.pdf", "appellantEvidence", null);
         noResizedDoc.getValue().setResizedDocumentLink(null);
 
         String result = issueFurtherEvidenceHandler.determineDescription(List.of(resizedDoc, noResizedDoc));
         assertEquals("Update issued evidence document flags after issuing further evidence", result);
     }
 
-    private SscsDocument buildSscsDocument(YesNo yesNo) {
+    @Test
+    @Parameters({"OTHER_PARTY_EVIDENCE", "OTHER_PARTY_REPRESENTATIVE_EVIDENCE"})
+    public void givenACaseWithAnOtherPartyDocumentNotIssued_shouldIssueEvidenceForOtherParty(DocumentType documentType) {
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+
+        SscsDocument otherPartySscsDocumentOtherNotIssued = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "1");
+
+        caseData.setSscsDocument(Arrays.asList(otherPartySscsDocumentOtherNotIssued));
+
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+
+        verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(documentType),
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq("1"));
+
+        verify(furtherEvidenceService, times(6)).issue(any(), eq(caseData), any(),
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), any());
+
+        verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
+            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
+
+        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+    }
+
+    @Test
+    @Parameters({"OTHER_PARTY_EVIDENCE", "OTHER_PARTY_REPRESENTATIVE_EVIDENCE"})
+    public void givenACaseWithMultipleOtherPartyDocumentsNotIssuedForTheSameOtherPartyId_shouldIssueEvidenceForOtherParty(DocumentType documentType) {
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+
+        SscsDocument otherPartySscsDocumentOtherNotIssued1 = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "1");
+
+        SscsDocument otherPartySscsDocumentOtherNotIssued2 = buildSscsDocument(NO, "test2.pdf", documentType.getValue(), "1");
+
+        caseData.setSscsDocument(Arrays.asList(otherPartySscsDocumentOtherNotIssued1, otherPartySscsDocumentOtherNotIssued2));
+
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+
+        verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(documentType),
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq("1"));
+
+        verify(furtherEvidenceService, times(6)).issue(any(), eq(caseData), any(),
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), any());
+
+        verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
+            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
+
+        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+    }
+
+    @Test
+    @Parameters({"OTHER_PARTY_EVIDENCE", "OTHER_PARTY_REPRESENTATIVE_EVIDENCE"})
+    public void givenACaseWithMultipleOtherPartyDocumentsNotIssuedForMultipleOtherPartyIds_shouldIssueEvidenceForAllOtherParties(DocumentType documentType) {
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+
+        SscsDocument otherPartySscsDocumentOtherNotIssued1 = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "1");
+
+        SscsDocument otherPartySscsDocumentOtherNotIssued2 = buildSscsDocument(NO, "test2.pdf", documentType.getValue(), "1");
+
+        SscsDocument otherPartySscsDocumentOtherIssued3 = buildSscsDocument(YES, "test.pdf", documentType.getValue(), "1");
+
+        SscsDocument otherPartySscsDocumentOtherNotIssued4 = buildSscsDocument(NO, "test2.pdf", documentType.getValue(), "2");
+
+        SscsDocument otherPartySscsDocumentOtherNotIssued5 = buildSscsDocument(NO, "test.pdf", documentType.getValue(), "2");
+
+        SscsDocument otherPartySscsDocumentOtherIssued6 = buildSscsDocument(YES, "test2.pdf", documentType.getValue(), "2");
+
+        caseData.setSscsDocument(Arrays.asList(otherPartySscsDocumentOtherNotIssued1, otherPartySscsDocumentOtherNotIssued2, otherPartySscsDocumentOtherIssued3, otherPartySscsDocumentOtherNotIssued4, otherPartySscsDocumentOtherNotIssued5, otherPartySscsDocumentOtherIssued6));
+
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+
+        verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(documentType),
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq("1"));
+
+        verify(furtherEvidenceService).issue(eq(caseData.getSscsDocument()), eq(caseData), eq(documentType),
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), eq("2"));
+
+        verify(furtherEvidenceService, times(7)).issue(any(), eq(caseData), any(),
+            eq(Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER)), any());
+
+        verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
+            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
+
+        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+    }
+
+    private SscsDocument buildSscsDocument(YesNo yesNo, String fileName, String documentType, String originalSenderOtherPartyId) {
         SscsDocumentDetails docDetails = SscsDocumentDetails.builder().evidenceIssued(yesNo.getValue())
+            .documentType(documentType)
             .resizedDocumentLink(
-                DocumentLink.builder().documentFilename("resized").build()
+                DocumentLink.builder().documentFilename(fileName).build()
             )
+            .originalSenderOtherPartyId(originalSenderOtherPartyId)
             .build();
         return SscsDocument.builder().value(docDetails).build();
     }
+
 }

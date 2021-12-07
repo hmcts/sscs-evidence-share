@@ -52,7 +52,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         final DocumentType documentType = Arrays.stream(DocumentType.values()).filter(f -> f.getValue().equals(selectedDocument.getValue().getDocumentType())).findFirst().orElse(DocumentType.APPELLANT_EVIDENCE);
 
         List<FurtherEvidenceLetterType> allowedLetterTypes = getAllowedFurtherEvidenceLetterTypes(caseData);
-        furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, documentType, allowedLetterTypes);
+        furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, documentType, allowedLetterTypes, null);
 
         if (CollectionUtils.isNotEmpty(allowedLetterTypes)) {
             udateCaseForReasonableAdjustments(caseData, selectedDocument);

@@ -34,15 +34,18 @@ public class SscsDocumentService {
         this.pdfHelper = pdfHelper;
     }
 
-    public List<PdfDocument> getPdfsForGivenDocTypeNotIssued(List<? extends AbstractDocument> sscsDocuments, DocumentType documentType, boolean isConfidentialCase) {
+    public List<PdfDocument> getPdfsForGivenDocTypeNotIssued(List<? extends AbstractDocument> sscsDocuments, DocumentType documentType, boolean isConfidentialCase, String otherPartyOriginalSenderId) {
         Objects.requireNonNull(sscsDocuments);
         Objects.requireNonNull(documentType);
 
-        return sscsDocuments.stream()
+        List<PdfDocument> test =  sscsDocuments.stream()
             .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType())
                     && "No".equals(doc.getValue().getEvidenceIssued()))
+            .filter(doc -> otherPartyOriginalSenderId == null || (otherPartyOriginalSenderId != null && otherPartyOriginalSenderId.equals(doc.getValue().getOriginalSenderOtherPartyId())))
             .map(doc -> PdfDocument.builder().pdf(toPdf(doc, isConfidentialCase)).document(doc).build())
             .collect(Collectors.toList());
+
+        return test;
     }
 
     private Pdf toPdf(AbstractDocument sscsDocument, boolean isConfidentialCase) {
