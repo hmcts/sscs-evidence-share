@@ -140,7 +140,7 @@ public class FurtherEvidenceService {
     }
 
     private void addOtherPartyOrAppointeeTo609_98Map(String otherPartyOriginalSenderId, CcdValue<OtherParty> otherParty, Multimap<FurtherEvidenceLetterType, String> partiesMap) {
-        if ((otherPartyOriginalSenderId == null && YesNo.isYes(otherParty.getValue().getIsAppointee()))
+        if ((otherPartyOriginalSenderId == null && !YesNo.isYes(otherParty.getValue().getIsAppointee()))
             || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getId()) && !YesNo.isYes(otherParty.getValue().getIsAppointee()))) {
             partiesMap.put(OTHER_PARTY_LETTER, otherParty.getValue().getId());
         } else if (otherParty.getValue().getAppointee() != null
