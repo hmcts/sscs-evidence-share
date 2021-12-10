@@ -7,22 +7,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.IOUtils;
@@ -118,191 +108,365 @@ public class FurtherEvidenceServiceTest {
     }
 
     @Test
-    public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndNoRep_shouldGenerateCoverLetterOriginalSenderAndOtherPartyDwpAndBulkPrintDocs() {
+    public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndNoRep_shouldGenerateCoverLetterOriginalSenderAnd609_98ForDwpAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("No", true);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES, null);
 
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
+            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq(null));
         then(coverLetterService).should(times(0))
-            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName));
+            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName), eq(null));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
-    public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndNoRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAndOtherPartyDwpAndBulkPrintDocs() {
+    public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndNoRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAnd609_98ForDwpAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("Yes", false);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES, null);
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderWelshTemplateName),
-                eq(furtherEvidenceOriginalSenderDocName));
+                eq(furtherEvidenceOriginalSenderDocName), eq(null));
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesWelshTemplateName),
-                eq(furtherEvidenceOtherPartiesDwpDocName));
+                eq(furtherEvidenceOtherPartiesDwpDocName), eq(null));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
-    public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndRep_shouldGenerateCoverLetterOriginalSenderAndOtherPartyRepAndDwpAndBulkPrintDocs() {
+    public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndRep_shouldGenerateCoverLetterOriginalSenderAnd609_98ForRepAndDwpAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("No", true);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES, null);
 
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
+            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq(null));
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
+            .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(0))
-            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName));
+            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName), eq(null));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
-    public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAndOtherPartyRepAndDwpAndBulkPrintDocs() {
+    public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAnd609_98ForRepAndDwpAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("Yes", false);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES, null);
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderWelshTemplateName),
-                eq(furtherEvidenceOriginalSenderDocName));
+                eq(furtherEvidenceOriginalSenderDocName), eq(null));
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER),
-                eq(furtherEvidenceOtherPartiesWelshTemplateName), eq(furtherEvidenceOtherPartiesDocName));
+                eq(furtherEvidenceOtherPartiesWelshTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesWelshTemplateName),
-                eq(furtherEvidenceOtherPartiesDwpDocName));
+                eq(furtherEvidenceOtherPartiesDwpDocName), eq(null));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
-    public void givenRepIssueFurtherEvidenceCallbackWithAppellantRep_shouldGenerateCoverLetterOriginalSenderAndOtherPartyAppellantAndDwpAndBulkPrintDocs() {
+    public void givenRepIssueFurtherEvidenceCallbackWithAppellantRep_shouldGenerateCoverLetterOriginalSenderAnd609_98ForAppellantAndDwpAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("No", true);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES, null);
 
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
+            .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq(null));
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
+            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(0))
-            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName));
+            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName), eq(null));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
-    public void givenRepIssueFurtherEvidenceCallbackWithAppellantRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAndOtherPartyAppellantAndDwpAndBulkPrintDocs() {
+    public void givenRepIssueFurtherEvidenceCallbackWithAppellantRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAnd609_98ForAppellantAndDwpAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("Yes", false);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES, null);
 
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER),
-                eq(furtherEvidenceOriginalSenderWelshTemplateName), eq(furtherEvidenceOriginalSenderDocName));
+                eq(furtherEvidenceOriginalSenderWelshTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq(null));
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesWelshTemplateName),
-                eq(furtherEvidenceOtherPartiesDocName));
+                eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesWelshTemplateName),
-                eq(furtherEvidenceOtherPartiesDwpDocName));
+                eq(furtherEvidenceOtherPartiesDwpDocName), eq(null));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
-    public void givenDwpIssueFurtherEvidenceCallbackWithAppellant_shouldGenerateCoverLetterOriginalSenderAndOtherPartyAppellantAndBulkPrintDocs() {
+    public void givenDwpIssueFurtherEvidenceCallbackWithAppellant_shouldGenerateCoverLetterOriginalSenderAnd609_98ForAppellantAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("No", false);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
-            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER));
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER), null);
 
         then(coverLetterService).should(times(0))
-            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
+            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq(null));
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
+            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
-    public void givenDwpIssueFurtherEvidenceCallbackWithAppellant_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAndOtherPartyAppellantAndBulkPrintDocs() {
+    public void givenDwpIssueFurtherEvidenceCallbackWithAppellant_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAnd609_98ForAppellantAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("Yes", false);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
-            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER));
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER), null);
 
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderWelshTemplateName),
-                eq(furtherEvidenceOriginalSenderDocName));
+                eq(furtherEvidenceOriginalSenderDocName), eq(null));
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesWelshTemplateName),
-                eq(furtherEvidenceOtherPartiesDocName));
+                eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
 
     @Test
-    public void givenDwpIssueFurtherEvidenceCallbackWithAppellantAndRep_shouldGenerateCoverLetterOriginalSenderAndOtherPartyAppellantAndRepAndBulkPrintDocs() {
+    public void givenDwpIssueFurtherEvidenceCallbackWithAppellantAndRep_shouldGenerateCoverLetterOriginalSenderAnd609_98ForAppellantAndRepAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("No", false);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
-            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER));
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER), null);
 
         then(coverLetterService).should(times(0))
-            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
+            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq(null));
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
+            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
+            .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), any(), any(), any());
     }
 
     @Test
-    public void givenJointPartyIssueFurtherEvidenceCallbackWithAppellant_shouldGenerateCoverLetterOriginalSenderAndOtherPartyAppellantAndBulkPrintDocs() {
+    public void givenJointPartyIssueFurtherEvidenceCallbackWithAppellant_shouldGenerateCoverLetterOriginalSenderAnd609_98ForAppellantAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("No", false, JOINT_PARTY_EVIDENCE);
         withJointParty();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, JOINT_PARTY_EVIDENCE,
-            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER));
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, JOINT_PARTY_EVIDENCE,
+            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER), null);
 
-        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(JOINT_PARTY_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
-        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(JOINT_PARTY_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq(null));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(JOINT_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
     }
 
     @Test
-    public void givenDwpIssueFurtherEvidenceCallbackWithAppellantAndRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAndOtherPartyAppellantAndRepAndBulkPrintDocs() {
+    public void givenOriginalSenderAsOtherPartyAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyAnd609_98ForAppellantThenBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        withOtherPartyOrRepOrAppointee(false, false, "1", null, null);
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_EVIDENCE,
+            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER), "1");
+
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq("1"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
+        then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+    }
+
+    @Test
+    public void givenOriginalSenderAsOtherPartyAppointeeAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyAppointeeAnd609_98ForAppellantThenBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        withOtherPartyOrRepOrAppointee(true, false, "1", "2", null);
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_EVIDENCE,
+            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER), "2");
+
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq("2"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
+        then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+    }
+
+    @Test
+    public void givenOriginalSenderAsOtherPartyRepAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyRepAnd609_98ForAppellantAndOtherPartyThenBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        withOtherPartyOrRepOrAppointee(false, true, "1", null, "3");
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_REPRESENTATIVE_EVIDENCE,
+            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER), "3");
+
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq("3"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("1"));
+        then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+    }
+
+    @Test
+    public void givenOriginalSenderAsOtherPartyRepAndThereIsOtherPartyAppointeeIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyRepAnd609_98ForAppellantAndOtherPartyAppointeeThenBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        withOtherPartyOrRepOrAppointee(true, true, "1", "2", "3");
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_REPRESENTATIVE_EVIDENCE,
+            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER), "3");
+
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq("3"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("2"));
+        then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+    }
+
+    @Test
+    public void givenOriginalSenderAsOtherPartyAppointeeAndThereIsOtherPartyRepIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyAppointeeAnd609_98ForAppellantAndOtherPartyRepThenBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        withOtherPartyOrRepOrAppointee(true, true, "1", "2", "3");
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_EVIDENCE,
+            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER), "2");
+
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq("2"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("3"));
+        then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+    }
+
+    @Test
+    public void givenMultipleOtherPartiesAndOriginalSenderAsOtherPartyAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyAnd609_98ForAppellantAndSecondOtherPartyThenBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        withOtherPartyOrRepOrAppointee(false, false, "1", null, null);
+        withOtherPartyOrRepOrAppointee(false, false, "4", null, null);
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_EVIDENCE,
+            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER), "1");
+
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq("1"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("4"));
+        then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+    }
+
+    @Test
+    public void givenMultipleOtherPartiesAndOriginalSenderAsOtherPartyAppointeeAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyAppointeeAnd609_98ForAppellantAndSecondOtherPartyThenBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        withOtherPartyOrRepOrAppointee(true, false, "1", "2", null);
+        withOtherPartyOrRepOrAppointee(false, false, "4", null, null);
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_EVIDENCE,
+            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER), "2");
+
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq("2"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("4"));
+        then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+    }
+
+    @Test
+    public void givenMultipleOtherPartiesAndOriginalSenderAsOtherPartyRepAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyRepAnd609_98ForAppellantAndSecondOtherPartyThenBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        withOtherPartyOrRepOrAppointee(true, true, "1", "2", "3");
+        withOtherPartyOrRepOrAppointee(false, false, "4", null, null);
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_REPRESENTATIVE_EVIDENCE,
+            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER), "3");
+
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq("3"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("4"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("2"));
+        then(coverLetterService).should(times(4)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+    }
+
+    @Test
+    public void givenMultipleOtherPartiesAndOriginalSenderAsOtherPartyAppointeeAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyRepAnd609_98ForAppellantAndAllSecondOtherPartyThenBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        withOtherPartyOrRepOrAppointee(true, true, "1", "2", "3");
+        withOtherPartyOrRepOrAppointee(true, true, "4", "5", "6");
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_EVIDENCE,
+            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER), "2");
+
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq("2"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("3"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("5"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("6"));
+        then(coverLetterService).should(times(5)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+    }
+
+    @Test
+    public void givenMultipleOtherPartiesAndOriginalSenderAsAppellantAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForAppellantAnd609_98ForAllOtherPartiesThenBulkPrintDocs() {
+        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        withOtherPartyOrRepOrAppointee(true, true, "1", "2", "3");
+        withOtherPartyOrRepOrAppointee(true, true, "4", "5", "6");
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, APPELLANT_EVIDENCE,
+            Arrays.asList(DWP_LETTER, APPELLANT_LETTER, JOINT_PARTY_LETTER, REPRESENTATIVE_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER), null);
+
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq(null));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("2"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("3"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("5"));
+        then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("6"));
+        then(coverLetterService).should(times(5)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+        then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
+    }
+
+    @Test
+    public void givenDwpIssueFurtherEvidenceCallbackWithAppellantAndRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAnd609_98ForAppellantAndRepAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("Yes", false);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
-            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER));
+            Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER), null);
 
         then(coverLetterService).should(times(0))
             .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOriginalSenderWelshTemplateName),
-                eq(furtherEvidenceOriginalSenderDocName));
+                eq(furtherEvidenceOriginalSenderDocName), eq(null));
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOtherPartiesWelshTemplateName),
-                eq(furtherEvidenceOtherPartiesDocName));
+                eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(1))
             .generateCoverLetter(eq(caseData), eq(REPRESENTATIVE_LETTER),
-                eq(furtherEvidenceOtherPartiesWelshTemplateName), eq(furtherEvidenceOtherPartiesDocName));
+                eq(furtherEvidenceOtherPartiesWelshTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(2)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
     }
@@ -314,7 +478,7 @@ public class FurtherEvidenceServiceTest {
         withRep();
         withJointParty();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, DWP_EVIDENCE, Collections.singletonList(furtherEvidenceLetterType));
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, DWP_EVIDENCE, Collections.singletonList(furtherEvidenceLetterType), null);
 
         String templateName = furtherEvidenceOtherPartiesTemplateName;
         String docName = furtherEvidenceOtherPartiesDocName;
@@ -323,7 +487,27 @@ public class FurtherEvidenceServiceTest {
             docName = furtherEvidenceOriginalSenderDocName;
         }
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(furtherEvidenceLetterType), eq(templateName), eq(docName));
+            .generateCoverLetter(eq(caseData), eq(furtherEvidenceLetterType), eq(templateName), eq(docName), eq(null));
+        then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
+        then(coverLetterService).shouldHaveNoMoreInteractions();
+        then(bulkPrintService).shouldHaveNoMoreInteractions();
+    }
+
+    @Test
+    @Parameters({"OTHER_PARTY_LETTER, 1", "OTHER_PARTY_REP_LETTER, 2" })
+    public void givenIssueForOtherParty_shouldGenerateCoverLetterForSelectedParty(FurtherEvidenceLetterType furtherEvidenceLetterType, String expectedOtherPartyId) {
+        createTestDataAndConfigureSscsDocumentServiceMock("No", true);
+        withRep();
+        withOtherPartyOrRepOrAppointee(false, true, "1", null, "2");
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, DWP_EVIDENCE, Collections.singletonList(furtherEvidenceLetterType), null);
+
+        String templateName = furtherEvidenceOtherPartiesTemplateName;
+        String docName = furtherEvidenceOtherPartiesDocName;
+
+        then(coverLetterService).should(times(1))
+            .generateCoverLetter(eq(caseData), eq(furtherEvidenceLetterType), eq(templateName), eq(docName), eq(expectedOtherPartyId));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
         then(coverLetterService).shouldHaveNoMoreInteractions();
@@ -337,7 +521,7 @@ public class FurtherEvidenceServiceTest {
         withRep();
         withJointParty();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, DWP_EVIDENCE, Collections.singletonList(furtherEvidenceLetterType));
+        furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, DWP_EVIDENCE, Collections.singletonList(furtherEvidenceLetterType), null);
 
         String templateName = furtherEvidenceOtherPartiesWelshTemplateName;
         String docName = furtherEvidenceOtherPartiesDocName;
@@ -346,7 +530,7 @@ public class FurtherEvidenceServiceTest {
             docName = furtherEvidenceOriginalSenderDocName;
         }
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(furtherEvidenceLetterType), eq(templateName), eq(docName));
+            .generateCoverLetter(eq(caseData), eq(furtherEvidenceLetterType), eq(templateName), eq(docName), eq(null));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any());
         then(coverLetterService).shouldHaveNoMoreInteractions();
@@ -354,18 +538,18 @@ public class FurtherEvidenceServiceTest {
     }
 
     @Test
-    public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndJointParty_shouldGenerateCoverLetterOriginalSenderAndOtherPartyAndDwpAndBulkPrintDocs() {
+    public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndJointParty_shouldGenerateCoverLetterOriginalSenderAnd609_98ForAndDwpAndBulkPrintDocs() {
         createTestDataAndConfigureSscsDocumentServiceMock("No", false);
         withJointParty();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES);
+        furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES, null);
 
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName));
+            .generateCoverLetter(eq(caseData), eq(APPELLANT_LETTER), eq(furtherEvidenceOriginalSenderTemplateName), eq(furtherEvidenceOriginalSenderDocName), eq(null));
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(JOINT_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName));
+            .generateCoverLetter(eq(caseData), eq(JOINT_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(null));
         then(coverLetterService).should(times(0))
-            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName));
+            .generateCoverLetter(eq(caseData), eq(DWP_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDwpDocName), eq(null));
         then(coverLetterService).should(times(2)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(JOINT_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE));
@@ -375,6 +559,33 @@ public class FurtherEvidenceServiceTest {
         caseData.setJointParty("Yes");
         caseData.setJointPartyName(JointPartyName.builder().lastName("Party").firstName("Joint").build());
         caseData.setJointPartyAddressSameAsAppellant("Yes");
+    }
+
+    private void withOtherPartyOrRepOrAppointee(boolean withAppointee, boolean withRep, String otherPartyId, String otherPartyAppointeeId, String otherPartyRepId) {
+        CcdValue<OtherParty> otherParty = CcdValue.<OtherParty>builder()
+            .value(OtherParty.builder()
+                .id(otherPartyId)
+                .name(Name.builder().firstName("Harry").lastName("Kane").build())
+                .isAppointee(NO.getValue())
+                .build())
+            .build();
+
+        if (withAppointee) {
+            otherParty.getValue().setIsAppointee(YES.getValue());
+            otherParty.getValue().setAppointee(Appointee.builder().id(otherPartyAppointeeId).name(Name.builder().firstName("Henry").lastName("Smith").build()).build());
+        }
+
+        if (withRep) {
+            otherParty.getValue().setRep(Representative.builder().id(otherPartyRepId).hasRepresentative(YES.getValue()).name(Name.builder().firstName("Wendy").lastName("Collins").build()).build());
+        }
+
+        List<CcdValue<OtherParty>> otherParties = new ArrayList<>();
+        if (caseData.getOtherParties() != null && caseData.getOtherParties().size() > 0) {
+            otherParties = caseData.getOtherParties();
+        }
+
+        otherParties.add(otherParty);
+        caseData.setOtherParties(otherParties);
     }
 
     private void createTestDataAndConfigureSscsDocumentServiceMock(String languagePreferenceFlag, boolean isConfidentialCase) {
@@ -398,7 +609,7 @@ public class FurtherEvidenceServiceTest {
             .build();
 
         doReturn(pdfDocumentList).when(sscsDocumentService).getPdfsForGivenDocTypeNotIssued(
-            eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), any(), eq(isConfidentialCase));
+            eq(Collections.singletonList(sscsDocument1WithAppellantEvidenceAndNoIssued)), any(), eq(isConfidentialCase), any());
 
         when(sscsDocumentService.sizeNormalisePdfs(any())).thenReturn(pdfDocumentList);
     }
