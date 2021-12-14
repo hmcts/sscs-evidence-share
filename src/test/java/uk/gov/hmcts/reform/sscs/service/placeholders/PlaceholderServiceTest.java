@@ -1,32 +1,10 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.APPELLANT_FULL_NAME_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.BENEFIT_TYPE_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.CASE_CREATED_DATE_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.CASE_ID_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE1_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE2_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.EXELA_ADDRESS_LINE3_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.NINO_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_1_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_2_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_3_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_4_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE2_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE3_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_ADDRESS_LINE4_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_COUNTY_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_POSTCODE_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.SC_NUMBER_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.WELSH_CASE_CREATED_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseData;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseDataWithoutBenefitType;
 
@@ -167,6 +145,7 @@ public class PlaceholderServiceTest {
         assertEquals("Bedford", placeholders.get(RECIPIENT_ADDRESS_LINE_4_LITERAL));
         assertEquals("L2 5UZ", placeholders.get(RECIPIENT_ADDRESS_LINE_5_LITERAL));
         assertEquals("SC123/12/1234", placeholders.get(SC_NUMBER_LITERAL));
+        assertEquals("No", placeholders.get(SHOULD_HIDE_NINO));
     }
 
     @Test
@@ -233,5 +212,23 @@ public class PlaceholderServiceTest {
         assertEquals("HM Courts & Tribunals Service", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
         assertEquals("welshhmcts.png", placeholders.get("hmctsWelshImgKey"));
         assertNotNull(placeholders.get(WELSH_CASE_CREATED_DATE_LITERAL));
+    }
+
+    @Test
+    public void givenAChildSupportCase_thenShouldHideNino() {
+        caseData.setLanguagePreferenceWelsh("Yes");
+        caseData.getAppeal().getBenefitType().setCode(CHILD_SUPPORT.getShortName());
+        caseData.getAppeal().getBenefitType().setDescription(CHILD_SUPPORT.getDescription());
+
+        Address address = Address.builder()
+            .line1("Unit 2")
+            .line2("156 The Road")
+            .town("Lechworth")
+            .county("Bedford")
+            .postcode("L2 5UZ").build();
+
+        service.build(caseData, placeholders, address, welshDate);
+
+        assertEquals("Yes", placeholders.get(SHOULD_HIDE_NINO));
     }
 }

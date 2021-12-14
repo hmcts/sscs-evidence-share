@@ -348,6 +348,132 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
+    @Parameters({"OtherParty", "OtherPartyAppointee"})
+    public void appealWithAppellantAndOtherPartyAndFurtherEvidenceFromOtherParty_shouldSend609_97ToOtherPartyAndSend609_98ToAppellant(String otherPartyType) throws IOException {
+        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
+            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource(String.format("issueFurtherEvidenceCallbackWith%sEvidence.json", otherPartyType))).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        topicConsumer.onMessage(json, "1");
+
+        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any());
+
+        assertEquals(2, documentCaptor.getAllValues().size());
+        assertEquals(2, documentCaptor.getAllValues().get(0).size());
+        assertEquals(2, documentCaptor.getAllValues().get(1).size());
+
+        String expectedName = otherPartyType.equals("OtherParty") ? "John Lewis" : "Wendy Smith";
+        assertEquals(expectedName, pdfDocumentRequest.getAllValues().get(0).getData().get("name"));
+        assertEquals("609-97-template (original sender)", documentCaptor.getAllValues().get(0).get(0).getName());
+        assertEquals("evidence-document", documentCaptor.getAllValues().get(0).get(1).getName());
+
+        assertEquals("Sarah Smith", pdfDocumentRequest.getAllValues().get(1).getData().get("name"));
+        assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(1).get(0).getName());
+        assertEquals("evidence-document", documentCaptor.getAllValues().get(1).get(1).getName());
+    }
+
+    @Test
+    public void appealWithAppellantAndOtherPartyRepAndFurtherEvidenceFromOtherPartyRep_shouldSend609_97ToOtherPartyRepAndSend609_98ToOtherPartyAndAppellant() throws IOException {
+        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
+            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource("issueFurtherEvidenceCallbackWithOtherPartyRepEvidence.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        topicConsumer.onMessage(json, "1");
+
+        verify(bulkPrintService, times(3)).sendToBulkPrint(any(), any(), any(), any());
+
+        assertEquals(3, documentCaptor.getAllValues().size());
+        assertEquals(2, documentCaptor.getAllValues().get(0).size());
+        assertEquals(2, documentCaptor.getAllValues().get(1).size());
+        assertEquals(2, documentCaptor.getAllValues().get(2).size());
+
+        assertEquals("Test Rep", pdfDocumentRequest.getAllValues().get(0).getData().get("name"));
+        assertEquals("609-97-template (original sender)", documentCaptor.getAllValues().get(0).get(0).getName());
+        assertEquals("evidence-document", documentCaptor.getAllValues().get(0).get(1).getName());
+
+        assertEquals("Sarah Smith", pdfDocumentRequest.getAllValues().get(1).getData().get("name"));
+        assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(1).get(0).getName());
+        assertEquals("evidence-document", documentCaptor.getAllValues().get(1).get(1).getName());
+
+        assertEquals("Wendy Smith", pdfDocumentRequest.getAllValues().get(2).getData().get("name"));
+        assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(2).get(0).getName());
+        assertEquals("evidence-document", documentCaptor.getAllValues().get(2).get(1).getName());
+    }
+
+    @Test
+    public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_shouldSend609_97ToOtherPartyRepAndSend609_98ToAllOtherPartiesAndAppellant() throws IOException {
+        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
+            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        topicConsumer.onMessage(json, "1");
+
+        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any());
+
+        assertEquals(5, documentCaptor.getAllValues().size());
+        assertEquals(3, documentCaptor.getAllValues().get(0).size());
+        assertEquals(3, documentCaptor.getAllValues().get(1).size());
+        assertEquals(3, documentCaptor.getAllValues().get(2).size());
+        assertEquals(3, documentCaptor.getAllValues().get(3).size());
+        assertEquals(3, documentCaptor.getAllValues().get(4).size());
+
+        assertEquals("Test Rep", pdfDocumentRequest.getAllValues().get(0).getData().get("name"));
+        assertEquals("609-97-template (original sender)", documentCaptor.getAllValues().get(0).get(0).getName());
+        assertEquals("evidence-document2", documentCaptor.getAllValues().get(0).get(1).getName());
+        assertEquals("evidence-document", documentCaptor.getAllValues().get(0).get(2).getName());
+
+        assertEquals("Sarah Smith", pdfDocumentRequest.getAllValues().get(1).getData().get("name"));
+        assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(1).get(0).getName());
+        assertEquals("evidence-document2", documentCaptor.getAllValues().get(1).get(1).getName());
+        assertEquals("evidence-document", documentCaptor.getAllValues().get(1).get(2).getName());
+
+        assertEquals("Wendy Smith", pdfDocumentRequest.getAllValues().get(2).getData().get("name"));
+        assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(2).get(0).getName());
+        assertEquals("evidence-document2", documentCaptor.getAllValues().get(2).get(1).getName());
+        assertEquals("evidence-document", documentCaptor.getAllValues().get(2).get(2).getName());
+
+        assertEquals("Shelly Barat", pdfDocumentRequest.getAllValues().get(3).getData().get("name"));
+        assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(3).get(0).getName());
+        assertEquals("evidence-document2", documentCaptor.getAllValues().get(3).get(1).getName());
+        assertEquals("evidence-document", documentCaptor.getAllValues().get(3).get(2).getName());
+
+        assertEquals("Robert Brokenshire", pdfDocumentRequest.getAllValues().get(4).getData().get("name"));
+        assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(4).get(0).getName());
+        assertEquals("evidence-document2", documentCaptor.getAllValues().get(4).get(1).getName());
+        assertEquals("evidence-document", documentCaptor.getAllValues().get(4).get(2).getName());
+    }
+
+    @Test
     public void appealWithAppellantAndFurtherEvidenceFromAppellantWithReasonableAdjustment_shouldReloadCaseData() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
