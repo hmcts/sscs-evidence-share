@@ -25,14 +25,12 @@ import uk.gov.hmcts.reform.sscs.service.FurtherEvidenceService;
 @Service
 public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData> {
 
-    private final FurtherEvidenceService furtherEvidenceService;
-    private final CcdService ccdService;
-    private final IdamService idamService;
+    private FurtherEvidenceService furtherEvidenceService;
+    private CcdService ccdService;
+    private IdamService idamService;
 
     @Autowired
-    public ReissueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService,
-                                         CcdService ccdService,
-                                         IdamService idamService) {
+    public ReissueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService, CcdService ccdService, IdamService idamService) {
         this.furtherEvidenceService = furtherEvidenceService;
         this.ccdService = ccdService;
         this.idamService = idamService;
@@ -45,13 +43,13 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         }
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        final AbstractDocument selectedDocument =
-            getSelectedDocumentInUiFromCaseData(caseData, caseData.getReissueArtifactUi());
 
-        final DocumentType documentType = Arrays.stream(DocumentType.values())
-            .filter(f -> f.getValue().equals(selectedDocument.getValue().getDocumentType()))
-            .findFirst()
-            .orElse(DocumentType.APPELLANT_EVIDENCE);
+        final AbstractDocument selectedDocument = Stream.of(caseData.getSscsDocument(), caseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(caseData.getReissueArtifactUi().getReissueFurtherEvidenceDocument().getValue().getCode())).findFirst()
+            .orElseThrow(() ->
+                new IllegalStateException(String.format("Cannot find the selected document to reissue with url %s for caseId %s.", caseData.getReissueArtifactUi().getReissueFurtherEvidenceDocument().getValue().getCode(), caseData.getCcdCaseId()))
+            );
+
+        final DocumentType documentType = Arrays.stream(DocumentType.values()).filter(f -> f.getValue().equals(selectedDocument.getValue().getDocumentType())).findFirst().orElse(DocumentType.APPELLANT_EVIDENCE);
 
         List<FurtherEvidenceLetterType> allowedLetterTypes = getAllowedFurtherEvidenceLetterTypes(caseData);
         furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, documentType, allowedLetterTypes, null);
@@ -59,30 +57,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         if (CollectionUtils.isNotEmpty(allowedLetterTypes)) {
             udateCaseForReasonableAdjustments(caseData, selectedDocument);
         }
-    }
 
-    private AbstractDocument<? extends AbstractDocumentDetails> getSelectedDocumentInUiFromCaseData(SscsCaseData caseData,
-                                                                                                    ReissueArtifactUi reissueArtifactUi) {
-        return Stream.of(caseData.getSscsDocument(), caseData.getSscsWelshDocuments())
-            .flatMap(documents -> getStreamIfNonNull(documents))
-            .filter(document -> isDocumentSelectedInUiEqualsToStreamDocument(reissueArtifactUi, document))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException(getNoSelectedDocumentErrorMessage(caseData)));
-    }
-
-    private boolean isDocumentSelectedInUiEqualsToStreamDocument(ReissueArtifactUi reissueArtifactUi,
-                                                                 AbstractDocument<? extends AbstractDocumentDetails> document) {
-        return document.getValue().getDocumentLink().getDocumentUrl().equals(reissueArtifactUi.getReissueFurtherEvidenceDocument().getValue().getCode());
-    }
-
-    private Stream<? extends AbstractDocument<? extends AbstractDocumentDetails>> getStreamIfNonNull(List<? extends AbstractDocument<? extends AbstractDocumentDetails>> documents) {
-        return documents == null ? null : documents.stream();
-    }
-
-    private String getNoSelectedDocumentErrorMessage(SscsCaseData caseData) {
-        return String.format("Cannot find the selected document to reissue with url %s for caseId %s.",
-            caseData.getReissueArtifactUi().getReissueFurtherEvidenceDocument().getValue().getCode(),
-            caseData.getCcdCaseId());
     }
 
     private void udateCaseForReasonableAdjustments(SscsCaseData caseData, AbstractDocument selectedDocument) {
@@ -97,7 +72,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
 
     private List<FurtherEvidenceLetterType> getAllowedFurtherEvidenceLetterTypes(SscsCaseData caseData) {
         final boolean resendToAppellant = YesNo.isYes(caseData.getReissueArtifactUi().getResendToAppellant());
-        boolean resendToRepresentative = YesNo.isYes(caseData.getReissueArtifactUi().getResendToRepresentative());
+        final boolean resendToRepresentative = YesNo.isYes(caseData.getReissueArtifactUi().getResendToRepresentative());
 
         List<FurtherEvidenceLetterType> allowedLetterTypes = new ArrayList<>();
         if (resendToAppellant) {
@@ -111,23 +86,17 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
     }
 
     private void setReissueFlagsToNull(SscsCaseData sscsCaseData) {
-        ReissueArtifactUi reissueArtifactUi = sscsCaseData.getReissueArtifactUi();
-        reissueArtifactUi.setReissueFurtherEvidenceDocument(null);
-        reissueArtifactUi.setResendToAppellant(null);
-        reissueArtifactUi.setResendToRepresentative(null);
-        reissueArtifactUi.setResendToDwp(null);
-        reissueArtifactUi.setOtherPartyOptions(null);
+        sscsCaseData.setReissueArtifactUi(null);
     }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        ReissueArtifactUi reissueArtifactUi = callback.getCaseDetails().getCaseData().getReissueArtifactUi();
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.REISSUE_FURTHER_EVIDENCE
-            && Objects.nonNull(reissueArtifactUi.getReissueFurtherEvidenceDocument())
-            && Objects.nonNull(reissueArtifactUi.getReissueFurtherEvidenceDocument().getValue())
-            && Objects.nonNull(reissueArtifactUi.getReissueFurtherEvidenceDocument().getValue().getCode())
+            && Objects.nonNull(callback.getCaseDetails().getCaseData().getReissueArtifactUi().getReissueFurtherEvidenceDocument())
+            && Objects.nonNull(callback.getCaseDetails().getCaseData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getValue())
+            && Objects.nonNull(callback.getCaseDetails().getCaseData().getReissueArtifactUi().getReissueFurtherEvidenceDocument().getValue().getCode())
             && furtherEvidenceService.canHandleAnyDocument(callback.getCaseDetails().getCaseData().getSscsDocument());
     }
 
@@ -152,8 +121,9 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         final boolean hasResizedDocs = document.getValue().getResizedDocumentLink() != null;
 
         final String baseDescription = "Update document evidence reissued flags after re-issuing further evidence to DWP";
+        final String  fullDescription = !hasResizedDocs ? baseDescription : baseDescription + " and attached resized document(s)";
 
-        return !hasResizedDocs ? baseDescription : baseDescription + " and attached resized document(s)";
+        return fullDescription;
     }
 
     @Override
