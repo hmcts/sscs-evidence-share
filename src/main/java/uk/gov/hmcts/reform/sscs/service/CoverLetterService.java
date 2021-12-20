@@ -69,11 +69,11 @@ public class CoverLetterService {
     }
 
     public byte[] generateCoverLetter(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String templateName,
-                                      String hmctsDocName) {
+                                      String hmctsDocName, String otherPartyId) {
 
         requireNonNull(caseData, "caseData must not be null");
 
-        Map<String, Object> placeholders = furtherEvidencePlaceholderService.populatePlaceholders(caseData, letterType);
+        Map<String, Object> placeholders = furtherEvidencePlaceholderService.populatePlaceholders(caseData, letterType, otherPartyId);
         return generateCoverLetterRetry(letterType, templateName, hmctsDocName, placeholders, 1);
     }
 

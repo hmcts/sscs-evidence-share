@@ -215,7 +215,7 @@ public class ReissueFurtherEvidenceHandlerTest {
             allowedLetterTypes.add(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
         }
 
-        verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(documentType), eq(allowedLetterTypes));
+        verify(furtherEvidenceService).issue(eq(Collections.singletonList(sscsDocumentNotIssued)), eq(caseData), eq(documentType), eq(allowedLetterTypes), eq(null));
 
         verifyNoMoreInteractions(furtherEvidenceService);
 

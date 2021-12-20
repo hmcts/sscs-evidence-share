@@ -8,10 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -82,7 +79,30 @@ public class SscsDocumentServiceTest {
 
         List<SscsDocument> testDocs = createTestData(editedDocument);
 
-        List<PdfDocument> actualPdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(testDocs, documentType, true);
+        List<PdfDocument> actualPdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(testDocs, documentType, true, null);
+
+        assertEquals(1, actualPdfs.size());
+        PdfDocument expectedPdfDocument = PdfDocument.builder().pdf(new Pdf(new byte[]{'a'}, expectedDocName)).document(testDocs.get(0)).build();
+        assertEquals(expectedPdfDocument, actualPdfs.get(0));
+    }
+
+    @Test
+    @Parameters({
+        "OTHER_PARTY_EVIDENCE, otherPartyDoc, false, 1",
+        "OTHER_PARTY_REPRESENTATIVE_EVIDENCE, otherPartyRepDoc, false, 2",
+        "OTHER_PARTY_EVIDENCE, otherPartyDoc, true, 1",
+        "OTHER_PARTY_REPRESENTATIVE_EVIDENCE, otherPartyRepDoc, true, 2"
+    })
+    public void givenOtherPartyDocs_getPdfsForGivenDocType(DocumentType documentType, String expectedDocName, boolean editedDocument, String otherPartyOriginalSenderId) {
+
+        String expectedDocumentUrl = editedDocument ? "http://editedDocumentUrl" : "http://documentUrl";
+        given(pdfStoreService.download(eq(expectedDocumentUrl)))
+            .willReturn(new byte[]{'a'});
+
+        List<SscsDocument> testDocs = createTestData(editedDocument);
+        addOtherPartyDocs(editedDocument, testDocs);
+
+        List<PdfDocument> actualPdfs = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(testDocs, documentType, true, otherPartyOriginalSenderId);
 
         assertEquals(1, actualPdfs.size());
         PdfDocument expectedPdfDocument = PdfDocument.builder().pdf(new Pdf(new byte[]{'a'}, expectedDocName)).document(testDocs.get(0)).build();
@@ -183,7 +203,48 @@ public class SscsDocumentServiceTest {
                 .evidenceIssued("No")
                 .build())
             .build();
-        return Arrays.asList(sscsDocumentAppellantType, sscsDocumentAppellantTypeIssued, sscsDocumentRepsType, sscsDocumentOtherType);
+
+        List<SscsDocument> sscsDocuments = new ArrayList<>();
+        sscsDocuments.add(sscsDocumentAppellantType);
+        sscsDocuments.add(sscsDocumentAppellantTypeIssued);
+        sscsDocuments.add(sscsDocumentRepsType);
+        sscsDocuments.add(sscsDocumentOtherType);
+
+        return sscsDocuments;
+    }
+
+    private void addOtherPartyDocs(boolean withEditedDocument, List<SscsDocument> sscsDocuments) {
+        DocumentLink documentLink = DocumentLink.builder()
+            .documentUrl("http://documentUrl")
+            .build();
+        DocumentLink editedDocumentLink = DocumentLink.builder()
+            .documentUrl("http://editedDocumentUrl")
+            .build();
+
+        SscsDocument sscsDocumentOtherPartyType = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentFileName("otherPartyDoc")
+                .documentType(OTHER_PARTY_EVIDENCE.getValue())
+                .documentLink(documentLink)
+                .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
+                .evidenceIssued("No")
+                .originalSenderOtherPartyId("1")
+                .build())
+            .build();
+
+        SscsDocument sscsDocumentOtherPartyRepType = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentFileName("otherPartyRepDoc")
+                .documentType(OTHER_PARTY_REPRESENTATIVE_EVIDENCE.getValue())
+                .documentLink(documentLink)
+                .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
+                .evidenceIssued("No")
+                .originalSenderOtherPartyId("2")
+                .build())
+            .build();
+
+        sscsDocuments.add(sscsDocumentOtherPartyType);
+        sscsDocuments.add(sscsDocumentOtherPartyRepType);
     }
 
     private UploadResponse createUploadResponse(String linkHref) {

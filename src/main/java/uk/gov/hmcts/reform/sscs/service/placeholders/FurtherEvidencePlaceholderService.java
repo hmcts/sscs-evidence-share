@@ -27,18 +27,18 @@ public class FurtherEvidencePlaceholderService {
         this.placeholderService = placeholderService;
     }
 
-    public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
+    public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String otherPartyId) {
 
 
         requireNonNull(caseData, "caseData must not be null");
 
         Map<String, Object> placeholders = new ConcurrentHashMap<>();
 
-        Address address = getAddress(caseData, letterType);
+        Address address = getAddress(caseData, letterType, otherPartyId);
 
         placeholderService.build(caseData, placeholders, address, null);
 
-        String name = getName(caseData, letterType);
+        String name = getName(caseData, letterType, otherPartyId);
 
         if (name != null) {
             placeholders.put(NAME, truncateAddressLine(name));
@@ -47,13 +47,15 @@ public class FurtherEvidencePlaceholderService {
         return placeholders;
     }
 
-    private String getName(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
+    private String getName(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String otherPartyId) {
         if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
             return extractNameAppellant(caseData);
         } else if (FurtherEvidenceLetterType.REPRESENTATIVE_LETTER.getValue().equals(letterType.getValue())) {
             return extractNameRep(caseData);
         } else if (FurtherEvidenceLetterType.JOINT_PARTY_LETTER.getValue().equals(letterType.getValue())) {
             return extractNameJointParty(caseData);
+        } else if (FurtherEvidenceLetterType.OTHER_PARTY_LETTER.getValue().equals(letterType.getValue()) || FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER.getValue().equals(letterType.getValue())) {
+            return getOtherPartyName(caseData, otherPartyId);
         }
         return null;
     }
@@ -94,15 +96,37 @@ public class FurtherEvidencePlaceholderService {
             .orElse("Sir/Madam");
     }
 
+    private String getOtherPartyName(SscsCaseData caseData, String otherPartyId) {
+        if (otherPartyId != null) {
+            for (CcdValue<OtherParty> otherParty : caseData.getOtherParties()) {
+                if (otherPartyId.equals(otherParty.getValue().getId())
+                    && isValidName(otherParty.getValue().getName())) {
+                    return otherParty.getValue().getName().getFullNameNoTitle();
+                } else if (otherParty.getValue().getAppointee() != null
+                    && otherPartyId.equals(otherParty.getValue().getAppointee().getId())
+                    && isValidName(otherParty.getValue().getAppointee().getName())) {
+                    return otherParty.getValue().getAppointee().getName().getFullNameNoTitle();
+                } else if (otherParty.getValue().getRep() != null
+                    && otherPartyId.equals(otherParty.getValue().getRep().getId())
+                    && isValidName(otherParty.getValue().getRep().getName())) {
+                    return otherParty.getValue().getRep().getName().getFullNameNoTitle();
+                }
+            }
+        }
+        return "Sir/Madam";
+    }
+
     private Boolean isValidName(Name name) {
         return isNoneBlank(name.getFirstName()) && isNoneBlank(name.getLastName());
     }
 
-    private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType) {
+    private Address getAddress(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String otherPartyId) {
         if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
             return getAppellantAddress(caseData);
         } else if (FurtherEvidenceLetterType.JOINT_PARTY_LETTER.getValue().equals(letterType.getValue())) {
             return getJointPartyAddress(caseData);
+        } else if (FurtherEvidenceLetterType.OTHER_PARTY_LETTER.getValue().equals(letterType.getValue()) || FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER.getValue().equals(letterType.getValue())) {
+            return getOtherPartyAddress(caseData, otherPartyId);
         }
         return getRepsAddress(caseData);
     }
@@ -126,6 +150,22 @@ public class FurtherEvidencePlaceholderService {
     private Address getJointPartyAddress(SscsCaseData caseData) {
         return caseData.isJointPartyAddressSameAsAppeallant() ? getAppellantAddress(caseData)
             : ofNullable(caseData.getJointPartyAddress()).orElse(getEmptyAddress());
+    }
+
+    private Address getOtherPartyAddress(SscsCaseData caseData, String otherPartyId) {
+        if (otherPartyId != null) {
+            for (CcdValue<OtherParty> otherParty : caseData.getOtherParties()) {
+                if (otherPartyId.equals(otherParty.getValue().getId())) {
+                    return otherParty.getValue().getAddress();
+                } else if (otherParty.getValue().getAppointee() != null && otherPartyId.equals(otherParty.getValue().getAppointee().getId())) {
+                    return otherParty.getValue().getAppointee().getAddress();
+                } else if (otherParty.getValue().getRep() != null && otherPartyId.equals(otherParty.getValue().getRep().getId())) {
+                    return otherParty.getValue().getRep().getAddress();
+
+                }
+            }
+        }
+        return getEmptyAddress();
     }
 
     private Address defaultAddress(Appeal appeal) {
