@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +108,22 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
             allowedLetterTypes.add(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
         }
 
+        List<OtherPartyOption> otherPartiesToReissue = getOtherPartiesToReissue(caseData);
+        if (isOtherPartyRepSelectedToReissue(otherPartiesToReissue)) {
+            allowedLetterTypes.add(FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER);
+        } else if (!otherPartiesToReissue.isEmpty()) {
+            allowedLetterTypes.add(FurtherEvidenceLetterType.OTHER_PARTY_LETTER);
+        }
+
         return allowedLetterTypes;
+    }
+
+    private boolean isOtherPartyRepSelectedToReissue(List<OtherPartyOption> otherPartiesToReissue) {
+        return !otherPartiesToReissue.isEmpty() && otherPartiesToReissue.stream().anyMatch(otherPartyOption -> otherPartyOption.getValue().getOtherPartyOptionName().contains("Representative"));
+    }
+
+    private List<OtherPartyOption> getOtherPartiesToReissue(SscsCaseData caseData) {
+        return caseData.getReissueArtifactUi().getOtherPartyOptions().stream().filter(otherPartyOption -> otherPartyOption.getValue().getResendToOtherParty().equals(YesNo.YES)).collect(Collectors.toList());
     }
 
     private void setReissueFlagsToNull(SscsCaseData sscsCaseData) {
