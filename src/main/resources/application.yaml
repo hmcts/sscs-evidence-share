@@ -28,11 +28,9 @@ http:
 send-grid:
   host: smtp.sendgrid.net
   port: 587
-  apiKey: 1
 
 ld:
   user-key: sscs-evidence-share
-  sdk-key: abcd
 
 
 service:
