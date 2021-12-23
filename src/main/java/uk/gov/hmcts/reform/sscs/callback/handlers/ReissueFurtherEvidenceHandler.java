@@ -46,8 +46,9 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
         }
         final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
+        ReissueArtifactUi reissueArtifactUi = caseData.getReissueArtifactUi();
         final AbstractDocument selectedDocument =
-            getSelectedDocumentInUiFromCaseData(caseData, caseData.getReissueArtifactUi());
+            getSelectedDocumentInUiFromCaseData(caseData, reissueArtifactUi);
 
         final DocumentType documentType = Arrays.stream(DocumentType.values())
             .filter(f -> f.getValue().equals(selectedDocument.getValue().getDocumentType()))
@@ -55,11 +56,37 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
             .orElse(DocumentType.APPELLANT_EVIDENCE);
 
         List<FurtherEvidenceLetterType> allowedLetterTypes = getAllowedFurtherEvidenceLetterTypes(caseData);
-        furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, documentType, allowedLetterTypes, null);
+
+        furtherEvidenceService.issue(Collections.singletonList(selectedDocument), caseData, documentType,
+            allowedLetterTypes, getOtherPartyToResendOriginalSenderId(reissueArtifactUi, selectedDocument));
 
         if (CollectionUtils.isNotEmpty(allowedLetterTypes)) {
             udateCaseForReasonableAdjustments(caseData, selectedDocument);
         }
+    }
+
+    private String getOtherPartyToResendOriginalSenderId(ReissueArtifactUi reissueArtifactUi,
+                                                         AbstractDocument selectedDocument) {
+        String docOtherPartyOriginalSenderId = selectedDocument.getValue().getOriginalSenderOtherPartyId();
+        String otherPartyToResendOriginalSender = null;
+        if (isAnyOtherPartyOptionToResendMatchedDocOriginalSender(reissueArtifactUi, docOtherPartyOriginalSenderId)) {
+            otherPartyToResendOriginalSender = docOtherPartyOriginalSenderId;
+        }
+        return otherPartyToResendOriginalSender;
+    }
+
+    private boolean isAnyOtherPartyOptionToResendMatchedDocOriginalSender(ReissueArtifactUi reissueArtifactUi,
+                                                                          String originalSenderOtherPartyId) {
+        return reissueArtifactUi.getOtherPartyOptions() != null
+            && reissueArtifactUi.getOtherPartyOptions().stream()
+            .map(OtherPartyOption::getValue)
+            .anyMatch(otherPartyOption -> isToResendOtherPartyMatchedId(originalSenderOtherPartyId, otherPartyOption));
+    }
+
+    private boolean isToResendOtherPartyMatchedId(String originalSenderOtherPartyId,
+                                                  OtherPartyOptionDetails otherPartyOption) {
+        return YesNo.isYes(otherPartyOption.getResendToOtherParty())
+            && otherPartyOption.getOtherPartyOptionId().equals(originalSenderOtherPartyId);
     }
 
     private AbstractDocument<? extends AbstractDocumentDetails> getSelectedDocumentInUiFromCaseData(SscsCaseData caseData,
@@ -108,22 +135,37 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
             allowedLetterTypes.add(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
         }
 
-        List<OtherPartyOption> otherPartiesToReissue = getOtherPartiesToReissue(caseData);
-        if (isOtherPartyRepSelectedToReissue(otherPartiesToReissue)) {
-            allowedLetterTypes.add(FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER);
-        } else if (!otherPartiesToReissue.isEmpty()) {
+        if (isThereAnyOtherPartyOtherThanRepToReissue(getOtherPartiesToReissue(caseData))) {
             allowedLetterTypes.add(FurtherEvidenceLetterType.OTHER_PARTY_LETTER);
+        }
+
+        if (isThereAnyOtherPartyRepToReissue(getOtherPartiesToReissue(caseData))) {
+            allowedLetterTypes.add(FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER);
         }
 
         return allowedLetterTypes;
     }
 
-    private boolean isOtherPartyRepSelectedToReissue(List<OtherPartyOption> otherPartiesToReissue) {
-        return !otherPartiesToReissue.isEmpty() && otherPartiesToReissue.stream().anyMatch(otherPartyOption -> otherPartyOption.getValue().getOtherPartyOptionName().contains("Representative"));
+    private boolean isThereAnyOtherPartyOtherThanRepToReissue(List<OtherPartyOption> otherPartiesToReissue) {
+        return !otherPartiesToReissue.isEmpty()
+            && otherPartiesToReissue.stream().map(OtherPartyOption::getValue)
+            .anyMatch(otherPartyOption -> YesNo.isYes(otherPartyOption.getResendToOtherParty())
+                && !otherPartyOption.getOtherPartyOptionName().contains("Representative"));
+    }
+
+    private boolean isThereAnyOtherPartyRepToReissue(List<OtherPartyOption> otherPartiesToReissue) {
+        return !otherPartiesToReissue.isEmpty()
+            && otherPartiesToReissue.stream().map(OtherPartyOption::getValue)
+            .anyMatch(otherPartyOption -> YesNo.isYes(otherPartyOption.getResendToOtherParty())
+               && otherPartyOption.getOtherPartyOptionName().contains("Representative"));
     }
 
     private List<OtherPartyOption> getOtherPartiesToReissue(SscsCaseData caseData) {
-        return caseData.getReissueArtifactUi().getOtherPartyOptions().stream().filter(otherPartyOption -> otherPartyOption.getValue().getResendToOtherParty().equals(YesNo.YES)).collect(Collectors.toList());
+        return caseData.getReissueArtifactUi().getOtherPartyOptions() != null
+            ? caseData.getReissueArtifactUi().getOtherPartyOptions().stream()
+                .filter(otherPartyOption -> otherPartyOption.getValue().getResendToOtherParty().equals(YesNo.YES))
+                .collect(Collectors.toList())
+            : Collections.emptyList();
     }
 
     private void setReissueFlagsToNull(SscsCaseData sscsCaseData) {
