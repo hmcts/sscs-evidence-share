@@ -285,9 +285,9 @@
           }
         ]
       },
-      "resendToAppellant": "YES",
-      "resendToRepresentative": "NO",
-      "resendToDwp": "NO",
+      "resendToAppellant": "Yes",
+      "resendToRepresentative": "No",
+      "resendToDwp": "No",
       "caseCreated": "2019-07-17",
       "regionalProcessingCenter": {
         "city": "BIRMINGHAM",

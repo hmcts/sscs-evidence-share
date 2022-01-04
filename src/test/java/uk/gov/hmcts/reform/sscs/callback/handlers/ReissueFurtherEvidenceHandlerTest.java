@@ -29,18 +29,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
@@ -77,14 +66,18 @@ public class ReissueFurtherEvidenceHandlerTest {
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
         handler.handle(callbackType,
-            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+            buildTestCallbackForGivenData(SscsCaseData.builder()
+                .reissueArtifactUi(ReissueArtifactUi.builder()
+                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
     }
 
     @Test(expected = IllegalStateException.class)
     @Parameters({"ISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenEventTypeIsNotReIssueFurtherEvidence_willThrowAnException(EventType eventType) {
         handler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, eventType));
+            buildTestCallbackForGivenData(SscsCaseData.builder()
+                .reissueArtifactUi(ReissueArtifactUi.builder()
+                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, eventType));
     }
 
     @Test(expected = RequiredFieldMissingException.class)
@@ -109,8 +102,8 @@ public class ReissueFurtherEvidenceHandlerTest {
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(false);
 
         handler.handle(CallbackType.SUBMITTED,
-            buildTestCallbackForGivenData(SscsCaseData.builder()
-                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url", "label"), null))
+            buildTestCallbackForGivenData(SscsCaseData.builder().reissueArtifactUi(ReissueArtifactUi.builder()
+                    .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url", "label"), null)).build())
                 .build(), INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
     }
 
@@ -192,9 +185,11 @@ public class ReissueFurtherEvidenceHandlerTest {
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("1563382899630221")
             .appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("YES").build()).build())
-            .reissueFurtherEvidenceDocument(dynamicList)
-            .resendToAppellant(resendToAppellant ? "yes" : "no")
-            .resendToRepresentative(resendToRepresentative ? "yes" : "no")
+            .reissueArtifactUi(ReissueArtifactUi.builder()
+                .reissueFurtherEvidenceDocument(dynamicList)
+                .resendToAppellant(resendToAppellant ? YesNo.YES : YesNo.NO)
+                .resendToRepresentative(resendToRepresentative ? YesNo.YES : YesNo.NO)
+                .build())
             .build();
         if (isEnglish) {
             caseData.setSscsDocument(Collections.singletonList((SscsDocument) sscsDocumentNotIssued));
