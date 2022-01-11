@@ -354,7 +354,7 @@ dependencies {
   // Contract Tests
   contractTestCompile group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pact_version
   contractTestCompile group: 'au.com.dius.pact.consumer', name: 'java8', version: versions.pact_version
-  contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.5.6'
+  contractTestCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.6.2'
   contractTestCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
   contractTestRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit_jupiter
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
@@ -371,7 +371,7 @@ dependencies {
 dependencyManagement {
   dependencies {
     dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
-    dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.16.0'
+    dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
     dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.16.0'
 
     //CVE-2021-40690
