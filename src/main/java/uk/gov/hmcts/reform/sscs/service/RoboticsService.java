@@ -116,7 +116,7 @@ public class RoboticsService {
         boolean presentingOfficeChanged = hasPresentingOfficeChanged(sscsCaseData);
 
         if (issuingOfficeChanged || originatingOfficeChanged || presentingOfficeChanged) {
-            log.info("Case {} automatically updating DWP office probably due to office closure", sscsCaseData.getCcdCaseId());
+            log.info("Case {} automatically updating FTA office probably due to office closure", sscsCaseData.getCcdCaseId());
         }
     }
 

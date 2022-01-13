@@ -44,7 +44,7 @@ import uk.gov.hmcts.reform.sscs.service.PrintService;
 public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private static final String DM_STORE_USER_ID = "sscs";
-    private static final String SENT_TO_DWP = "Sent to DWP";
+    private static final String SENT_TO_DWP = "Sent to FTA";
     private final DispatchPriority dispatchPriority;
 
     private final DocumentManagementServiceWrapper documentManagementServiceWrapper;
@@ -121,7 +121,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             updateCaseToFlagError(caseData, e.getMessage());
         } catch (Exception e) {
             log.info("Error when bulk-printing caseId: {}", callback.getCaseDetails().getId(), e);
-            updateCaseToFlagError(caseData, "Send to DWP Error event has been triggered from Evidence Share service");
+            updateCaseToFlagError(caseData, "Send to FTA Error event has been triggered from Evidence Share service");
         }
         updateCaseToSentToDwp(callback, caseData, bulkPrintInfo);
     }
@@ -136,7 +136,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
         ccdService.updateCase(caseData,
             Long.valueOf(caseData.getCcdCaseId()),
             EventType.SENT_TO_DWP_ERROR.getCcdType(),
-            "Send to DWP Error",
+            "Send to FTA Error",
             description,
             idamService.getIdamTokens());
     }
@@ -155,7 +155,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
                 EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
                 idamService.getIdamTokens());
             if (bulkPrintInfo.isAllowedTypeForBulkPrint()) {
-                log.info("Case sent to dwp for case id {} with returned value {}",
+                log.info("Case sent to fta for case id {} with returned value {}",
                     sscsCaseDataCallback.getCaseDetails().getId(), bulkPrintInfo.getUuid());
             }
         }
@@ -215,7 +215,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             return BulkPrintInfo.builder()
                 .uuid(null)
                 .allowedTypeForBulkPrint(false)
-                .desc("Case state is now sent to DWP")
+                .desc("Case state is now sent to FTA")
                 .build();
         }
     }
@@ -233,7 +233,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             arr.add(pdf.getName());
         }
 
-        return "Case has been sent to the DWP via Bulk Print with bulk print id: "
+        return "Case has been sent to the FTA via Bulk Print with bulk print id: "
             + bulkPrintId
             + " and with documents: "
             + String.join(", ", arr);
