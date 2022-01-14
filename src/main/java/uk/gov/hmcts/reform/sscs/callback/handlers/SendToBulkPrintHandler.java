@@ -44,7 +44,7 @@ import uk.gov.hmcts.reform.sscs.service.PrintService;
 public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
 
     private static final String DM_STORE_USER_ID = "sscs";
-    private static final String SENT_TO_DWP = "Sent to FTA";
+    private static final String SENT_TO_FTA = "Sent to FTA";
     private final DispatchPriority dispatchPriority;
 
     private final DocumentManagementServiceWrapper documentManagementServiceWrapper;
@@ -152,7 +152,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             caseData.setDwpDueDate(LocalDate.now().plusDays(getResponseDueDays(caseData)).toString());
 
             ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
-                EventType.SENT_TO_DWP.getCcdType(), SENT_TO_DWP, bulkPrintInfo.getDesc(),
+                EventType.SENT_TO_DWP.getCcdType(), SENT_TO_FTA, bulkPrintInfo.getDesc(),
                 idamService.getIdamTokens());
             if (bulkPrintInfo.isAllowedTypeForBulkPrint()) {
                 log.info("Case sent to fta for case id {} with returned value {}",
