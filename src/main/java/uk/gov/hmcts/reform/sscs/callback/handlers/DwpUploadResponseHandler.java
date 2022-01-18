@@ -55,8 +55,35 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
             handleUc(callback);
         } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName())) {
             handleChildSupport(callback);
+        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.TAX_CREDIT.getShortName())
+            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.GUARDIANS_ALLOWANCE.getShortName())
+            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.TAX_FREE_CHILDCARE.getShortName())
+            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.HOME_RESPONSIBILITIES_PROTECTION.getShortName())
+            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_BENEFIT.getShortName())
+            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.THIRTY_HOURS_FREE_CHILDCARE.getShortName())
+            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.GUARANTEED_MINIMUM_PENSION.getShortName())
+            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.NATIONAL_INSURANCE_CREDITS.getShortName())) {
+            handleSscs5Case(callback);
         } else {
             handleNonUc(callback);
+        }
+    }
+
+    private void handleSscs5Case(Callback<SscsCaseData> callback) {
+        if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "Yes")) {
+            SscsCaseData caseData = setDwpState(callback);
+            caseData.setInterlocReviewState("awaitingAdminAction");
+            updateEventDetails(caseData, callback.getCaseDetails().getId(),
+                EventType.DWP_RESPOND, "Response received", "Update to response received as an Admin has to review the case");
+        } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "No")) {
+            if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpEditedEvidenceReason(), "phme")) {
+                SscsCaseData caseData = setDwpState(callback);
+                caseData.setInterlocReviewState("reviewByJudge");
+                updateEventDetails(caseData, callback.getCaseDetails().getId(),
+                    EventType.DWP_RESPOND, "Response received", "Update to response received as an Admin has to review the case");
+            } else {
+                triggerReadyToListEvent(callback);
+            }
         }
     }
 
