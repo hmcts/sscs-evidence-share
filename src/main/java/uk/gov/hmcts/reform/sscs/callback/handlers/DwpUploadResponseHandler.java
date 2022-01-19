@@ -50,7 +50,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         }
 
         BenefitType benefitType = callback.getCaseDetails().getCaseData().getAppeal().getBenefitType();
-        Benefit benefit = Benefit.getBenefitByCodeOrThrowExcetion(benefitType.getCode());
+        Benefit benefit = Benefit.getBenefitByCodeOrThrowException(benefitType.getCode());
 
         if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName())) {
             handleUc(callback);
