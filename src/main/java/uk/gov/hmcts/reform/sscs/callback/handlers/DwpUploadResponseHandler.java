@@ -20,8 +20,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @Service
 public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
-    private CcdService ccdService;
-    private IdamService idamService;
+    private final CcdService ccdService;
+    private final IdamService idamService;
 
     @Autowired
     public DwpUploadResponseHandler(CcdService ccdService,
@@ -50,30 +50,30 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         }
 
         BenefitType benefitType = callback.getCaseDetails().getCaseData().getAppeal().getBenefitType();
-        Benefit benefit = Benefit.getBenefitByCodeOrThrowException(benefitType.getCode());
+        SscsType benefitSscsType = callback.getCaseDetails().getCaseData().getBenefitType().get().getSscsType();
 
         if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName())) {
             handleUc(callback);
-        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName()) || benefit.getSscsType().equals(SscsType.SSCS5)) {
-            handleChildSupportAndSscs5Case(callback, benefit);
+        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName()) || SscsType.SSCS5.equals(benefitSscsType)) {
+            handleChildSupportAndSscs5Case(callback, benefitSscsType);
         } else {
             handleNonUc(callback);
         }
     }
 
-    private void handleChildSupportAndSscs5Case(Callback<SscsCaseData> callback, Benefit benefit) {
+    private void handleChildSupportAndSscs5Case(Callback<SscsCaseData> callback, SscsType benefitSscsType) {
         if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "Yes")) {
             SscsCaseData caseData = setDwpState(callback);
             caseData.setInterlocReviewState("awaitingAdminAction");
             updateEventDetails(caseData, callback.getCaseDetails().getId(),
                 EventType.DWP_RESPOND, "Response received", "Update to response received as an Admin has to review the case");
         } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "No")) {
-            if (benefit.getSscsType().equals(SscsType.SSCS5) && !StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpEditedEvidenceReason(), "phme")) {
+            if (SscsType.SSCS5.equals(benefitSscsType) && !StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpEditedEvidenceReason(), "phme")) {
                 triggerReadyToListEvent(callback);
             } else {
                 SscsCaseData caseData = setDwpState(callback);
                 caseData.setInterlocReviewState("reviewByJudge");
-                if (benefit.getSscsType().equals(SscsType.SSCS5)) {
+                if (SscsType.SSCS5.equals(benefitSscsType)) {
                     updateEventDetails(caseData, callback.getCaseDetails().getId(),
                         EventType.DWP_RESPOND, "Response received", "Update to response received as an Admin has to review the case");
                 } else {
