@@ -50,54 +50,32 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
         }
 
         BenefitType benefitType = callback.getCaseDetails().getCaseData().getAppeal().getBenefitType();
+        Benefit benefit = Benefit.getBenefitByCodeOrThrowExcetion(benefitType.getCode());
 
         if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.UC.getShortName())) {
             handleUc(callback);
-        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName())) {
-            handleChildSupport(callback);
-        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.TAX_CREDIT.getShortName())
-            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.GUARDIANS_ALLOWANCE.getShortName())
-            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.TAX_FREE_CHILDCARE.getShortName())
-            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.HOME_RESPONSIBILITIES_PROTECTION.getShortName())
-            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_BENEFIT.getShortName())
-            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.THIRTY_HOURS_FREE_CHILDCARE.getShortName())
-            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.GUARANTEED_MINIMUM_PENSION.getShortName())
-            || StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.NATIONAL_INSURANCE_CREDITS.getShortName())) {
-            handleSscs5Case(callback);
+        } else if (StringUtils.equalsIgnoreCase(benefitType.getCode(), Benefit.CHILD_SUPPORT.getShortName()) || benefit.getSscsType().equals(SscsType.SSCS5)) {
+            handleChildSupportAndSscs5Case(callback, benefit);
         } else {
             handleNonUc(callback);
         }
     }
 
-    private void handleSscs5Case(Callback<SscsCaseData> callback) {
+    private void handleChildSupportAndSscs5Case(Callback<SscsCaseData> callback, Benefit benefit) {
         if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "Yes")) {
             SscsCaseData caseData = setDwpState(callback);
             caseData.setInterlocReviewState("awaitingAdminAction");
             updateEventDetails(caseData, callback.getCaseDetails().getId(),
                 EventType.DWP_RESPOND, "Response received", "Update to response received as an Admin has to review the case");
         } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "No")) {
-            if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpEditedEvidenceReason(), "phme")) {
+            if (benefit.getSscsType().equals(SscsType.SSCS5) && !StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpEditedEvidenceReason(), "phme")) {
+                triggerReadyToListEvent(callback);
+            } else {
                 SscsCaseData caseData = setDwpState(callback);
                 caseData.setInterlocReviewState("reviewByJudge");
                 updateEventDetails(caseData, callback.getCaseDetails().getId(),
-                    EventType.DWP_RESPOND, "Response received", "Update to response received as an Admin has to review the case");
-            } else {
-                triggerReadyToListEvent(callback);
+                    EventType.NOT_LISTABLE, "Not Listable", "Update to Not Listable as a Judge has to review the case");
             }
-        }
-    }
-
-    private void handleChildSupport(Callback<SscsCaseData> callback) {
-        if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "Yes")) {
-            SscsCaseData caseData = setDwpState(callback);
-            caseData.setInterlocReviewState("awaitingAdminAction");
-            updateEventDetails(caseData, callback.getCaseDetails().getId(),
-                EventType.DWP_RESPOND, "Response received", "Update to response received as an Admin has to review the case");
-        } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "No")) {
-            SscsCaseData caseData = setDwpState(callback);
-            caseData.setInterlocReviewState("reviewByJudge");
-            updateEventDetails(caseData, callback.getCaseDetails().getId(),
-                EventType.NOT_LISTABLE, "Not Listable", "Update to Not Listable as a Judge has to review the case");
         }
     }
 
