@@ -105,7 +105,7 @@ public class FurtherEvidenceService {
         Multimap<FurtherEvidenceLetterType, String> otherPartiesMap = buildMapOfPartiesFor609_98(caseData, documentType, otherPartyOriginalSenderId);
 
         for (Map.Entry<FurtherEvidenceLetterType, String> party : otherPartiesMap.entries()) {
-            String docName = party.getKey() == DWP_LETTER ? "609-98-template (DWP)" : "609-98-template (other parties)";
+            String docName = party.getKey() == DWP_LETTER ? "609-98-template (FTA)" : "609-98-template (other parties)";
 
             if (allowedLetterTypes.contains(party.getKey())) {
                 byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, party.getKey(), docName, party.getValue());
