@@ -150,11 +150,11 @@ public class EvidenceShareServiceIt {
         json = json.replace("CCD_EVENT_ID", "validAppealCreated");
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
 
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to DWP"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any())).thenReturn(SscsCaseDetails.builder().build());
 
         topicConsumer.onMessage(json, "1");
 
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to DWP"), any());
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
     }
 
     @Test
@@ -167,11 +167,11 @@ public class EvidenceShareServiceIt {
         json = json.replace("CCD_EVENT_ID", "validAppealCreated");
         json = json.replace("CREATED_IN_GAPS_FROM", "readyToList");
 
-        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to DWP"), any())).thenReturn(SscsCaseDetails.builder().build());
+        when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any())).thenReturn(SscsCaseDetails.builder().build());
 
         topicConsumer.onMessage(json, "1");
 
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to DWP"), any());
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
     }
 
     @Test
@@ -196,7 +196,7 @@ public class EvidenceShareServiceIt {
 
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
-        String documentList = "Case has been sent to the DWP via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
+        String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
         when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
 
         topicConsumer.onMessage(json, "1");
@@ -236,7 +236,7 @@ public class EvidenceShareServiceIt {
 
         when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
 
-        String documentList = "Case has been sent to the DWP via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
+        String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
         when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
 
         topicConsumer.onMessage(json, "1");
@@ -308,7 +308,7 @@ public class EvidenceShareServiceIt {
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to DWP"), any());
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
         verify(emailService).sendEmail(anyLong(), any());
     }
 
@@ -323,7 +323,7 @@ public class EvidenceShareServiceIt {
 
         verifyNoMoreInteractions(restTemplate);
         verifyNoMoreInteractions(evidenceManagementService);
-        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to DWP"), any());
+        verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq("Case state is now sent to FTA"), any());
         verifyNoMoreInteractions(emailService);
     }
 

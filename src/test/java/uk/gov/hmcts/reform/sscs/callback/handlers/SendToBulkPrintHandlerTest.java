@@ -204,8 +204,8 @@ public class SendToBulkPrintHandlerTest {
         verify(pdfStoreService, times(2)).download(eq(docUrl));
         verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any());
 
-        String documentList = "Case has been sent to the DWP via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: evidence1.pdf, evidence2.pdf";
-        verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq(documentList), any());
+        String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: evidence1.pdf, evidence2.pdf";
+        verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to FTA"), eq(documentList), any());
 
         List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
         assertNull(docs.get(0).getValue().getEvidenceIssued());
@@ -255,7 +255,7 @@ public class SendToBulkPrintHandlerTest {
         ArgumentCaptor<SscsCaseData> caseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
         then(ccdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Triggered from Evidence Share – no DL6/16 present, please validate."), any());
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to FTA Error"), eq("Triggered from Evidence Share – no DL6/16 present, please validate."), any());
 
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
 
@@ -273,7 +273,7 @@ public class SendToBulkPrintHandlerTest {
 
         then(ccdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Send to DWP Error event has been triggered from Evidence Share service"), any());
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to FTA Error"), eq("Send to FTA Error event has been triggered from Evidence Share service"), any());
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
@@ -288,7 +288,7 @@ public class SendToBulkPrintHandlerTest {
 
         then(ccdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Send to DWP Error event has been triggered from Evidence Share service"), any());
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to FTA Error"), eq("Send to FTA Error event has been triggered from Evidence Share service"), any());
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
@@ -305,7 +305,7 @@ public class SendToBulkPrintHandlerTest {
 
         then(ccdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Unable to contact dm-store, please try again by running the \"Send to DWP\"."), any());
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to FTA Error"), eq("Unable to contact dm-store, please try again by running the \"Send to FTA\"."), any());
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
@@ -319,7 +319,7 @@ public class SendToBulkPrintHandlerTest {
         handler.handle(CallbackType.SUBMITTED, callback);
         then(ccdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Non-PDFs/broken PDFs seen in list of documents, please correct."), any());
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to FTA Error"), eq("Non-PDFs/broken PDFs seen in list of documents, please correct."), any());
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
@@ -334,7 +334,7 @@ public class SendToBulkPrintHandlerTest {
         handler.handle(CallbackType.SUBMITTED, callback);
         then(ccdCaseService)
             .should(times(1))
-            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to DWP Error"), eq("Unable to contact idam, please try again by running the \"Send to DWP\"."), any());
+            .updateCase(caseDataCaptor.capture(), eq(123L), eq("sendToDwpError"), eq("Send to FTA Error"), eq("Unable to contact idam, please try again by running the \"Send to FTA\"."), any());
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
 
@@ -377,7 +377,7 @@ public class SendToBulkPrintHandlerTest {
 
         verifyNoMoreInteractions(documentManagementServiceWrapper);
 
-        verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case state is now sent to DWP"), any());
+        verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to FTA"), eq("Case state is now sent to FTA"), any());
 
         assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
         assertEquals(DwpState.UNREGISTERED.getId(), caseDataCaptor.getValue().getDwpState());
@@ -409,7 +409,7 @@ public class SendToBulkPrintHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP_ERROR.getCcdType()), eq("Send to DWP Error"), eq("Send to DWP Error event has been triggered from Evidence Share service"), any());
+        verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP_ERROR.getCcdType()), eq("Send to FTA Error"), eq("Send to FTA Error event has been triggered from Evidence Share service"), any());
 
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
     }
