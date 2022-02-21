@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -28,12 +26,20 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
 
     private final IdamService idamService;
 
+    private Map<String, Object> hmctsServiceIdMap;
+
+    private Map<String, Map<String, Object>> supplementaryDataRequestMap;
+
     @Autowired
     public ManualCaseCreatedHandler(CcdService ccdService,
                                  IdamService idamService) {
         this.dispatchPriority = DispatchPriority.LATEST;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        hmctsServiceIdMap = new HashMap<>();
+        hmctsServiceIdMap.put("HMCTSServiceId", "BBA3");
+        supplementaryDataRequestMap = new HashMap<>();
+        supplementaryDataRequestMap.put("$set", hmctsServiceIdMap);
     }
 
     @Override
@@ -62,32 +68,24 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
         //get the supplementary data
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         Map<String, Map<String, Object>> supplementaryData = caseDetails.getSupplementaryData();
-        //Map<String, Map<String, Object>> supplementaryData = supplementaryDataRequestMap;
 
-        boolean changed = false;
+        boolean supplementaryDataNeedsUpdating = false;
         if (supplementaryData == null) {
             supplementaryData = supplementaryDataRequestMap;
-            changed = true;
+            supplementaryDataNeedsUpdating = true;
         }
         if (supplementaryData.get("$set") == null) {
             supplementaryData.put("$set", hmctsServiceIdMap);
-            changed = true;
+            supplementaryDataNeedsUpdating = true;
         }
         if (supplementaryData.get("$set").get("HMCTSServiceId") == null) {
             supplementaryData.get("$set").put("HMCTSServiceId", "BBA3");
-            changed = true;
+            supplementaryDataNeedsUpdating = true;
         }
-        if (changed) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                log.info(objectMapper.writeValueAsString(supplementaryData));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+        if (supplementaryDataNeedsUpdating) {
             try {
                 Map<String, Map<String, Map<String, Object>>> supplementaryDataUpdates = new HashMap<>();
                 supplementaryDataUpdates.put("supplementary_data_updates", supplementaryData);
-                log.info(objectMapper.writeValueAsString(supplementaryDataUpdates));
                 ccdService.setSupplementaryData(idamTokens, caseId, supplementaryDataUpdates);
             } catch (Exception e) {
                 log.error("Error sending supplementary for caseId {}", caseId, e);
@@ -95,19 +93,6 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
         }
 
     }
-
-    private Map<String, Object> hmctsServiceIdMap = new HashMap<>() {
-        {
-            put("HMCTSServiceId", "BBA3");
-        }
-    };
-
-    private Map<String, Map<String, Object>> supplementaryDataRequestMap = new HashMap<>() {
-        {
-            put("$set", hmctsServiceIdMap);
-        }
-    };
-
 
     @Override
     public DispatchPriority getPriority() {
