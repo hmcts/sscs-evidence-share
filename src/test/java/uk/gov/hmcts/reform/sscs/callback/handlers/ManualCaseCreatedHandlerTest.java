@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildCallbackWithSupplementaryData;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildCallback;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
@@ -73,51 +73,9 @@ public class ManualCaseCreatedHandlerTest {
 
     @Test
     public void givenNullSupplementaryData_addServiceId() {
-        handler.handle(SUBMITTED, buildCallbackWithSupplementaryData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), READY_TO_LIST, VALID_APPEAL_CREATED, null));
+        handler.handle(SUBMITTED, buildCallback(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), READY_TO_LIST, VALID_APPEAL_CREATED, null));
 
         verify(ccdCaseService).setSupplementaryData(any(), any(), eq(getWrappedData(getSupplementaryData())));
-    }
-
-    @Test
-    public void givenOtherSupplementaryData_addServiceId() {
-        Map<String, Map<String, Object>> suppMap = getSupplementaryData();
-        suppMap.remove(setKey);
-        Map<String, Object> otherMap = new HashMap();
-        otherMap.put("other", "thing");
-        suppMap.put("$something", otherMap);
-        handler.handle(SUBMITTED, buildCallbackWithSupplementaryData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), READY_TO_LIST, VALID_APPEAL_CREATED, suppMap));
-
-        Map<String, Map<String, Object>> finalMap = getSupplementaryData();
-        Map<String, Object> otherMapFinal = new HashMap();
-        otherMapFinal.put("other", "thing");
-        finalMap.put("$something", otherMapFinal);
-
-        verify(ccdCaseService).setSupplementaryData(any(), any(), eq(getWrappedData(finalMap)));
-    }
-
-    @Test
-    public void givenOtherSetData_addServiceIdRetainOtherData() {
-        Map<String, Map<String, Object>> suppMap = getSupplementaryData();
-        suppMap.remove(setKey);
-        Map<String, Object> otherMap = new HashMap();
-        otherMap.put("other", "thing");
-        suppMap.put(setKey, otherMap);
-        handler.handle(SUBMITTED, buildCallbackWithSupplementaryData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), READY_TO_LIST, VALID_APPEAL_CREATED, suppMap));
-
-        Map<String, Map<String, Object>> finalMap = getSupplementaryData();
-        Map<String, Object> otherMapFinal = new HashMap();
-        otherMapFinal.put("other", "thing");
-        otherMapFinal.put("HMCTSServiceId", "BBA3");
-        finalMap.put(setKey, otherMapFinal);
-
-        verify(ccdCaseService).setSupplementaryData(any(), any(), eq(getWrappedData(finalMap)));
-    }
-
-    @Test
-    public void givenExistingSupplementaryData_dontChange() {
-        handler.handle(SUBMITTED, buildCallbackWithSupplementaryData(SscsCaseData.builder().createdInGapsFrom(READY_TO_LIST.getId()).build(), READY_TO_LIST, VALID_APPEAL_CREATED, getSupplementaryData()));
-
-        verify(ccdCaseService, never()).setSupplementaryData(any(), any(), eq(getWrappedData(getSupplementaryData())));
     }
 
     public Map<String, Map<String, Object>> getSupplementaryData() {

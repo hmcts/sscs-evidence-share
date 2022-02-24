@@ -29,10 +29,9 @@ public final class HandlerHelper {
         return new Callback<>(caseDetails, Optional.of(oldCaseDetails), eventType, false);
     }
 
-    public static Callback<SscsCaseData> buildCallbackWithSupplementaryData(SscsCaseData sscsCaseData, State state, EventType eventType, Map<String, Map<String, Object>> supplementaryData) {
+    public static Callback<SscsCaseData> buildCallback(SscsCaseData sscsCaseData, State state, EventType eventType, Map<String, Map<String, Object>> supplementaryData) {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "SSCS", state, sscsCaseData,
             LocalDateTime.now(), "Benefit");
-        caseDetails.setSupplementaryData(supplementaryData);
 
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }

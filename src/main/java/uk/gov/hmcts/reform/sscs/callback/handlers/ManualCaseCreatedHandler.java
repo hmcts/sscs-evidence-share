@@ -65,31 +65,12 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
 
         IdamTokens idamTokens = idamService.getIdamTokens();
 
-        //get the supplementary data
-        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        Map<String, Map<String, Object>> supplementaryData = caseDetails.getSupplementaryData();
-
-        boolean supplementaryDataNeedsUpdating = false;
-        if (supplementaryData == null) {
-            supplementaryData = supplementaryDataRequestMap;
-            supplementaryDataNeedsUpdating = true;
-        }
-        if (supplementaryData.get("$set") == null) {
-            supplementaryData.put("$set", hmctsServiceIdMap);
-            supplementaryDataNeedsUpdating = true;
-        }
-        if (supplementaryData.get("$set").get("HMCTSServiceId") == null) {
-            supplementaryData.get("$set").put("HMCTSServiceId", "BBA3");
-            supplementaryDataNeedsUpdating = true;
-        }
-        if (supplementaryDataNeedsUpdating) {
-            try {
-                Map<String, Map<String, Map<String, Object>>> supplementaryDataUpdates = new HashMap<>();
-                supplementaryDataUpdates.put("supplementary_data_updates", supplementaryData);
-                ccdService.setSupplementaryData(idamTokens, caseId, supplementaryDataUpdates);
-            } catch (Exception e) {
-                log.error("Error sending supplementary for caseId {}", caseId, e);
-            }
+        try {
+            Map<String, Map<String, Map<String, Object>>> supplementaryDataUpdates = new HashMap<>();
+            supplementaryDataUpdates.put("supplementary_data_updates", supplementaryDataRequestMap);
+            ccdService.setSupplementaryData(idamTokens, caseId, supplementaryDataUpdates);
+        } catch (Exception e) {
+            log.error("Error sending supplementary for caseId {}", caseId, e);
         }
 
     }
