@@ -316,7 +316,7 @@ dependencies {
   compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
   compile group: 'com.github.hmcts', name: 'sscs-common', version: '4.6.43-RC-SSCS-10068'
-  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.46'
+  compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '4.6.43-RC-SSCS-10068-01'
 
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
