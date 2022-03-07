@@ -119,12 +119,8 @@ robotics:
             location: /schema/sscs-robotics.json
     scottishCount: 1
 send-grid:
-  host: smtp.sendgrid.net
-  port: 587
-  api-key: dummy
-ld:
-  user-key: sscs-evidence-share
-  sdk-key: abcd
+    host: smtp.sendgrid.net
+    port: 587
 send-letter:
     enabled: ${SEND_LETTER_SERVICE_ENABLED:true}
     maxRetryAttempts: ${MAX_RETRY_ATTEMPTS:3}
