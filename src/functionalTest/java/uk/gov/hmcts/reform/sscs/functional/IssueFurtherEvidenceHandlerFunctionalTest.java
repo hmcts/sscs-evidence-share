@@ -1,15 +1,18 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
-import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 
 public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
 
@@ -61,55 +64,53 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     private void verifyEvidenceIsNotIssued() {
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
-        assertEquals("failedSendingFurtherEvidence", caseData.getHmctsDwpState());
-        List<SscsDocument> docs = caseData.getSscsDocument();
-        Assertions.assertThat(docs)
+
+        assertThat(caseData.getHmctsDwpState()).isEqualTo("failedSendingFurtherEvidence");
+
+        assertThat(caseData.getSscsDocument())
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .filteredOn("No"::equalsIgnoreCase)
+            .filteredOn(YesNo::isNo)
             .hasSize(3);
     }
 
     private void verifyEvidenceIssued() {
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
-        List<SscsDocument> docs = caseData.getSscsDocument();
 
-        Assertions.assertThat(docs)
+        assertThat(caseData.getSscsDocument())
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .filteredOn("Yes"::equalsIgnoreCase)
+            .filteredOn(YesNo::isYes)
             .hasSize(3);
     }
 
     private void verifyEvidenceIssuedAndReasonableAdjustmentRaised(SscsCaseDetails caseDetailsIn) {
         SscsCaseDetails caseDetails = findCaseById(String.valueOf(caseDetailsIn.getId()));
         SscsCaseData caseData = caseDetails.getData();
-        List<SscsDocument> docs = caseData.getSscsDocument();
 
-        Assertions.assertThat(docs)
+        assertThat(caseData.getSscsDocument())
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .filteredOn("Yes"::equalsIgnoreCase)
+            .filteredOn(YesNo::isYes)
             .hasSize(3);
 
-        assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
-        assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
+        assertThat(caseData.getReasonableAdjustmentsOutstanding()).isEqualTo(YES);
+        assertThat(caseData.getReasonableAdjustmentsLetters().getAppellant()).hasSize(2);
     }
 
     private void verifyEvidenceIssuedAndExistingReasonableAdjustmentRaised(SscsCaseDetails caseDetailsIn) {
         SscsCaseDetails caseDetails = findCaseById(String.valueOf(caseDetailsIn.getId()));
         SscsCaseData caseData = caseDetails.getData();
-        List<SscsDocument> docs = caseData.getSscsDocument();
 
-        Assertions.assertThat(docs)
+        assertThat(caseData.getSscsDocument())
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .filteredOn("Yes"::equalsIgnoreCase)
+            .filteredOn(YesNo::isYes)
             .hasSize(3);
 
-        assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
-        assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
+        assertThat(caseData.getReasonableAdjustmentsOutstanding()).isEqualTo(YES);
+        assertThat(caseData.getReasonableAdjustmentsLetters().getAppellant()).hasSize(2);
     }
 
 

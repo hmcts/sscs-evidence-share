@@ -64,7 +64,7 @@ public class FurtherEvidencePlaceholderService {
     private String extractNameAppellant(SscsCaseData caseData) {
         return Optional.of(caseData.getAppeal())
             .map(Appeal::getAppellant)
-            .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
+            .filter(appellant -> isYes(appellant.getIsAppointee()))
             .map(Appellant::getAppointee)
             .map(Appointee::getName)
             .filter(name -> isValidName(name))
@@ -142,7 +142,7 @@ public class FurtherEvidencePlaceholderService {
     private Address getAppellantAddress(SscsCaseData caseData) {
         return Optional.of(caseData.getAppeal())
             .map(Appeal::getAppellant)
-            .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
+            .filter(appellant -> isYes(appellant.getIsAppointee()))
             .map(Appellant::getAppointee)
             .map(Appointee::getAddress)
             .orElseGet(() -> defaultAddress(caseData.getAppeal()));

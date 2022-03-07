@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNo;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
 
@@ -160,7 +162,7 @@ public class FurtherEvidenceService {
 
     private boolean checkRepExists(SscsCaseData caseData) {
         Representative rep = caseData.getAppeal().getRep();
-        return null != rep && "yes".equalsIgnoreCase(rep.getHasRepresentative());
+        return nonNull(rep) && isYes(rep.getHasRepresentative());
     }
 
     private boolean checkJointPartyExists(SscsCaseData caseData) {
@@ -206,7 +208,7 @@ public class FurtherEvidenceService {
 
     private boolean canHandleDocument(SscsDocument sscsDocument) {
         return sscsDocument != null && sscsDocument.getValue() != null
-            && "No".equals(sscsDocument.getValue().getEvidenceIssued())
+            && isNo(sscsDocument.getValue().getEvidenceIssued())
             && null != sscsDocument.getValue().getDocumentType();
     }
 

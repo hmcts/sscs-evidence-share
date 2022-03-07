@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -235,7 +236,7 @@ public class RoboticsCallbackHandlerTest {
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(WITH_DWP, READY_TO_LIST.getId());
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_RAISE_EXCEPTION, false);
-        caseDetails.getCaseData().setIsProgressingViaGaps("Yes");
+        caseDetails.getCaseData().setIsProgressingViaGaps(YES);
 
         handler.handle(SUBMITTED, callback);
 

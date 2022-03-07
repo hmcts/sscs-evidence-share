@@ -7,6 +7,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -53,13 +55,13 @@ public class SscsDocumentServiceTest {
     @Test
     public void filterByDocTypeAndApplyActionHappyPath() {
         List<SscsDocument> sscsDocumentList = createTestData(false);
-        Consumer<SscsDocument> action = doc -> doc.getValue().setEvidenceIssued("Yes");
+        Consumer<SscsDocument> action = doc -> doc.getValue().setEvidenceIssued(YES);
 
         sscsDocumentService.filterByDocTypeAndApplyAction(sscsDocumentList, APPELLANT_EVIDENCE, action);
 
         sscsDocumentList.stream()
             .filter(doc -> APPELLANT_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()))
-            .forEach(doc -> assertEquals("Yes", doc.getValue().getEvidenceIssued()));
+            .forEach(doc -> assertEquals(YES, doc.getValue().getEvidenceIssued()));
     }
 
     @Test
@@ -173,7 +175,7 @@ public class SscsDocumentServiceTest {
                 .documentType(APPELLANT_EVIDENCE.getValue())
                 .documentLink(documentLink)
                 .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
-                .evidenceIssued("No")
+                .evidenceIssued(NO)
                 .build())
             .build();
         SscsDocument sscsDocumentAppellantTypeIssued = SscsDocument.builder()
@@ -182,7 +184,7 @@ public class SscsDocumentServiceTest {
                 .documentType(APPELLANT_EVIDENCE.getValue())
                 .documentLink(documentLink)
                 .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
-                .evidenceIssued("Yes")
+                .evidenceIssued(YES)
                 .build())
             .build();
         SscsDocument sscsDocumentRepsType = SscsDocument.builder()
@@ -191,7 +193,7 @@ public class SscsDocumentServiceTest {
                 .documentType(REPRESENTATIVE_EVIDENCE.getValue())
                 .documentLink(documentLink)
                 .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
-                .evidenceIssued("No")
+                .evidenceIssued(NO)
                 .build())
             .build();
         SscsDocument sscsDocumentOtherType = SscsDocument.builder()
@@ -200,7 +202,7 @@ public class SscsDocumentServiceTest {
                 .documentType(OTHER_DOCUMENT.getValue())
                 .documentLink(documentLink)
                 .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
-                .evidenceIssued("No")
+                .evidenceIssued(NO)
                 .build())
             .build();
 
@@ -227,7 +229,7 @@ public class SscsDocumentServiceTest {
                 .documentType(OTHER_PARTY_EVIDENCE.getValue())
                 .documentLink(documentLink)
                 .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
-                .evidenceIssued("No")
+                .evidenceIssued(NO)
                 .originalSenderOtherPartyId("1")
                 .build())
             .build();
@@ -238,7 +240,7 @@ public class SscsDocumentServiceTest {
                 .documentType(OTHER_PARTY_REPRESENTATIVE_EVIDENCE.getValue())
                 .documentLink(documentLink)
                 .editedDocumentLink(withEditedDocument ? editedDocumentLink : null)
-                .evidenceIssued("No")
+                .evidenceIssued(NO)
                 .originalSenderOtherPartyId("2")
                 .build())
             .build();

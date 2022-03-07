@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseData;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseDataWithoutBenefitType;
@@ -145,7 +147,7 @@ public class PlaceholderServiceTest {
         assertEquals("Bedford", placeholders.get(RECIPIENT_ADDRESS_LINE_4_LITERAL));
         assertEquals("L2 5UZ", placeholders.get(RECIPIENT_ADDRESS_LINE_5_LITERAL));
         assertEquals("SC123/12/1234", placeholders.get(SC_NUMBER_LITERAL));
-        assertEquals("No", placeholders.get(SHOULD_HIDE_NINO));
+        assertEquals(NO.getValue(), placeholders.get(SHOULD_HIDE_NINO));
     }
 
     @Test
@@ -205,7 +207,7 @@ public class PlaceholderServiceTest {
             .town("Lechworth")
             .county("Bedford")
             .postcode("L2 5UZ").build();
-        caseData.setLanguagePreferenceWelsh("Yes");
+        caseData.setLanguagePreferenceWelsh(YES);
 
         service.build(caseData, placeholders, address, welshDate);
 
@@ -216,7 +218,7 @@ public class PlaceholderServiceTest {
 
     @Test
     public void givenAChildSupportCase_thenShouldHideNino() {
-        caseData.setLanguagePreferenceWelsh("Yes");
+        caseData.setLanguagePreferenceWelsh(YES);
         caseData.getAppeal().getBenefitType().setCode(CHILD_SUPPORT.getShortName());
         caseData.getAppeal().getBenefitType().setDescription(CHILD_SUPPORT.getDescription());
 
@@ -229,6 +231,6 @@ public class PlaceholderServiceTest {
 
         service.build(caseData, placeholders, address, welshDate);
 
-        assertEquals("Yes", placeholders.get(SHOULD_HIDE_NINO));
+        assertEquals(YES.getValue(), placeholders.get(SHOULD_HIDE_NINO));
     }
 }

@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -26,12 +26,12 @@ public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest exten
     private void verifyEvidenceIssued() {
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
-        List<SscsDocument> docs = caseData.getSscsDocument();
         log.info("verifyEvidenceIssued ccdCaseId " + ccdCaseId);
 
-        Assertions.assertThat(docs)
+        assertThat(caseData.getSscsDocument())
+            .hasSize(4)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .contains("Yes", "Yes", "Yes");
+            .containsExactlyInAnyOrder(YES, YES, YES, null);
     }
 }

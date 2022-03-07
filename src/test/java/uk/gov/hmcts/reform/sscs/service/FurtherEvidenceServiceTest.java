@@ -109,7 +109,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndNoRep_shouldGenerateCoverLetterOriginalSenderAnd609_98ForDwpAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", true);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, true);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES, null);
 
@@ -123,7 +123,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndNoRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAnd609_98ForDwpAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("Yes", false);
+        createTestDataAndConfigureSscsDocumentServiceMock(YES, false);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES, null);
 
@@ -139,7 +139,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndRep_shouldGenerateCoverLetterOriginalSenderAnd609_98ForRepAndDwpAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", true);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, true);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES, null);
@@ -156,7 +156,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAnd609_98ForRepAndDwpAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("Yes", false);
+        createTestDataAndConfigureSscsDocumentServiceMock(YES, false);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES, null);
@@ -176,7 +176,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenRepIssueFurtherEvidenceCallbackWithAppellantRep_shouldGenerateCoverLetterOriginalSenderAnd609_98ForAppellantAndDwpAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", true);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, true);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES, null);
@@ -193,7 +193,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenRepIssueFurtherEvidenceCallbackWithAppellantRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAnd609_98ForAppellantAndDwpAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("Yes", false);
+        createTestDataAndConfigureSscsDocumentServiceMock(YES, false);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, REPRESENTATIVE_EVIDENCE, ALLOWED_LETTER_TYPES, null);
@@ -213,7 +213,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenDwpIssueFurtherEvidenceCallbackWithAppellant_shouldGenerateCoverLetterOriginalSenderAnd609_98ForAppellantAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
             Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER), null);
@@ -228,7 +228,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenDwpIssueFurtherEvidenceCallbackWithAppellant_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAnd609_98ForAppellantAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("Yes", false);
+        createTestDataAndConfigureSscsDocumentServiceMock(YES, false);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
             Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER), null);
@@ -245,7 +245,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenDwpIssueFurtherEvidenceCallbackWithAppellantAndRep_shouldGenerateCoverLetterOriginalSenderAnd609_98ForAppellantAndRepAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
@@ -263,7 +263,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenJointPartyIssueFurtherEvidenceCallbackWithAppellant_shouldGenerateCoverLetterOriginalSenderAnd609_98ForAppellantAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false, JOINT_PARTY_EVIDENCE);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false, JOINT_PARTY_EVIDENCE);
         withJointParty();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, JOINT_PARTY_EVIDENCE,
@@ -278,7 +278,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenOriginalSenderAsOtherPartyAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyAnd609_98ForAppellantThenBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false, OTHER_PARTY_EVIDENCE);
         withOtherPartyOrRepOrAppointee(false, false, "1", null, null);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_EVIDENCE,
@@ -293,7 +293,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenOriginalSenderAsOtherPartyAppointeeAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyAppointeeAnd609_98ForAppellantThenBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false, OTHER_PARTY_EVIDENCE);
         withOtherPartyOrRepOrAppointee(true, false, "1", "2", null);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_EVIDENCE,
@@ -308,7 +308,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenOriginalSenderAsOtherPartyRepAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyRepAnd609_98ForAppellantAndOtherPartyThenBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false, OTHER_PARTY_EVIDENCE);
         withOtherPartyOrRepOrAppointee(false, true, "1", null, "3");
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_REPRESENTATIVE_EVIDENCE,
@@ -325,7 +325,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenOriginalSenderAsOtherPartyRepAndThereIsOtherPartyAppointeeIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyRepAnd609_98ForAppellantAndOtherPartyAppointeeThenBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false, OTHER_PARTY_EVIDENCE);
         withOtherPartyOrRepOrAppointee(true, true, "1", "2", "3");
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_REPRESENTATIVE_EVIDENCE,
@@ -342,7 +342,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenOriginalSenderAsOtherPartyAppointeeAndThereIsOtherPartyRepIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyAppointeeAnd609_98ForAppellantAndOtherPartyRepThenBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false, OTHER_PARTY_EVIDENCE);
         withOtherPartyOrRepOrAppointee(true, true, "1", "2", "3");
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, OTHER_PARTY_EVIDENCE,
@@ -359,7 +359,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenMultipleOtherPartiesAndOriginalSenderAsOtherPartyAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyAnd609_98ForAppellantAndSecondOtherPartyThenBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false, OTHER_PARTY_EVIDENCE);
         withOtherPartyOrRepOrAppointee(false, false, "1", null, null);
         withOtherPartyOrRepOrAppointee(false, false, "4", null, null);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
@@ -376,7 +376,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenMultipleOtherPartiesAndOriginalSenderAsOtherPartyAppointeeAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyAppointeeAnd609_98ForAppellantAndSecondOtherPartyThenBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false, OTHER_PARTY_EVIDENCE);
         withOtherPartyOrRepOrAppointee(true, false, "1", "2", null);
         withOtherPartyOrRepOrAppointee(false, false, "4", null, null);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
@@ -393,7 +393,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenMultipleOtherPartiesAndOriginalSenderAsOtherPartyRepAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyRepAnd609_98ForAppellantAndSecondOtherPartyThenBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false, OTHER_PARTY_EVIDENCE);
         withOtherPartyOrRepOrAppointee(true, true, "1", "2", "3");
         withOtherPartyOrRepOrAppointee(false, false, "4", null, null);
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
@@ -412,7 +412,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenMultipleOtherPartiesAndOriginalSenderAsOtherPartyAppointeeAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForOtherPartyRepAnd609_98ForAppellantAndAllSecondOtherPartyThenBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false, OTHER_PARTY_EVIDENCE);
         withOtherPartyOrRepOrAppointee(true, true, "1", "2", "3");
         withOtherPartyOrRepOrAppointee(true, true, "4", "5", "6");
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
@@ -432,7 +432,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenMultipleOtherPartiesAndOriginalSenderAsAppellantAndIssueFurtherEvidenceCallback_shouldGenerateCoverLetterForAppellantAnd609_98ForAllOtherPartiesThenBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false, OTHER_PARTY_EVIDENCE);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false, OTHER_PARTY_EVIDENCE);
         withOtherPartyOrRepOrAppointee(true, true, "1", "2", "3");
         withOtherPartyOrRepOrAppointee(true, true, "4", "5", "6");
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
@@ -452,7 +452,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenDwpIssueFurtherEvidenceCallbackWithAppellantAndRep_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterOriginalSenderAnd609_98ForAppellantAndRepAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("Yes", false);
+        createTestDataAndConfigureSscsDocumentServiceMock(YES, false);
         withRep();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, DWP_EVIDENCE,
@@ -474,7 +474,7 @@ public class FurtherEvidenceServiceTest {
     @Test
     @Parameters({"APPELLANT_LETTER", "REPRESENTATIVE_LETTER", "DWP_LETTER", "JOINT_PARTY_LETTER" })
     public void givenIssueForParty_shouldGenerateCoverLetterForSelectedParty(FurtherEvidenceLetterType furtherEvidenceLetterType) {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", true);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, true);
         withRep();
         withJointParty();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
@@ -497,7 +497,7 @@ public class FurtherEvidenceServiceTest {
     @Test
     @Parameters({"OTHER_PARTY_LETTER, 1", "OTHER_PARTY_REP_LETTER, 2" })
     public void givenIssueForOtherParty_shouldGenerateCoverLetterForSelectedParty(FurtherEvidenceLetterType furtherEvidenceLetterType, String expectedOtherPartyId) {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", true);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, true);
         withRep();
         withOtherPartyOrRepOrAppointee(false, true, "1", null, "2");
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
@@ -517,7 +517,7 @@ public class FurtherEvidenceServiceTest {
     @Test
     @Parameters({"APPELLANT_LETTER", "REPRESENTATIVE_LETTER", "DWP_LETTER", "JOINT_PARTY_LETTER" })
     public void givenIssueForParty_whenLanguageIsWelsh_shouldGenerateWelshCoverLetterForSelectedParty(FurtherEvidenceLetterType furtherEvidenceLetterType) {
-        createTestDataAndConfigureSscsDocumentServiceMock("Yes", false);
+        createTestDataAndConfigureSscsDocumentServiceMock(YES, false);
         withRep();
         withJointParty();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
@@ -539,7 +539,7 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void givenAppellantIssueFurtherEvidenceCallbackWithAppellantAndJointParty_shouldGenerateCoverLetterOriginalSenderAnd609_98ForAndDwpAndBulkPrintDocs() {
-        createTestDataAndConfigureSscsDocumentServiceMock("No", false);
+        createTestDataAndConfigureSscsDocumentServiceMock(NO, false);
         withJointParty();
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(),caseData, APPELLANT_EVIDENCE, ALLOWED_LETTER_TYPES, null);
@@ -566,17 +566,17 @@ public class FurtherEvidenceServiceTest {
             .value(OtherParty.builder()
                 .id(otherPartyId)
                 .name(Name.builder().firstName("Harry").lastName("Kane").build())
-                .isAppointee(NO.getValue())
+                .isAppointee(NO)
                 .build())
             .build();
 
         if (withAppointee) {
-            otherParty.getValue().setIsAppointee(YES.getValue());
+            otherParty.getValue().setIsAppointee(YES);
             otherParty.getValue().setAppointee(Appointee.builder().id(otherPartyAppointeeId).name(Name.builder().firstName("Henry").lastName("Smith").build()).build());
         }
 
         if (withRep) {
-            otherParty.getValue().setRep(Representative.builder().id(otherPartyRepId).hasRepresentative(YES.getValue()).name(Name.builder().firstName("Wendy").lastName("Collins").build()).build());
+            otherParty.getValue().setRep(Representative.builder().id(otherPartyRepId).hasRepresentative(YES).name(Name.builder().firstName("Wendy").lastName("Collins").build()).build());
         }
 
         List<CcdValue<OtherParty>> otherParties = new ArrayList<>();
@@ -588,15 +588,16 @@ public class FurtherEvidenceServiceTest {
         caseData.setOtherParties(otherParties);
     }
 
-    private void createTestDataAndConfigureSscsDocumentServiceMock(String languagePreferenceFlag, boolean isConfidentialCase) {
+    private void createTestDataAndConfigureSscsDocumentServiceMock(YesNo languagePreferenceFlag, boolean isConfidentialCase) {
         createTestDataAndConfigureSscsDocumentServiceMock(languagePreferenceFlag, isConfidentialCase, APPELLANT_EVIDENCE);
     }
 
-    private void createTestDataAndConfigureSscsDocumentServiceMock(String languagePreferenceFlag, boolean isConfidentialCase, DocumentType documentType) {
+    private void createTestDataAndConfigureSscsDocumentServiceMock(YesNo languagePreferenceFlag,
+                                                                   boolean isConfidentialCase, DocumentType documentType) {
         SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(documentType.getValue())
-                .evidenceIssued("No")
+                .evidenceIssued(NO)
                 .build())
             .build();
 
@@ -615,7 +616,7 @@ public class FurtherEvidenceServiceTest {
     }
 
     private void withRep() {
-        caseData.getAppeal().setRep(Representative.builder().hasRepresentative("Yes").build());
+        caseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES).build());
     }
 
     @Test
@@ -730,28 +731,28 @@ public class FurtherEvidenceServiceTest {
         SscsDocument sscsDocument1WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(APPELLANT_EVIDENCE.getValue())
-                .evidenceIssued("No")
+                .evidenceIssued(NO)
                 .build())
             .build();
 
         SscsDocument sscsDocument2WithAppellantEvidenceAndNoIssued = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(APPELLANT_EVIDENCE.getValue())
-                .evidenceIssued("No")
+                .evidenceIssued(NO)
                 .build())
             .build();
 
         SscsDocument sscsDocument3WithAppellantEvidenceAndYesIssued = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(APPELLANT_EVIDENCE.getValue())
-                .evidenceIssued("Yes")
+                .evidenceIssued(YES)
                 .build())
             .build();
 
         SscsDocument sscsDocument4WithRepEvidenceAndNoIssued = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentType(REPRESENTATIVE_EVIDENCE.getValue())
-                .evidenceIssued("No")
+                .evidenceIssued(NO)
                 .build())
             .build();
 
@@ -774,12 +775,12 @@ public class FurtherEvidenceServiceTest {
                 .build()), false},
             new Object[]{Collections.singletonList(SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
-                    .evidenceIssued("No")
+                    .evidenceIssued(NO)
                     .build())
                 .build()), false},
             new Object[]{Collections.singletonList(SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
-                    .evidenceIssued("No")
+                    .evidenceIssued(NO)
                     .documentType(null)
                     .build())
                 .build()), false},

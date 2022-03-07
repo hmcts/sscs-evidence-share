@@ -8,7 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
@@ -72,7 +75,7 @@ public class RoboticsServiceIt {
         caseData = SscsCaseData.builder()
             .ccdCaseId("123456")
             .regionalProcessingCenter(null)
-            .evidencePresent("Yes")
+            .evidencePresent(YES)
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().dwpIssuingOffice("DWP PIP (1)").build())
                 .benefitType(BenefitType.builder().code("PIP").description("Personal Independence Payment").build())
@@ -83,7 +86,7 @@ public class RoboticsServiceIt {
                     .identity(Identity.builder().nino("JT0123456B").build())
                     .contact(Contact.builder().mobile(null).email(null).build())
                     .build())
-                .hearingOptions(HearingOptions.builder().wantsToAttend("Yes").other("My hearing").build())
+                .hearingOptions(HearingOptions.builder().wantsToAttend(YES).other("My hearing").build())
                 .build())
             .build();
 
@@ -98,7 +101,7 @@ public class RoboticsServiceIt {
     public void givenSscsCaseDataWithRep_makeValidRoboticsJsonThatValidatesAgainstSchema() {
 
         caseData.getAppeal().setRep(Representative.builder()
-            .hasRepresentative("Yes").name(Name.builder().title("Mrs").firstName("Wendy").lastName("Barker").build())
+            .hasRepresentative(YES).name(Name.builder().title("Mrs").firstName("Wendy").lastName("Barker").build())
             .address(Address.builder().line1("99 My Road").town("Grantham").county("Surrey").postcode("RH5 6PO").build())
             .contact(Contact.builder().mobile(null).email(null).build())
             .build());
@@ -185,7 +188,7 @@ public class RoboticsServiceIt {
             .address(Address.builder().line1("99 My Road").town("Grantham").county("Surrey").postcode("CV10 6PO").build())
             .identity(Identity.builder().nino("JT0123456B").build())
             .contact(Contact.builder().mobile(null).email(null).build())
-            .isAppointee("Yes").appointee(
+            .isAppointee(YES).appointee(
                 Appointee.builder().name(Name.builder().title("Mr").firstName("Terry").lastName("Tibbs").build())
                     .identity(Identity.builder().nino("JT0123456B").build())
                     .address(Address.builder().line1("99 My Road").town("Chelmsford").county("Essex").postcode("CM12 0NS").build())
@@ -206,7 +209,7 @@ public class RoboticsServiceIt {
 
     @Test
     public void givenSscsCaseDataWithoutHearingArrangements_makeValidRoboticsJsonThatValidatesAgainstSchema() {
-        caseData.getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend("Yes").build());
+        caseData.getAppeal().setHearingOptions(HearingOptions.builder().wantsToAttend(YES).build());
 
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
 
@@ -221,8 +224,9 @@ public class RoboticsServiceIt {
     @Test
     public void givenUcSscsCaseDataWithJointPartyAndElements_makeValidRoboticsJsonThatValidatesAgainstSchema() {
         caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("Pip").build());
+
         caseDetails.getCaseData().setElementsDisputedLinkedAppealRef("123456");
-        caseDetails.getCaseData().setElementsDisputedIsDecisionDisputedByOthers("Yes");
+        caseDetails.getCaseData().setElementsDisputedIsDecisionDisputedByOthers(YES);
 
         caseDetails.getCaseData().getJointParty().setHasJointParty(YES);
         caseDetails.getCaseData().getJointParty().setName(Name.builder().title("Mr").firstName("Terry").lastName("Tibbs").build());
@@ -289,13 +293,13 @@ public class RoboticsServiceIt {
     @Test
     public void givenDwpRaiseException_thenSetDigitalFlagNoToRobotics() {
         caseData.setCreatedInGapsFrom(VALID_APPEAL.getId());
-        caseData.setIsProgressingViaGaps("Yes");
+        caseData.setIsProgressingViaGaps(YES);
 
         caseDetails = new CaseDetails<>(1234L, "sscs", State.NOT_LISTABLE, caseData, null, "Benefit");
 
         JSONObject result = roboticsService.sendCaseToRobotics(caseDetails);
 
-        assertEquals("No", result.getString("isDigital"));
+        assertEquals(NO.getValue(), result.getString("isDigital"));
         verifyNoMoreInteractions(ccdService);
     }
 

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 
+import static java.util.Objects.isNull;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,15 +60,15 @@ public class PanelCompositionService {
     private boolean hasNoHearingOption(CcdValue<OtherParty> otherPartyCcdValue) {
         HearingOptions hearingOptions = otherPartyCcdValue.getValue().getHearingOptions();
         return hearingOptions == null
-            || (StringUtils.isBlank(hearingOptions.getWantsToAttend())
-            && StringUtils.isBlank(hearingOptions.getWantsSupport())
-            && StringUtils.isBlank(hearingOptions.getLanguageInterpreter())
+            || (isNull(hearingOptions.getWantsToAttend())
+            && isNull(hearingOptions.getWantsSupport())
+            && isNull(hearingOptions.getLanguageInterpreter())
             && StringUtils.isBlank(hearingOptions.getLanguages())
             && StringUtils.isBlank(hearingOptions.getSignLanguageType())
             && (hearingOptions.getArrangements() == null || hearingOptions.getArrangements().isEmpty())
-            && StringUtils.isBlank(hearingOptions.getScheduleHearing())
+            && isNull(hearingOptions.getScheduleHearing())
             && (hearingOptions.getExcludeDates() == null || hearingOptions.getExcludeDates().isEmpty())
-            && StringUtils.isBlank(hearingOptions.getAgreeLessNotice())
+            && isNull(hearingOptions.getAgreeLessNotice())
             && StringUtils.isBlank(hearingOptions.getOther()));
     }
 }

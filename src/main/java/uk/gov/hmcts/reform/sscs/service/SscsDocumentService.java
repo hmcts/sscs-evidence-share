@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Optional.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNo;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -40,8 +41,8 @@ public class SscsDocumentService {
 
         return sscsDocuments.stream()
             .filter(doc -> documentType.getValue().equals(doc.getValue().getDocumentType())
-                    && "No".equals(doc.getValue().getEvidenceIssued()))
-            .filter(doc -> otherPartyOriginalSenderId == null || (otherPartyOriginalSenderId != null && otherPartyOriginalSenderId.equals(doc.getValue().getOriginalSenderOtherPartyId())))
+                    && isNo(doc.getValue().getEvidenceIssued()))
+            .filter(doc -> otherPartyOriginalSenderId == null || otherPartyOriginalSenderId.equals(doc.getValue().getOriginalSenderOtherPartyId()))
             .map(doc -> PdfDocument.builder().pdf(toPdf(doc, isConfidentialCase)).document(doc).build())
             .collect(Collectors.toList());
     }

@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -48,7 +50,7 @@ public class TemplateServiceTest {
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().mrnDate(dateAsString).build())
                 .build())
-            .languagePreferenceWelsh("Yes")
+            .languagePreferenceWelsh(YES)
             .build();
 
         Template result = service.findTemplate(caseData);
@@ -65,7 +67,7 @@ public class TemplateServiceTest {
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().mrnDate(dateAsString).build())
                 .build())
-            .languagePreferenceWelsh("No")
+            .languagePreferenceWelsh(NO)
             .build();
 
         Template result = service.findTemplate(caseData);
@@ -82,7 +84,7 @@ public class TemplateServiceTest {
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().mrnDate(dateAsString).build())
                 .build())
-            .languagePreferenceWelsh("Yes")
+            .languagePreferenceWelsh(YES)
             .build();
 
         Template result = service.findTemplate(caseData);
@@ -99,7 +101,7 @@ public class TemplateServiceTest {
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().mrnDate(dateAsString).build())
                 .build())
-            .languagePreferenceWelsh("No")
+            .languagePreferenceWelsh(NO)
             .build();
 
         Template result = service.findTemplate(caseData);
@@ -116,7 +118,7 @@ public class TemplateServiceTest {
             .appeal(Appeal.builder()
                 .mrnDetails(MrnDetails.builder().mrnDate(dateAsString).build())
                 .build())
-            .languagePreferenceWelsh("Yes")
+            .languagePreferenceWelsh(YES)
             .build();
 
         Template result = service.findTemplate(caseData);

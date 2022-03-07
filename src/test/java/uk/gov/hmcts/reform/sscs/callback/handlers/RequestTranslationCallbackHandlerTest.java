@@ -13,6 +13,8 @@ import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTest
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REQUEST_TRANSLATION_FROM_WLU;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -34,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.exception.WelshException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -71,19 +74,20 @@ public class RequestTranslationCallbackHandlerTest {
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "ABOUT_TO_SUBMIT"})
     public void givenCallbackIsNotSubmitted_willThrowAnException(CallbackType callbackType) {
         handler.handle(callbackType,
-                buildTestCallbackForGivenData(SscsCaseData.builder().languagePreferenceWelsh("No").build(), APPEAL_CREATED, REQUEST_TRANSLATION_FROM_WLU));
+                buildTestCallbackForGivenData(SscsCaseData.builder().languagePreferenceWelsh(NO).build(),
+                    APPEAL_CREATED, REQUEST_TRANSLATION_FROM_WLU));
     }
 
     @Test
     public void givenCallbackIsSubmitted_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(REQUEST_TRANSLATION_FROM_WLU);
-        when(callback.getCaseDetails()).thenReturn(getCaseDetails("Yes"));
+        when(callback.getCaseDetails()).thenReturn(getCaseDetails(YES));
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
     @Test
     public void requestTranslationForNonWelshCase() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("No");
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(NO);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), REQUEST_TRANSLATION_FROM_WLU, false);
 
         Exception exception = assertThrows(IllegalStateException.class, () ->
@@ -94,7 +98,7 @@ public class RequestTranslationCallbackHandlerTest {
 
     @Test
     public void requestTranslationForWelshCase() {
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("Yes");
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(YES);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), REQUEST_TRANSLATION_FROM_WLU, false);
         when(requestTranslationService.sendCaseToWlu(any())).thenReturn(true);
         handler.handle(SUBMITTED, callback);
@@ -108,7 +112,7 @@ public class RequestTranslationCallbackHandlerTest {
         RequestTranslationCallbackHandler mockHandle =  mock(RequestTranslationCallbackHandler.class);
         Mockito.doThrow(new WelshException(new Exception())).when(mockHandle).handle(any(),any());
 
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails("Yes");
+        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(YES);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), REQUEST_TRANSLATION_FROM_WLU, false);
 
         WelshException exception = assertThrows(
@@ -116,7 +120,7 @@ public class RequestTranslationCallbackHandlerTest {
         assertNotNull(exception.getMessage());
     }
 
-    private CaseDetails<SscsCaseData> getCaseDetails(String languagePreference) {
+    private CaseDetails<SscsCaseData> getCaseDetails(YesNo languagePreference) {
         SscsCaseData caseData = SscsCaseData.builder()
                 .ccdCaseId("123")
                 .appeal(Appeal.builder().build())

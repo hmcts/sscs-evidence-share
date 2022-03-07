@@ -8,6 +8,8 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import feign.FeignException;
 import java.time.LocalDate;
@@ -88,7 +90,7 @@ public class SendToBulkPrintHandlerTest {
         SscsDocument.builder().value(SscsDocumentDetails.builder()
             .documentFileName(docPdf.getName())
             .documentType("sscs1")
-            .evidenceIssued("No")
+            .evidenceIssued(NO)
             .documentLink(DocumentLink.builder().documentUrl(docUrl)
                 .documentFilename(docPdf.getName()).build())
             .build()).build()), APPEAL_CREATED);
@@ -145,7 +147,7 @@ public class SendToBulkPrintHandlerTest {
 
     @Test
     public void givenDocTranslationOutstanding_thenReturnFalse() {
-        caseDetails.getCaseData().setTranslationWorkOutstanding("Yes");
+        caseDetails.getCaseData().setTranslationWorkOutstanding(YES);
         caseDetails.getCaseData().isTranslationWorkOutstanding();
         assertFalse(handler.canHandle(SUBMITTED, callback));
     }
@@ -153,7 +155,7 @@ public class SendToBulkPrintHandlerTest {
     @Test
     public void givenResendToDwpWithDocTranslationOutstanding_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.RESEND_TO_DWP);
-        caseDetails.getCaseData().setTranslationWorkOutstanding("Yes");
+        caseDetails.getCaseData().setTranslationWorkOutstanding(YES);
         assertTrue(handler.canHandle(SUBMITTED, callback));
     }
 
@@ -173,7 +175,7 @@ public class SendToBulkPrintHandlerTest {
                 .documentType("appellantEvidence")
                 .documentLink(DocumentLink.builder().documentUrl(docUrl)
                     .documentFilename(docPdf2.getName()).build())
-                .evidenceIssued("No")
+                .evidenceIssued(NO)
                 .build()).build(),
             SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("filtered out word.doc")
@@ -242,7 +244,7 @@ public class SendToBulkPrintHandlerTest {
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
 
         List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
-        assertEquals("No", docs.get(0).getValue().getEvidenceIssued());
+        assertEquals(NO, docs.get(0).getValue().getEvidenceIssued());
     }
 
     @Test
@@ -260,7 +262,7 @@ public class SendToBulkPrintHandlerTest {
         assertEquals("failedSending", caseDataCaptor.getValue().getHmctsDwpState());
 
         List<SscsDocument> docs = caseDataCaptor.getValue().getSscsDocument();
-        assertEquals("No", docs.get(0).getValue().getEvidenceIssued());
+        assertEquals(NO, docs.get(0).getValue().getEvidenceIssued());
     }
 
     @Test
@@ -419,7 +421,7 @@ public class SendToBulkPrintHandlerTest {
             .ccdCaseId("123")
             .createdInGapsFrom("validAppeal")
             .caseCreated(nowString)
-            .translationWorkOutstanding("No")
+            .translationWorkOutstanding(NO)
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code(benefitType).build())
                 .receivedVia(receivedVia)

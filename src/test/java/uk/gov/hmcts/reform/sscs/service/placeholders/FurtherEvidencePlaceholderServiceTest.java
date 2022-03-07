@@ -90,7 +90,7 @@ public class FurtherEvidencePlaceholderServiceTest {
                         .identity(Identity.builder().nino("JT0123456B").build())
                         .address(APPOINTEE_ADDRESS)
                         .build())
-                    .isAppointee("Yes")
+                    .isAppointee(YES)
                     .build())
                 .build())
             .build();

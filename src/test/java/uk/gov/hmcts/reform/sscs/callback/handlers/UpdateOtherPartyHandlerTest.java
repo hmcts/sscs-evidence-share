@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTest
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_OTHER_PARTY_DATA;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
@@ -131,10 +132,10 @@ public class UpdateOtherPartyHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder()
                 .ccdCaseId("1")
-                .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YES : YesNo.NO)
+                .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YES : NO)
                 .directionDueDate(null)
                 .otherParties(Arrays.asList(buildOtherParty("2",
-                    HearingOptions.builder().scheduleHearing("Yes").build()), buildOtherParty("1",
+                    HearingOptions.builder().scheduleHearing(YES).build()), buildOtherParty("1",
                     HearingOptions.builder().build())))
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
                     .build()).build(), INTERLOCUTORY_REVIEW_STATE, UPDATE_OTHER_PARTY_DATA);
@@ -153,7 +154,7 @@ public class UpdateOtherPartyHandlerTest {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder()
                 .ccdCaseId("1")
-                .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YES : YesNo.NO)
+                .isFqpmRequired(isFqpmRequired.equalsIgnoreCase("yes") ? YES : NO)
                 .directionDueDate(LocalDate.now().toString())
                 .otherParties(Arrays.asList(buildOtherParty("1",
                     HearingOptions.builder().excludeDates(new ArrayList<>()).build())))
@@ -228,13 +229,13 @@ public class UpdateOtherPartyHandlerTest {
     private Object[] generateAllPossibleOtherPartyWithHearingOptions() {
         return new Object[]{
             new Object[]{
-                HearingOptions.builder().wantsToAttend("Yes").build()
+                HearingOptions.builder().wantsToAttend(YES).build()
             },
             new Object[]{
-                HearingOptions.builder().wantsSupport("No").build()
+                HearingOptions.builder().wantsSupport(NO).build()
             },
             new Object[]{
-                HearingOptions.builder().languageInterpreter("No").build()
+                HearingOptions.builder().languageInterpreter(NO).build()
             },
             new Object[]{
                 HearingOptions.builder().languages("Yes").build()
@@ -243,16 +244,16 @@ public class UpdateOtherPartyHandlerTest {
                 HearingOptions.builder().arrangements(Collections.singletonList("Arrange")).build()
             },
             new Object[]{
-                HearingOptions.builder().scheduleHearing("Yes").build()
+                HearingOptions.builder().scheduleHearing(YES).build()
             },
             new Object[]{
-                HearingOptions.builder().scheduleHearing("Yes").build()
+                HearingOptions.builder().scheduleHearing(YES).build()
             },
             new Object[]{
                 HearingOptions.builder().excludeDates(Collections.singletonList(ExcludeDate.builder().build())).build()
             },
             new Object[]{
-                HearingOptions.builder().agreeLessNotice("Yes").build()
+                HearingOptions.builder().agreeLessNotice(YES).build()
             },
             new Object[]{
                 HearingOptions.builder().other("Yes").build()
@@ -274,9 +275,9 @@ public class UpdateOtherPartyHandlerTest {
         return CcdValue.<OtherParty>builder()
             .value(OtherParty.builder()
                 .id(id)
-                .isAppointee(YES.getValue())
+                .isAppointee(YES)
                 .appointee(Appointee.builder().id(appointeeId).build())
-                .rep(Representative.builder().id(repId).hasRepresentative(YES.getValue()).build())
+                .rep(Representative.builder().id(repId).hasRepresentative(YES).build())
                 .build())
             .build();
     }

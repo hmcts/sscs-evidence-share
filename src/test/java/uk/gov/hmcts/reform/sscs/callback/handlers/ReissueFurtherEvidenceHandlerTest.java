@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -169,7 +170,7 @@ public class ReissueFurtherEvidenceHandlerTest {
                 .value(SscsDocumentDetails.builder()
                     .documentLink(DocumentLink.builder().documentUrl("www.acme.co.uk").build())
                     .documentType(documentType.getValue())
-                    .evidenceIssued("No")
+                    .evidenceIssued(NO)
                     .build())
                 .build();
         } else {
@@ -177,7 +178,7 @@ public class ReissueFurtherEvidenceHandlerTest {
                 .value(SscsWelshDocumentDetails.builder()
                     .documentLink(DocumentLink.builder().documentUrl("www.acme.co.uk").build())
                     .documentType(documentType.getValue())
-                    .evidenceIssued("No")
+                    .evidenceIssued(NO)
                     .build())
                 .build();
         }
@@ -188,11 +189,11 @@ public class ReissueFurtherEvidenceHandlerTest {
         DynamicList dynamicList = new DynamicList(dynamicListItem, Collections.singletonList(dynamicListItem));
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("1563382899630221")
-            .appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("YES").build()).build())
+            .appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(YES).build()).build())
             .reissueArtifactUi(ReissueArtifactUi.builder()
                 .reissueFurtherEvidenceDocument(dynamicList)
-                .resendToAppellant(resendToAppellant ? YesNo.YES : YesNo.NO)
-                .resendToRepresentative(resendToRepresentative ? YesNo.YES : YesNo.NO)
+                .resendToAppellant(resendToAppellant ? YES : NO)
+                .resendToRepresentative(resendToRepresentative ? YES : NO)
                 .build())
             .build();
         if (isEnglish) {
@@ -222,9 +223,9 @@ public class ReissueFurtherEvidenceHandlerTest {
             verify(ccdService).updateCase(captor.capture(), any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
                 any(), any(), any(IdamTokens.class));
             if (isEnglish) {
-                assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+                assertEquals(YES, captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
             } else {
-                assertEquals("Yes", captor.getValue().getSscsWelshDocuments().get(0).getValue().getEvidenceIssued());
+                assertEquals(YES, captor.getValue().getSscsWelshDocuments().get(0).getValue().getEvidenceIssued());
             }
         } else {
             verifyNoInteractions(ccdService);
@@ -280,7 +281,7 @@ public class ReissueFurtherEvidenceHandlerTest {
                 .value(SscsDocumentDetails.builder()
                     .documentLink(DocumentLink.builder().documentUrl("www.acme.co.uk").build())
                     .documentType(documentType.getValue())
-                    .evidenceIssued("No").originalSenderOtherPartyId("3")
+                    .evidenceIssued(NO).originalSenderOtherPartyId("3")
                     .build())
                 .build();
         } else {
@@ -288,7 +289,7 @@ public class ReissueFurtherEvidenceHandlerTest {
                 .value(SscsWelshDocumentDetails.builder()
                     .documentLink(DocumentLink.builder().documentUrl("www.acme.co.uk").build())
                     .documentType(documentType.getValue())
-                    .evidenceIssued("No")
+                    .evidenceIssued(NO)
                     .build())
                 .build();
         }
@@ -299,13 +300,13 @@ public class ReissueFurtherEvidenceHandlerTest {
         DynamicList dynamicList = new DynamicList(dynamicListItem, Collections.singletonList(dynamicListItem));
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("1563382899630221")
-            .appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("YES").build()).build())
+            .appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(YES).build()).build())
             .reissueArtifactUi(ReissueArtifactUi.builder()
                 .reissueFurtherEvidenceDocument(dynamicList)
-                .resendToAppellant(resendToAppellant ? YesNo.YES : YesNo.NO)
-                .resendToRepresentative(resendToRepresentative ? YesNo.YES : YesNo.NO)
-                .otherPartyOptions(getOtherPartyOptions(resendToOtherParty ? YesNo.YES : YesNo.NO,
-                    resendToOtherPartyRep ? YesNo.YES : YesNo.NO))
+                .resendToAppellant(isYesOrNo(resendToAppellant))
+                .resendToRepresentative(isYesOrNo(resendToRepresentative))
+                .otherPartyOptions(getOtherPartyOptions(isYesOrNo(resendToOtherParty),
+                        isYesOrNo(resendToOtherPartyRep)))
                 .build())
             .build();
         if (isEnglish) {
@@ -341,9 +342,9 @@ public class ReissueFurtherEvidenceHandlerTest {
             verify(ccdService).updateCase(captor.capture(), any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
                 any(), any(), any(IdamTokens.class));
             if (isEnglish) {
-                assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+                assertEquals(YES, captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
             } else {
-                assertEquals("Yes", captor.getValue().getSscsWelshDocuments().get(0).getValue().getEvidenceIssued());
+                assertEquals(YES, captor.getValue().getSscsWelshDocuments().get(0).getValue().getEvidenceIssued());
             }
         } else {
             verifyNoInteractions(ccdService);

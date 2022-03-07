@@ -64,7 +64,7 @@ public class IssueFurtherEvidenceHandlerTest {
     private final SscsDocument sscsDocumentNotIssued = SscsDocument.builder()
         .value(SscsDocumentDetails.builder()
             .documentType(APPELLANT_EVIDENCE.getValue())
-            .evidenceIssued("No")
+            .evidenceIssued(NO)
             .build())
         .build();
 
@@ -178,7 +178,7 @@ public class IssueFurtherEvidenceHandlerTest {
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
             eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
 
-        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+        assertEquals(YES, captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
 
         verifyNoMoreInteractions(ccdService);
         verifyNoMoreInteractions(furtherEvidenceService);
@@ -232,7 +232,7 @@ public class IssueFurtherEvidenceHandlerTest {
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
             eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
 
-        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+        assertEquals(YES, captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
     }
 
     @Test
@@ -258,7 +258,7 @@ public class IssueFurtherEvidenceHandlerTest {
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
             eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
 
-        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+        assertEquals(YES, captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
     }
 
     @Test
@@ -295,11 +295,11 @@ public class IssueFurtherEvidenceHandlerTest {
         verify(ccdService, times(1)).updateCase(captor.capture(), any(Long.class),
             eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any(IdamTokens.class));
 
-        assertEquals("Yes", captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
+        assertEquals(YES, captor.getValue().getSscsDocument().get(0).getValue().getEvidenceIssued());
     }
 
     private SscsDocument buildSscsDocument(YesNo yesNo, String fileName, String documentType, String originalSenderOtherPartyId) {
-        SscsDocumentDetails docDetails = SscsDocumentDetails.builder().evidenceIssued(yesNo.getValue())
+        SscsDocumentDetails docDetails = SscsDocumentDetails.builder().evidenceIssued(yesNo)
             .documentType(documentType)
             .resizedDocumentLink(
                 DocumentLink.builder().documentFilename(fileName).build()

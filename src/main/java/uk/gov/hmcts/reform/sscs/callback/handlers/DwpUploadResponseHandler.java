@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerUtils.isANewJointParty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNo;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -63,12 +65,12 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void handleChildSupportAndSscs5Case(Callback<SscsCaseData> callback) {
-        if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "Yes")) {
+        if (isYes(callback.getCaseDetails().getCaseData().getDwpFurtherInfo())) {
             SscsCaseData caseData = setDwpState(callback);
             caseData.setInterlocReviewState("awaitingAdminAction");
             updateEventDetails(caseData, callback.getCaseDetails().getId(),
                 EventType.DWP_RESPOND, "Response received", "Update to response received as an Admin has to review the case");
-        } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "No")) {
+        } else if (isNo(callback.getCaseDetails().getCaseData().getDwpFurtherInfo())) {
             if (isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType()) && !StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpEditedEvidenceReason(), "phme")) {
                 triggerReadyToListEvent(callback);
             } else {
@@ -91,9 +93,9 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
 
 
     private void handleNonUc(Callback<SscsCaseData> callback) {
-        if ("Yes".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getUrgentCase())) {
+        if (isYes(callback.getCaseDetails().getCaseData().getUrgentCase())) {
             triggerDwpRespondEventForUrgentCase(callback);
-        } else if (StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "no")) {
+        } else if (isNo(callback.getCaseDetails().getCaseData().getDwpFurtherInfo())) {
             triggerReadyToListEvent(callback);
         }
     }
@@ -106,17 +108,15 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void handleUc(Callback<SscsCaseData> callback) {
-        boolean dwpFurtherInfo =
-            StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getDwpFurtherInfo(), "yes");
+        boolean dwpFurtherInfo = isYes(callback.getCaseDetails().getCaseData().getDwpFurtherInfo());
 
         boolean disputedDecision = false;
         if (callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers() != null) {
-            disputedDecision = StringUtils.equalsIgnoreCase(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers(), "yes");
+            disputedDecision = isYes(callback.getCaseDetails().getCaseData().getElementsDisputedIsDecisionDisputedByOthers());
         }
-
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        if ("Yes".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getUrgentCase())) {
+        if (isYes(callback.getCaseDetails().getCaseData().getUrgentCase())) {
             triggerDwpRespondEventForUrgentCase(callback);
         } else if (!dwpFurtherInfo && !disputedDecision) {
             triggerReadyToListEvent(callback);

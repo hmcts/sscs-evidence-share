@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
 
 import java.time.LocalDateTime;
@@ -92,7 +93,7 @@ public class PlaceholderServiceIt {
 
         Map<String, Object> placeholders = new HashMap<>();
         caseData = buildCaseData(rpc);
-        caseData.setIsScottishCase("Yes");
+        caseData.setIsScottishCase(YES);
         placeholderService.build(caseData, placeholders, address, now);
 
         assertEquals("HMCTS SSCS", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));
@@ -113,7 +114,7 @@ public class PlaceholderServiceIt {
 
         Map<String, Object> placeholders = new HashMap<>();
         caseData = buildCaseData(rpc);
-        caseData.setIsScottishCase("Yes");
+        caseData.setIsScottishCase(YES);
         placeholderService.build(caseData, placeholders, address, now);
 
         assertEquals("HMCTS SSCS", placeholders.get(EXELA_ADDRESS_LINE1_LITERAL));

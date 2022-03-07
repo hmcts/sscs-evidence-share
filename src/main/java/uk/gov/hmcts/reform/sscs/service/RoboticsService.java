@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.yesOrNoOrNullToString;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.*;
 
 import java.security.SecureRandom;
@@ -90,7 +91,7 @@ public class RoboticsService {
             .builder()
             .sscsCaseData(caseData)
             .ccdCaseId(caseDetails.getId())
-            .evidencePresent(caseData.getEvidencePresent())
+            .evidencePresent(yesOrNoOrNullToString(caseData.getEvidencePresent()))
             .state(caseDetails.getState()).build();
 
         JSONObject roboticsJson = createRobotics(wrapper);

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.truncateAddressLine;
@@ -77,11 +78,11 @@ public class PlaceholderService {
         buildRecipientAddressPlaceholders(address, placeholders);
     }
 
-    private void buildExcelaAddress(String isScottish, Map<String, Object> placeholders) {
+    private void buildExcelaAddress(YesNo isScottish, Map<String, Object> placeholders) {
         placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getAddressLine1());
         placeholders.put(EXELA_ADDRESS_LINE3_LITERAL, exelaAddressConfig.getAddressLine3());
 
-        if ("Yes".equalsIgnoreCase(isScottish) && scottishPoBoxEnabled) {
+        if (isYes(isScottish) && scottishPoBoxEnabled) {
             placeholders.put(EXELA_ADDRESS_LINE2_LITERAL, exelaAddressConfig.getScottishAddressLine2());
             placeholders.put(EXELA_ADDRESS_POSTCODE_LITERAL, exelaAddressConfig.getScottishPostcode());
         } else {

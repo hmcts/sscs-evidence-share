@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -163,7 +164,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
     private List<OtherPartyOption> getOtherPartiesToReissue(SscsCaseData caseData) {
         return caseData.getReissueArtifactUi().getOtherPartyOptions() != null
             ? caseData.getReissueArtifactUi().getOtherPartyOptions().stream()
-                .filter(otherPartyOption -> otherPartyOption.getValue().getResendToOtherParty().equals(YesNo.YES))
+                .filter(otherPartyOption -> otherPartyOption.getValue().getResendToOtherParty().equals(YES))
                 .collect(Collectors.toList())
             : Collections.emptyList();
     }
@@ -190,8 +191,8 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
     }
 
     private void setEvidenceIssuedFlagToYes(AbstractDocument doc) {
-        if (doc.getValue().getEvidenceIssued() != null && doc.getValue().getEvidenceIssued().equals("No")) {
-            doc.getValue().setEvidenceIssued("Yes");
+        if (isNo(doc.getValue().getEvidenceIssued())) {
+            doc.getValue().setEvidenceIssued(YES);
         }
     }
 

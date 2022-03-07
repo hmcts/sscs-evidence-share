@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerUtils.distinctBy
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNo;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
 
 import java.util.*;
@@ -75,7 +76,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private void issueFurtherEvidenceForEachOtherPartyThatIsOriginalSender(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes) {
         List<SscsDocument> groupedOtherPartyDocuments = findUniqueOtherPartyDocumentsByOtherPartyId(caseData.getSscsDocument());
 
-        if (groupedOtherPartyDocuments != null && groupedOtherPartyDocuments.size() > 0) {
+        if (groupedOtherPartyDocuments != null && !groupedOtherPartyDocuments.isEmpty()) {
             groupedOtherPartyDocuments.forEach(doc -> issueEvidencePerDocumentType(caseData, allowedLetterTypes, DocumentType.fromValue(doc.getValue().getDocumentType()), doc.getValue().getOriginalSenderOtherPartyId()));
         }
     }
@@ -86,7 +87,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         // Further down the line, in the FurtherEvidenceService, we work out what documents to actually issue out.
         return sscsDocuments.stream()
             .filter(doc -> OTHER_PARTY_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()) || OTHER_PARTY_REPRESENTATIVE_EVIDENCE.getValue().equals(doc.getValue().getDocumentType()))
-            .filter(d -> "No".equals(d.getValue().getEvidenceIssued()))
+            .filter(d -> isNo(d.getValue().getEvidenceIssued()))
             .filter(distinctByKey(p -> p.getValue().getOriginalSenderOtherPartyId()))
             .collect(Collectors.toList());
     }
@@ -130,7 +131,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
     public String determineDescription(List<SscsDocument> documents) {
         final boolean hasResizedDocs = documents.stream().anyMatch(document ->
-            document.getValue().getResizedDocumentLink() != null && document.getValue().getEvidenceIssued().equals(NO.getValue())
+            document.getValue().getResizedDocumentLink() != null && document.getValue().getEvidenceIssued().equals(NO)
         );
 
         final String baseDescription = "Update issued evidence document flags after issuing further evidence";
@@ -150,9 +151,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private void setEvidenceIssuedFlagToYes(List<SscsDocument> sscsDocuments) {
         if (sscsDocuments != null) {
             for (SscsDocument doc : sscsDocuments) {
-                if (doc.getValue() != null && doc.getValue().getEvidenceIssued() != null
-                    && "No".equalsIgnoreCase(doc.getValue().getEvidenceIssued())) {
-                    doc.getValue().setEvidenceIssued(YES.getValue());
+                if (doc.getValue() != null && isNo(doc.getValue().getEvidenceIssued())) {
+                    doc.getValue().setEvidenceIssued(YES);
                 }
             }
         }

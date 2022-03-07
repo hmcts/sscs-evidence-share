@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +95,7 @@ public class ReciprocalLinkHandler implements CallbackHandler<SscsCaseData> {
 
                     caseLinks.add(caseLink);
                     matchedCase.getData().setAssociatedCase(caseLinks);
-                    matchedCase.getData().setLinkedCasesBoolean("Yes");
+                    matchedCase.getData().setLinkedCasesBoolean(YES);
 
                     log.info("Back linking case id {} to case id {}", caseId, matchedCase.getId().toString());
 
