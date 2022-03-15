@@ -6,9 +6,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -33,6 +35,9 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
     private final IdamService idamService;
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
+
+    @Value("${feature.gaps-switchover.enabled}")
+    private boolean gapsSwitchOverFeature;
 
     @Autowired
     public RoboticsCallbackHandler(RoboticsService roboticsService,
@@ -79,6 +84,20 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             log.info("Is case valid to send to robotics {} for case id {}", isCaseValidToSendToRobotics, callback.getCaseDetails().getId());
 
             if (isCaseValidToSendToRobotics) {
+                if(gapsSwitchOverFeature){
+                    String region = latestCase.getData().getRegion();
+
+                    Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
+                        .getRegionalProcessingCenterMap();
+
+                    HearingRoute route = regionalProcessingCenterMap.values().stream()
+                        .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
+                        .map(RegionalProcessingCenter::getHearingRoute)
+                        .findFirst().orElse(HearingRoute.LIST_ASSIST);
+                    if(route.equals(HearingRoute.LIST_ASSIST)){
+                        return;
+                    }
+                }
                 updateRpc(callback);
                 roboticsService.sendCaseToRobotics(callback.getCaseDetails());
 
