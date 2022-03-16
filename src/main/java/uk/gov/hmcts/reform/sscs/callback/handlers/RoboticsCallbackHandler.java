@@ -83,7 +83,12 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             boolean isCaseValidToSendToRobotics = checkCaseValidToSendToRobotics(callback, latestCase);
             log.info("Is case valid to send to robotics {} for case id {}", isCaseValidToSendToRobotics, callback.getCaseDetails().getId());
 
-            if(gapsSwitchOverFeature && regionalProcessingCenterService.getHearingRoute(latestCase).equals(HearingRoute.LIST_ASSIST)){
+            if (gapsSwitchOverFeature &&
+                regionalProcessingCenterService
+                    .getHearingRoute(latestCase)
+                    .equals(HearingRoute.LIST_ASSIST)) {
+                log.info("Hearing route is: {}. Ignoring GAPS route for case id: {}",
+                    HearingRoute.LIST_ASSIST, latestCase.getId());
                 return;
             }
 
