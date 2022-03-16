@@ -83,21 +83,11 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             boolean isCaseValidToSendToRobotics = checkCaseValidToSendToRobotics(callback, latestCase);
             log.info("Is case valid to send to robotics {} for case id {}", isCaseValidToSendToRobotics, callback.getCaseDetails().getId());
 
+            if(gapsSwitchOverFeature && regionalProcessingCenterService.getHearingRoute(latestCase).equals(HearingRoute.LIST_ASSIST)){
+                return;
+            }
+
             if (isCaseValidToSendToRobotics) {
-                if(gapsSwitchOverFeature){
-                    String region = latestCase.getData().getRegion();
-
-                    Map<String, RegionalProcessingCenter> regionalProcessingCenterMap = regionalProcessingCenterService
-                        .getRegionalProcessingCenterMap();
-
-                    HearingRoute route = regionalProcessingCenterMap.values().stream()
-                        .filter(rpc -> rpc.getName().equalsIgnoreCase(region))
-                        .map(RegionalProcessingCenter::getHearingRoute)
-                        .findFirst().orElse(HearingRoute.LIST_ASSIST);
-                    if(route.equals(HearingRoute.LIST_ASSIST)){
-                        return;
-                    }
-                }
                 updateRpc(callback);
                 roboticsService.sendCaseToRobotics(callback.getCaseDetails());
 
