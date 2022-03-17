@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,18 +78,19 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         SscsCaseDetails latestCase =  ccdService.getByCaseId(callback.getCaseDetails().getId(), idamService.getIdamTokens());
 
+        if (gapsSwitchOverFeature
+            && regionalProcessingCenterService
+                .getHearingRoute(latestCase.getData().getRegion())
+                .equals(HearingRoute.LIST_ASSIST)) {
+            log.info("Hearing route is: {}. Ignoring GAPS route for case id: {}",
+                HearingRoute.LIST_ASSIST, latestCase.getId());
+            return;
+        }
+
         try {
             boolean isCaseValidToSendToRobotics = checkCaseValidToSendToRobotics(callback, latestCase);
             log.info("Is case valid to send to robotics {} for case id {}", isCaseValidToSendToRobotics, callback.getCaseDetails().getId());
 
-            if (gapsSwitchOverFeature &&
-                regionalProcessingCenterService
-                    .getHearingRoute(latestCase.getData().getRegion())
-                    .equals(HearingRoute.LIST_ASSIST)) {
-                log.info("Hearing route is: {}. Ignoring GAPS route for case id: {}",
-                    HearingRoute.LIST_ASSIST, latestCase.getId());
-                return;
-            }
 
             if (isCaseValidToSendToRobotics) {
                 updateRpc(callback);
