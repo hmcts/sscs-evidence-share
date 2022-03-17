@@ -249,7 +249,7 @@ public class RoboticsCallbackHandlerTest {
     }
 
     @Test
-    public void givenRequestSentToRobotics_andGapSwitchOverFeatureEnabled_andHearingRouteIsListAssist_thenDoesNotRunFurther(){
+    public void givenRequestSentToRobotics_andGapSwitchOverFeatureEnabled_andHearingRouteIsListAssist_thenDoesNotRunFurther() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
         when(regionalProcessingCenterService.getHearingRoute(caseData.getRegion())).thenReturn(HearingRoute.LIST_ASSIST);
         when(caseData.getDateTimeSentToGaps()).thenReturn(Optional.of(LocalDateTime.now().minusHours(23)));
