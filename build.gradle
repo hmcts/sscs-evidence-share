@@ -331,7 +331,7 @@ dependencies {
 
   testImplementation libraries.junit5
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-  integrationTestCompile group: 'com.github.hmcts', name: 'fortify-client', version: '1.2.2', classifier: 'all', {
+  testCompile group: 'com.github.hmcts', name: 'fortify-client', version: '1.2.2', classifier: 'all', {
     exclude group: 'commons-io', module: 'commons-io'
   }
   compile group: 'commons-io', name: 'commons-io', version: '2.11.0'
