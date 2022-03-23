@@ -158,7 +158,7 @@ feature:
   scottish-po-box.enabled: ${SCOTTISH_PO_BOX_ENABLED:false}
   secure-doc-store.enabled: ${SECURE_DOC_STORE_FEATURE:false}
   enhancedConfidentiality.enabled: ${ENHANCED_CONFIDENTIALITY_FEATURE:false}
-  feature.gaps-switchover.enabled: ${GAPS_SWITCHOVER_FEATURE:false}
+  gaps-switchover.enabled: ${GAPS_SWITCHOVER_FEATURE:false}
 
 case_document_am.url: ${CASE_DOCUMENT_AM_URL:http://localhost:4455}
 
