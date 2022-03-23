@@ -91,7 +91,6 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             boolean isCaseValidToSendToRobotics = checkCaseValidToSendToRobotics(callback, latestCase);
             log.info("Is case valid to send to robotics {} for case id {}", isCaseValidToSendToRobotics, callback.getCaseDetails().getId());
 
-
             if (isCaseValidToSendToRobotics) {
                 updateRpc(callback);
                 roboticsService.sendCaseToRobotics(callback.getCaseDetails());
