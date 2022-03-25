@@ -126,7 +126,7 @@ public class SscsDocumentServiceTest {
     @Test
     public void savesAndUpdatesDocumentHandlesFailure() {
 
-        when(pdfStoreService.storeDocument(any())).thenThrow(new UnsupportedDocumentTypeException(new Exception()));
+        when(pdfStoreService.storeDocument((byte[]) any())).thenThrow(new UnsupportedDocumentTypeException(new Exception()));
         Pdf pdf = new Pdf("".getBytes(), "file.pdf");
         SscsDocument testDoc = createTestData(false).get(0);
         AbstractDocument result = sscsDocumentService.saveAndUpdateDocument(pdf, testDoc);
