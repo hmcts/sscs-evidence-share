@@ -64,6 +64,8 @@ exela:
 feature:
     urgent-hearing:
         enabled: ${URGENT_HEARING_ENABLED:false}
+    gaps-switchover:
+        enabled: ${GAPS_SWITCHOVER_FEATURE:false}
 http:
     connect:
         read:
