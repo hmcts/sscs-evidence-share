@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -34,9 +33,6 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
     private final IdamService idamService;
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
-
-    @Value("${feature.gaps-switchover.enabled}")
-    private boolean gapsSwitchOverFeature;
 
     @Autowired
     public RoboticsCallbackHandler(RoboticsService roboticsService,
@@ -77,15 +73,6 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         log.info("Processing robotics for case id {} in evidence share service", callback.getCaseDetails().getId());
 
         SscsCaseDetails latestCase =  ccdService.getByCaseId(callback.getCaseDetails().getId(), idamService.getIdamTokens());
-
-        if (gapsSwitchOverFeature
-            && regionalProcessingCenterService
-                .getHearingRoute(latestCase.getData().getRegion())
-                .equals(HearingRoute.LIST_ASSIST)) {
-            log.info("Hearing route is: {}. Ignoring GAPS route for case id: {}",
-                HearingRoute.LIST_ASSIST, latestCase.getId());
-            return;
-        }
 
         try {
             boolean isCaseValidToSendToRobotics = checkCaseValidToSendToRobotics(callback, latestCase);
