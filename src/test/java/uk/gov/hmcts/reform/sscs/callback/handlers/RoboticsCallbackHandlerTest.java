@@ -21,7 +21,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -246,19 +245,6 @@ public class RoboticsCallbackHandlerTest {
         verify(ccdService).updateCase(any(), any(), capture.capture(), any(), any(), any());
 
         assertEquals(NOT_LISTABLE.getCcdType(), capture.getValue());
-    }
-
-    @Test
-    public void givenRequestSentToRobotics_andGapSwitchOverFeatureEnabled_andHearingRouteIsListAssist_thenDoesNotRunFurther() {
-        ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
-        when(regionalProcessingCenterService.getHearingRoute(caseData.getRegion())).thenReturn(HearingRoute.LIST_ASSIST);
-        when(caseData.getDateTimeSentToGaps()).thenReturn(Optional.of(LocalDateTime.now().minusHours(23)));
-
-        CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, null);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
-        handler.handle(SUBMITTED, callback);
-
-        verifyNoInteractions(roboticsService);
     }
 
 }
