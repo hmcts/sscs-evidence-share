@@ -1,16 +1,14 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.DWP_LETTER;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
-import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
+import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +43,8 @@ public class FurtherEvidenceService {
     }
 
     public void issue(List<? extends AbstractDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
-                      List<FurtherEvidenceLetterType> allowedLetterTypes) {
-        List<PdfDocument> pdfDocument = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType, isYes(caseData.getIsConfidentialCase()));
+                      List<FurtherEvidenceLetterType> allowedLetterTypes, String otherPartyOriginalSenderId) {
+        List<PdfDocument> pdfDocument = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType, isYes(caseData.getIsConfidentialCase()), otherPartyOriginalSenderId);
 
         List<PdfDocument> sizeNormalisedPdfDocuments = sscsDocumentService.sizeNormalisePdfs(pdfDocument);
 
@@ -55,8 +53,8 @@ public class FurtherEvidenceService {
         List<Pdf> pdfs = sizeNormalisedPdfDocuments.stream().map(pdfDoc -> pdfDoc.getPdf()).collect(Collectors.toList());
 
         if (pdfs != null && pdfs.size() > 0) {
-            send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes);
-            send609_98_OtherParty(caseData, documentType, pdfs, allowedLetterTypes);
+            send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes, otherPartyOriginalSenderId);
+            send609_98_partiesOnCase(caseData, documentType, pdfs, allowedLetterTypes, otherPartyOriginalSenderId);
             log.info("Sending documents to bulk print for ccd Id: {} and document type: {}", caseData.getCcdCaseId(), documentType);
         }
     }
@@ -89,51 +87,75 @@ public class FurtherEvidenceService {
 
 
     protected void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
-                                           List<FurtherEvidenceLetterType> allowedLetterTypes) {
+                                             List<FurtherEvidenceLetterType> allowedLetterTypes, String otherPartyOriginalSenderId) {
 
         String docName = "609-97-template (original sender)";
         final FurtherEvidenceLetterType letterType = findLetterType(documentType);
 
         if (allowedLetterTypes.contains(letterType)) {
-            byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, letterType, docName);
+            byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, letterType, docName, otherPartyOriginalSenderId);
             bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData, letterType,
                 EventType.ISSUE_FURTHER_EVIDENCE);
-
         }
     }
 
-    protected void send609_98_OtherParty(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
-                                       List<FurtherEvidenceLetterType> allowedLetterTypes) {
+    protected void send609_98_partiesOnCase(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
+                                         List<FurtherEvidenceLetterType> allowedLetterTypes, String otherPartyOriginalSenderId) {
 
-        List<FurtherEvidenceLetterType> otherPartiesList = buildOtherPartiesList(caseData, documentType);
+        Multimap<FurtherEvidenceLetterType, String> otherPartiesMap = buildMapOfPartiesFor609_98(caseData, documentType, otherPartyOriginalSenderId);
 
-        for (FurtherEvidenceLetterType letterType : otherPartiesList) {
-            String docName = letterType == DWP_LETTER ? "609-98-template (DWP)" : "609-98-template (other parties)";
+        for (Map.Entry<FurtherEvidenceLetterType, String> party : otherPartiesMap.entries()) {
+            String docName = party.getKey() == DWP_LETTER ? "609-98-template (FTA)" : "609-98-template (other parties)";
 
-            if (allowedLetterTypes.contains(letterType)) {
-                byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, letterType, docName);
+            if (allowedLetterTypes.contains(party.getKey())) {
+                byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, party.getKey(), docName, party.getValue());
 
                 List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs, docName);
-                bulkPrintService.sendToBulkPrint(pdfs60998, caseData, letterType,
+                bulkPrintService.sendToBulkPrint(pdfs60998, caseData, party.getKey(),
                     EventType.ISSUE_FURTHER_EVIDENCE);
             }
         }
     }
 
-    private List<FurtherEvidenceLetterType> buildOtherPartiesList(SscsCaseData caseData, DocumentType documentType) {
-        List<FurtherEvidenceLetterType> otherPartiesList = new ArrayList<>();
+    private Multimap<FurtherEvidenceLetterType, String> buildMapOfPartiesFor609_98(SscsCaseData caseData, DocumentType documentType, String otherPartyOriginalSenderId) {
+        Multimap<FurtherEvidenceLetterType, String> partiesMap = LinkedHashMultimap.create();
 
         if (documentType != APPELLANT_EVIDENCE) {
-            otherPartiesList.add(APPELLANT_LETTER);
+            partiesMap.put(APPELLANT_LETTER, null);
         }
         if (documentType != REPRESENTATIVE_EVIDENCE && checkRepExists(caseData)) {
-            otherPartiesList.add(REPRESENTATIVE_LETTER);
+            partiesMap.put(REPRESENTATIVE_LETTER, null);
         }
         if (documentType != JOINT_PARTY_EVIDENCE && checkJointPartyExists(caseData)) {
-            otherPartiesList.add(JOINT_PARTY_LETTER);
+            partiesMap.put(JOINT_PARTY_LETTER, null);
         }
 
-        return otherPartiesList;
+        if (caseData.getOtherParties() != null && caseData.getOtherParties().size() > 0) {
+            for (CcdValue<OtherParty> otherParty : caseData.getOtherParties()) {
+                addOtherPartyOrAppointeeTo609_98Map(otherPartyOriginalSenderId, otherParty, partiesMap);
+                addOtherPartyRepTo609_98Map(otherPartyOriginalSenderId, otherParty, partiesMap);
+            }
+        }
+        return partiesMap;
+    }
+
+    private void addOtherPartyOrAppointeeTo609_98Map(String otherPartyOriginalSenderId, CcdValue<OtherParty> otherParty, Multimap<FurtherEvidenceLetterType, String> partiesMap) {
+        if ((otherPartyOriginalSenderId == null && !YesNo.isYes(otherParty.getValue().getIsAppointee()))
+            || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getId()) && !YesNo.isYes(otherParty.getValue().getIsAppointee()))) {
+            partiesMap.put(OTHER_PARTY_LETTER, otherParty.getValue().getId());
+        } else if (otherParty.getValue().getAppointee() != null
+            && ((otherPartyOriginalSenderId == null && YesNo.isYes(otherParty.getValue().getIsAppointee())
+            || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getAppointee().getId()) && YesNo.isYes(otherParty.getValue().getIsAppointee()))))) {
+            partiesMap.put(OTHER_PARTY_LETTER, otherParty.getValue().getAppointee().getId());
+        }
+    }
+
+    private void addOtherPartyRepTo609_98Map(String otherPartyOriginalSenderId, CcdValue<OtherParty> otherParty, Multimap<FurtherEvidenceLetterType, String> partiesMap) {
+        if (otherParty.getValue().getRep() != null
+            && ((otherPartyOriginalSenderId == null && YesNo.isYes(otherParty.getValue().getRep().getHasRepresentative())
+            || (otherPartyOriginalSenderId != null && !otherPartyOriginalSenderId.equals(otherParty.getValue().getRep().getId()) && YesNo.isYes(otherParty.getValue().getRep().getHasRepresentative()))))) {
+            partiesMap.put(OTHER_PARTY_REP_LETTER, otherParty.getValue().getRep().getId());
+        }
     }
 
     private boolean checkRepExists(SscsCaseData caseData) {
@@ -152,6 +174,10 @@ public class FurtherEvidenceService {
             return REPRESENTATIVE_LETTER;
         } else if (documentType == JOINT_PARTY_EVIDENCE) {
             return JOINT_PARTY_LETTER;
+        } else if (documentType == OTHER_PARTY_EVIDENCE) {
+            return OTHER_PARTY_LETTER;
+        } else if (documentType == OTHER_PARTY_REPRESENTATIVE_EVIDENCE) {
+            return OTHER_PARTY_REP_LETTER;
         } else {
             return DWP_LETTER;
         }
@@ -163,14 +189,14 @@ public class FurtherEvidenceService {
         return pdfs;
     }
 
-    private byte[] buildPdfsFor609_97(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName) {
+    private byte[] buildPdfsFor609_97(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName, String otherPartyId) {
         return coverLetterService.generateCoverLetter(caseData, letterType,
-            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-97"), pdfName);
+            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-97"), pdfName, otherPartyId);
     }
 
-    private byte[] buildPdfsFor609_98(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName) {
+    private byte[] buildPdfsFor609_98(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String pdfName, String otherPartyId) {
         return coverLetterService.generateCoverLetter(caseData, letterType,
-            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-98"), pdfName);
+            getTemplateNameBasedOnLanguagePreference(caseData.getLanguagePreference(), "d609-98"), pdfName, otherPartyId);
     }
 
     public boolean canHandleAnyDocument(List<SscsDocument> sscsDocumentList) {

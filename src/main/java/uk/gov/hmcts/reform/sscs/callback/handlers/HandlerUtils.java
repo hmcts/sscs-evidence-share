@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -22,5 +26,10 @@ public class HandlerUtils {
             wasNotAlreadyJointParty = true;
         }
         return wasNotAlreadyJointParty && caseData.getJointParty() != null && StringUtils.equalsIgnoreCase("Yes", caseData.getJointParty());
+    }
+
+    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
     }
 }

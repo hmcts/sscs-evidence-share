@@ -198,7 +198,7 @@ public class RoboticsServiceIt {
         assertFalse(result.has("representative"));
         assertTrue(result.has("hearingArrangements"));
         assertTrue(result.has("isReadyToList"));
-        assertEquals("Basildon Combined Court", result.get("appellantPostCode"));
+        assertEquals("Basildon CC", result.get("appellantPostCode"));
 
         verifyNoMoreInteractions(ccdService);
     }

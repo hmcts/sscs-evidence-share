@@ -84,16 +84,16 @@ public class CoverLetterServiceTest {
         SscsCaseData caseData = SscsCaseData.builder().build();
 
         given(furtherEvidencePlaceholderService
-            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER)))
+            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER), eq(null)))
             .willReturn(Collections.singletonMap("someKey", "someValue"));
 
         given(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
             .willReturn(new byte[]{'l', 'e', 't', 't', 'e', 'r'});
 
-        coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName");
+        coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName", null);
 
         then(furtherEvidencePlaceholderService).should(times(1))
-            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER));
+            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER), eq(null));
 
         assertArgumentsForPdfGeneration();
     }
@@ -104,13 +104,13 @@ public class CoverLetterServiceTest {
         SscsCaseData caseData = SscsCaseData.builder().build();
 
         given(furtherEvidencePlaceholderService
-            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER)))
+            .populatePlaceholders(eq(caseData), eq(APPELLANT_LETTER), eq(null)))
             .willReturn(Collections.singletonMap("someKey", "someValue"));
 
         when(pdfGenerationService.generatePdf(any(DocumentHolder.class)))
             .thenThrow(new HttpClientErrorException(HttpStatus.valueOf(400)));
 
-        coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName");
+        coverLetterService.generateCoverLetter(caseData, APPELLANT_LETTER, "testName.doc", "testDocName", null);
     }
 
     private void assertArgumentsForPdfGeneration() {
