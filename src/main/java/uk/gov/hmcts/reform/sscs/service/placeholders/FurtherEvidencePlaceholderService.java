@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNoneBlank;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.NAME;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.truncateAddressLine;
 
@@ -90,9 +91,9 @@ public class FurtherEvidencePlaceholderService {
     }
 
     private String extractNameJointParty(SscsCaseData caseData) {
-        return ofNullable(caseData.getJointPartyName())
+        return ofNullable(caseData.getJointParty().getName())
             .filter(jpn -> isValidName(Name.builder().firstName(jpn.getFirstName()).lastName(jpn.getLastName()).build()))
-            .map(JointPartyName::getFullNameNoTitle)
+            .map(Name::getFullNameNoTitle)
             .orElse("Sir/Madam");
     }
 
@@ -148,8 +149,8 @@ public class FurtherEvidencePlaceholderService {
     }
 
     private Address getJointPartyAddress(SscsCaseData caseData) {
-        return caseData.isJointPartyAddressSameAsAppeallant() ? getAppellantAddress(caseData)
-            : ofNullable(caseData.getJointPartyAddress()).orElse(getEmptyAddress());
+        return isYes(caseData.getJointParty().getJointPartyAddressSameAsAppellant()) ? getAppellantAddress(caseData)
+            : ofNullable(caseData.getJointParty().getAddress()).orElse(getEmptyAddress());
     }
 
     private Address getOtherPartyAddress(SscsCaseData caseData, String otherPartyId) {

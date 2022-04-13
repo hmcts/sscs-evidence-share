@@ -9,6 +9,7 @@ import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_UPLOAD_RESPONSE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -320,7 +321,7 @@ public class DwpUploadResponseHandlerTest {
     public void givenADwpUploadResponseEventWithJointParty_runJointPartyAddedEvent() {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
-                .jointParty("Yes").elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
+                .jointParty(JointParty.builder().hasJointParty(YES).build()).elementsDisputedIsDecisionDisputedByOthers("No").appeal(Appeal.builder()
                     .benefitType(BenefitType.builder().code("UC").build())
                     .build()).build(), WITH_DWP, DWP_UPLOAD_RESPONSE);
 
