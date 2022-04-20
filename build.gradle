@@ -160,12 +160,12 @@ sonarqube {
   properties {
     property "sonar.exclusions",
       "src/main/java/uk/gov/hmcts/reform/sscs/config/**," +
-      "src/main/java/uk/gov/hmcts/reform/sscs/servicebus/messaging/**," +
-      "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
-      "src/main/java/uk/gov/hmcts/reform/sscs/model/**," +
-      "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
-      "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
-      "src/main/java/uk/gov/hmcts/reform/sscs/SscsEvidenceShareApplication.java,"
+        "src/main/java/uk/gov/hmcts/reform/sscs/servicebus/messaging/**," +
+        "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
+        "src/main/java/uk/gov/hmcts/reform/sscs/model/**," +
+        "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/domain/**," +
+        "src/main/java/uk/gov/hmcts/reform/sscs/docmosis/config/**," +
+        "src/main/java/uk/gov/hmcts/reform/sscs/SscsEvidenceShareApplication.java,"
     property "sonar.projectName", "Reform :: sscs-evidence-share"
     property "sonar.projectKey", "uk.gov.hmcts.reform:sscs-evidence-share"
     property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
@@ -379,7 +379,7 @@ dependencyManagement {
     dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.17.1'
 
     //CVE-2021-40690
-     dependency group: 'org.apache.santuario', name: 'xmlsec', version: '2.3.0'
+    dependency group: 'org.apache.santuario', name: 'xmlsec', version: '2.3.0'
 
     // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103
     dependencySet(group: 'org.jetbrains.kotlin', version: '1.5.31') {
