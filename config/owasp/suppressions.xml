@@ -29,15 +29,15 @@
     <cve>CVE-2021-33813</cve>
   </suppress>
   <suppress until="2021-08-01">
-        <notes><![CDATA[
+    <notes><![CDATA[
    file name: jquery-1.11.3.js
    ]]></notes>
-        <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
-        <cve>CVE-2015-9251</cve>
-        <cve>CVE-2019-11358</cve>
-        <cve>CVE-2020-11022</cve>
-        <cve>CVE-2020-11023</cve>
-    </suppress>
+    <packageUrl regex="true">^pkg:javascript/jquery@.*$</packageUrl>
+    <cve>CVE-2015-9251</cve>
+    <cve>CVE-2019-11358</cve>
+    <cve>CVE-2020-11022</cve>
+    <cve>CVE-2020-11023</cve>
+  </suppress>
   <suppress until="2022-07-01">
     <notes><![CDATA[
    file name: spring-core-5.2.15.RELEASE.jar
@@ -78,7 +78,7 @@
    ]]></notes>
     <cve>CVE-2022-23181</cve>
   </suppress>
-  <suppress until="2022-06-21">
+  <suppress until="2022-04-21">
     <notes><![CDATA[
    file name: jackson-databind-2.11.3.jar
    ]]></notes>
