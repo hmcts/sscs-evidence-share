@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNull;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +22,7 @@ public class TemplateServiceTest {
     @Autowired
     private TemplateService service;
 
-    private DateTimeFormatter formatter;
-
-    @Before
-    public void setup() {
-        formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    }
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Test
     public void givenACaseDataWithMrnWithin30Days_thenGenerateThePlaceholderMappingsForDl6() {
