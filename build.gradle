@@ -344,7 +344,7 @@ dependencies {
   implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
 
   testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.3.1'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
   testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
   testImplementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
 
