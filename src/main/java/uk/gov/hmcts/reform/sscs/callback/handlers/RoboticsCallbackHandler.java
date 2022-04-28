@@ -79,8 +79,9 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         SscsCaseDetails latestCase =  ccdService.getByCaseId(callback.getCaseDetails().getId(), idamService.getIdamTokens());
 
         if (gapsSwitchOverFeature
-            && regionalProcessingCenterService
-                .getHearingRoute(latestCase.getData().getRegion())
+            && latestCase.getData()
+                .getSchedulingAndListingFields()
+                .getHearingRoute()
                 .equals(HearingRoute.LIST_ASSIST)) {
             log.info("Hearing route is: {}. Ignoring GAPS route for case id: {}",
                 HearingRoute.LIST_ASSIST, latestCase.getId());
