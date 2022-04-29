@@ -78,13 +78,9 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         SscsCaseDetails latestCase =  ccdService.getByCaseId(callback.getCaseDetails().getId(), idamService.getIdamTokens());
 
-        if (gapsSwitchOverFeature
-            && latestCase.getData()
-                .getSchedulingAndListingFields()
-                .getHearingRoute()
-                .equals(HearingRoute.LIST_ASSIST)) {
-            log.info("Hearing route is: {}. Ignoring GAPS route for case id: {}",
-                HearingRoute.LIST_ASSIST, latestCase.getId());
+        if (gapsSwitchOverFeature && callback.getCaseDetails().getCaseData()
+                .getSchedulingAndListingFields().getHearingRoute().equals(HearingRoute.LIST_ASSIST)) {
+            updateListAssistCaseData(callback);
             return;
         }
 
@@ -104,22 +100,36 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
                 callback.getCaseDetails().getCaseData().setDateCaseSentToGaps(LocalDate.now().toString());
                 callback.getCaseDetails().getCaseData().setDateTimeCaseSentToGaps(LocalDateTime.now().toString());
 
-                String ccdEventType = null;
-                if (callback.getEvent() == DWP_RAISE_EXCEPTION) {
-                    ccdEventType = NOT_LISTABLE.getCcdType();
-                } else if (callback.getEvent() == EventType.READY_TO_LIST
-                    || callback.getEvent() == RESEND_CASE_TO_GAPS2) {
-                    ccdEventType = CASE_UPDATED.getCcdType();
-                }
+                updateCaseDataIfEventApplicable(callback, "Case sent to robotics", "Updated case with date sent to robotics");
 
-                if (ccdEventType != null) {
-                    ccdService.updateCase(callback.getCaseDetails().getCaseData(), Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
-                        ccdEventType, "Case sent to robotics", "Updated case with date sent to robotics",
-                        idamService.getIdamTokens());
-                }
             }
         } catch (Exception e) {
             log.error("Error when sending to robotics: {}", callback.getCaseDetails().getId(), e);
+        }
+    }
+
+    private void updateListAssistCaseData(Callback<SscsCaseData> callback) {
+        log.info("Hearing route is: {}. Case {} will not be sent to robotics.",
+            HearingRoute.LIST_ASSIST, callback.getCaseDetails().getId());
+
+        updateCaseDataIfEventApplicable(callback, "Case sent to List Assist", "Updated case with sent to List Assist");
+    }
+
+    private void  updateCaseDataIfEventApplicable(Callback<SscsCaseData> callback, String summary,
+                                  String description) {
+        String ccdEventType = null;
+        if (callback.getEvent() == DWP_RAISE_EXCEPTION) {
+            ccdEventType = NOT_LISTABLE.getCcdType();
+        } else if (callback.getEvent() == EventType.READY_TO_LIST
+            || callback.getEvent() == RESEND_CASE_TO_GAPS2) {
+            ccdEventType = CASE_UPDATED.getCcdType();
+        }
+
+        if (ccdEventType != null) {
+            ccdService.updateCase(callback.getCaseDetails().getCaseData(),
+                Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId()),
+                ccdEventType, summary, description,
+                idamService.getIdamTokens());
         }
     }
 

@@ -254,12 +254,18 @@ public class RoboticsCallbackHandlerTest {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
 
         when(caseData.getSchedulingAndListingFields().getHearingRoute()).thenReturn(HearingRoute.LIST_ASSIST);
-        when(caseData.getDateTimeSentToGaps()).thenReturn(Optional.of(LocalDateTime.now().minusHours(23)));
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, null);
+        caseDetails.getCaseData().getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.RESEND_CASE_TO_GAPS2, false);
         handler.handle(SUBMITTED, callback);
 
+        ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
         verifyNoInteractions(roboticsService);
+        verify(ccdService).updateCase(any(), any(), any(), summaryCaptor.capture(), descriptionCaptor.capture(), any());
+
+        assertEquals("Case sent to List Assist", summaryCaptor.getValue());
+        assertEquals("Updated case with sent to List Assist", descriptionCaptor.getValue());
     }
 }
