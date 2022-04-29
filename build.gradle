@@ -324,7 +324,7 @@ dependencies {
   implementation group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '4.0.0'
 
   implementation group: 'com.github.hmcts', name: 'sscs-common', version: versions.sscsCommon
-  implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.54'
+  implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.46'
 
   //Remove when our dependencies pull in this version or later
   implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2.2'
@@ -334,6 +334,10 @@ dependencies {
   implementation group: 'org.pitest', name: 'pitest', version: versions.pitest
   implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
   implementation group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: versions.sonarPitest
+
+  implementation group:'org.springframework.retry', name:'spring-retry'
+
+  implementation group:'org.bouncycastle', name:'bcprov-jdk15on', version: '1.70'
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
@@ -468,6 +472,17 @@ dependencyManagement {
       entry 'cxf-rt-rs-client'
       entry 'cxf-rt-security'
       entry 'cxf-rt-transports-http'
+    }
+
+    dependencySet(group: 'org.springframework.cloud', version: '3.1.2') {
+      entry 'spring-cloud-openfeign-core'
+      entry 'spring-cloud-starter-openfeign'
+    }
+
+
+    dependencySet(group: 'org.springframework.plugin', version: '2.0.0.RELEASE') {
+      entry 'spring-plugin-core'
+      entry 'spring-plugin-metadata'
     }
 
     //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
