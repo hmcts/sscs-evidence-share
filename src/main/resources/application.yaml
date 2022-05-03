@@ -17,6 +17,10 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+springdoc:
+  packagesToScan=package1, package2
+  springdoc.pathsToMatch=/v1, /api/balance/**
+
 http:
   connect:
     timeout: 5000

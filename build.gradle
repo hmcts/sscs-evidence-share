@@ -263,7 +263,7 @@ def versions = [
   junitPlatform   : '1.8.1',
   reformLogging: '5.1.7',
   springBoot: springBoot.class.package.implementationVersion,
-  springfoxSwagger: '2.9.2',
+  springDocApi: '1.6.8',
   lombok: '1.18.16',
   restAssured: '4.3.1',
   pact_version: '4.1.7',
@@ -302,14 +302,13 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
-  implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
+  implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: versions.springDocApi
   implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   implementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
   implementation group: 'io.rest-assured', name: 'json-path', version: versions.restAssured
   implementation group: 'io.rest-assured', name: 'xml-path', version: versions.restAssured
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
 
-  implementation group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
   implementation group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.1.0'
   implementation group: 'com.github.hmcts', name: 'java-logging', version: versions.reformLogging
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
@@ -492,7 +491,7 @@ dependencyManagement {
     dependency group: 'org.apache.commons', name: 'commons-compress', version: '1.21'
 
     imports {
-      mavenBom "org.springframework.cloud:spring-cloud-dependencies:Hoxton.SR12"
+      mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.2"
     }
   }
 }
