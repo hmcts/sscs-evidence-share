@@ -259,8 +259,8 @@ pact {
 // it is important to specify logback classic and core packages explicitly as libraries like spring boot
 // enforces it's own (older) version which is not recommended.
 def versions = [
-  junit           : '5.7.2',
-  junitPlatform   : '1.7.2',
+  junit           : '5.8.1',
+  junitPlatform   : '1.8.1',
   reformLogging: '5.1.7',
   springBoot: springBoot.class.package.implementationVersion,
   springfoxSwagger: '2.9.2',
@@ -348,9 +348,9 @@ dependencies {
   implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
 
   testImplementation 'pl.pragmatists:JUnitParams:1.1.1'
-  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
+  testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.5.0'
   testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
-  testImplementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
+  testImplementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
 
   compileOnly group: 'org.projectlombok', name: 'lombok', version: versions.lombok
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
