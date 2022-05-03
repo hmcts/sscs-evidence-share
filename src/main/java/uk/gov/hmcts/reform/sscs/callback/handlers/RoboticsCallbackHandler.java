@@ -109,7 +109,7 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void updateListAssistCaseData(Callback<SscsCaseData> callback) {
-        log.info("Hearing route is: {}. Case {} will not be sent to robotics.",
+        log.info("Hearing route is: {}. Case {} will not be sent to robotics, updating case data if applicable.",
             HearingRoute.LIST_ASSIST, callback.getCaseDetails().getId());
 
         updateCaseDataIfEventApplicable(callback, "Case sent to List Assist", "Updated case with sent to List Assist");
