@@ -80,7 +80,11 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
 
         if (gapsSwitchOverFeature && HearingRoute.LIST_ASSIST == callback.getCaseDetails().getCaseData()
                 .getSchedulingAndListingFields().getHearingRoute()) {
-            updateListAssistCaseData(callback);
+            log.info("Hearing route is: {}. Case {} will not be sent to robotics.",
+                HearingRoute.LIST_ASSIST, callback.getCaseDetails().getId());
+
+            updateCaseDataIfEventApplicable(callback, "Case sent to List Assist", "Updated case with sent to List Assist");
+
             return;
         }
 
@@ -106,13 +110,6 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
         } catch (Exception e) {
             log.error("Error when sending to robotics: {}", callback.getCaseDetails().getId(), e);
         }
-    }
-
-    private void updateListAssistCaseData(Callback<SscsCaseData> callback) {
-        log.info("Hearing route is: {}. Case {} will not be sent to robotics.",
-            HearingRoute.LIST_ASSIST, callback.getCaseDetails().getId());
-
-        updateCaseDataIfEventApplicable(callback, "Case sent to List Assist", "Updated case with sent to List Assist");
     }
 
     private void  updateCaseDataIfEventApplicable(Callback<SscsCaseData> callback, String summary,
