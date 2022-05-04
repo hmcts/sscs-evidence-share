@@ -284,10 +284,12 @@ public class FurtherEvidencePlaceholderServiceTest {
 
         final Address appellantAddress = Address.builder().postcode("W1 1AA").build();
         SscsCaseData caseData = SscsCaseData.builder()
-            .jointParty(YES.getValue())
-            .jointPartyAddress(REP_ADDRESS)
-            .jointPartyName(JointPartyName.builder().title("Mr").firstName(firstName).lastName(lastName).build())
-            .jointPartyAddressSameAsAppellant(sameAddressAsAppellant.getValue())
+            .jointParty(JointParty.builder()
+                    .hasJointParty(YES)
+                    .address(REP_ADDRESS)
+                    .name(Name.builder().title("Mr").firstName(firstName).lastName(lastName).build())
+                    .jointPartyAddressSameAsAppellant(sameAddressAsAppellant)
+                    .build())
             .appeal(Appeal.builder()
                 .appellant(Appellant.builder().address(appellantAddress).build())
                 .benefitType(BenefitType.builder().code("PIP").build())

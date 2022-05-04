@@ -556,9 +556,9 @@ public class FurtherEvidenceServiceTest {
     }
 
     private void withJointParty() {
-        caseData.setJointParty("Yes");
-        caseData.setJointPartyName(JointPartyName.builder().lastName("Party").firstName("Joint").build());
-        caseData.setJointPartyAddressSameAsAppellant("Yes");
+        caseData.getJointParty().setHasJointParty(YES);
+        caseData.getJointParty().setName(Name.builder().lastName("Party").firstName("Joint").build());
+        caseData.getJointParty().setJointPartyAddressSameAsAppellant(YES);
     }
 
     private void withOtherPartyOrRepOrAppointee(boolean withAppointee, boolean withRep, String otherPartyId, String otherPartyAppointeeId, String otherPartyRepId) {
