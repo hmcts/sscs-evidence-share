@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -56,7 +57,7 @@ public class RoboticsCallbackHandlerTest {
     @Mock
     private SscsCaseDetails sscsCaseDetails;
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private SscsCaseData caseData;
 
     private RoboticsCallbackHandler handler;
@@ -251,14 +252,20 @@ public class RoboticsCallbackHandlerTest {
     @Test
     public void givenRequestSentToRobotics_andGapSwitchOverFeatureEnabled_andHearingRouteIsListAssist_thenDoesNotRunFurther() {
         ReflectionTestUtils.setField(handler, "gapsSwitchOverFeature", true);
-        when(regionalProcessingCenterService.getHearingRoute(caseData.getRegion())).thenReturn(HearingRoute.LIST_ASSIST);
-        when(caseData.getDateTimeSentToGaps()).thenReturn(Optional.of(LocalDateTime.now().minusHours(23)));
+
+        when(caseData.getSchedulingAndListingFields().getHearingRoute()).thenReturn(HearingRoute.LIST_ASSIST);
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails(APPEAL_CREATED, null);
-        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
+        caseDetails.getCaseData().getSchedulingAndListingFields().setHearingRoute(HearingRoute.LIST_ASSIST);
+        Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.RESEND_CASE_TO_GAPS2, false);
         handler.handle(SUBMITTED, callback);
 
+        ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
         verifyNoInteractions(roboticsService);
-    }
+        verify(ccdService).updateCase(any(), any(), any(), summaryCaptor.capture(), descriptionCaptor.capture(), any());
 
+        assertEquals("Case sent to List Assist", summaryCaptor.getValue());
+        assertEquals("Updated case with sent to List Assist", descriptionCaptor.getValue());
+    }
 }
