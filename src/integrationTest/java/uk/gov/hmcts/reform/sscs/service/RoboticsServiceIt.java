@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -220,14 +221,13 @@ public class RoboticsServiceIt {
     @Test
     public void givenUcSscsCaseDataWithJointPartyAndElements_makeValidRoboticsJsonThatValidatesAgainstSchema() {
         caseDetails.getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("Pip").build());
-        caseDetails.getCaseData().setJointParty("Yes");
         caseDetails.getCaseData().setElementsDisputedLinkedAppealRef("123456");
         caseDetails.getCaseData().setElementsDisputedIsDecisionDisputedByOthers("Yes");
 
-        caseDetails.getCaseData().setJointPartyName(JointPartyName.builder().title("Mr").firstName("Terry").lastName("Tibbs").build());
-        caseDetails.getCaseData().setJointPartyAddress(Address.builder().line1("99 My Road").town("Grantham").county("Surrey").postcode("CV10 6PO").build());
-        caseDetails.getCaseData().setJointPartyIdentity(Identity.builder().nino("JT0123456B").dob("2000-01-01").build());
-        caseDetails.getCaseData().setJointPartyAddress(Address.builder().line1("99 My Road").town("Chelmsford").county("Essex").postcode("CM12 0NS").build());
+        caseDetails.getCaseData().getJointParty().setHasJointParty(YES);
+        caseDetails.getCaseData().getJointParty().setName(Name.builder().title("Mr").firstName("Terry").lastName("Tibbs").build());
+        caseDetails.getCaseData().getJointParty().setIdentity(Identity.builder().nino("JT0123456B").dob("2000-01-01").build());
+        caseDetails.getCaseData().getJointParty().setAddress(Address.builder().line1("99 My Road").town("Chelmsford").county("Essex").postcode("CM12 0NS").build());
 
         List<ElementDisputed> elementsDisputedGeneralList = new ArrayList<>();
         elementsDisputedGeneralList.add(ElementDisputed.builder().value(ElementDisputedDetails.builder().issueCode("firstIssueElementsDisputedGeneral1").build()).build());
