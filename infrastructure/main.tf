@@ -25,7 +25,6 @@ data "azurerm_key_vault" "send_grid" {
 data "azurerm_key_vault_secret" "send_grid_api_key" {
   provider = azurerm.send-grid
 
-
   key_vault_id = data.azurerm_key_vault.send_grid.id
   name         = "sscs-api-key"
 }
