@@ -7,7 +7,7 @@ locals {
 }
 
 data "azurerm_key_vault" "sscs_key_vault" {
-  name                = "${local.azureVaultName}"
+  name                = local.azureVaultName
   resource_group_name = local.azureVaultName
 }
 
@@ -21,7 +21,6 @@ data "azurerm_key_vault" "send_grid" {
 data "azurerm_key_vault_secret" "send_grid_api_key" {
   provider = azurerm.send-grid
 
-
   key_vault_id = data.azurerm_key_vault.send_grid.id
   name         = "sscs-api-key"
 }
@@ -30,4 +29,6 @@ resource "azurerm_key_vault_secret" "sendgrid_api_key" {
   key_vault_id = data.azurerm_key_vault.sscs_key_vault.id
   name         = "sendgrid-api-key"
   value        = data.azurerm_key_vault_secret.send_grid_api_key.value
+
+  tags = var.common_tags
 }
