@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Collections.singletonMap;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.WorkAllocationFieldsHelper.setWorkAllocationFields;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.CaseAccessManagementFieldsHelper.setCaseAccessManagementFields;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
@@ -61,7 +61,7 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
         try {
             setSupplementaryData(caseId, idamTokens);
             if (workAllocationFeature) {
-                setWorkAllocationFields(callback
+                setCaseAccessManagementFields(callback
                     .getCaseDetails()
                     .getCaseData());
                 ccdService.updateCase(

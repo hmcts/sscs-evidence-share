@@ -2,11 +2,11 @@ package uk.gov.hmcts.reform.sscs.callback.handlers.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.WorkAllocationFieldsHelper.hasAppellantName;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.WorkAllocationFieldsHelper.isHmrcBenefit;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.WorkAllocationFieldsHelper.setCaseNames;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.WorkAllocationFieldsHelper.setCategories;
-import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.WorkAllocationFieldsHelper.setOgdType;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.CaseAccessManagementFieldsHelper.hasAppellantName;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.CaseAccessManagementFieldsHelper.isHmrcBenefit;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.CaseAccessManagementFieldsHelper.setCaseNames;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.CaseAccessManagementFieldsHelper.setCategories;
+import static uk.gov.hmcts.reform.sscs.callback.handlers.helper.CaseAccessManagementFieldsHelper.setOgdType;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS1;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.FormType.SSCS5;
 
@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
-class WorkAllocationFieldsHelperTest {
+class CaseAccessManagementFieldsHelperTest {
 
     @Test
     void shouldSetCategories_givenValidBenefitTypeCode() {
@@ -33,8 +33,8 @@ class WorkAllocationFieldsHelperTest {
 
         setCategories(testCaseData);
 
-        assertThat(testCaseData.getWorkAllocationFields().getCaseAccessCategory()).isEqualTo("tax-freeChildcare");
-        assertThat(testCaseData.getWorkAllocationFields().getCaseManagementCategory().getValue().getCode()).isEqualTo("taxFreeChildcare");
+        assertThat(testCaseData.getCaseAccessManagementFields().getCaseAccessCategory()).isEqualTo("tax-freeChildcare");
+        assertThat(testCaseData.getCaseAccessManagementFields().getCaseManagementCategory().getValue().getCode()).isEqualTo("taxFreeChildcare");
     }
 
     @Test
@@ -45,8 +45,8 @@ class WorkAllocationFieldsHelperTest {
 
         setCategories(testCaseData);
 
-        assertNull(testCaseData.getWorkAllocationFields().getCaseAccessCategory());
-        assertNull(testCaseData.getWorkAllocationFields().getCaseManagementCategory());
+        assertNull(testCaseData.getCaseAccessManagementFields().getCaseAccessCategory());
+        assertNull(testCaseData.getCaseAccessManagementFields().getCaseManagementCategory());
     }
 
     @Test
@@ -61,8 +61,8 @@ class WorkAllocationFieldsHelperTest {
 
         setCategories(testCaseData);
 
-        assertNull(testCaseData.getWorkAllocationFields().getCaseAccessCategory());
-        assertNull(testCaseData.getWorkAllocationFields().getCaseManagementCategory());
+        assertNull(testCaseData.getCaseAccessManagementFields().getCaseAccessCategory());
+        assertNull(testCaseData.getCaseAccessManagementFields().getCaseManagementCategory());
     }
 
     @Test
@@ -80,9 +80,9 @@ class WorkAllocationFieldsHelperTest {
 
         setCaseNames(testCaseData);
 
-        assertThat(testCaseData.getWorkAllocationFields().getCaseNameHmctsInternal()).isEqualTo("John Doe");
-        assertThat(testCaseData.getWorkAllocationFields().getCaseNameHmctsRestricted()).isEqualTo("John Doe");
-        assertThat(testCaseData.getWorkAllocationFields().getCaseNamePublic()).isEqualTo("John Doe");
+        assertThat(testCaseData.getCaseAccessManagementFields().getCaseNameHmctsInternal()).isEqualTo("John Doe");
+        assertThat(testCaseData.getCaseAccessManagementFields().getCaseNameHmctsRestricted()).isEqualTo("John Doe");
+        assertThat(testCaseData.getCaseAccessManagementFields().getCaseNamePublic()).isEqualTo("John Doe");
     }
 
     @Test
@@ -95,9 +95,9 @@ class WorkAllocationFieldsHelperTest {
 
         setCaseNames(testCaseData);
 
-        assertNull(testCaseData.getWorkAllocationFields().getCaseNameHmctsInternal());
-        assertNull(testCaseData.getWorkAllocationFields().getCaseNameHmctsRestricted());
-        assertNull(testCaseData.getWorkAllocationFields().getCaseNamePublic());
+        assertNull(testCaseData.getCaseAccessManagementFields().getCaseNameHmctsInternal());
+        assertNull(testCaseData.getCaseAccessManagementFields().getCaseNameHmctsRestricted());
+        assertNull(testCaseData.getCaseAccessManagementFields().getCaseNamePublic());
     }
 
     @ParameterizedTest
@@ -116,7 +116,7 @@ class WorkAllocationFieldsHelperTest {
 
         setOgdType(testCaseData);
 
-        assertThat(testCaseData.getWorkAllocationFields().getOgdType()).isEqualTo(expectedOgdType);
+        assertThat(testCaseData.getCaseAccessManagementFields().getOgdType()).isEqualTo(expectedOgdType);
     }
 
     @Test
@@ -125,7 +125,7 @@ class WorkAllocationFieldsHelperTest {
 
         setOgdType(testCaseData);
 
-        assertNull(testCaseData.getWorkAllocationFields().getOgdType());
+        assertNull(testCaseData.getCaseAccessManagementFields().getOgdType());
     }
 
     @Test
@@ -136,7 +136,7 @@ class WorkAllocationFieldsHelperTest {
 
         setOgdType(testCaseData);
 
-        assertNull(testCaseData.getWorkAllocationFields().getOgdType());
+        assertNull(testCaseData.getCaseAccessManagementFields().getOgdType());
     }
 
     @Test

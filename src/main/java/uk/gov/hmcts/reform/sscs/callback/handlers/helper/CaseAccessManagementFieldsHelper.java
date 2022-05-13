@@ -9,16 +9,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
 
-public class WorkAllocationFieldsHelper {
+public class CaseAccessManagementFieldsHelper {
 
     private static final String HMRC_OGD_TYPE = "HMRC";
     private static final String DWP_OGD_TYPE = "DWP";
 
-    private WorkAllocationFieldsHelper() {
+    private CaseAccessManagementFieldsHelper() {
         // no-op
     }
 
-    public static void setWorkAllocationFields(SscsCaseData sscsCaseData) {
+    public static void setCaseAccessManagementFields(SscsCaseData sscsCaseData) {
         setCategories(sscsCaseData);
         setCaseNames(sscsCaseData);
         setOgdType(sscsCaseData);
@@ -34,7 +34,7 @@ public class WorkAllocationFieldsHelper {
             getBenefitOptionalByCode(appeal.getBenefitType().getCode())
                 .ifPresent(
                     benefit -> sscsCaseData
-                        .getWorkAllocationFields()
+                        .getCaseAccessManagementFields()
                         .setCategories(benefit)
                 );
         }
@@ -43,7 +43,7 @@ public class WorkAllocationFieldsHelper {
     static void setCaseNames(SscsCaseData sscsCaseData) {
         if (hasAppellantName(sscsCaseData.getAppeal())) {
             sscsCaseData
-                .getWorkAllocationFields()
+                .getCaseAccessManagementFields()
                 .setCaseNames(sscsCaseData
                     .getAppeal()
                     .getAppellant()
@@ -57,7 +57,7 @@ public class WorkAllocationFieldsHelper {
         if (nonNull(sscsCaseData.getAppeal())
             && nonNull(sscsCaseData.getAppeal().getBenefitType())) {
             sscsCaseData
-                .getWorkAllocationFields()
+                .getCaseAccessManagementFields()
                 .setOgdType(isHmrcBenefit(sscsCaseData)
                     ? HMRC_OGD_TYPE
                     : DWP_OGD_TYPE);
