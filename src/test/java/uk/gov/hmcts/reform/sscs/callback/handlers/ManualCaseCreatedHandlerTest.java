@@ -108,8 +108,8 @@ public class ManualCaseCreatedHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCcd_givenWorkAllocationEnabled() {
-        setField(handler, "workAllocationFeature", true);
+    public void shouldUpdateCcd_givenCaseAccessManagementFeatureEnabled() {
+        setField(handler, "caseAccessManagementFeature", true);
         Callback<SscsCaseData> callback = buildCallback(SscsCaseData.builder()
                 .createdInGapsFrom(READY_TO_LIST.getId()).build(),
             READY_TO_LIST,

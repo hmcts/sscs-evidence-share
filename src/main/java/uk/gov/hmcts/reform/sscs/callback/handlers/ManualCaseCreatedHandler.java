@@ -32,8 +32,8 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
     private final CcdService ccdService;
     private final IdamService idamService;
 
-    @Value("${feature.work-allocation.enabled}")
-    private boolean workAllocationFeature;
+    @Value("${feature.case-access-management.enabled}")
+    private boolean caseAccessManagementFeature;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -60,7 +60,7 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
 
         try {
             setSupplementaryData(caseId, idamTokens);
-            if (workAllocationFeature) {
+            if (caseAccessManagementFeature) {
                 setCaseAccessManagementFields(callback
                     .getCaseDetails()
                     .getCaseData());
