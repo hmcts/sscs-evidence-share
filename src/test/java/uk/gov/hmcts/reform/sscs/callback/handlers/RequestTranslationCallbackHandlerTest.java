@@ -86,8 +86,9 @@ public class RequestTranslationCallbackHandlerTest {
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("No");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), REQUEST_TRANSLATION_FROM_WLU, false);
 
-        Exception exception = assertThrows(
-                IllegalStateException.class, () -> handler.handle(SUBMITTED, callback));
+        Exception exception = assertThrows(IllegalStateException.class, () ->
+            handler.handle(SUBMITTED, callback));
+
         assertEquals("Error: This action is only available for Welsh cases", exception.getMessage());
     }
 
@@ -103,12 +104,13 @@ public class RequestTranslationCallbackHandlerTest {
     }
 
     @Test
-    public void whenCallbackFailsthrowWelshException() {
+    public void whenCallbackFailsThrowWelshException() {
         RequestTranslationCallbackHandler mockHandle =  mock(RequestTranslationCallbackHandler.class);
         Mockito.doThrow(new WelshException(new Exception())).when(mockHandle).handle(any(),any());
 
         CaseDetails<SscsCaseData> caseDetails = getCaseDetails("Yes");
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), REQUEST_TRANSLATION_FROM_WLU, false);
+
         WelshException exception = assertThrows(
                 WelshException.class, () -> mockHandle.handle(SUBMITTED, callback));
         assertNotNull(exception.getMessage());
