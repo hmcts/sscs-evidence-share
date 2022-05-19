@@ -51,6 +51,7 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Mock
     private IdamService idamService;
+
     @Mock
     private CcdService ccdService;
 
@@ -60,14 +61,14 @@ public class IssueFurtherEvidenceHandlerTest {
     @Captor
     ArgumentCaptor<SscsCaseData> captor;
 
-    private SscsDocument sscsDocumentNotIssued = SscsDocument.builder()
+    private final SscsDocument sscsDocumentNotIssued = SscsDocument.builder()
         .value(SscsDocumentDetails.builder()
             .documentType(APPELLANT_EVIDENCE.getValue())
             .evidenceIssued("No")
             .build())
         .build();
 
-    private SscsCaseData caseData = SscsCaseData.builder()
+    private final SscsCaseData caseData = SscsCaseData.builder()
         .ccdCaseId("1563382899630221")
         .sscsDocument(Collections.singletonList(sscsDocumentNotIssued))
         .appeal(Appeal.builder().build())

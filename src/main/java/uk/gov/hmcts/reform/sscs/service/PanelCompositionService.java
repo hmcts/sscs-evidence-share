@@ -22,19 +22,23 @@ public class PanelCompositionService {
         this.idamService = idamService;
     }
 
-    public SscsCaseDetails processCaseState(Callback<SscsCaseData> callback, SscsCaseData caseData, EventType eventType) {
+    public void processCaseState(Callback<SscsCaseData> callback, SscsCaseData caseData, EventType eventType) {
         if (caseData.getIsFqpmRequired() == null
             || hasDueDateSetAndOtherPartyWithoutHearingOption(caseData)) {
-            return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.NOT_LISTABLE.getCcdType(), "Not listable",
-                "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set", idamService.getIdamTokens());
+            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.NOT_LISTABLE.getCcdType(),
+                "Not listable",
+                "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set",
+                idamService.getIdamTokens());
         } else {
             if (eventType.equals(EventType.UPDATE_OTHER_PARTY_DATA)) {
                 caseData.setDirectionDueDate(null);
             }
-            return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.READY_TO_LIST.getCcdType(), "Ready to list",
-                "Update to ready to list event as there is no further information to assist the tribunal and no dispute.", idamService.getIdamTokens());
+            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.READY_TO_LIST.getCcdType(),
+                "Ready to list",
+                "Update to ready to list event as there is no further information to assist the tribunal and no dispute.",
+                idamService.getIdamTokens());
         }
     }
 
