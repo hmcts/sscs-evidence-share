@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Optional;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -17,6 +16,7 @@ public final class HandlerHelper {
     public static Callback<SscsCaseData> buildTestCallbackForGivenData(SscsCaseData sscsCaseData, State state, EventType eventType) {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "SSCS", state, sscsCaseData,
             LocalDateTime.now(), "Benefit");
+
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 
@@ -29,7 +29,7 @@ public final class HandlerHelper {
         return new Callback<>(caseDetails, Optional.of(oldCaseDetails), eventType, false);
     }
 
-    public static Callback<SscsCaseData> buildCallback(SscsCaseData sscsCaseData, State state, EventType eventType, Map<String, Map<String, Object>> supplementaryData) {
+    public static Callback<SscsCaseData> buildCallback(SscsCaseData sscsCaseData, State state, EventType eventType) {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "SSCS", state, sscsCaseData,
             LocalDateTime.now(), "Benefit");
 
