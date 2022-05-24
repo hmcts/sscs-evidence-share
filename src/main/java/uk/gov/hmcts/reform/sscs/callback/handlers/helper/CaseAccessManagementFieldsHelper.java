@@ -4,11 +4,13 @@ import static com.microsoft.applicationinsights.boot.dependencies.apachecommons.
 import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitOptionalByCode;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.FormType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsType;
 
+@Slf4j
 public class CaseAccessManagementFieldsHelper {
 
     private static final String HMRC_OGD_TYPE = "HMRC";
@@ -62,6 +64,9 @@ public class CaseAccessManagementFieldsHelper {
                     ? HMRC_OGD_TYPE
                     : DWP_OGD_TYPE);
         }
+        log.info("OgdType of {} was added for: {}",
+            sscsCaseData.getCaseAccessManagementFields().getOgdType(),
+            sscsCaseData.getCcdCaseId());
     }
 
     static boolean hasAppellantName(Appeal appeal) {

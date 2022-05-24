@@ -59,11 +59,15 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
         IdamTokens idamTokens = idamService.getIdamTokens();
 
         try {
+            log.info("Setting supplementary data for: {}", caseId);
             setSupplementaryData(caseId, idamTokens);
             if (caseAccessManagementFeature) {
+                log.info("Setting CAM data for: {}", caseId);
                 setCaseAccessManagementFields(callback
                     .getCaseDetails()
                     .getCaseData());
+                log.info("Set CAM fields for {} as follows: {}",
+                    caseId, callback.getCaseDetails().getCaseData().getCaseAccessManagementFields().toString());
                 ccdService.updateCase(
                     callback.getCaseDetails().getCaseData(),
                     callback.getCaseDetails().getId(),
