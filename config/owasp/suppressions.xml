@@ -96,4 +96,11 @@
     <packageUrl regex="true">^pkg:maven/com\.twelvemonkeys\..*$</packageUrl>
     <cve>CVE-2021-23792</cve>
   </suppress>
+  <suppress until="2022-07-01">
+    <notes><![CDATA[
+   file name: tika-core-2.1.0.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org.apache.tika/tika-core@2.1.0</packageUrl>
+    <cve>CVE-2022-25169</cve>
+  </suppress>
 </suppressions>
