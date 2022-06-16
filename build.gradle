@@ -325,7 +325,7 @@ dependencies {
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
-  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.6.3'
+  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.8.1'
 
   compile group: 'org.pitest', name: 'pitest', version: versions.pitest
   compile group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
@@ -391,7 +391,7 @@ dependencyManagement {
     }
 
     // CVE-2020-13934, CVE-2020-13935 Java and Command Line injections in Windows
-    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.54') {
+    dependencySet(group: 'org.apache.tomcat.embed', version: '9.0.63') {
       entry 'tomcat-embed-core'
       entry 'tomcat-embed-el'
       entry 'tomcat-embed-websocket'
@@ -438,8 +438,8 @@ dependencyManagement {
       entry 'batik-all'
     }
 
-    //CVE-2021-22118
-    dependencySet(group: 'org.springframework', version: '5.2.21.RELEASE') {
+    //CVE-2021-22118, CVE-2022-22970, CVE-2022-22971
+    dependencySet(group: 'org.springframework', version: '5.2.22.RELEASE') {
       entry 'spring-aop'
       entry 'spring-aspects'
       entry 'spring-beans'
