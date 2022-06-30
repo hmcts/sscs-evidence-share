@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority.LATEST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPDATE_CASE_ONLY;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import java.util.HashMap;
@@ -71,7 +72,7 @@ public class ManualCaseCreatedHandler implements CallbackHandler<SscsCaseData> {
                 ccdService.updateCase(
                     callback.getCaseDetails().getCaseData(),
                     callback.getCaseDetails().getId(),
-                    callback.getEvent().getCcdType(),
+                    UPDATE_CASE_ONLY.getCcdType(),
                     "Case Update - Manual Case Created",
                     "Case was updated in SSCS-Evidence-Share",
                     idamService.getIdamTokens()
