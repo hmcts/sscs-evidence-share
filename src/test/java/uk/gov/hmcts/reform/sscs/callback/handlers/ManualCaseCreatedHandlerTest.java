@@ -120,7 +120,7 @@ public class ManualCaseCreatedHandlerTest {
         verify(ccdService).updateCase(
             eq(callback.getCaseDetails().getCaseData()),
             eq(callback.getCaseDetails().getId()),
-            eq(callback.getEvent().getCcdType()),
+            eq(UPDATE_CASE_ONLY.getCcdType()),
             eq("Case Update - Manual Case Created"),
             eq("Case was updated in SSCS-Evidence-Share"),
             any());
