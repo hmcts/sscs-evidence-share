@@ -65,7 +65,9 @@ public class RoboticsCallbackHandler implements CallbackHandler<SscsCaseData> {
             || callback.getEvent() == EventType.SEND_TO_DWP
             || callback.getEvent() == EventType.DWP_RAISE_EXCEPTION)
             && !callback.getCaseDetails().getCaseData().isTranslationWorkOutstanding())
-            || callback.getEvent() == RESEND_CASE_TO_GAPS2;
+            || callback.getEvent() == RESEND_CASE_TO_GAPS2
+            || callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
+            && callback.getEvent() == EventType.READY_TO_LIST;
     }
 
     @Override
