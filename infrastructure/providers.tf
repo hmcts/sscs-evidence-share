@@ -13,7 +13,7 @@ terraform {
 }
 
 provider "azurerm" {
-  alias = "send-grid"
+  alias           = "send-grid"
   subscription_id = var.env != "prod" ? local.sendgrid_subscription.nonprod : local.sendgrid_subscription.prod
   features {}
 }
