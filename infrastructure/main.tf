@@ -28,8 +28,6 @@ data "azurerm_key_vault_secret" "send_grid_api_key" {
 }
 
 resource "azurerm_key_vault_secret" "sendgrid_api_key" {
-  count = contains(["prod", "demo"], var.env) ? 1 : 0
-
   key_vault_id = data.azurerm_key_vault.sscs_key_vault.id
   name         = "sendgrid-api-key"
   value        = data.azurerm_key_vault_secret.send_grid_api_key.value
