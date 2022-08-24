@@ -14,6 +14,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -450,27 +451,39 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals("Test Rep", pdfDocumentRequest.getAllValues().get(0).getData().get("name"));
         assertEquals("609-97-template (original sender)", documentCaptor.getAllValues().get(0).get(0).getName());
         //assertEquals("evidence-document2", documentCaptor.getAllValues().get(0).get(1).getName());
-        assertEquals("evidence-document", documentCaptor.getAllValues().get(0).get(2).getName());
+        //assertEquals("evidence-document", documentCaptor.getAllValues().get(0).get(2).getName());
+        Assertions.assertThat(documentCaptor.getAllValues().get(0))
+            .hasSize(3)
+            .extracting(Pdf::getName)
+            .contains("evidence-document2", "evidence-document");
 
         assertEquals("Sarah Smith", pdfDocumentRequest.getAllValues().get(1).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(1).get(0).getName());
-        assertEquals("evidence-document2", documentCaptor.getAllValues().get(1).get(1).getName());
-        assertEquals("evidence-document", documentCaptor.getAllValues().get(1).get(2).getName());
+        Assertions.assertThat(documentCaptor.getAllValues().get(1))
+            .hasSize(3)
+            .extracting(Pdf::getName)
+            .contains("evidence-document2", "evidence-document");
 
         assertEquals("Wendy Smith", pdfDocumentRequest.getAllValues().get(2).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(2).get(0).getName());
-        assertEquals("evidence-document2", documentCaptor.getAllValues().get(2).get(1).getName());
-        assertEquals("evidence-document", documentCaptor.getAllValues().get(2).get(2).getName());
+        Assertions.assertThat(documentCaptor.getAllValues().get(2))
+            .hasSize(3)
+            .extracting(Pdf::getName)
+            .contains("evidence-document2", "evidence-document");
 
         assertEquals("Shelly Barat", pdfDocumentRequest.getAllValues().get(3).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(3).get(0).getName());
-        assertEquals("evidence-document2", documentCaptor.getAllValues().get(3).get(1).getName());
-        assertEquals("evidence-document", documentCaptor.getAllValues().get(3).get(2).getName());
+        Assertions.assertThat(documentCaptor.getAllValues().get(3))
+            .hasSize(3)
+            .extracting(Pdf::getName)
+            .contains("evidence-document2", "evidence-document");
 
         assertEquals("Robert Brokenshire", pdfDocumentRequest.getAllValues().get(4).getData().get("name"));
         assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(4).get(0).getName());
-        assertEquals("evidence-document2", documentCaptor.getAllValues().get(4).get(1).getName());
-        assertEquals("evidence-document", documentCaptor.getAllValues().get(4).get(2).getName());
+        Assertions.assertThat(documentCaptor.getAllValues().get(4))
+            .hasSize(3)
+            .extracting(Pdf::getName)
+            .contains("evidence-document2", "evidence-document");
     }
 
     @Test
