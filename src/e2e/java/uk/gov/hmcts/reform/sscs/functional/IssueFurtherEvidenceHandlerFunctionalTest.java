@@ -70,11 +70,7 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
-
-        assertNull(docs.get(0).getValue().getEvidenceIssued());
-        assertEquals("Yes", docs.get(1).getValue().getEvidenceIssued());
-        assertEquals("Yes", docs.get(2).getValue().getEvidenceIssued());
-        assertEquals("Yes", docs.get(3).getValue().getEvidenceIssued());
+        
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
