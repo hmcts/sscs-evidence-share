@@ -10,7 +10,6 @@ import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 
 public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
 
