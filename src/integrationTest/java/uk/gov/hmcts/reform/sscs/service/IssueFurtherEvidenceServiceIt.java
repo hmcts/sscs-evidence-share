@@ -450,8 +450,6 @@ public class IssueFurtherEvidenceServiceIt {
 
         assertEquals("Test Rep", pdfDocumentRequest.getAllValues().get(0).getData().get("name"));
         assertEquals("609-97-template (original sender)", documentCaptor.getAllValues().get(0).get(0).getName());
-        //assertEquals("evidence-document2", documentCaptor.getAllValues().get(0).get(1).getName());
-        //assertEquals("evidence-document", documentCaptor.getAllValues().get(0).get(2).getName());
         Assertions.assertThat(documentCaptor.getAllValues().get(0))
             .hasSize(3)
             .extracting(Pdf::getName)
