@@ -6,8 +6,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDEN
 
 import java.io.IOException;
 import java.util.List;
+
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 
 public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
 
@@ -74,6 +77,13 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         assertEquals("Yes", docs.get(1).getValue().getEvidenceIssued());
         assertEquals("Yes", docs.get(2).getValue().getEvidenceIssued());
         assertEquals("Yes", docs.get(3).getValue().getEvidenceIssued());
+        Assertions.assertThat(docs)
+            .extracting(SscsDocument::getValue)
+            .extracting(SscsDocumentDetails::getEvidenceIssued)
+            .contains("Yes", "Yes", "Yes");
+
+
+
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
     }
