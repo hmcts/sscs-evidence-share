@@ -7,10 +7,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVID
 import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 
 @Slf4j
 public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
@@ -29,9 +31,9 @@ public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest exten
         List<SscsDocument> docs = caseData.getSscsDocument();
         log.info("verifyEvidenceIssued ccdCaseId " + ccdCaseId);
 
-        assertNull(docs.get(0).getValue().getEvidenceIssued());
-        assertEquals("Yes",docs.get(1).getValue().getEvidenceIssued());
-        assertEquals("Yes",docs.get(2).getValue().getEvidenceIssued());
-        assertEquals("Yes",docs.get(3).getValue().getEvidenceIssued());
+        Assertions.assertThat(docs)
+            .extracting(SscsDocument::getValue)
+            .extracting(SscsDocumentDetails::getEvidenceIssued)
+            .contains("Yes", "Yes", "Yes");
     }
 }
