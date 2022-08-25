@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.functional;
 
-import static junit.framework.TestCase.assertNull;
-import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
 
 import java.io.IOException;
