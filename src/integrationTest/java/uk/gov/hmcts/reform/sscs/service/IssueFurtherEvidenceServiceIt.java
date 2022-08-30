@@ -448,40 +448,40 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals(3, documentCaptor.getAllValues().get(3).size());
         assertEquals(3, documentCaptor.getAllValues().get(4).size());
 
-        assertEquals("Test Rep", pdfDocumentRequest.getAllValues().get(0).getData().get("name"));
-        assertEquals("609-97-template (original sender)", documentCaptor.getAllValues().get(0).get(0).getName());
-        Assertions.assertThat(documentCaptor.getAllValues().get(0))
+        Integer pdfIndex = findPdfDocumentRequestIndex("Test Rep");
+        assertNotNull(pdfIndex);
+        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
-            .contains("evidence-document2", "evidence-document");
+            .contains("609-97-template (original sender)", "evidence-document2", "evidence-document");
 
-        assertEquals("Sarah Smith", pdfDocumentRequest.getAllValues().get(1).getData().get("name"));
-        assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(1).get(0).getName());
-        Assertions.assertThat(documentCaptor.getAllValues().get(1))
+        pdfIndex = findPdfDocumentRequestIndex("Sarah Smith");
+        assertNotNull(pdfIndex);
+        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
-            .contains("evidence-document2", "evidence-document");
+            .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
 
-        assertEquals("Wendy Smith", pdfDocumentRequest.getAllValues().get(2).getData().get("name"));
-        assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(2).get(0).getName());
-        Assertions.assertThat(documentCaptor.getAllValues().get(2))
+        pdfIndex = findPdfDocumentRequestIndex("Wendy Smith");
+        assertNotNull(pdfIndex);
+        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
-            .contains("evidence-document2", "evidence-document");
+            .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
 
-        assertEquals("Shelly Barat", pdfDocumentRequest.getAllValues().get(3).getData().get("name"));
-        assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(3).get(0).getName());
-        Assertions.assertThat(documentCaptor.getAllValues().get(3))
+        pdfIndex = findPdfDocumentRequestIndex("Shelly Barat");
+        assertNotNull(pdfIndex);
+        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
-            .contains("evidence-document2", "evidence-document");
+            .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
 
-        assertEquals("Robert Brokenshire", pdfDocumentRequest.getAllValues().get(4).getData().get("name"));
-        assertEquals("609-98-template (other parties)", documentCaptor.getAllValues().get(4).get(0).getName());
-        Assertions.assertThat(documentCaptor.getAllValues().get(4))
+        pdfIndex = findPdfDocumentRequestIndex("Robert Brokenshire");
+        assertNotNull(pdfIndex);
+        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
-            .contains("evidence-document2", "evidence-document");
+            .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
     }
 
     @Test
@@ -515,5 +515,18 @@ public class IssueFurtherEvidenceServiceIt {
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any());
 
         verify(ccdService, times(1)).getByCaseId(any(), any());
+    }
+
+
+    private Integer findPdfDocumentRequestIndex(String name) {
+        Integer index = 0;
+        for (PdfDocumentRequest pdf : pdfDocumentRequest.getAllValues()) {
+            if (name.equals(pdf.getData().get("name"))) {
+                return index;
+            }
+            index++;
+        }
+        return null;
+
     }
 }
