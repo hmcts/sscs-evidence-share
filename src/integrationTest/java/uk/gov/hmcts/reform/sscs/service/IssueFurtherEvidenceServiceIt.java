@@ -519,14 +519,11 @@ public class IssueFurtherEvidenceServiceIt {
 
 
     private Integer findPdfDocumentRequestIndex(String name) {
-        Integer index = 0;
-        for (PdfDocumentRequest pdf : pdfDocumentRequest.getAllValues()) {
-            if (name.equals(pdf.getData().get("name"))) {
+        for (Integer index = 0; index < pdfDocumentRequest.getAllValues().size(); index++) {
+            if (name.equals(pdfDocumentRequest.getAllValues().get(index).getData().get("name"))) {
                 return index;
             }
-            index++;
         }
         return null;
-
     }
 }
