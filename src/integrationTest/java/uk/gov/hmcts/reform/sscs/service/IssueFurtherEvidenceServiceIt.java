@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import junitparams.JUnitParamsRunner;
@@ -152,19 +153,7 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithAppellantAndFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAndNotSend609_98() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallback.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint("issueFurtherEvidenceCallback.json");
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any());
 
@@ -176,24 +165,13 @@ public class IssueFurtherEvidenceServiceIt {
         assertEquals("evidence-document", documentCaptor.getAllValues().get(0).get(1).getName());
     }
 
+
     @Test
     @Parameters({"Rep", "JointParty"})
     public void appealWithAppellantAndRepFurtherEvidenceFromAppellant_shouldSend609_97ToAppellantAnd609_98ToParty(String party) throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource(String.format("issueFurtherEvidenceCallbackWith%s.json", party))).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint(String.format("issueFurtherEvidenceCallbackWith%s.json", party));
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any());
 
@@ -214,19 +192,7 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithAppellantAndRepFurtherEvidenceFromRep_shouldSend609_97ToRepAnd609_98ToAppellant() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithRepEvidence.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint("issueFurtherEvidenceCallbackWithRepEvidence.json");
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any());
 
@@ -247,19 +213,7 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithAppellantFurtherEvidenceAndRepFurtherEvidence_shouldSend609_97ToRepAndAppellantAnd609_98ToAppellantAndRep() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithAppellantEvidenceAndRepEvidence.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint("issueFurtherEvidenceCallbackWithAppellantEvidenceAndRepEvidence.json");
 
         verify(bulkPrintService, times(4)).sendToBulkPrint(any(), any(), any(), any());
 
@@ -290,19 +244,7 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToAppellant() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithDwpEvidence.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint("issueFurtherEvidenceCallbackWithDwpEvidence.json");
 
         verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any());
 
@@ -319,19 +261,7 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithRepAndFurtherEvidenceFromDwp_shouldNotSend609_97AndSend609_98ToAppellantAndParty(String party) throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource(String.format("issueFurtherEvidenceCallbackWith%sAndEvidenceFromDwp.json", party))).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint(String.format("issueFurtherEvidenceCallbackWith%sAndEvidenceFromDwp.json", party));
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any());
 
@@ -353,19 +283,7 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithAppellantAndOtherPartyAndFurtherEvidenceFromOtherParty_shouldSend609_97ToOtherPartyAndSend609_98ToAppellant(String otherPartyType) throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource(String.format("issueFurtherEvidenceCallbackWith%sEvidence.json", otherPartyType))).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint(String.format("issueFurtherEvidenceCallbackWith%sEvidence.json", otherPartyType));
 
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any());
 
@@ -387,19 +305,7 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithAppellantAndOtherPartyRepAndFurtherEvidenceFromOtherPartyRep_shouldSend609_97ToOtherPartyRepAndSend609_98ToOtherPartyAndAppellant() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithOtherPartyRepEvidence.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint("issueFurtherEvidenceCallbackWithOtherPartyRepEvidence.json");
 
         verify(bulkPrintService, times(3)).sendToBulkPrint(any(), any(), any(), any());
 
@@ -425,19 +331,7 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_containsSharedEvidenceDocumentsForAllParties() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json");
 
         verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any());
 
@@ -453,19 +347,7 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_containsCorrectAmountOfDocumentsForAllParties() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json");
 
         verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any());
 
@@ -478,19 +360,7 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_hasCorrectParties() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json");
 
         verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any());
 
@@ -505,27 +375,11 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_shouldSend609_97ToOtherPartyRep() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json");
 
         verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any());
 
-        Integer pdfIndex = findPdfDocumentRequestIndex("Test Rep");
-        assertNotNull(pdfIndex);
-        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
-            .extracting(Pdf::getName)
-            .contains("609-97-template (original sender)");
+        verifyPartyHasReceivedSpecifiedTemplate("Test Rep", "609-97-template (original sender)");
 
     }
 
@@ -533,50 +387,23 @@ public class IssueFurtherEvidenceServiceIt {
     public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_shouldSend609_98ToAllOtherPartiesAndAppellant() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
-        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
-            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
-        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
-
-        IdamTokens idamTokens = IdamTokens.builder().build();
-        when(idamService.getIdamTokens()).thenReturn(idamTokens);
-
-        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
-        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        topicConsumer.onMessage(json, "1");
+        prepareAndSendToBulkPrint("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json");
 
         verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any());
 
-        Integer pdfIndex = findPdfDocumentRequestIndex("Sarah Smith");
-        assertNotNull(pdfIndex);
-        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
-            .extracting(Pdf::getName)
-            .contains("609-98-template (other parties)");
+        verifyPartyHasReceivedSpecifiedTemplate("Sarah Smith", "609-98-template (other parties)");
+        verifyPartyHasReceivedSpecifiedTemplate("Wendy Smith", "609-98-template (other parties)");
+        verifyPartyHasReceivedSpecifiedTemplate("Shelly Barat", "609-98-template (other parties)");
+        verifyPartyHasReceivedSpecifiedTemplate("Robert Brokenshire", "609-98-template (other parties)");
 
-        pdfIndex = findPdfDocumentRequestIndex("Wendy Smith");
-        assertNotNull(pdfIndex);
-        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
-            .extracting(Pdf::getName)
-            .contains("609-98-template (other parties)");
-
-        pdfIndex = findPdfDocumentRequestIndex("Shelly Barat");
-        assertNotNull(pdfIndex);
-        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
-            .extracting(Pdf::getName)
-            .contains("609-98-template (other parties)");
-
-        pdfIndex = findPdfDocumentRequestIndex("Robert Brokenshire");
-        assertNotNull(pdfIndex);
-        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
-            .extracting(Pdf::getName)
-            .contains("609-98-template (other parties)");
     }
+
 
     @Test
     public void appealWithAppellantAndFurtherEvidenceFromAppellantWithReasonableAdjustment_shouldReloadCaseData() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+
+        String jsonResource = "issueFurtherEvidenceCallbackReasonableAdjustment.json";
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
@@ -597,7 +424,7 @@ public class IssueFurtherEvidenceServiceIt {
                 .jointParty(Collections.emptyList()).build()).build()).build());
 
         String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
-            .getResource("issueFurtherEvidenceCallbackReasonableAdjustment.json")).getFile();
+            .getResource(jsonResource)).getFile();
         String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         topicConsumer.onMessage(json, "1");
@@ -608,12 +435,37 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
 
-    private Integer findPdfDocumentRequestIndex(String name) {
-        for (Integer index = 0; index < pdfDocumentRequest.getAllValues().size(); index++) {
-            if (name.equals(pdfDocumentRequest.getAllValues().get(index).getData().get("name"))) {
-                return index;
-            }
-        }
-        return null;
+    private int findPdfDocumentRequestIndex(String name) {
+        int index = pdfDocumentRequest.getAllValues().stream()
+            .map(item -> item.getData().get("name"))
+            .collect(Collectors.toList())
+            .indexOf(name);
+
+        Assertions.assertThat(index).isGreaterThan(-1).withFailMessage("The document request index for the specified party name was not found.");
+        return index;
     }
+
+    private void verifyPartyHasReceivedSpecifiedTemplate(String partyName, String desiredTemplate) {
+        int pdfIndex = findPdfDocumentRequestIndex(partyName);
+        Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
+            .extracting(Pdf::getName)
+            .contains(desiredTemplate);
+    }
+
+    private void prepareAndSendToBulkPrint(String jsonResource) throws IOException {
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
+            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource(jsonResource)).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        topicConsumer.onMessage(json, "1");
+    }
+
 }
