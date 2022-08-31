@@ -9,14 +9,14 @@ import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
-public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
+public class IssueFurtherEvidenceHandlerFunctionalTest extends FurtherEvidenceHandlerAbstractFunctionalTest {
 
     @Test
     public void givenIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
         String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType());
         simulateCcdCallback(issueFurtherEvidenceCallback);
-        verifyEvidenceIssued();
+        verifyEvidenceIssued(findCaseById(ccdCaseId));
     }
 
     @Test
@@ -24,7 +24,7 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         // we are able to cause the issue further evidence to fail by setting to null the Appellant.Name in the callback.json
         String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "Faulty");
         simulateCcdCallback(issueFurtherEvidenceCallback);
-        verifyEvidenceIsNotIssued();
+        verifyEvidenceIsNotIssued(findCaseById(ccdCaseId));
     }
 
     @Test
@@ -32,7 +32,10 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         throws IOException {
         String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ReasonableAdjustment");
         simulateCcdCallback(issueFurtherEvidenceCallback);
-        verifyEvidenceIssuedAndReasonableAdjustmentRaised();
+        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+        verifyEvidenceIssued(caseDetails);
+        verifyReasonableAdjustmentRaised(caseDetails);
+        verifyReasonableAdjustmentAppellantLettersAmountIsCorrect(caseDetails);
     }
 
     @Test
@@ -40,58 +43,33 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         throws IOException {
         String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ExistingReasonableAdjustment");
         simulateCcdCallback(issueFurtherEvidenceCallback);
-        verifyEvidenceIssuedAndExistingReasonableAdjustmentRaised();
+        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+        verifyEvidenceIssued(caseDetails);
+        verifyReasonableAdjustmentRaised(caseDetails);
+        verifyReasonableAdjustmentAppellantLettersAmountIsCorrect(caseDetails);
     }
 
-    private void verifyEvidenceIsNotIssued() {
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+    private void verifyEvidenceIsNotIssued(SscsCaseDetails caseDetails) {
         SscsCaseData caseData = caseDetails.getData();
         assertEquals("failedSendingFurtherEvidence", caseData.getHmctsDwpState());
         List<SscsDocument> docs = caseData.getSscsDocument();
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .contains("No", "No", "No");
+            .hasSize(3).containsOnly("No");
     }
 
-    private void verifyEvidenceIssued() {
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+    private void verifyReasonableAdjustmentRaised(SscsCaseDetails caseDetails) {
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
-
-        Assertions.assertThat(docs)
-            .extracting(SscsDocument::getValue)
-            .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .contains("Yes", "Yes", "Yes");
-    }
-
-    private void verifyEvidenceIssuedAndReasonableAdjustmentRaised() {
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-        SscsCaseData caseData = caseDetails.getData();
-        List<SscsDocument> docs = caseData.getSscsDocument();
-
-        Assertions.assertThat(docs)
-            .extracting(SscsDocument::getValue)
-            .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .contains("Yes", "Yes", "Yes");
 
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
-        assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
     }
 
-    private void verifyEvidenceIssuedAndExistingReasonableAdjustmentRaised() {
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+    private void verifyReasonableAdjustmentAppellantLettersAmountIsCorrect(SscsCaseDetails caseDetails) {
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
-        Assertions.assertThat(docs)
-            .extracting(SscsDocument::getValue)
-            .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .contains("Yes", "Yes", "Yes");
-
-        assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
     }
-
-
 }

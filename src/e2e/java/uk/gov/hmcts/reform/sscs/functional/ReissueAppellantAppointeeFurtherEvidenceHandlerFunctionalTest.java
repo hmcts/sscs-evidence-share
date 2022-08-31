@@ -13,25 +13,14 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 
 @Slf4j
-public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
+public class ReissueAppellantAppointeeFurtherEvidenceHandlerFunctionalTest extends FurtherEvidenceHandlerAbstractFunctionalTest {
 
     @Test
     public void givenReIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
         String reissueFurtherEvidenceCallback = createTestData(REISSUE_FURTHER_EVIDENCE.getCcdType());
         simulateCcdCallback(reissueFurtherEvidenceCallback);
-        verifyEvidenceIssued();
+        verifyEvidenceIssued(findCaseById(ccdCaseId));
     }
 
-    private void verifyEvidenceIssued() {
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
-        SscsCaseData caseData = caseDetails.getData();
-        List<SscsDocument> docs = caseData.getSscsDocument();
-        log.info("verifyEvidenceIssued ccdCaseId " + ccdCaseId);
-
-        Assertions.assertThat(docs)
-            .extracting(SscsDocument::getValue)
-            .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .contains("Yes", "Yes", "Yes");
-    }
 }
