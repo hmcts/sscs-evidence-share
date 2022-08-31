@@ -422,6 +422,61 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
+    public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_containsSharedEvidenceDocumentsForAllParties() throws IOException {
+        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
+            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        topicConsumer.onMessage(json, "1");
+
+        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any());
+
+        Assertions.assertThat(documentCaptor.getAllValues())
+            .extracting(ArrayList::new)
+            .allSatisfy(pdfList -> Assertions.assertThat(pdfList)
+                .extracting(Pdf::getName)
+                .contains("evidence-document2", "evidence-document")
+            );
+    }
+
+    @Test
+    public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_hasCorrectParties() throws IOException {
+        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
+            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        topicConsumer.onMessage(json, "1");
+
+        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any());
+
+        Assertions.assertThat(pdfDocumentRequest.getAllValues())
+            .hasSize(5)
+            .extracting(PdfDocumentRequest::getData)
+            .extracting(x -> (String) x.get("name"))
+            .contains("Test Rep","Sarah Smith","Wendy Smith","Shelly Barat","Robert Brokenshire");
+    }
+
+    @Test
     public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_shouldSend609_97ToOtherPartyRepAndSend609_98ToAllOtherPartiesAndAppellant() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
@@ -441,47 +496,40 @@ public class IssueFurtherEvidenceServiceIt {
 
         verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any());
 
-        assertEquals(5, documentCaptor.getAllValues().size());
-        assertEquals(3, documentCaptor.getAllValues().get(0).size());
-        assertEquals(3, documentCaptor.getAllValues().get(1).size());
-        assertEquals(3, documentCaptor.getAllValues().get(2).size());
-        assertEquals(3, documentCaptor.getAllValues().get(3).size());
-        assertEquals(3, documentCaptor.getAllValues().get(4).size());
-
         Integer pdfIndex = findPdfDocumentRequestIndex("Test Rep");
         assertNotNull(pdfIndex);
         Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
-            .contains("609-97-template (original sender)", "evidence-document2", "evidence-document");
+            .contains("609-97-template (original sender)");
 
         pdfIndex = findPdfDocumentRequestIndex("Sarah Smith");
         assertNotNull(pdfIndex);
         Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
-            .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
+            .contains("609-98-template (other parties)");
 
         pdfIndex = findPdfDocumentRequestIndex("Wendy Smith");
         assertNotNull(pdfIndex);
         Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
-            .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
+            .contains("609-98-template (other parties)");
 
         pdfIndex = findPdfDocumentRequestIndex("Shelly Barat");
         assertNotNull(pdfIndex);
         Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
-            .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
+            .contains("609-98-template (other parties)");
 
         pdfIndex = findPdfDocumentRequestIndex("Robert Brokenshire");
         assertNotNull(pdfIndex);
         Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .hasSize(3)
             .extracting(Pdf::getName)
-            .contains("609-98-template (other parties)", "evidence-document2", "evidence-document");
+            .contains("609-98-template (other parties)");
     }
 
     @Test
