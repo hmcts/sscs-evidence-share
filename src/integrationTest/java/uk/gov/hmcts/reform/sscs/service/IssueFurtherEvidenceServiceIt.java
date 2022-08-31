@@ -502,7 +502,7 @@ public class IssueFurtherEvidenceServiceIt {
     }
 
     @Test
-    public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_shouldSend609_97ToOtherPartyRepAndSend609_98ToAllOtherPartiesAndAppellant() throws IOException {
+    public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_shouldSend609_97ToOtherPartyRep() throws IOException {
         assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
 
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
@@ -527,7 +527,29 @@ public class IssueFurtherEvidenceServiceIt {
             .extracting(Pdf::getName)
             .contains("609-97-template (original sender)");
 
-        pdfIndex = findPdfDocumentRequestIndex("Sarah Smith");
+    }
+
+    @Test
+    public void appealWithAppellantAndMultipleOtherPartiesAndMultipleFurtherEvidenceFromOtherParties_shouldSend609_98ToAllOtherPartiesAndAppellant() throws IOException {
+        assertNotNull("IssueFurtherEvidenceHandler must be autowired", handler);
+
+        doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
+            .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
+        when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        String path = Objects.requireNonNull(Thread.currentThread().getContextClassLoader()
+            .getResource("issueFurtherEvidenceCallbackWithMultipleOtherPartyRepEvidence.json")).getFile();
+        String json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        topicConsumer.onMessage(json, "1");
+
+        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any());
+
+        Integer pdfIndex = findPdfDocumentRequestIndex("Sarah Smith");
         assertNotNull(pdfIndex);
         Assertions.assertThat(documentCaptor.getAllValues().get(pdfIndex))
             .extracting(Pdf::getName)
