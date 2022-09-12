@@ -437,6 +437,10 @@ dependencyManagement {
     dependencySet(group: 'org.apache.xmlgraphics', version: '1.14') {
       entry 'batik-all'
     }
+    
+    dependencySet(group: 'org.yaml', version: '1.31') {
+      entry 'snakeyaml'
+    }
 
     //CVE-2021-22118, CVE-2022-22970, CVE-2022-22971
     dependencySet(group: 'org.springframework', version: '5.2.22.RELEASE') {
