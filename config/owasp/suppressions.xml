@@ -43,7 +43,7 @@
     <packageUrl regex="true">^pkg:maven/com\.squareup.okhttp3/okhttp@.*$</packageUrl>
     <cve>CVE-2021-0341</cve>
   </suppress>
-  <suppress until="2022-09-01">
+  <suppress until="2022-09-15">
     <notes><![CDATA[
    file name: spring-core-5.2.15.RELEASE.jar
    ]]></notes>
@@ -52,7 +52,7 @@
     <cve>CVE-2016-1000027</cve>
     <cve>CVE-2022-22968</cve>
   </suppress>
-  <suppress until="2022-09-01">
+  <suppress until="2022-09-15">
     <notes><![CDATA[
    file name: jackson-databind-2.11.3.jar
    ]]></notes>
@@ -102,5 +102,26 @@
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j\-to\-slf4j@.*$</packageUrl>
     <cve>CVE-2022-33915</cve>
+  </suppress>
+  <suppress until="2022-09-15">
+   <notes><![CDATA[
+   file name: logback-classic-1.2.3.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/ch\.qos\.logback/logback\-classic@.*$</packageUrl>
+   <cpe>cpe:/a:qos:logback</cpe>
+  </suppress>
+  <suppress until="2022-09-15">
+   <notes><![CDATA[
+   file name: logback-core-1.2.3.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/ch\.qos\.logback/logback\-core@.*$</packageUrl>
+   <cpe>cpe:/a:qos:logback</cpe>
+  </suppress>
+  <suppress until="2022-09-15">
+    <notes><![CDATA[
+   file name: snakeyaml-1.26.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+    <cpe>cpe:/a:snakeyaml_project:snakeyaml</cpe>
   </suppress>
 </suppressions>
