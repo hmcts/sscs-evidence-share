@@ -2,10 +2,10 @@
   "extends": [
     "config:base",
     ":dependencyDashboard",
-    ":semanticCommitType(chore)"
+    ":semanticPrefixChore",
+    ":rebaseStalePrs",
+    ":prConcurrentLimit10"
   ],
-  "rebaseWhen": "behind-base-branch",
-  "prConcurrentLimit": 10,
   "labels": ["dependencies"],
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 }
