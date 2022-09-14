@@ -10,11 +10,6 @@
     {
       "matchPackageNames": ["com.github.hmcts:sscs-common"],
       "prPriority": 100
-    },
-    {
-      "matchPackageNames": ["com.github.hmcts:sscs-common"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
     }
   ]
   "labels": ["dependencies"],
