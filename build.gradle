@@ -324,7 +324,7 @@ dependencies {
   //Remove when our dependencies pull in this version or later
   compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
 
-  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.8.1'
+  compile 'com.launchdarkly:launchdarkly-java-server-sdk:5.10.2'
 
   compile group: 'org.pitest', name: 'pitest', version: versions.pitest
   compile group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
