@@ -1,8 +1,17 @@
 {
   "extends": [
     "config:base",
-    ":dependencyDashboard"
+    ":dependencyDashboard",
+    ":semanticPrefixChore",
+    ":rebaseStalePrs",
+    ":prConcurrentLimit10"
   ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["com.github.hmcts:sscs-common"],
+      "prPriority": 100
+    }
+  ]
   "labels": ["dependencies"],
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 }
