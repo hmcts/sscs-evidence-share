@@ -321,7 +321,7 @@ dependencies {
   compile group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.4.56'
 
   //Remove when our dependencies pull in this version or later
-  compile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
+  compile 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
 
   compile group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.2'
 
@@ -329,7 +329,7 @@ dependencies {
   compile group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
   compile group:'org.codehaus.sonar-plugins', name:'sonar-pitest-plugin', version: versions.sonarPitest
 
-  integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.11.3'
+  integrationTestCompile 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
 
   testImplementation libraries.junit5
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
@@ -365,8 +365,8 @@ dependencies {
   contractTestRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit_jupiter
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit_jupiter
   contractTestRuntime group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.8.1'
-  contractTestImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
-  contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.4'
+  contractTestImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4'
+  contractTestCompile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4'
   contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.0'
   contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.9.RELEASE'
 
