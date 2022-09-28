@@ -59,10 +59,12 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
+        Assertions.assertThat(docs).hasSize(3);
+
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .contains("Yes", "Yes", "Yes");
+            .containsOnly("Yes");
     }
 
     private void verifyEvidenceIssuedAndReasonableAdjustmentRaised() {
@@ -70,10 +72,12 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
+        Assertions.assertThat(docs).hasSize(3);
+
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .contains("Yes", "Yes", "Yes");
+            .containsOnly("Yes");
 
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
@@ -84,10 +88,12 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
+        Assertions.assertThat(docs).hasSize(3);
+
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .contains("Yes", "Yes", "Yes");
+            .containsOnly("Yes");
 
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());

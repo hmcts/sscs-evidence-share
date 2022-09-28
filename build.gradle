@@ -195,10 +195,24 @@ dependencyUpdates.resolutionStrategy {
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
-  // Specifies if the build should be failed if a CVSS score above a specified level is identified.
-  // range of 7-10 fails the build, anything lower and it doesn't fail the build
-  failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 7.0 : 11
+  // We want any vulnerability, regardless of severity, to fail the build. The reason is that by failing the build we
+  //  have an opportunity to know the problem beforehand and open the related CVE ticket (and add temporary suppressions)
+  //  whereas if we don't fail the build we can know about potential problems only by tweaking the config or checking
+  //  the dependency-check reports, which may inadvertently fall through the cracks.
+  // If the restriction proves to be excessively severe, re-instate the following line
+  //  failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 7.0 : 11
+  failBuildOnCVSS = 0
+  cveValidForHours = 4 // on Jenkins we have 24, so if you get more vulnerabilities locally, try to normalize this value with Jenkins
   suppressionFile = 'config/owasp/suppressions.xml'
+
+  analyzers {
+    retirejs {
+      enabled = false
+    }
+    ossIndex {
+      enabled = false
+    }
+  }
 }
 
 repositories {
@@ -408,6 +422,11 @@ dependencyManagement {
     //to remove CVE-2018-10237
     dependencySet(group: 'com.google.guava', version: '31.0.1-jre') {
       entry 'guava'
+    }
+
+    // CVE-2020-5408
+    dependencySet(group: 'org.springframework.security', version: '5.7.2') {
+      entry 'spring-security-crypto'
     }
 
     //CVE-2021-27807
