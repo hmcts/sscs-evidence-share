@@ -51,7 +51,8 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .contains("No", "No", "No");
+            .filteredOn("No"::equalsIgnoreCase)
+            .hasSize(3);
     }
 
     private void verifyEvidenceIssued() {
@@ -59,12 +60,11 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
-        Assertions.assertThat(docs).hasSize(3);
-
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .containsOnly("Yes");
+            .filteredOn("Yes"::equalsIgnoreCase)
+            .hasSize(3);
     }
 
     private void verifyEvidenceIssuedAndReasonableAdjustmentRaised() {
@@ -72,12 +72,11 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
-        Assertions.assertThat(docs).hasSize(3);
-
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .containsOnly("Yes");
+            .filteredOn("Yes"::equalsIgnoreCase)
+            .hasSize(3);
 
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
@@ -88,12 +87,11 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
-        Assertions.assertThat(docs).hasSize(3);
-
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
-            .containsOnly("Yes");
+            .filteredOn("Yes"::equalsIgnoreCase)
+            .hasSize(3);
 
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());

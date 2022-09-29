@@ -195,13 +195,9 @@ dependencyUpdates.resolutionStrategy {
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
-  // We want any vulnerability, regardless of severity, to fail the build. The reason is that by failing the build we
-  //  have an opportunity to know the problem beforehand and open the related CVE ticket (and add temporary suppressions)
-  //  whereas if we don't fail the build we can know about potential problems only by tweaking the config or checking
-  //  the dependency-check reports, which may inadvertently fall through the cracks.
-  // If the restriction proves to be excessively severe, re-instate the following line
-  //  failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 7.0 : 11
-  failBuildOnCVSS = 0
+  // If we set a dedicated environment variable to 'false' to be lax in our build standards, then we won't fail the build,
+  //  otherwise we are strict in our build and fail it.
+  failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'false' ? 11 : 7.0
   cveValidForHours = 4 // on Jenkins we have 24, so if you get more vulnerabilities locally, try to normalize this value with Jenkins
   suppressionFile = 'config/owasp/suppressions.xml'
 
