@@ -2,14 +2,25 @@ package uk.gov.hmcts.reform.sscs.functional;
 
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 
 import java.io.IOException;
 import java.util.List;
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
+
+    @Before
+    public void slowDownTests() throws InterruptedException {
+        // we have a problem with functional tests failing randomly. It was noticed that there are frequent connection failures,
+        //  so maybe the tests run before the corresponding services are spun up. This method introduces a delay before tests
+        //  to try and give the environment a bit more time to cope.
+
+        Thread.sleep(5000);
+    }
 
     @Test
     public void givenIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
@@ -30,17 +41,21 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     @Test
     public void givenIssueFurtherEventIsTriggeredWithReasonableAdjustment_shouldNotBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
-        String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ReasonableAdjustment");
+        SscsCaseDetails caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
+        String issueFurtherEvidenceCallback = uploadCaseDocuments(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ReasonableAdjustment", caseDetails);
+
         simulateCcdCallback(issueFurtherEvidenceCallback);
-        verifyEvidenceIssuedAndReasonableAdjustmentRaised();
+        verifyEvidenceIssuedAndReasonableAdjustmentRaised(caseDetails);
     }
 
     @Test
     public void givenIssueFurtherEventIsTriggeredWithExistingReasonableAdjustment_shouldNotBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
-        String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ExistingReasonableAdjustment");
+        SscsCaseDetails caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
+        String issueFurtherEvidenceCallback = uploadCaseDocuments(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ExistingReasonableAdjustment", caseDetails);
+
         simulateCcdCallback(issueFurtherEvidenceCallback);
-        verifyEvidenceIssuedAndExistingReasonableAdjustmentRaised();
+        verifyEvidenceIssuedAndExistingReasonableAdjustmentRaised(caseDetails);
     }
 
     private void verifyEvidenceIsNotIssued() {
@@ -67,8 +82,8 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
             .hasSize(3);
     }
 
-    private void verifyEvidenceIssuedAndReasonableAdjustmentRaised() {
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+    private void verifyEvidenceIssuedAndReasonableAdjustmentRaised(SscsCaseDetails caseDetailsIn) {
+        SscsCaseDetails caseDetails = findCaseById(String.valueOf(caseDetailsIn.getId()));
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
@@ -82,8 +97,8 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
     }
 
-    private void verifyEvidenceIssuedAndExistingReasonableAdjustmentRaised() {
-        SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
+    private void verifyEvidenceIssuedAndExistingReasonableAdjustmentRaised(SscsCaseDetails caseDetailsIn) {
+        SscsCaseDetails caseDetails = findCaseById(String.valueOf(caseDetailsIn.getId()));
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
