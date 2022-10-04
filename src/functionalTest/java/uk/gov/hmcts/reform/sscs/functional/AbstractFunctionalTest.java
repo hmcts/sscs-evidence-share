@@ -156,6 +156,12 @@ public abstract class AbstractFunctionalTest {
     protected String createTestData(String fileName) throws IOException {
         SscsCaseDetails caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
 
+        String json = uploadCaseDocuments(fileName, caseDetails);
+
+        return json;
+    }
+
+    protected String uploadCaseDocuments(String fileName, SscsCaseDetails caseDetails) throws IOException {
         String json = getJson(fileName);
         json = json.replace("CASE_ID_TO_BE_REPLACED", String.valueOf(caseDetails.getId()));
         json = json.replace("CREATED_IN_GAPS_FROM", State.READY_TO_LIST.getId());
@@ -165,7 +171,6 @@ public abstract class AbstractFunctionalTest {
         json = uploadCaseDocument(EXISTING_DOCUMENT_PDF, EXISTING_DOCUMENT_TYPE, json);
 
         updateCaseForDocuments(caseDetails, json);
-
         return json;
     }
 
