@@ -24,7 +24,7 @@
      ]]></notes>
     <cve>CVE-2021-22053</cve>
   </suppress>
-  <suppress until = "2022-10-11">
+  <suppress until = "2022-11-11">
       <notes><![CDATA[
       file name: jackson-databind-2.13.4.jar
       ]]></notes>
