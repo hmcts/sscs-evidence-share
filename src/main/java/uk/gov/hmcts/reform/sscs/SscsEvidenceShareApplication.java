@@ -14,14 +14,13 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 @SpringBootApplication(
     scanBasePackages = {"uk.gov.hmcts.reform.sscs"})
 @EnableCircuitBreaker
-@EnableFeignClients(basePackages =
-    {
-        "uk.gov.hmcts.reform.sendletter",
-        "uk.gov.hmcts.reform.sscs.idam",
-        "uk.gov.hmcts.reform.sscs.document",
-        "uk.gov.hmcts.reform.ccd.client",
-        "uk.gov.hmcts.reform.idam"
-    })
+@EnableFeignClients(basePackages = {
+    "uk.gov.hmcts.reform.sendletter",
+    "uk.gov.hmcts.reform.sscs.idam",
+    "uk.gov.hmcts.reform.sscs.document",
+    "uk.gov.hmcts.reform.ccd.client",
+    "uk.gov.hmcts.reform.idam"
+})
 @EnableRetry
 @ComponentScan(
     basePackages = {"uk.gov.hmcts.reform.sscs", "uk.gov.hmcts.reform.ccd.document.am"},
