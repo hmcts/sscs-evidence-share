@@ -106,7 +106,7 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
             .filteredOn("Yes"::equalsIgnoreCase)
-            .hasSize(0);
+            .hasSize(3);
 
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
