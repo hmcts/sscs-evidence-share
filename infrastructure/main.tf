@@ -32,5 +32,8 @@ resource "azurerm_key_vault_secret" "sendgrid_api_key" {
   name         = "sendgrid-api-key"
   value        = data.azurerm_key_vault_secret.send_grid_api_key.value
 
-  tags = var.common_tags
+  content_type = "secret"
+  tags = merge(var.common_tags, {
+    "source" : "Vault ${data.azurerm_key_vault.sscs_key_vault.name}"
+  })
 }
