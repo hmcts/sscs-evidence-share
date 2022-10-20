@@ -285,7 +285,7 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.9.RELEASE'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   // For the below: https://stackoverflow.com/questions/64994034/bootstrap-yml-configuration-not-processed-anymore-with-spring-cloud-2020-0
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap'
 
@@ -347,8 +347,8 @@ dependencies {
   contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.1'
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
   contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.8.1'
-  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.0'
-  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.9.RELEASE'
+  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.4'
+  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.10.RELEASE'
 
   contractTestImplementation sourceSets.main.runtimeClasspath
   contractTestImplementation sourceSets.test.runtimeClasspath
