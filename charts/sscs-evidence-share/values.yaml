@@ -17,7 +17,7 @@ java:
         - ccd-tid
         - sscs-s2s-secret
         - s2s-micro
-        - sscs-asb-primary-send-and-listen-shared-access-key
+        - evidence-share-topic-shared-access-key
         - docmosis-endpoint
         - docmosis-api-key
         - robotics-email-to
