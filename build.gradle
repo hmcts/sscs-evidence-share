@@ -231,7 +231,7 @@ project.ext {
   pacticipantVersion = getCheckedOutGitCommitHash()
 }
 
-def getCheckedOutGitCommitHash() {
+static def getCheckedOutGitCommitHash() {
   'git rev-parse --verify --shirt HEAD'.execute().text.trim()
 }
 
