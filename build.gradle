@@ -282,7 +282,7 @@ dependencies {
   implementation group: 'io.rest-assured', name: 'rest-assured', version:  '5.2.0'
   implementation group: 'io.rest-assured', name: 'json-path', version: '5.2.0'
   implementation group: 'io.rest-assured', name: 'xml-path', version: '5.2.0'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.1'
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   // For the below: https://stackoverflow.com/questions/64994034/bootstrap-yml-configuration-not-processed-anymore-with-spring-cloud-2020-0
