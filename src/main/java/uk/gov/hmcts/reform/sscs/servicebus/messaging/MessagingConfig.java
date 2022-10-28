@@ -43,7 +43,7 @@ public class MessagingConfig {
             jmsConnectionFactory.setSslContext(jmsSslContext);
         }
 
-        return new CachingConnectionFactory(jmsConnectionFactory);
+        return new CachingConnectionFactory((ConnectionFactory) jmsConnectionFactory);
     }
 
     @Bean
