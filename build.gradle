@@ -327,6 +327,11 @@ dependencies {
 
   implementation group: 'org.apache.xmlgraphics', name: 'batik-all', version: '1.16', ext: 'pom'
 
+  implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
+
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.0-rc3'
+  implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.0-rc3'
+
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.1'
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.9.1'
@@ -344,6 +349,7 @@ dependencies {
   testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.8.0'
   testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
   testImplementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.1'
+  testImplementation group: 'org.glassfish', name: 'jakarta.el', version: '5.0.0-M1'
 
   implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.24'
@@ -365,21 +371,6 @@ dependencies {
 
 dependencyManagement {
   dependencies {
-    //CVE-2021-35515, CVE-2021-35516, CVE-2021-35517, CVE-2021-36090
-    dependency group: 'org.glassfish', name: 'jakarta.el', version: '4.0.2'
-
-    //CVE-2022-25857, CVE-2022-38751
-    dependencySet(group: 'org.yaml', version: '1.33') {
-        entry 'snakeyaml'
-    }
-
-    // CVE-2022-42003, CVE-2022-42004
-    // remove once spring manager incorporates this changes
-    dependencySet(group: 'com.fasterxml.jackson.core', version: '2.14.0-rc2') {
-        entry 'jackson-core'
-        entry 'jackson-databind'
-    }
-
     imports {
       mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.4"
     }
