@@ -322,8 +322,8 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.1'
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.1'
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
-
-  implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.21.1'
+  
+  implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'SSCS-10843-20221018-SNAPSHOT'
   implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.6.0'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '5.10.3'
