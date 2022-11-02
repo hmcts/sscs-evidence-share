@@ -26,13 +26,16 @@ public class SwaggerConfiguration {
     @Bean
     public OpenAPI api() {
         return new OpenAPI()
-            .info(new Info().title("Blah")
-            .description("blah")
-            .version("1.2.3")
-            .license(new License().name("Apache 2.0").url("http://springdoc.org")))
-            .externalDocs(new ExternalDocumentation()
-                .description("Deocumnetanetion")
-                .url("www.web.io"));
+            .info(new Info()
+                .title("Blah")
+                .description("blah")
+                .version("1.2.3")
+                .license(new License()
+                    .name("Apache 2.0")
+                    .url("http://springdoc.org")))
+                    .externalDocs(new ExternalDocumentation()
+                        .description("Deocumnetanetion")
+                        .url("www.web.io"));
     }
 
 }
