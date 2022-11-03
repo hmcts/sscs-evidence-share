@@ -43,7 +43,6 @@ public class MessagingConfig {
             jmsConnectionFactory.setSslContext(jmsSslContext);
         }
 
-        // TODO this is now a problem since upgrading spring it is not accepting the type cast
         return new CachingConnectionFactory(jmsConnectionFactory);
     }
 
