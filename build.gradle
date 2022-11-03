@@ -289,7 +289,7 @@ dependencies {
   // For the below: https://stackoverflow.com/questions/64994034/bootstrap-yml-configuration-not-processed-anymore-with-spring-cloud-2020-0
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.4'
 
-  implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.4'
+  implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
 
   implementation group: 'org.springframework', name: 'spring-jms'
   implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '2.1.0'
