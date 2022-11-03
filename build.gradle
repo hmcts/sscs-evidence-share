@@ -395,7 +395,7 @@ dependencyManagement {
     }
 
     // CVE-2020-5408
-    dependencySet(group: 'org.springframework.security', version: '5.7.2') {
+    dependencySet(group: 'org.springframework.security', version: '5.7.5') {
       entry 'spring-security-crypto'
     }
 
