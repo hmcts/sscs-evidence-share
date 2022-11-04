@@ -20,8 +20,7 @@ public class SwaggerConfiguration {
                     .name("The MIT License (MIT)")
                     .url("https://github.com/hmcts/sscs-evidence-share/blob/master/LICENSE")))
                     .externalDocs(new ExternalDocumentation()
-                        .description("Building and running the application")
-                        .url("https://github.com/hmcts/sscs-evidence-share"));
+                        .description("Building and running the application"));
     }
 
 }
