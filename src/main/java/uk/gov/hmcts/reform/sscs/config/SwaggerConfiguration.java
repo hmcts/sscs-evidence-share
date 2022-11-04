@@ -17,8 +17,7 @@ public class SwaggerConfiguration {
                 .description("SSCS Evidence Share")
                 .version("1.0.0")
                 .contact(new Contact()
-                    .email("sscs@hmcts.net")
-                    .url("http://sscs.net/"))
+                    .url("https://www.gov.uk/government/publications/first-tier-tribunal-social-security-and-child-support-hearing-lists/"))
                 .license(new License()
                     .name("The MIT License (MIT)")
                     .url("https://github.com/hmcts/sscs-evidence-share/blob/master/LICENSE")));
