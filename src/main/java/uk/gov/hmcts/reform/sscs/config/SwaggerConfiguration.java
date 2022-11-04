@@ -9,33 +9,30 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SwaggerConfiguration {
-    /*
-
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-            .useDefaultResponseMessages(false)
-            .select()
-            .apis(RequestHandlerSelectors.basePackage(SscsEvidenceShareApplication.class.getPackage().getName() + ".controllers"))
-            .paths(PathSelectors.any())
-            .build();
-    }
-    */
-
-    // This is boilerplate and requires implementing real values of the above commented code
     @Bean
     public OpenAPI api() {
         return new OpenAPI()
             .info(new Info()
-                .title("Blah")
-                .description("blah")
-                .version("1.2.3")
+                .title("SSCS Evidence Share")
+                .description("Microservice to handle sending evidence via an SFTP server to DWP from SSCS")
+                .version("1.0.0")
                 .license(new License()
-                    .name("Apache 2.0")
+                    .name("The MIT License (MIT)")
                     .url("http://springdoc.org")))
                     .externalDocs(new ExternalDocumentation()
-                        .description("Deocumnetanetion")
-                        .url("www.web.io"));
+                        .description("Copyright (c) 2018 HMCTS (HM Courts & Tribunals Service)\n"
+                            + "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated "
+                            + "documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation "
+                            + "the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to "
+                            + "permit persons to whom the Software is furnished to do so, subject to the following conditions:\n"
+                            + "The above copyright notice and this permission notice shall be included in all copies or substantial portions of "
+                            + "the Software.\n"
+                            + "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED "
+                            + "TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE "
+                            + "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, "
+                            + "TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE "
+                            + "SOFTWARE.\n")
+                        .url("https://github.com/hmcts/sscs-evidence-share"));
     }
 
 }
