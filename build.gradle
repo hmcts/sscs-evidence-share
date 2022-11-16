@@ -430,9 +430,9 @@ dependencyManagement {
         entry 'snakeyaml'
     }
 
-    // CVE-2022-42003, CVE-2022-42004
+    // CVE-2022-42004
     // remove once spring manager incorporates this changes
-    dependencySet(group: 'com.fasterxml.jackson.core', version: '2.13.4') {
+    dependencySet(group: 'com.fasterxml.jackson.core', version: '2.14.0') {
         entry 'jackson-core'
         entry 'jackson-databind'
     }
