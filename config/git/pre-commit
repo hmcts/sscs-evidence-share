@@ -1,0 +1,17 @@
+#!/bin/sh
+
+echo "*****Running pre commit tasks******"
+
+git stash -q --keep-index
+
+./gradlew runGitPreCommitTasks
+
+status=$?
+
+git stash pop -q
+
+echo "*****Done with pre commit tasks******"
+
+echo Returned status from gradle is $status
+
+exit $status

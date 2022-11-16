@@ -266,6 +266,23 @@ pact {
   }
 }
 
+task installLocalGitHook(type: Copy){
+  from new File(rootProject.rootDir, 'config/git/pre-commit')
+  into { new File(rootProject.rootDir, '.git/hooks')}
+  fileMode 0775
+}
+
+build.dependsOn installLocalGitHook
+
+task runGitPreCommitTasks {
+  dependsOn 'test'
+  dependsOn 'pmdMain'
+  dependsOn 'pmdTest'
+  dependsOn 'dependencyCheckAggregate'
+  dependsOn 'checkstyleMain'
+  dependsOn 'checkstyleTest'
+}
+
 dependencies {
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
