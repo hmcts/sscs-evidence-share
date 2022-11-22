@@ -282,7 +282,7 @@ dependencies {
   implementation group: 'io.rest-assured', name: 'rest-assured', version:  '4.3.1'
   implementation group: 'io.rest-assured', name: 'json-path', version: '4.3.1'
   implementation group: 'io.rest-assured', name: 'xml-path', version: '4.3.1'
-  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.16.3'
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: '7.17.7'
 
   implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.9.RELEASE'
