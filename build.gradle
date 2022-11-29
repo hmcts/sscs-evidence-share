@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 plugins {
   id 'application'
   id 'pmd'
@@ -272,9 +274,19 @@ task installLocalGitHook(type: Copy){
   fileMode 0775
 }
 
-build.dependsOn installLocalGitHook
+compileJava.dependsOn installLocalGitHook
 
 task runGitPreCommitTasks {
+
+  doFirst{
+    if(Os.isFamily(Os.FAMILY_WINDOWS)) {
+      String path = System.getenv('PATH')
+      String gitInstallDir = "C:\\Program Files\\Git\\usr\\bin"
+      path = path + ";" + gitInstallDir
+      environment 'PATH', path
+    }
+  }
+
   dependsOn 'test'
   dependsOn 'pmdMain'
   dependsOn 'pmdTest'
