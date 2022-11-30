@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,7 +12,6 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 
 @SpringBootApplication(
     scanBasePackages = {"uk.gov.hmcts.reform.sscs"})
-@EnableCircuitBreaker
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.sendletter",
     "uk.gov.hmcts.reform.sscs.idam",

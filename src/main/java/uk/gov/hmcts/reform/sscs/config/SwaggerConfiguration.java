@@ -1,26 +1,26 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-import uk.gov.hmcts.reform.sscs.SscsEvidenceShareApplication;
 
 @Configuration
-@EnableSwagger2
 public class SwaggerConfiguration {
-
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-            .useDefaultResponseMessages(false)
-            .select()
-            .apis(RequestHandlerSelectors.basePackage(SscsEvidenceShareApplication.class.getPackage().getName() + ".controllers"))
-            .paths(PathSelectors.any())
-            .build();
+    public OpenAPI api() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("sscs-evidence-share")
+                .description("SSCS Evidence Share")
+                .version("1.0.0")
+                .contact(new Contact()
+                    .url("https://www.gov.uk/government/publications/first-tier-tribunal-social-security-and-child-support-hearing-lists/"))
+                .license(new License()
+                    .name("The MIT License (MIT)")
+                    .url("https://github.com/hmcts/sscs-evidence-share/blob/master/LICENSE")));
     }
 
 }
