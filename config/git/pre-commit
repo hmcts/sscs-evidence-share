@@ -2,6 +2,8 @@
 
 echo "*****Running pre commit tasks******"
 
+export PATH=$PATH":/c/Program Files/Git/usr/bin"
+
 git stash -q --keep-index
 
 ./gradlew runGitPreCommitTasks
