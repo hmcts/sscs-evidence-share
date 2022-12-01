@@ -267,7 +267,7 @@ pact {
   }
 }
 
-task installLocalGitHook(type: Copy){
+task installLocalGitHook(type: Copy) {
   from new File(rootProject.rootDir, 'config/git/pre-commit')
   into { new File(rootProject.rootDir, '.git/hooks')}
   fileMode 0775
