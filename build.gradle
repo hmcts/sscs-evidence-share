@@ -2,8 +2,8 @@ plugins {
   id 'application'
   id 'pmd'
   id 'jacoco'
-  id 'io.spring.dependency-management' version '1.0.13.RELEASE'
-  id 'org.springframework.boot' version '2.7.5'
+  id 'io.spring.dependency-management' version '1.1.0'
+  id 'org.springframework.boot' version '2.7.6'
   id 'uk.gov.hmcts.java' version '0.12.33'
   id 'com.github.ben-manes.versions' version '0.39.0'
   id 'org.owasp.dependencycheck' version '7.3.2'
@@ -304,9 +304,9 @@ dependencies {
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   // For the below: https://stackoverflow.com/questions/64994034/bootstrap-yml-configuration-not-processed-anymore-with-spring-cloud-2020-0
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.4'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.5'
 
-  implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
+  implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.0'
 
   implementation group: 'org.springframework', name: 'spring-jms'
   implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.7.0'
@@ -375,12 +375,12 @@ dependencies {
   // Contract Tests
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.39'
-  contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.5'
+  contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.6'
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
   contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.1'
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
   contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.9.0'
-  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.4'
+  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.5'
   contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.10.RELEASE'
 
   contractTestImplementation sourceSets.main.runtimeClasspath
@@ -390,7 +390,7 @@ dependencies {
 dependencyManagement {
   dependencies {
     imports {
-      mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.4"
+      mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.5"
     }
   }
 }
