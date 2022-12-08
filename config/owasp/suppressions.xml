@@ -18,4 +18,11 @@
     <packageUrl regex="true">^pkg:maven/org\.springframework\.cloud/spring\-cloud\-.*netflix.*@.*$</packageUrl>
     <cve>CVE-2021-22053</cve>
   </suppress>
+  <suppress>
+    <notes><![CDATA[
+   file name: qpid-jms-client-1.7.0.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.apache\.qpid/qpid\-jms\-client@.*$</packageUrl>
+    <cve>CVE-2016-3094</cve>
+  </suppress>
 </suppressions>
