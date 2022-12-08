@@ -52,7 +52,7 @@ public class RoboticsCallbackHandlerTest {
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
     @Mock
-    private CaseDetails caseDetails;
+    private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
     private SscsCaseDetails sscsCaseDetails;
