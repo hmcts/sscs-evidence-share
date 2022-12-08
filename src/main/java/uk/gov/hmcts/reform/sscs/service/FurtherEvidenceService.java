@@ -63,7 +63,7 @@ public class FurtherEvidenceService {
 
         List<SscsDocument> sscsCaseDocuments = caseData.getSscsDocument();
 
-        for (AbstractDocument doc : documents) {
+        for (AbstractDocument<?> doc : documents) {
 
             if (doc.getValue() != null
                 && documentType.getValue().equals(doc.getValue().getDocumentType())
