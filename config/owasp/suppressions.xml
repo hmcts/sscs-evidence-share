@@ -25,4 +25,18 @@
     <packageUrl regex="true">^pkg:maven/org\.apache\.qpid/qpid\-jms\-client@.*$</packageUrl>
     <cve>CVE-2016-3094</cve>
   </suppress>
+  <suppress until = "2023-01-08">
+    <notes><![CDATA[
+     these common libraries are being mistaken as Apache Commons Net
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven\/commons\-(?!net)\w+\/commons\-(?!net)\w+@.*$</packageUrl>
+    <cve>CVE-2021-37533</cve>
+  </suppress>
+  <suppress until = "2023-01-08">
+    <notes><![CDATA[
+     these common libraries are being mistaken as Apache Commons Net
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven\/org(\-|\.)apache(\-|\.)commons\/commons\-(?!net)\w+@.*$</packageUrl>
+    <cve>CVE-2021-37533</cve>
+  </suppress>
 </suppressions>
