@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 import feign.FeignException;
@@ -380,7 +381,7 @@ public class SendToBulkPrintHandlerTest {
         verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to FTA"), eq("Case state is now sent to FTA"), any());
 
         assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
-        assertEquals(DwpState.UNREGISTERED.getId(), caseDataCaptor.getValue().getDwpState());
+        assertEquals(UNREGISTERED, caseDataCaptor.getValue().getDwpState());
     }
 
     @Test
