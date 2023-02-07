@@ -183,7 +183,7 @@ public class ConfirmPanelCompositionHandlerTest {
                 .directionDueDate(LocalDate.now().toString())
                 .otherParties(otherParties)
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
-                    .build()).build(), INTERLOCUTORY_REVIEW_STATE, CONFIRM_PANEL_COMPOSITION);
+                    .build()).build(), DORMANT_APPEAL_STATE, CONFIRM_PANEL_COMPOSITION);
 
         handler.handle(CallbackType.SUBMITTED, callback);
         verify(ccdService, times(0)).updateCase(any(), anyLong(), anyString(), anyString(),anyString(), any());
