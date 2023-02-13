@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 
-@Slf4j
 @Service
 public class PanelCompositionService {
 
@@ -49,7 +47,7 @@ public class PanelCompositionService {
     }
 
     private static boolean stateNotDormant(State caseState) {
-        return ! State.DORMANT_APPEAL_STATE.equals(caseState);
+        return !State.DORMANT_APPEAL_STATE.equals(caseState);
     }
 
     private boolean hasDueDateSetAndOtherPartyWithoutHearingOption(SscsCaseData sscsCaseData) {
