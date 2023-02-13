@@ -23,23 +23,31 @@ public class PanelCompositionService {
     }
 
     public void processCaseState(Callback<SscsCaseData> callback, SscsCaseData caseData, EventType eventType) {
-        if (caseData.getIsFqpmRequired() == null
-            || hasDueDateSetAndOtherPartyWithoutHearingOption(caseData)) {
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.NOT_LISTABLE.getCcdType(),
-                "Not listable",
-                "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set",
-                idamService.getIdamTokens());
-        } else {
-            if (eventType.equals(EventType.UPDATE_OTHER_PARTY_DATA)) {
-                caseData.setDirectionDueDate(null);
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+
+        if (stateNotDormant(caseDetails.getState())) {
+            if (caseData.getIsFqpmRequired() == null
+                || hasDueDateSetAndOtherPartyWithoutHearingOption(caseData)) {
+                ccdService.updateCase(caseData, caseDetails.getId(),
+                    EventType.NOT_LISTABLE.getCcdType(),
+                    "Not listable",
+                    "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set",
+                    idamService.getIdamTokens());
+            } else {
+                if (eventType.equals(EventType.UPDATE_OTHER_PARTY_DATA)) {
+                    caseData.setDirectionDueDate(null);
+                }
+                ccdService.updateCase(caseData, caseDetails.getId(),
+                    EventType.READY_TO_LIST.getCcdType(),
+                    "Ready to list",
+                    "Update to ready to list event as there is no further information to assist the tribunal and no dispute.",
+                    idamService.getIdamTokens());
             }
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.READY_TO_LIST.getCcdType(),
-                "Ready to list",
-                "Update to ready to list event as there is no further information to assist the tribunal and no dispute.",
-                idamService.getIdamTokens());
         }
+    }
+
+    private static boolean stateNotDormant(State caseState) {
+        return !State.DORMANT_APPEAL_STATE.equals(caseState);
     }
 
     private boolean hasDueDateSetAndOtherPartyWithoutHearingOption(SscsCaseData sscsCaseData) {
