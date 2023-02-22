@@ -40,6 +40,8 @@ service:
       uri: ${PDF_SERVICE_HEALTH_URL:https://docmosis.aat.platform.hmcts.net/rs/status}
 
 amqp:
+  amqp-connection-string-template: ${JMS_AMQP_CONNECTION_TEMPLATE:amqps://%1s?amqp.idleTimeout=%2d}
+  idleTimeout: ${JMS_IDLE_TIMEOUT:3600000}
   host: ${AMQP_HOST:localhost}
   username: ${AMQP_USERNAME:guest}
   password: ${AMQP_PASSWORD:}
@@ -131,6 +133,8 @@ docmosis:
         name: TB-SCS-GNO-ENG-00068.doc
       d609-98:
         name: TB-SCS-GNO-ENG-00069.doc
+      generic-letter:
+        name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
     welsh:
       dl6:
         name: TB-SCS-GNO-ENG-00010.doc
@@ -140,6 +144,8 @@ docmosis:
         name: TB-SCS-GNO-WEL-00469.docx
       d609-98:
         name: TB-SCS-GNO-WEL-00470.docx
+      generic-letter:
+        name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
 
 evidence-share:
   submit-types:

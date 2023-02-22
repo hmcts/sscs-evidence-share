@@ -44,12 +44,15 @@ public class CoverLetterServiceTest {
     @Mock
     private PdfGenerationService pdfGenerationService;
 
+    @Mock
+    private PdfStoreService pdfStoreService;
+
     private CoverLetterService coverLetterService;
 
     @Before
     public void initMocks() {
         MockitoAnnotations.openMocks(this);
-        coverLetterService = new CoverLetterService(furtherEvidencePlaceholderService, pdfGenerationService, 3);
+        coverLetterService = new CoverLetterService(furtherEvidencePlaceholderService, pdfStoreService, pdfGenerationService, 3);
     }
 
     @Test
