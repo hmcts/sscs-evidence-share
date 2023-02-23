@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.model.LetterType;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.service.PrintService;
@@ -96,7 +97,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     }
 
     private void sendLetter(SscsCaseData caseData, List<Pdf> pdfs) {
-        Optional<UUID> id = Optional.of(UUID.randomUUID());//bulkPrintService.sendToBulkPrint(pdfs, caseData);
+        Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData);//Optional.of(UUID.randomUUID());
 
         String caseId = caseData.getCcdCaseId();
 
@@ -157,12 +158,13 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
             OtherParty otherParty = getOtherPartyByEntityId(entityId, otherParties);
 
             if (otherParty != null) {
+                var letterType = getLetterType(otherParty, entityId);
                 var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
-                    FurtherEvidenceLetterType.OTHER_PARTY_LETTER, otherParty.getId());
+                    letterType, entityId);
 
                 String letterName = String.format(LETTER_NAME, LocalDateTime.now());
 
-                var generatedPdf = coverLetterService.generateCoverLetterRetry(FurtherEvidenceLetterType.JOINT_PARTY_LETTER,
+                var generatedPdf = coverLetterService.generateCoverLetterRetry(letterType,
                     docmosisTemplate, letterName, placeholders, 1);
 
                 var pdf = new Pdf(generatedPdf, letterName);
@@ -172,6 +174,14 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
                 sendLetter(caseData, letter);
             }
         }
+    }
+
+    private FurtherEvidenceLetterType getLetterType(OtherParty otherParty, String entityId) {
+        if (otherParty.hasRepresentative() && entityId.equals(otherParty.getRep().getId())) {
+            return FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER;
+        }
+
+        return FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
     }
 
     private void sendToJointParty(SscsCaseData caseData, List<Pdf> documents) {
@@ -248,7 +258,13 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     private OtherParty getOtherPartyByEntityId(String entityId, List<CcdValue<OtherParty>> otherParties) {
         return otherParties.stream()
             .map(CcdValue::getValue)
-            .filter(o -> entityId.contains(o.getId())).findFirst()
+            .filter(o -> filterByEntityID(entityId, o)).findFirst()
             .orElse(null);
+    }
+
+    private static boolean filterByEntityID(String entityId, OtherParty o) {
+        return entityId.contains(o.getId())
+            || (o.hasRepresentative() && entityId.contains(o.getRep().getId()))
+            || (o.hasAppointee() && entityId.contains(o.getAppointee().getId()));
     }
 }

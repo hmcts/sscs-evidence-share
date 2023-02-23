@@ -72,24 +72,22 @@ public class GenericLetterPlaceholderService {
 
         placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
-
+        placeholders.put(IS_REPRESENTATIVE, "No");
 
         if (isRepresentativeLetter(letterType) || isOtherPartyLetter(letterType)) {
             String representativeName = PlaceholderUtility.getName(caseData, letterType, otherPartyId);
 
-            placeholders.put(IS_REPRESENTATIVE, "Yes");
             placeholders.put(REPRESENTATIVE_NAME, representativeName);
 
             if (isOtherPartyLetter(letterType)) {
                 placeholders.put(IS_OTHER_PARTY, "Yes");
+            } else {
+                placeholders.put(IS_REPRESENTATIVE, "Yes");
             }
-        } else {
-            placeholders.put(IS_REPRESENTATIVE, "No");
         }
 
         if (placeholderService.hasRegionalProcessingCenter(caseData)) {
             RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
-            log.info("rpc {} {}", rpc, rpc.getPhoneNumber());
             placeholders.put(REGIONAL_OFFICE_PHONE_LITERAL, defaultToEmptyStringIfNull(rpc.getPhoneNumber()));
         }
 

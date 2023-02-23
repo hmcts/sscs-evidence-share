@@ -20,6 +20,9 @@ import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 
 @Slf4j
 final class PlaceholderUtility {
+
+    private static final String SIR_MADAM = "Sir/Madam";
+
     private PlaceholderUtility() {
     }
 
@@ -72,7 +75,6 @@ final class PlaceholderUtility {
                     return otherParty.getValue().getAppointee().getAddress();
                 } else if (otherParty.getValue().getRep() != null && otherPartyId.equals(otherParty.getValue().getRep().getId())) {
                     return otherParty.getValue().getRep().getAddress();
-
                 }
             }
         }
@@ -116,34 +118,34 @@ final class PlaceholderUtility {
             .filter(appellant -> "yes".equalsIgnoreCase(appellant.getIsAppointee()))
             .map(Appellant::getAppointee)
             .map(Appointee::getName)
-            .filter(name -> isValidName(name))
+            .filter(PlaceholderUtility::isValidName)
             .map(Name::getFullNameNoTitle)
             .orElseGet(() -> Optional.of(caseData.getAppeal())
                 .map(Appeal::getAppellant)
                 .map(Appellant::getName)
-                .filter(name -> isValidName(name))
+                .filter(PlaceholderUtility::isValidName)
                 .map(Name::getFullNameNoTitle)
-                .orElse("Sir/Madam"));
+                .orElse(SIR_MADAM));
     }
 
     private static String extractNameRep(SscsCaseData caseData) {
         return Optional.of(caseData.getAppeal())
             .map(Appeal::getRep)
             .map(Representative::getName)
-            .filter(name -> isValidName(name))
+            .filter(PlaceholderUtility::isValidName)
             .map(Name::getFullNameNoTitle)
             .orElseGet(() -> Optional.of(caseData.getAppeal())
                 .map(Appeal::getRep)
                 .map(Representative::getOrganisation)
-                .filter(org -> isNoneBlank(org))
-                .orElse("Sir/Madam"));
+                .filter(StringUtils::isNoneBlank)
+                .orElse(SIR_MADAM));
     }
 
     private static String extractNameJointParty(SscsCaseData caseData) {
         return ofNullable(caseData.getJointParty().getName())
             .filter(jpn -> isValidName(Name.builder().firstName(jpn.getFirstName()).lastName(jpn.getLastName()).build()))
             .map(Name::getFullNameNoTitle)
-            .orElse("Sir/Madam");
+            .orElse(SIR_MADAM);
     }
 
     private static String getOtherPartyName(SscsCaseData caseData, String otherPartyId) {
@@ -163,10 +165,10 @@ final class PlaceholderUtility {
                 }
             }
         }
-        return "Sir/Madam";
+        return SIR_MADAM;
     }
 
-    private static Boolean isValidName(Name name) {
+    private static boolean isValidName(Name name) {
         return isNoneBlank(name.getFirstName()) && isNoneBlank(name.getLastName());
     }
 }
