@@ -10,8 +10,10 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_GENERIC_LETTER;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
@@ -36,7 +38,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
@@ -49,7 +53,7 @@ import uk.gov.hmcts.reform.sscs.service.placeholders.GenericLetterPlaceholderSer
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
-public class IssueGenericLetterHandlerTest {
+class IssueGenericLetterHandlerTest {
 
     @Mock
     private GenericLetterPlaceholderService genericLetterPlaceholderService;
@@ -91,7 +95,7 @@ public class IssueGenericLetterHandlerTest {
     }
 
     @Test
-    public void shouldReturnFalse_givenANonQualifyingCallbackType() {
+    void shouldReturnFalse_givenANonQualifyingCallbackType() {
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(SscsCaseData.builder().build(),
             READY_TO_LIST,
             NON_COMPLIANT);
@@ -104,7 +108,7 @@ public class IssueGenericLetterHandlerTest {
     }
 
     @Test
-    public void shouldReturnFalse_givenANonQualifyingEvent() {
+    void shouldReturnFalse_givenANonQualifyingEvent() {
         Assertions.assertFalse(handler.canHandle(SUBMITTED,
             buildTestCallbackForGivenData(SscsCaseData.builder()
                     .createdInGapsFrom(READY_TO_LIST.getId()).build(),
@@ -114,14 +118,28 @@ public class IssueGenericLetterHandlerTest {
     }
 
     @Test
-    public void shouldThrowException_givenCallbackIsNull() {
+    void shouldThrowException_givenCallbackIsNull() {
         assertThrows(NullPointerException.class, () ->
             handler.canHandle(SUBMITTED, null)
         );
     }
 
     @Test
-    public void test_1() {
+    void shouldThrowExceptionInHandler_givenCallbackIsNull() {
+        SscsCaseData caseData = buildCaseData();
+        Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_ADJOURNMENT_NOTICE);
+
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(MID_EVENT, callback)
+        );
+
+        assertThrows(IllegalStateException.class, () ->
+            handler.handle(SUBMITTED, callback)
+        );
+    }
+
+    @Test
+    void shouldSendLettersToAllPartiesWhenAllPartiesSelected() {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToAllParties(YesNo.YES);
 
@@ -129,12 +147,13 @@ public class IssueGenericLetterHandlerTest {
         caseData.setJointParty(jointParty);
 
         var otherParty = new CcdValue<>(buildOtherParty());
-        caseData.setOtherParties(List.of(otherParty));
 
-        var item = new DynamicListItem(otherParty.getValue().getId(), "test");
-        var list = new DynamicList(item, List.of());
-        CcdValue<OtherPartySelectionDetails> otherParties = new CcdValue<>(new OtherPartySelectionDetails(list));
-        caseData.setOtherPartySelection(List.of(otherParties));
+        var otherPartyWithRep = buildOtherParty();
+        Representative representative = caseData.getAppeal().getRep();
+        otherPartyWithRep.setRep(representative);
+
+        caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
+        caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
 
         UUID uuid = UUID.randomUUID();
 
@@ -146,6 +165,19 @@ public class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(bulkPrintService, times(4)).sendToBulkPrint(any(), eq(caseData));
+        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData));
+    }
+
+    private static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty, Representative representative) {
+        var item1 = new DynamicListItem(otherParty.getValue().getId(), "test");
+        var item2 = new DynamicListItem(representative.getId(), "test");
+
+        var list1 = new DynamicList(item1, List.of());
+        CcdValue<OtherPartySelectionDetails> otherParties1 = new CcdValue<>(new OtherPartySelectionDetails(list1));
+
+        var list2 = new DynamicList(item2, List.of());
+        CcdValue<OtherPartySelectionDetails> otherParties2 = new CcdValue<>(new OtherPartySelectionDetails(list2));
+
+        return List.of(otherParties1, otherParties2);
     }
 }
