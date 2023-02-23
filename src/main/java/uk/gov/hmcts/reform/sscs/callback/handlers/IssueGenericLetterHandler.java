@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 
 import java.time.LocalDateTime;
@@ -89,21 +90,20 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        long id = callback.getCaseDetails().getId();
 
         docmosisTemplate = getDocmosisTemplate(caseData);
 
-        process(caseData);
+        process(id, caseData);
     }
 
-    private void sendLetter(SscsCaseData caseData, List<Pdf> pdfs) {
+    private void sendLetter(long caseId, SscsCaseData caseData, List<Pdf> pdfs) {
         Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData);//Optional.of(UUID.randomUUID());
-
-        String caseId = caseData.getCcdCaseId();
 
         Pdf letter = pdfs.get(0);
 
         if (id.isPresent()) {
-            ccdPdfService.mergeDocIntoCcd(letter.getName(), letter.getContent(), Long.valueOf(caseData.getCcdCaseId()),
+            ccdPdfService.mergeDocIntoCcd(letter.getName(), letter.getContent(), caseId,
                 caseData, idamService.getIdamTokens(), DocumentType.OTHER_DOCUMENT.getValue());
             log.info("Generic letters were send for case {}", caseId);
         } else {
@@ -116,7 +116,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
             .get("generic-letter").get("name");
     }
 
-    private void process(SscsCaseData caseData) {
+    private void process(long caseId, SscsCaseData caseData) {
         List<Pdf> documents = new ArrayList<>();
 
         if (YesNo.isYes(caseData.getAddDocuments())) {
@@ -124,31 +124,31 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         }
 
         if (YesNo.isYes(caseData.getSendToAllParties())) {
-            sendToAllParties(caseData, documents);
+            sendToAllParties(caseId, caseData, documents);
             return;
         }
 
         if (YesNo.isYes(caseData.getSendToApellant())) {
-            sendToApellant(caseData, documents);
+            sendToAppellant(caseId, caseData, documents);
         }
 
         if (YesNo.isYes(caseData.getSendToRepresentative())) {
-            sendToRepresentative(caseData, documents);
+            sendToRepresentative(caseId, caseData, documents);
         }
 
         if (YesNo.isYes(caseData.getSendToJointParty())) {
-            sendToJointParty(caseData, documents);
+            sendToJointParty(caseId, caseData, documents);
         }
 
         if (YesNo.isYes(caseData.getSendToOtherParties())) {
-            sendToOtherParties(caseData, documents);
+            sendToOtherParties(caseId, caseData, documents);
         }
 
         // TODO reasonable adjustments?
-        // bland page??
+        // blank page??
     }
 
-    private void sendToOtherParties(SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         var selectedOtherParties = caseData.getOtherPartySelection();
         var otherParties = caseData.getOtherParties();
 
@@ -161,7 +161,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
                 var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
                     letterType, entityId);
 
-                String letterName = String.format(LETTER_NAME, LocalDateTime.now());
+                String letterName = String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
 
                 var generatedPdf = coverLetterService.generateCoverLetterRetry(letterType,
                     docmosisTemplate, letterName, placeholders, 1);
@@ -170,7 +170,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
                 List<Pdf> letter = new ArrayList<>();
                 letter.add(pdf);
                 letter.addAll(documents);
-                sendLetter(caseData, letter);
+                sendLetter(caseId, caseData, letter);
             }
         }
     }
@@ -183,7 +183,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         return FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
     }
 
-    private void sendToJointParty(SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToJointParty(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
             FurtherEvidenceLetterType.JOINT_PARTY_LETTER,
             null);
@@ -197,10 +197,10 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         List<Pdf> letter = new ArrayList<>();
         letter.add(pdf);
         letter.addAll(documents);
-        sendLetter(caseData, letter);
+        sendLetter(caseId, caseData, letter);
     }
 
-    private void sendToRepresentative(SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToRepresentative(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
             FurtherEvidenceLetterType.REPRESENTATIVE_LETTER,
             null);
@@ -214,10 +214,10 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         List<Pdf> letter = new ArrayList<>();
         letter.add(pdf);
         letter.addAll(documents);
-        sendLetter(caseData, letter);
+        sendLetter(caseId, caseData, letter);
     }
 
-    private void sendToApellant(SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToAppellant(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
             FurtherEvidenceLetterType.APPELLANT_LETTER,
             null);
@@ -231,26 +231,26 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         List<Pdf> letter = new ArrayList<>();
         letter.add(pdf);
         letter.addAll(documents);
-        sendLetter(caseData, letter);
+        sendLetter(caseId, caseData, letter);
     }
 
     private static String getLetterName(Map<String, Object> placeholders) {
         return String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
     }
 
-    private void sendToAllParties(SscsCaseData caseData, List<Pdf> documents) {
-        sendToApellant(caseData, documents);
+    private void sendToAllParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+        sendToAppellant(caseId, caseData, documents);
 
-        if (YesNo.isYes(caseData.getHasRepresentative())) {
-            sendToRepresentative(caseData, documents);
+        if (caseData.isThereARepresentative()) {
+            sendToRepresentative(caseId, caseData, documents);
         }
 
-        if (YesNo.isYes(caseData.getHasJointParty())) {
-            sendToJointParty(caseData, documents);
+        if (caseData.isThereAJointParty()) {
+            sendToJointParty(caseId, caseData, documents);
         }
 
-        if (YesNo.isYes(caseData.getHasOtherParties())) {
-            sendToOtherParties(caseData, documents);
+        if (isNotEmpty(caseData.getOtherParties())) {
+            sendToOtherParties(caseId, caseData, documents);
         }
     }
 

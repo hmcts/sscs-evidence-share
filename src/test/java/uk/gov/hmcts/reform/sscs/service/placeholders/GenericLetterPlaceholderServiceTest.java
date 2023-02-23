@@ -21,10 +21,11 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_3_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_4_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildJointParty;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildOtherParty;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,8 +34,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -191,48 +190,5 @@ class GenericLetterPlaceholderServiceTest {
 
     private static String getApellantName(SscsCaseData caseData) {
         return caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
-    }
-
-    private static JointParty buildJointParty() {
-        Name name = Name.builder()
-            .title("Ms")
-            .firstName("Joint")
-            .lastName("Party")
-            .build();
-
-        Address address = Address.builder()
-            .town("London")
-            .postcode("T4 4JP")
-            .line1("JP address line 1")
-            .line2("JP address line 2")
-            .build();
-
-
-        return JointParty.builder()
-            .name(name)
-            .id(UUID.randomUUID().toString())
-            .address(address)
-            .build();
-    }
-
-    private static OtherParty buildOtherParty() {
-        Name otherPartyName = Name.builder()
-            .title("Mr")
-            .firstName("Other")
-            .lastName("Party")
-            .build();
-
-        Address address = Address.builder()
-            .town("London")
-            .postcode("T4 4OP")
-            .line1("OP address line 1")
-            .line2("OP address line 2")
-            .build();
-
-        return OtherParty.builder()
-            .id(UUID.randomUUID().toString())
-            .name(otherPartyName)
-            .address(address)
-            .build();
     }
 }
