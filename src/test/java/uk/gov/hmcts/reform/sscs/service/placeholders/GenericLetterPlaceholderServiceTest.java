@@ -102,10 +102,11 @@ class GenericLetterPlaceholderServiceTest {
 
         Address address = otherParty.getAddress();
         String appellantName = getApellantName(caseData);
-        String otherPartyName = otherParty.getName().getFullNameNoTitle();
         assertNotNull(placeholders);
         assertEquals(address.getPostcode(), placeholders.get(RECIPIENT_ADDRESS_LINE_4_LITERAL));
         assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
+
+        String otherPartyName = otherParty.getName().getFullNameNoTitle();
         assertEquals(otherPartyName, placeholders.get(NAME));
         assertEquals(otherPartyName, placeholders.get(ADDRESS_NAME));
         assertEquals("No", placeholders.get(IS_REPRESENTATIVE));
@@ -134,7 +135,6 @@ class GenericLetterPlaceholderServiceTest {
 
     @Test
     void shouldReturnOtherPartyAppointeePlaceholdersGivenOtherPartyHasAppointee() {
-        String appellantName = getApellantName(caseData);
         OtherParty otherParty = buildOtherParty();
         Appointee appointee = caseData.getAppeal().getAppellant().getAppointee();
         otherParty.setAppointee(appointee);
@@ -145,6 +145,8 @@ class GenericLetterPlaceholderServiceTest {
 
         Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, OTHER_PARTY_LETTER,
             appointee.getId());
+
+        String appellantName = getApellantName(caseData);
 
         assertNotNull(placeholders);
         assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
