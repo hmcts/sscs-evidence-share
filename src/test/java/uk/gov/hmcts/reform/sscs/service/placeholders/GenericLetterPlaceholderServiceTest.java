@@ -26,6 +26,7 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.bu
 
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class GenericLetterPlaceholderServiceTest {
 
@@ -97,7 +99,7 @@ class GenericLetterPlaceholderServiceTest {
         caseData.setOtherParties(List.of(new CcdValue<>(otherParty)));
 
         Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, OTHER_PARTY_LETTER,
-            otherParty.getId());
+            " otherParty" + otherParty.getId());
 
         Address address = otherParty.getAddress();
         String appellantName = getApellantName(caseData);

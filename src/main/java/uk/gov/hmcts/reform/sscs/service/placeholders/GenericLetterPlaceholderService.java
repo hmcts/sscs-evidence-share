@@ -68,7 +68,8 @@ public class GenericLetterPlaceholderService {
         placeholders.put(APPELLANT_NAME, appellantName);
 
         Benefit benefit = getBenefitByCodeOrThrowException(caseData.getAppeal().getBenefitType().getCode());
-        placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, benefit.name());
+        String benefitAcronym = benefit.isHasAcronym() ? benefit.getShortName() : benefit.getDescription();
+        placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, benefitAcronym);
 
         placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());

@@ -69,11 +69,11 @@ final class PlaceholderUtility {
     private static Address getOtherPartyAddress(SscsCaseData caseData, String otherPartyId) {
         if (otherPartyId != null) {
             for (CcdValue<OtherParty> otherParty : caseData.getOtherParties()) {
-                if (otherPartyId.equals(otherParty.getValue().getId())) {
+                if (otherPartyId.contains(otherParty.getValue().getId())) {
                     return otherParty.getValue().getAddress();
-                } else if (otherParty.getValue().getAppointee() != null && otherPartyId.equals(otherParty.getValue().getAppointee().getId())) {
+                } else if (otherParty.getValue().getAppointee() != null && otherPartyId.contains(otherParty.getValue().getAppointee().getId())) {
                     return otherParty.getValue().getAppointee().getAddress();
-                } else if (otherParty.getValue().getRep() != null && otherPartyId.equals(otherParty.getValue().getRep().getId())) {
+                } else if (otherParty.getValue().getRep() != null && otherPartyId.contains(otherParty.getValue().getRep().getId())) {
                     return otherParty.getValue().getRep().getAddress();
                 }
             }
@@ -151,15 +151,15 @@ final class PlaceholderUtility {
     private static String getOtherPartyName(SscsCaseData caseData, String otherPartyId) {
         if (otherPartyId != null) {
             for (CcdValue<OtherParty> otherParty : caseData.getOtherParties()) {
-                if (otherPartyId.equals(otherParty.getValue().getId())
+                if (otherPartyId.contains(otherParty.getValue().getId())
                     && isValidName(otherParty.getValue().getName())) {
                     return otherParty.getValue().getName().getFullNameNoTitle();
                 } else if (otherParty.getValue().getAppointee() != null
-                    && otherPartyId.equals(otherParty.getValue().getAppointee().getId())
+                    && otherPartyId.contains(otherParty.getValue().getAppointee().getId())
                     && isValidName(otherParty.getValue().getAppointee().getName())) {
                     return otherParty.getValue().getAppointee().getName().getFullNameNoTitle();
                 } else if (otherParty.getValue().getRep() != null
-                    && otherPartyId.equals(otherParty.getValue().getRep().getId())
+                    && otherPartyId.contains(otherParty.getValue().getRep().getId())
                     && isValidName(otherParty.getValue().getRep().getName())) {
                     return otherParty.getValue().getRep().getName().getFullNameNoTitle();
                 }
