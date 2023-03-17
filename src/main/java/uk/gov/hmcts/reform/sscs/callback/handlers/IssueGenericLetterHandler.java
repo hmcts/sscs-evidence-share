@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
@@ -26,9 +25,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
+import uk.gov.hmcts.reform.sscs.service.CcdNotificationService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
+import uk.gov.hmcts.reform.sscs.service.FeatureToggleService;
 import uk.gov.hmcts.reform.sscs.service.PrintService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.GenericLetterPlaceholderService;
 
@@ -38,7 +37,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private final PrintService bulkPrintService;
 
-    private final CcdPdfService ccdPdfService;
+    private final CcdNotificationService ccdNotificationService;
 
     private final GenericLetterPlaceholderService genericLetterPlaceholderService;
 
@@ -46,7 +45,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private final DocmosisTemplateConfig docmosisTemplateConfig;
 
-    private final IdamService idamService;
+    private final FeatureToggleService featureToggleService;
 
     private String docmosisTemplate;
 
@@ -57,24 +56,24 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     public IssueGenericLetterHandler(PrintService bulkPrintService,
                                      GenericLetterPlaceholderService genericLetterPlaceholderService,
                                      CoverLetterService coverLetterService,
-                                     CcdPdfService ccdPdfService,
-                                     IdamService idamService,
-                                     DocmosisTemplateConfig docmosisTemplateConfig) {
+                                     CcdNotificationService ccdNotificationService,
+                                     DocmosisTemplateConfig docmosisTemplateConfig,
+                                     FeatureToggleService featureToggleService) {
         this.bulkPrintService = bulkPrintService;
         this.genericLetterPlaceholderService = genericLetterPlaceholderService;
         this.coverLetterService = coverLetterService;
-        this.ccdPdfService = ccdPdfService;
-        this.idamService = idamService;
+        this.ccdNotificationService = ccdNotificationService;
         this.docmosisTemplateConfig = docmosisTemplateConfig;
+        this.featureToggleService = featureToggleService;
     }
-
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.SUBMITTED) && callback.getEvent() == EventType.ISSUE_GENERIC_LETTER;
+        return featureToggleService.isIssueGenericLetterEnabled() && callbackType.equals(CallbackType.SUBMITTED)
+            && callback.getEvent() == EventType.ISSUE_GENERIC_LETTER;
     }
 
     @Override
@@ -98,14 +97,15 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     }
 
     private void sendLetter(long caseId, SscsCaseData caseData, List<Pdf> pdfs) {
-        Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData);//Optional.of(UUID.randomUUID());
+        Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData);
+        //Optional.of(UUID.randomUUID());
 
         Pdf letter = pdfs.get(0);
 
         if (id.isPresent()) {
-            ccdPdfService.mergeDocIntoCcd(letter.getName(), letter.getContent(), caseId,
-                caseData, idamService.getIdamTokens(), DocumentType.OTHER_DOCUMENT.getValue());
-            log.info("Generic letters were send for case {}", caseId);
+            ccdNotificationService.storeNotificationLetterIntoCcd(EventType.ISSUE_GENERIC_LETTER, letter.getContent(),
+                caseId);
+            log.info("Generic letters were send for case {}, send-letter-service id {}", caseId, id.get());
         } else {
             log.error("Failed to send to bulk print for case {}. No print id returned", caseId);
         }

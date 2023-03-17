@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import com.launchdarkly.sdk.LDUser;
-import com.launchdarkly.sdk.LDValue;
+import com.launchdarkly.sdk.LDContext;
 import com.launchdarkly.sdk.server.LDClient;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,19 +19,17 @@ public class FeatureToggleService {
     }
 
     public boolean isSendGridEnabled() {
-        return ldClient.boolVariation("send-grid", createLDUser(), false);
+        return ldClient.boolVariation("send-grid", createLdContext(), false);
     }
 
-    private LDUser createLDUser() {
-        return createLDUser(Map.of());
+    public boolean isIssueGenericLetterEnabled() {
+        return ldClient.boolVariation("issue-generic-letter", createLdContext(), false);
     }
 
-    private LDUser createLDUser(Map<String, LDValue> values) {
-        LDUser.Builder builder = new LDUser.Builder(ldUserKey)
-            .custom("timestamp", String.valueOf(System.currentTimeMillis()));
+    private LDContext createLdContext() {
+        var contextBuilder = LDContext.builder(ldUserKey)
+            .set("timestamp", String.valueOf(System.currentTimeMillis()));
 
-        values.forEach(builder::custom);
-        return builder.build();
+        return contextBuilder.build();
     }
-
 }

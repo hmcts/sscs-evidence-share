@@ -2,7 +2,10 @@ package uk.gov.hmcts.reform.sscs.callback.handlers;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,10 +47,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
+import uk.gov.hmcts.reform.sscs.service.CcdNotificationService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
+import uk.gov.hmcts.reform.sscs.service.FeatureToggleService;
 import uk.gov.hmcts.reform.sscs.service.PrintService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.GenericLetterPlaceholderService;
 
@@ -62,18 +64,20 @@ class IssueGenericLetterHandlerTest {
     private IssueGenericLetterHandler handler;
 
     @Mock
-    private IdamService idamService;
-
-    @Mock
     private PrintService bulkPrintService;
 
     @Mock
     CoverLetterService coverLetterService;
 
     @Mock
-    CcdPdfService ccdPdfService;
+    CcdNotificationService ccdNotificationService;
+
+    @Mock
+    FeatureToggleService featureToggleService;
 
     private Map<LanguagePreference, Map<String, Map<String, String>>> template =  new HashMap<>();
+
+    private byte[] letter = new byte[1];
 
     @BeforeEach
     public void setup() {
@@ -86,12 +90,11 @@ class IssueGenericLetterHandlerTest {
         englishDocs.put("generic-letter", nameMap);
         template.put(LanguagePreference.ENGLISH, englishDocs);
 
-
         DocmosisTemplateConfig docmosisTemplateConfig = new DocmosisTemplateConfig();
         docmosisTemplateConfig.setTemplate(template);
 
         handler = new IssueGenericLetterHandler(bulkPrintService, genericLetterPlaceholderService, coverLetterService,
-            ccdPdfService, idamService, docmosisTemplateConfig);
+            ccdNotificationService, docmosisTemplateConfig, featureToggleService);
     }
 
     @Test
@@ -99,8 +102,7 @@ class IssueGenericLetterHandlerTest {
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(SscsCaseData.builder().build(),
             READY_TO_LIST,
             NON_COMPLIANT);
-
-        log.info("Handler {}", handler);
+        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(true);
 
         boolean result = handler.canHandle(ABOUT_TO_SUBMIT,  callback);
 
@@ -109,12 +111,26 @@ class IssueGenericLetterHandlerTest {
 
     @Test
     void shouldReturnFalse_givenANonQualifyingEvent() {
-        Assertions.assertFalse(handler.canHandle(SUBMITTED,
-            buildTestCallbackForGivenData(SscsCaseData.builder()
-                    .createdInGapsFrom(READY_TO_LIST.getId()).build(),
-                READY_TO_LIST,
-                DECISION_ISSUED)
-        ));
+        Callback<SscsCaseData> callback = buildTestCallbackForGivenData(SscsCaseData.builder().build(),
+            READY_TO_LIST,
+            DECISION_ISSUED);
+        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(true);
+
+        boolean result = handler.canHandle(SUBMITTED, callback);
+
+        Assertions.assertFalse(result);
+    }
+
+    @Test
+    void shouldReturnFalse_givenFeatureFlagIsFalse() {
+        Callback<SscsCaseData> callback = buildTestCallbackForGivenData(SscsCaseData.builder().build(),
+            READY_TO_LIST,
+            ISSUE_GENERIC_LETTER);
+        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(false);
+
+        boolean result = handler.canHandle(SUBMITTED, callback);
+
+        Assertions.assertFalse(result);
     }
 
     @Test
@@ -158,14 +174,34 @@ class IssueGenericLetterHandlerTest {
         UUID uuid = UUID.randomUUID();
 
         when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(true);
+        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
 
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
 
         handler.handle(SUBMITTED, callback);
 
+        verify(ccdNotificationService, times(5))
+            .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
         verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData));
+    }
+
+    @Test
+    void shouldLogErrorWhenIdIsEmpty() {
+        SscsCaseData caseData = buildCaseData();
+        caseData.setSendToAllParties(YesNo.YES);
+
+        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.empty());
+        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(true);
+
+        Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any());
+        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), eq(caseData));
     }
 
     private static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty, Representative representative) {
