@@ -28,20 +28,23 @@ public class PanelCompositionService {
         if (stateNotDormant(caseDetails.getState())) {
             if (caseData.getIsFqpmRequired() == null
                 || hasDueDateSetAndOtherPartyWithoutHearingOption(caseData)) {
-                ccdService.updateCase(caseData, caseDetails.getId(),
-                    EventType.NOT_LISTABLE.getCcdType(),
-                    "Not listable",
-                    "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set",
-                    idamService.getIdamTokens());
+                if (!(State.WITH_DWP.equals(caseDetails.getState())
+                    || State.RESPONSE_RECEIVED.equals(caseDetails.getState()))) {
+                    updateCase(caseData,
+                        caseDetails.getId(),
+                        EventType.NOT_LISTABLE,
+                        "Not listable",
+                        "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set");
+                }
             } else {
                 if (eventType.equals(EventType.UPDATE_OTHER_PARTY_DATA)) {
                     caseData.setDirectionDueDate(null);
                 }
-                ccdService.updateCase(caseData, caseDetails.getId(),
-                    EventType.READY_TO_LIST.getCcdType(),
+                updateCase(caseData,
+                    caseDetails.getId(),
+                    EventType.READY_TO_LIST,
                     "Ready to list",
-                    "Update to ready to list event as there is no further information to assist the tribunal and no dispute.",
-                    idamService.getIdamTokens());
+                    "Update to ready to list event as there is no further information to assist the tribunal and no dispute.");
             }
         }
     }
@@ -76,5 +79,9 @@ public class PanelCompositionService {
             && (hearingOptions.getExcludeDates() == null || hearingOptions.getExcludeDates().isEmpty())
             && StringUtils.isBlank(hearingOptions.getAgreeLessNotice())
             && StringUtils.isBlank(hearingOptions.getOther()));
+    }
+
+    private void updateCase(SscsCaseData caseData, Long caseId, EventType eventType, String summary, String description) {
+        ccdService.updateCase(caseData, caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens());
     }
 }
