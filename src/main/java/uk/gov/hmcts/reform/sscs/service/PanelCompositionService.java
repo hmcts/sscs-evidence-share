@@ -28,8 +28,7 @@ public class PanelCompositionService {
         if (stateNotDormant(caseDetails.getState())) {
             if (caseData.getIsFqpmRequired() == null
                 || hasDueDateSetAndOtherPartyWithoutHearingOption(caseData)) {
-                if (!(State.WITH_DWP.equals(caseDetails.getState())
-                    || State.RESPONSE_RECEIVED.equals(caseDetails.getState()))) {
+                if (stateNotWithFtaOrResponseReceived(caseDetails)) {
                     updateCase(caseData,
                         caseDetails.getId(),
                         EventType.NOT_LISTABLE,
@@ -47,6 +46,11 @@ public class PanelCompositionService {
                     "Update to ready to list event as there is no further information to assist the tribunal and no dispute.");
             }
         }
+    }
+
+    private boolean stateNotWithFtaOrResponseReceived(CaseDetails<SscsCaseData> caseDetails) {
+        return !(State.WITH_DWP.equals(caseDetails.getState())
+            || State.RESPONSE_RECEIVED.equals(caseDetails.getState()));
     }
 
     private static boolean stateNotDormant(State caseState) {
