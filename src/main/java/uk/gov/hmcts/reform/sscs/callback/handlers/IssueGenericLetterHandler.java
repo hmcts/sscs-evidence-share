@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
@@ -17,11 +18,7 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
@@ -97,6 +94,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     }
 
     private void sendLetter(long caseId, SscsCaseData caseData, List<Pdf> pdfs) {
+        log.info("Sending letter");
         Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData);
         //Optional.of(UUID.randomUUID());
 
@@ -117,6 +115,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     }
 
     private void process(long caseId, SscsCaseData caseData) {
+        log.info("Process the issue generic letter for the case : " + caseId);
         List<Pdf> documents = new ArrayList<>();
 
         if (YesNo.isYes(caseData.getAddDocuments())) {
@@ -149,28 +148,31 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     }
 
     private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+        log.info("Sending letter to other party");
         var selectedOtherParties = caseData.getOtherPartySelection();
         var otherParties = caseData.getOtherParties();
 
-        for (var party : selectedOtherParties) {
-            String entityId = party.getValue().getOtherPartiesList().getValue().getCode();
-            OtherParty otherParty = getOtherPartyByEntityId(entityId, otherParties);
+        if (nonNull(selectedOtherParties)) {
+            for (var party : selectedOtherParties) {
+                String entityId = party.getValue().getOtherPartiesList().getValue().getCode();
+                OtherParty otherParty = getOtherPartyByEntityId(entityId, otherParties);
 
-            if (otherParty != null) {
-                var letterType = getLetterType(otherParty, entityId);
-                var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
-                    letterType, entityId);
+                if (otherParty != null) {
+                    var letterType = getLetterType(otherParty, entityId);
+                    var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
+                        letterType, entityId);
 
-                String letterName = String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
+                    String letterName = String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
 
-                var generatedPdf = coverLetterService.generateCoverLetterRetry(letterType,
-                    docmosisTemplate, letterName, placeholders, 1);
+                    var generatedPdf = coverLetterService.generateCoverLetterRetry(letterType,
+                        docmosisTemplate, letterName, placeholders, 1);
 
-                var pdf = new Pdf(generatedPdf, letterName);
-                List<Pdf> letter = new ArrayList<>();
-                letter.add(pdf);
-                letter.addAll(documents);
-                sendLetter(caseId, caseData, letter);
+                    var pdf = new Pdf(generatedPdf, letterName);
+                    List<Pdf> letter = new ArrayList<>();
+                    letter.add(pdf);
+                    letter.addAll(documents);
+                    sendLetter(caseId, caseData, letter);
+                }
             }
         }
     }
