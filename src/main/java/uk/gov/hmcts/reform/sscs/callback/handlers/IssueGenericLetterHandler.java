@@ -5,6 +5,8 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +14,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
@@ -45,6 +53,8 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     private final FeatureToggleService featureToggleService;
 
     private String docmosisTemplate;
+
+    private String docmosisCoverSheetTemplate;
 
     private static String LETTER_NAME = "Generic Letter to %s %s.pdf";
 
@@ -89,6 +99,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         long id = callback.getCaseDetails().getId();
 
         docmosisTemplate = getDocmosisTemplate(caseData);
+        docmosisCoverSheetTemplate = getDocmosisCoverSheet(caseData);
 
         process(id, caseData);
     }
@@ -112,6 +123,11 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     private String getDocmosisTemplate(SscsCaseData caseData) {
         return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference())
             .get("generic-letter").get("name");
+    }
+
+    private String getDocmosisCoverSheet(SscsCaseData caseData) {
+        return docmosisTemplateConfig.getTemplate().get(caseData.getLanguagePreference())
+            .get("generic-letter").get("cover");
     }
 
     private void process(long caseId, SscsCaseData caseData) {
@@ -143,7 +159,6 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
             sendToOtherParties(caseId, caseData, documents);
         }
 
-        // TODO reasonable adjustments?
         // blank page??
     }
 
@@ -159,18 +174,8 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
                 if (otherParty != null) {
                     var letterType = getLetterType(otherParty, entityId);
-                    var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
-                        letterType, entityId);
 
-                    String letterName = String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
-
-                    var generatedPdf = coverLetterService.generateCoverLetterRetry(letterType,
-                        docmosisTemplate, letterName, placeholders, 1);
-
-                    var pdf = new Pdf(generatedPdf, letterName);
-                    List<Pdf> letter = new ArrayList<>();
-                    letter.add(pdf);
-                    letter.addAll(documents);
+                    List<Pdf> letter = getLetterPdfs(caseData, documents, letterType);
                     sendLetter(caseId, caseData, letter);
                 }
             }
@@ -186,53 +191,17 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     }
 
     private void sendToJointParty(long caseId, SscsCaseData caseData, List<Pdf> documents) {
-        var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
-            FurtherEvidenceLetterType.JOINT_PARTY_LETTER,
-            null);
-
-        String letterName = getLetterName(placeholders);
-
-        var generatedPdf = coverLetterService.generateCoverLetterRetry(FurtherEvidenceLetterType.JOINT_PARTY_LETTER,
-            docmosisTemplate, letterName, placeholders, 1);
-
-        Pdf pdf = new Pdf(generatedPdf, letterName);
-        List<Pdf> letter = new ArrayList<>();
-        letter.add(pdf);
-        letter.addAll(documents);
+        List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.JOINT_PARTY_LETTER);
         sendLetter(caseId, caseData, letter);
     }
 
     private void sendToRepresentative(long caseId, SscsCaseData caseData, List<Pdf> documents) {
-        var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
-            FurtherEvidenceLetterType.REPRESENTATIVE_LETTER,
-            null);
-
-        String letterName = getLetterName(placeholders);
-
-        var generatedPdf = coverLetterService.generateCoverLetterRetry(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER,
-            docmosisTemplate, letterName, placeholders, 1);
-
-        Pdf pdf = new Pdf(generatedPdf, letterName);
-        List<Pdf> letter = new ArrayList<>();
-        letter.add(pdf);
-        letter.addAll(documents);
+        List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
         sendLetter(caseId, caseData, letter);
     }
 
     private void sendToAppellant(long caseId, SscsCaseData caseData, List<Pdf> documents) {
-        var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
-            FurtherEvidenceLetterType.APPELLANT_LETTER,
-            null);
-
-        String letterName = getLetterName(placeholders);
-
-        var generatedPdf = coverLetterService.generateCoverLetterRetry(FurtherEvidenceLetterType.APPELLANT_LETTER,
-            docmosisTemplate, letterName, placeholders, 1);
-
-        Pdf pdf = new Pdf(generatedPdf, letterName);
-        List<Pdf> letter = new ArrayList<>();
-        letter.add(pdf);
-        letter.addAll(documents);
+        List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.APPELLANT_LETTER);
         sendLetter(caseId, caseData, letter);
     }
 
@@ -267,5 +236,56 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         return entityId.contains(o.getId())
             || (o.hasRepresentative() && entityId.contains(o.getRep().getId()))
             || (o.hasAppointee() && entityId.contains(o.getAppointee().getId()));
+    }
+
+    private List<Pdf> getLetterPdfs(SscsCaseData caseData, List<Pdf> documents, FurtherEvidenceLetterType furtherEvidenceLetterType) {
+        return getLetterPdfs(caseData, documents, furtherEvidenceLetterType, null);
+    }
+
+    private List<Pdf> getLetterPdfs(SscsCaseData caseData, List<Pdf> documents, FurtherEvidenceLetterType letterType, String entityId) {
+        var placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData,
+            letterType,
+            entityId);
+
+        String letterName = getLetterName(placeholders);
+
+        var generatedPdf = coverLetterService.generateCoverLetterRetry(letterType,
+            docmosisTemplate, letterName, placeholders, 1);
+
+        var coverSheet = coverLetterService.generateCoverSheet(docmosisCoverSheetTemplate,
+            "coversheet", placeholders);
+
+        var bundledLetter = buildBundledLetter(coverSheet, generatedPdf);
+
+        Pdf pdf = new Pdf(bundledLetter, letterName);
+        List<Pdf> letter = new ArrayList<>();
+        letter.add(pdf);
+        letter.addAll(documents);
+        return letter;
+    }
+
+    private byte[] buildBundledLetter(byte[] coverSheet, byte[] letter) {
+        if (coverSheet != null) {
+            PDDocument bundledLetter = null;
+
+            try {
+                bundledLetter = PDDocument.load(letter);
+
+                PDDocument loadDoc = PDDocument.load(coverSheet);
+
+                final PDFMergerUtility merger = new PDFMergerUtility();
+                merger.appendDocument(bundledLetter, loadDoc);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bundledLetter.save(baos);
+                bundledLetter.close();
+
+                return baos.toByteArray();
+            } catch (IOException e) {
+                log.info("Failed to merge letter and coversheet with exception {}", e.getMessage());
+            }
+        }
+
+        return letter;
     }
 }

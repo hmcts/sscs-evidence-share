@@ -90,7 +90,6 @@ public class CoverLetterService {
     public byte[] generateCoverLetterRetry(FurtherEvidenceLetterType letterType, String templateName,
                                       String hmctsDocName, Map<String, Object> placeholders, int retries) {
         try {
-
             byte[] coverLetterContent = pdfGenerationService.generatePdf(DocumentHolder.builder()
                 .template(new Template(templateName, hmctsDocName))
                 .placeholders(placeholders)
@@ -109,6 +108,18 @@ public class CoverLetterService {
                 throw new UnableToContactThirdPartyException("docmosis", e);
             }
         }
+    }
+
+    public byte[] generateCoverSheet(String templateName, String hmctsDocName, Map<String, Object> placeholders) {
+        byte[] coverSheetContent = pdfGenerationService.generatePdf(DocumentHolder.builder()
+            .template(new Template(templateName, hmctsDocName))
+            .placeholders(placeholders)
+            .pdfArchiveMode(true)
+            .build());
+
+        printCoverLetterToPdfLocallyForDebuggingPurpose(coverSheetContent, FurtherEvidenceLetterType.APPELLANT_LETTER, hmctsDocName);
+
+        return coverSheetContent;
     }
 
     public List<Pdf> getSelectedDocuments(SscsCaseData sscsCaseData) {

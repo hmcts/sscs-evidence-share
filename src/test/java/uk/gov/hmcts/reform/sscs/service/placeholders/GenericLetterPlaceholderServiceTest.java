@@ -15,12 +15,12 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.INFO_REQUEST_DETAIL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.IS_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.JOINT;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.NAME;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_1_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_2_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_3_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_4_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildJointParty;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildOtherParty;
 
@@ -71,7 +71,7 @@ class GenericLetterPlaceholderServiceTest {
         String appellantName = getApellantName(caseData);
 
         assertNotNull(placeholders);
-        assertEquals(address.getPostcode(), placeholders.get(RECIPIENT_ADDRESS_LINE_5_LITERAL));
+        assertEquals(address.getPostcode(), placeholders.get(LETTER_ADDRESS_POSTCODE));
         assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
         assertEquals(appellantName, placeholders.get(NAME));
         assertEquals(appellantName, placeholders.get(ADDRESS_NAME));
@@ -104,7 +104,7 @@ class GenericLetterPlaceholderServiceTest {
         Address address = otherParty.getAddress();
         String appellantName = getApellantName(caseData);
         assertNotNull(placeholders);
-        assertEquals(address.getPostcode(), placeholders.get(RECIPIENT_ADDRESS_LINE_4_LITERAL));
+        assertEquals(address.getPostcode(), placeholders.get(LETTER_ADDRESS_LINE_4));
         assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
 
         String otherPartyName = otherParty.getName().getFullNameNoTitle();
@@ -183,11 +183,11 @@ class GenericLetterPlaceholderServiceTest {
             null);
 
         assertNotNull(placeholders);
-        assertFalse(placeholders.containsKey(RECIPIENT_ADDRESS_LINE_1_LITERAL));
-        assertFalse(placeholders.containsKey(RECIPIENT_ADDRESS_LINE_2_LITERAL));
-        assertFalse(placeholders.containsKey(RECIPIENT_ADDRESS_LINE_3_LITERAL));
-        assertFalse(placeholders.containsKey(RECIPIENT_ADDRESS_LINE_4_LITERAL));
-        assertFalse(placeholders.containsKey(RECIPIENT_ADDRESS_LINE_5_LITERAL));
+        assertFalse(placeholders.containsKey(LETTER_ADDRESS_LINE_1));
+        assertFalse(placeholders.containsKey(LETTER_ADDRESS_LINE_2));
+        assertFalse(placeholders.containsKey(LETTER_ADDRESS_LINE_3));
+        assertFalse(placeholders.containsKey(LETTER_ADDRESS_LINE_4));
+        assertFalse(placeholders.containsKey(LETTER_ADDRESS_POSTCODE));
     }
 
     private static String getApellantName(SscsCaseData caseData) {

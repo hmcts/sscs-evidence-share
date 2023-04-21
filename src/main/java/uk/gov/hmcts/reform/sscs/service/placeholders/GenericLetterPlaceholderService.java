@@ -6,18 +6,19 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.APPEAL_REF;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.APPELLANT_NAME;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.CASE_ID_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.HMCTS2;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.INFO_REQUEST_DETAIL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.IS_OTHER_PARTY;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.IS_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.JOINT;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.NAME;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_1_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_2_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_3_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_4_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.RECIPIENT_ADDRESS_LINE_5_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_PHONE_LITERAL;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REPRESENTATIVE_NAME;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.SSCS_URL;
@@ -96,6 +97,9 @@ public class GenericLetterPlaceholderService {
         placeholders.put(APPEAL_REF, getAppealReference(caseData));
         placeholders.put(INFO_REQUEST_DETAIL, caseData.getGenericLetterText());
         placeholders.put(HMCTS2, HMCTS_IMG);
+        placeholders.put(CASE_ID_LITERAL, caseData.getCcdCaseId());
+
+        placeholderService.buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
 
         return placeholders;
     }
@@ -124,22 +128,21 @@ public class GenericLetterPlaceholderService {
         String[] lines = lines(address);
 
         if (lines.length >= 1) {
-            addressPlaceHolders.put(RECIPIENT_ADDRESS_LINE_1_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[0])));
+            addressPlaceHolders.put(LETTER_ADDRESS_LINE_1, truncateAddressLine(defaultToEmptyStringIfNull(lines[0])));
         }
         if (lines.length >= 2) {
-            addressPlaceHolders.put(RECIPIENT_ADDRESS_LINE_2_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[1])));
+            addressPlaceHolders.put(LETTER_ADDRESS_LINE_2, truncateAddressLine(defaultToEmptyStringIfNull(lines[1])));
         }
         if (lines.length >= 3) {
-            addressPlaceHolders.put(RECIPIENT_ADDRESS_LINE_3_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[2])));
+            addressPlaceHolders.put(LETTER_ADDRESS_LINE_3, truncateAddressLine(defaultToEmptyStringIfNull(lines[2])));
         }
         if (lines.length >= 4) {
-            addressPlaceHolders.put(RECIPIENT_ADDRESS_LINE_4_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[3])));
+            addressPlaceHolders.put(LETTER_ADDRESS_LINE_4, truncateAddressLine(defaultToEmptyStringIfNull(lines[3])));
         }
         if (lines.length >= 5) {
-            addressPlaceHolders.put(RECIPIENT_ADDRESS_LINE_5_LITERAL, truncateAddressLine(defaultToEmptyStringIfNull(lines[4])));
+            addressPlaceHolders.put(LETTER_ADDRESS_POSTCODE, truncateAddressLine(defaultToEmptyStringIfNull(lines[4])));
         }
 
         return addressPlaceHolders;
     }
-
 }

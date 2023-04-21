@@ -135,6 +135,7 @@ docmosis:
         name: TB-SCS-GNO-ENG-00069.doc
       generic-letter:
         name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
+        cover: TB-SCS-LET-ENG-Cover-Sheet.docx
     welsh:
       dl6:
         name: TB-SCS-GNO-ENG-00010.doc
@@ -146,6 +147,7 @@ docmosis:
         name: TB-SCS-GNO-WEL-00470.docx
       generic-letter:
         name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
+        cover: TB-SCS-LET-ENG-Cover-Sheet.docx
 
 evidence-share:
   submit-types:

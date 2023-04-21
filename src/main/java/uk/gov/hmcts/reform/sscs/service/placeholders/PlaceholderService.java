@@ -79,7 +79,7 @@ public class PlaceholderService {
         buildRecipientAddressPlaceholders(address, placeholders);
     }
 
-    private void buildExcelaAddress(String isScottish, Map<String, Object> placeholders) {
+    public void buildExcelaAddress(String isScottish, Map<String, Object> placeholders) {
         placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getAddressLine1());
         placeholders.put(EXELA_ADDRESS_LINE3_LITERAL, exelaAddressConfig.getAddressLine3());
 
