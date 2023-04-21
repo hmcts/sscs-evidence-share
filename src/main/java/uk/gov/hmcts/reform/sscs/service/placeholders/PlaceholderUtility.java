@@ -151,17 +151,19 @@ final class PlaceholderUtility {
     private static String getOtherPartyName(SscsCaseData caseData, String otherPartyId) {
         if (otherPartyId != null) {
             for (CcdValue<OtherParty> otherParty : caseData.getOtherParties()) {
-                if (otherPartyId.contains(otherParty.getValue().getId())
-                    && isValidName(otherParty.getValue().getName())) {
-                    return otherParty.getValue().getName().getFullNameNoTitle();
-                } else if (otherParty.getValue().getAppointee() != null
-                    && otherPartyId.contains(otherParty.getValue().getAppointee().getId())
-                    && isValidName(otherParty.getValue().getAppointee().getName())) {
-                    return otherParty.getValue().getAppointee().getName().getFullNameNoTitle();
-                } else if (otherParty.getValue().getRep() != null
-                    && otherPartyId.contains(otherParty.getValue().getRep().getId())
-                    && isValidName(otherParty.getValue().getRep().getName())) {
-                    return otherParty.getValue().getRep().getName().getFullNameNoTitle();
+                OtherParty otherPartyValue = otherParty.getValue();
+
+                if (otherPartyId.contains(otherPartyValue.getId())
+                    && isValidName(otherPartyValue.getName())) {
+                    return otherPartyValue.getName().getFullNameNoTitle();
+                } else if (otherPartyValue.getAppointee() != null
+                    && otherPartyId.contains(otherPartyValue.getAppointee().getId())
+                    && isValidName(otherPartyValue.getAppointee().getName())) {
+                    return otherPartyValue.getAppointee().getName().getFullNameNoTitle();
+                } else if (otherPartyValue.getRep() != null
+                    && otherPartyId.contains(otherPartyValue.getRep().getId())
+                    && isValidName(otherPartyValue.getRep().getName())) {
+                    return otherPartyValue.getRep().getName().getFullNameNoTitle();
                 }
             }
         }

@@ -78,7 +78,6 @@ public class GenericLetterPlaceholderService {
 
         if (isRepresentativeLetter(letterType) || isOtherPartyLetter(letterType)) {
             String representativeName = PlaceholderUtility.getName(caseData, letterType, otherPartyId);
-
             placeholders.put(REPRESENTATIVE_NAME, representativeName);
 
             if (isOtherPartyLetter(letterType)) {
@@ -124,23 +123,12 @@ public class GenericLetterPlaceholderService {
 
     private Map<String, Object> getAddressPlaceHolders(Address address) {
         var addressPlaceHolders = new HashMap<String, Object>();
-
         String[] lines = lines(address);
+        String[] addressConstants = {LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
+            LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE};
 
-        if (lines.length >= 1) {
-            addressPlaceHolders.put(LETTER_ADDRESS_LINE_1, truncateAddressLine(defaultToEmptyStringIfNull(lines[0])));
-        }
-        if (lines.length >= 2) {
-            addressPlaceHolders.put(LETTER_ADDRESS_LINE_2, truncateAddressLine(defaultToEmptyStringIfNull(lines[1])));
-        }
-        if (lines.length >= 3) {
-            addressPlaceHolders.put(LETTER_ADDRESS_LINE_3, truncateAddressLine(defaultToEmptyStringIfNull(lines[2])));
-        }
-        if (lines.length >= 4) {
-            addressPlaceHolders.put(LETTER_ADDRESS_LINE_4, truncateAddressLine(defaultToEmptyStringIfNull(lines[3])));
-        }
-        if (lines.length >= 5) {
-            addressPlaceHolders.put(LETTER_ADDRESS_POSTCODE, truncateAddressLine(defaultToEmptyStringIfNull(lines[4])));
+        for (int i = 0; i < lines.length; i++) {
+            addressPlaceHolders.put(addressConstants[i], truncateAddressLine(defaultToEmptyStringIfNull(lines[i])));
         }
 
         return addressPlaceHolders;

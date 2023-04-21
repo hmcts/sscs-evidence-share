@@ -131,7 +131,6 @@ public class CoverLetterService {
 
             if (documentLink != null) {
                 document = pdfStoreService.download(documentLink.getDocumentUrl());
-
                 Pdf pdf = new Pdf(document, documentLink.getDocumentFilename());
                 documents.add(pdf);
             }

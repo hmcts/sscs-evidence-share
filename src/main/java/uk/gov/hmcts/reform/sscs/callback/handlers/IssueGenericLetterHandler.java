@@ -96,16 +96,15 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         }
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        long id = callback.getCaseDetails().getId();
+        long caseDetailsId = callback.getCaseDetails().getId();
 
         docmosisTemplate = getDocmosisTemplate(caseData);
         docmosisCoverSheetTemplate = getDocmosisCoverSheet(caseData);
 
-        process(id, caseData);
+        process(caseDetailsId, caseData);
     }
 
     private void sendLetter(long caseId, SscsCaseData caseData, List<Pdf> pdfs) {
-        log.info("Sending letter");
         Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData);
         //Optional.of(UUID.randomUUID());
 
@@ -159,7 +158,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
             sendToOtherParties(caseId, caseData, documents);
         }
 
-        // blank page??
+        // TODO check if blank page on odd page ending is needed
     }
 
     private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
@@ -183,11 +182,9 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     }
 
     private FurtherEvidenceLetterType getLetterType(OtherParty otherParty, String entityId) {
-        if (otherParty.hasRepresentative() && entityId.equals(otherParty.getRep().getId())) {
-            return FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER;
-        }
+        boolean hasRepresentative = otherParty.hasRepresentative() && entityId.equals(otherParty.getRep().getId());
 
-        return FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
+        return hasRepresentative ? FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER : FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
     }
 
     private void sendToJointParty(long caseId, SscsCaseData caseData, List<Pdf> documents) {
@@ -270,7 +267,6 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
             try {
                 bundledLetter = PDDocument.load(letter);
-
                 PDDocument loadDoc = PDDocument.load(coverSheet);
 
                 final PDFMergerUtility merger = new PDFMergerUtility();
