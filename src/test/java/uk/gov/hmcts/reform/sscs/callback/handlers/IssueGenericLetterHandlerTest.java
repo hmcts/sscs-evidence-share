@@ -188,6 +188,42 @@ class IssueGenericLetterHandlerTest {
     }
 
     @Test
+    void shouldSendToSelectedParties() {
+        SscsCaseData caseData = buildCaseData();
+        caseData.setSendToApellant(YesNo.YES);
+        caseData.setSendToJointParty(YesNo.YES);
+        caseData.setSendToOtherParties(YesNo.YES);
+        caseData.setSendToRepresentative(YesNo.YES);
+
+        var jointParty = buildJointParty();
+        caseData.setJointParty(jointParty);
+
+        var otherParty = new CcdValue<>(buildOtherParty());
+
+        var otherPartyWithRep = buildOtherParty();
+        Representative representative = caseData.getAppeal().getRep();
+        otherPartyWithRep.setRep(representative);
+
+        caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
+        caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
+
+        UUID uuid = UUID.randomUUID();
+
+        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
+        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(true);
+        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+
+        Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(ccdNotificationService, times(5))
+            .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
+        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData));
+    }
+
+    @Test
     void shouldLogErrorWhenIdIsEmpty() {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToAllParties(YesNo.YES);
