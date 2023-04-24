@@ -84,9 +84,6 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
                 if (isBenefitTypeSscs5(callback.getCaseDetails().getCaseData().getBenefitType())) {
                     updateEventDetails(caseData, callback.getCaseDetails().getId(),
                         EventType.DWP_RESPOND, "Response received", "Update to response received as an Admin has to review the case");
-                } else {
-                    updateEventDetails(caseData, callback.getCaseDetails().getId(),
-                        EventType.NOT_LISTABLE, "Not Listable", "Update to Not Listable as a Judge has to review the case");
                 }
             }
         }
