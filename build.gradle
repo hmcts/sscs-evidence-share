@@ -340,7 +340,7 @@ dependencies {
   implementation group: 'javax.jms', name: 'javax.jms-api', version: '2.0.1'
 
   implementation group: 'org.json', name: 'json', version: '20230227'
-  implementation group: 'joda-time', name: 'joda-time', version: '2.12.2'
+  implementation group: 'joda-time', name: 'joda-time', version: '2.12.5'
 
   implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 
