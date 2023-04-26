@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
@@ -24,12 +25,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildJointParty;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildOtherParty;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,9 +83,10 @@ class IssueGenericLetterHandlerTest {
         openMocks(this);
 
         Map<String, String> nameMap;
-        Map<String, Map<String, String>> englishDocs = new HashMap<>();
         nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-LET-ENG-Issue-Generic-Letter.docx");
+        nameMap.put("cover", "TB-SCS-LET-ENG-Cover-Sheet.docx");
+        Map<String, Map<String, String>> englishDocs = new HashMap<>();
         englishDocs.put("generic-letter", nameMap);
         template.put(LanguagePreference.ENGLISH, englishDocs);
 
@@ -171,6 +175,7 @@ class IssueGenericLetterHandlerTest {
         when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
+        when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
 
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
 
@@ -217,6 +222,35 @@ class IssueGenericLetterHandlerTest {
     }
 
     @Test
+    void shouldNotSendLettersWhenNoPartiesSelected() {
+        SscsCaseData caseData = buildCaseData();
+        caseData.setSendToApellant(YesNo.NO);
+        caseData.setSendToJointParty(YesNo.NO);
+        caseData.setSendToOtherParties(YesNo.NO);
+        caseData.setSendToRepresentative(YesNo.NO);
+
+        var jointParty = buildJointParty();
+        caseData.setJointParty(jointParty);
+
+        var otherParty = new CcdValue<>(buildOtherParty());
+
+        var otherPartyWithRep = buildOtherParty();
+        Representative representative = caseData.getAppeal().getRep();
+        otherPartyWithRep.setRep(representative);
+
+        caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
+        caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
+
+        Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
+
+        handler.handle(SUBMITTED, callback);
+
+        verifyNoInteractions(ccdNotificationService);
+        verifyNoInteractions(bulkPrintService);
+    }
+
+
+    @Test
     void shouldLogErrorWhenIdIsEmpty() {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToAllParties(YesNo.YES);
@@ -230,6 +264,31 @@ class IssueGenericLetterHandlerTest {
 
         verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any());
         verify(bulkPrintService, times(2)).sendToBulkPrint(any(), eq(caseData));
+    }
+
+    @Test
+    void shouldBundleCoverLetter() throws IOException {
+        SscsCaseData caseData = buildCaseData();
+        caseData.setSendToApellant(YesNo.YES);
+        caseData.setSendToJointParty(YesNo.NO);
+        caseData.setSendToOtherParties(YesNo.NO);
+        caseData.setSendToRepresentative(YesNo.NO);
+
+        UUID uuid = UUID.randomUUID();
+
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
+        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
+        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
+        when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(pdfBytes);
+        when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(pdfBytes);
+
+        Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
+
+        handler.handle(SUBMITTED, callback);
+
+        verify(ccdNotificationService, times(1))
+            .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
+        verify(bulkPrintService, times(1)).sendToBulkPrint(any(), eq(caseData));
     }
 
     private static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty, Representative representative) {
