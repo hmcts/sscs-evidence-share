@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -32,7 +33,6 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
-import uk.gov.hmcts.reform.sscs.service.FeatureToggleService;
 import uk.gov.hmcts.reform.sscs.service.PrintService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.GenericLetterPlaceholderService;
 
@@ -50,7 +50,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private final DocmosisTemplateConfig docmosisTemplateConfig;
 
-    private final FeatureToggleService featureToggleService;
+    private final boolean canIssueGenericLetter;
 
     private String docmosisTemplate;
 
@@ -58,20 +58,20 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private static String LETTER_NAME = "Generic Letter to %s %s.pdf";
 
-
     @Autowired
     public IssueGenericLetterHandler(PrintService bulkPrintService,
                                      GenericLetterPlaceholderService genericLetterPlaceholderService,
                                      CoverLetterService coverLetterService,
                                      CcdNotificationService ccdNotificationService,
                                      DocmosisTemplateConfig docmosisTemplateConfig,
-                                     FeatureToggleService featureToggleService) {
+                                     @Value("${feature.issue-generic-letter.enabled}")
+                                     boolean canIssueGenericLetter) {
         this.bulkPrintService = bulkPrintService;
         this.genericLetterPlaceholderService = genericLetterPlaceholderService;
         this.coverLetterService = coverLetterService;
         this.ccdNotificationService = ccdNotificationService;
         this.docmosisTemplateConfig = docmosisTemplateConfig;
-        this.featureToggleService = featureToggleService;
+        this.canIssueGenericLetter = canIssueGenericLetter;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return featureToggleService.isIssueGenericLetterEnabled() && callbackType.equals(CallbackType.SUBMITTED)
+        return canIssueGenericLetter && callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.ISSUE_GENERIC_LETTER;
     }
 
@@ -174,7 +174,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
                 if (otherParty != null) {
                     var letterType = getLetterType(otherParty, entityId);
 
-                    List<Pdf> letter = getLetterPdfs(caseData, documents, letterType);
+                    List<Pdf> letter = getLetterPdfs(caseData, documents, letterType, entityId);
                     sendLetter(caseId, caseData, letter);
                 }
             }

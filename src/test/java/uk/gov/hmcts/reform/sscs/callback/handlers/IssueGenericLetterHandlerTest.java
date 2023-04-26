@@ -49,7 +49,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
-import uk.gov.hmcts.reform.sscs.service.FeatureToggleService;
 import uk.gov.hmcts.reform.sscs.service.PrintService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.GenericLetterPlaceholderService;
 
@@ -72,9 +71,6 @@ class IssueGenericLetterHandlerTest {
     @Mock
     CcdNotificationService ccdNotificationService;
 
-    @Mock
-    FeatureToggleService featureToggleService;
-
     private Map<LanguagePreference, Map<String, Map<String, String>>> template =  new HashMap<>();
 
     private byte[] letter = new byte[1];
@@ -94,7 +90,7 @@ class IssueGenericLetterHandlerTest {
         docmosisTemplateConfig.setTemplate(template);
 
         handler = new IssueGenericLetterHandler(bulkPrintService, genericLetterPlaceholderService, coverLetterService,
-            ccdNotificationService, docmosisTemplateConfig, featureToggleService);
+            ccdNotificationService, docmosisTemplateConfig, true);
     }
 
     @Test
@@ -102,7 +98,6 @@ class IssueGenericLetterHandlerTest {
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(SscsCaseData.builder().build(),
             READY_TO_LIST,
             NON_COMPLIANT);
-        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(true);
 
         boolean result = handler.canHandle(ABOUT_TO_SUBMIT,  callback);
 
@@ -114,7 +109,6 @@ class IssueGenericLetterHandlerTest {
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(SscsCaseData.builder().build(),
             READY_TO_LIST,
             DECISION_ISSUED);
-        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(true);
 
         boolean result = handler.canHandle(SUBMITTED, callback);
 
@@ -126,7 +120,8 @@ class IssueGenericLetterHandlerTest {
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(SscsCaseData.builder().build(),
             READY_TO_LIST,
             ISSUE_GENERIC_LETTER);
-        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(false);
+        handler = new IssueGenericLetterHandler(bulkPrintService, genericLetterPlaceholderService, coverLetterService,
+            ccdNotificationService, null, false);
 
         boolean result = handler.canHandle(SUBMITTED, callback);
 
@@ -175,7 +170,6 @@ class IssueGenericLetterHandlerTest {
 
         when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
-        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(true);
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
 
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
@@ -211,7 +205,6 @@ class IssueGenericLetterHandlerTest {
 
         when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
-        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(true);
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
 
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
@@ -230,7 +223,6 @@ class IssueGenericLetterHandlerTest {
 
         when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.empty());
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
-        when(featureToggleService.isIssueGenericLetterEnabled()).thenReturn(true);
 
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
 

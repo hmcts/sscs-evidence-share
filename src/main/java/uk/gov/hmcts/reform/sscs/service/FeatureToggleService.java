@@ -22,10 +22,6 @@ public class FeatureToggleService {
         return ldClient.boolVariation("send-grid", createLdContext(), false);
     }
 
-    public boolean isIssueGenericLetterEnabled() {
-        return ldClient.boolVariation("issue-generic-letter", createLdContext(), false);
-    }
-
     private LDContext createLdContext() {
         var contextBuilder = LDContext.builder(ldUserKey)
             .set("timestamp", String.valueOf(System.currentTimeMillis()));
