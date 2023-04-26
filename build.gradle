@@ -327,7 +327,7 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.25.20'
   implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.3'
 
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.0.5'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.1.0'
 
   implementation group: 'org.pitest', name: 'pitest', version: '1.13.0'
   implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.11'
