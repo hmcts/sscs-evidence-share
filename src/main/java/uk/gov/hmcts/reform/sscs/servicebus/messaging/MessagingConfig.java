@@ -23,9 +23,15 @@ import org.springframework.jms.core.JmsTemplate;
 @Slf4j
 public class MessagingConfig {
 
+    @Value("${amqp.amqp-connection-string-template}")
+    private String amqpConnectionStringTemplate;
+
+    @Value("${amqp.idleTimeout}")
+    private Long idleTimeout;
+
     @Bean
     public String jmsUrlString(@Value("${amqp.host}") final String host) {
-        return String.format("amqps://%1s?amqp.idleTimeout=3600000", host);
+        return String.format(amqpConnectionStringTemplate, host, idleTimeout);
     }
 
     @Bean
