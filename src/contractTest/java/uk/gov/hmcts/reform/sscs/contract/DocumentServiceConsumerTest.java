@@ -7,7 +7,7 @@ import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
-import au.com.dius.pact.core.model.annotations.PactFolder;
+import au.com.dius.pact.core.model.annotations.PactDirectory;
 import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.util.Map;
@@ -29,7 +29,7 @@ import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @PactTestFor(providerName = "em_dm_store", port = "5006")
-@PactFolder("pacts")
+@PactDirectory("pacts")
 @SpringBootTest({
     "document_management.url : http://localhost:5006"
 })
