@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
@@ -10,16 +11,14 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -29,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = SscsEvidenceShareApplication.class)
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 public class DocmosisPdfGenerationIt {
@@ -53,7 +51,7 @@ public class DocmosisPdfGenerationIt {
         return dataMap;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         mockServer = MockRestServiceServer.createServer(restTemplate);
         pdfGenerationService = new DocmosisPdfGenerationService(PDF_SERVICE_URI, "bla2", restTemplate);
@@ -67,7 +65,7 @@ public class DocmosisPdfGenerationIt {
 
         byte[] result = pdfGenerationService.generatePdf(DocumentHolder.builder().template(new Template("dl6-template.doc", "dl6")).placeholders(PLACEHOLDERS).build());
         assertNotNull(result);
-        assertThat(result, is(equalTo(FILE_CONTENT.getBytes())));
+        assertArrayEquals(result, FILE_CONTENT.getBytes());
     }
 
     @Test
