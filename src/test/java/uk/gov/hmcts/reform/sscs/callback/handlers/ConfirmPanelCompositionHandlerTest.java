@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
@@ -11,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIRM_PANEL_COMPOSITION;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.DORMANT_APPEAL_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -187,6 +189,20 @@ public class ConfirmPanelCompositionHandlerTest {
 
         handler.handle(CallbackType.SUBMITTED, callback);
         verify(ccdService, times(0)).updateCase(any(), anyLong(), anyString(), anyString(),anyString(), any());
+    }
+
+    @Test
+    public void givenCaseStateIsResponseReceived_thenCaseStateIsUnchangedAndReviewStateIsAwaitingAdminAction() {
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder()
+                .state(RESPONSE_RECEIVED)
+                .ccdCaseId("1")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
+                    .build()).build(), RESPONSE_RECEIVED, CONFIRM_PANEL_COMPOSITION);
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+        verify(ccdService, times(0)).updateCase(any(), anyLong(), anyString(), anyString(),anyString(), any());
+        assertEquals(callback.getCaseDetails().getCaseData().getInterlocReviewState(), InterlocReviewState.AWAITING_ADMIN_ACTION);
     }
 
     private Object[] generateOtherPartyOptions() {

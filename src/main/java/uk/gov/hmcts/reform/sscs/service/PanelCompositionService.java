@@ -25,6 +25,11 @@ public class PanelCompositionService {
     public void processCaseState(Callback<SscsCaseData> callback, SscsCaseData caseData, EventType eventType) {
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
 
+        if (State.RESPONSE_RECEIVED.equals(caseData.getState())) {
+            caseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
+            return;
+        }
+
         if (stateNotDormant(caseDetails.getState())) {
             if (caseData.getIsFqpmRequired() == null
                 || hasDueDateSetAndOtherPartyWithoutHearingOption(caseData)) {
