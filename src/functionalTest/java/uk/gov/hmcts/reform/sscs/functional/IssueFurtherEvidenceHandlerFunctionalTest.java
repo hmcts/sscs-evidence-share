@@ -63,6 +63,11 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         SscsCaseData caseData = caseDetails.getData();
         assertEquals("failedSendingFurtherEvidence", caseData.getHmctsDwpState());
         List<SscsDocument> docs = caseData.getSscsDocument();
+
+        System.out.println(String.format("1 docs %s", docs.size()));
+        System.out.println(String.format("1 docs AbstractDocument %s", docs.stream().map(SscsDocument::getValue).count()));
+        System.out.println(String.format("1 docs AbstractDocument getEvidenceIssued %s", docs.stream().map(AbstractDocument::getValue).filter(o -> "No".equalsIgnoreCase(o.getEvidenceIssued())).count()));
+
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
@@ -75,6 +80,10 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
+        System.out.println(String.format("2 docs %s", docs.size()));
+        System.out.println(String.format("2 docs AbstractDocument %s", docs.stream().map(SscsDocument::getValue).count()));
+        System.out.println(String.format("2 docs AbstractDocument getEvidenceIssued %s", docs.stream().map(AbstractDocument::getValue).filter(o -> "No".equalsIgnoreCase(o.getEvidenceIssued())).count()));
+
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
@@ -86,6 +95,10 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         SscsCaseDetails caseDetails = findCaseById(String.valueOf(caseDetailsIn.getId()));
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
+
+        System.out.println(String.format("3 docs %s", docs.size()));
+        System.out.println(String.format("3 docs AbstractDocument %s", docs.stream().map(SscsDocument::getValue).count()));
+        System.out.println(String.format("3 docs AbstractDocument getEvidenceIssued %s", docs.stream().map(AbstractDocument::getValue).filter(o -> "No".equalsIgnoreCase(o.getEvidenceIssued())).count()));
 
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
@@ -102,6 +115,10 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         SscsCaseData caseData = caseDetails.getData();
         List<SscsDocument> docs = caseData.getSscsDocument();
 
+        System.out.println(String.format("4 docs %s", docs.size()));
+        System.out.println(String.format("4 docs AbstractDocument %s", docs.stream().map(SscsDocument::getValue).count()));
+        System.out.println(String.format("4 docs AbstractDocument getEvidenceIssued %s", docs.stream().map(AbstractDocument::getValue).filter(o -> "No".equalsIgnoreCase(o.getEvidenceIssued())).count()));
+
         Assertions.assertThat(docs)
             .extracting(SscsDocument::getValue)
             .extracting(SscsDocumentDetails::getEvidenceIssued)
@@ -111,6 +128,4 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         assertEquals(YesNo.YES, caseData.getReasonableAdjustmentsOutstanding());
         assertEquals(2, caseData.getReasonableAdjustmentsLetters().getAppellant().size());
     }
-
-
 }

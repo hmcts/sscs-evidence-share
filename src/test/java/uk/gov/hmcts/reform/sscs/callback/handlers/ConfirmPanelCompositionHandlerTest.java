@@ -228,7 +228,7 @@ public class ConfirmPanelCompositionHandlerTest {
                 HearingOptions.builder().languageInterpreter("No").build()
             },
             new Object[]{
-                HearingOptions.builder().languages("Yes").build()
+                HearingOptions.builder().languages(new DynamicList("Yes")).build()
             },
             new Object[]{
                 HearingOptions.builder().arrangements(Collections.singletonList("Arrange")).build()

@@ -86,7 +86,7 @@ public class PanelCompositionService {
             || (StringUtils.isBlank(hearingOptions.getWantsToAttend())
             && StringUtils.isBlank(hearingOptions.getWantsSupport())
             && StringUtils.isBlank(hearingOptions.getLanguageInterpreter())
-            && StringUtils.isBlank(hearingOptions.getLanguages())
+            && (hearingOptions.getLanguages() == null)
             && StringUtils.isBlank(hearingOptions.getSignLanguageType())
             && (hearingOptions.getArrangements() == null || hearingOptions.getArrangements().isEmpty())
             && StringUtils.isBlank(hearingOptions.getScheduleHearing())
