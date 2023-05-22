@@ -192,7 +192,7 @@ public class ConfirmPanelCompositionHandlerTest {
     }
 
     @Test
-    public void givenCaseStateIsResponseReceived_thenCaseStateIsUnchangedAndReviewStateIsAwaitingAdminAction() {
+    public void givenCaseStateIsResponseReceived_thenCaseStateIsUnchangedAndReviewStateIsNone() {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder()
                 .state(RESPONSE_RECEIVED)
@@ -201,8 +201,8 @@ public class ConfirmPanelCompositionHandlerTest {
                     .build()).build(), RESPONSE_RECEIVED, CONFIRM_PANEL_COMPOSITION);
 
         handler.handle(CallbackType.SUBMITTED, callback);
-        verify(ccdService, times(0)).updateCase(any(), anyLong(), anyString(), anyString(),anyString(), any());
-        assertEquals(callback.getCaseDetails().getCaseData().getInterlocReviewState(), InterlocReviewState.AWAITING_ADMIN_ACTION);
+        verify(ccdService, times(1)).updateCase(any(), anyLong(), anyString(), anyString(),anyString(), any());
+        assertEquals(callback.getCaseDetails().getCaseData().getInterlocReviewState(), InterlocReviewState.NONE);
     }
 
     private Object[] generateOtherPartyOptions() {

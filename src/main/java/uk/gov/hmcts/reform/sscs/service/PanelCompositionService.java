@@ -26,7 +26,12 @@ public class PanelCompositionService {
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
 
         if (State.RESPONSE_RECEIVED.equals(caseDetails.getState())) {
-            caseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION);
+            caseData.setInterlocReviewState(InterlocReviewState.NONE);
+            updateCase(caseData,
+                caseDetails.getId(),
+                EventType.INTERLOC_REVIEW_STATE_AMEND,
+                "",
+                "");
             return;
         }
 
