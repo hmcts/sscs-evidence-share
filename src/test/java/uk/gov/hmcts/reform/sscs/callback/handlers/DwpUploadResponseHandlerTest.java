@@ -350,10 +350,6 @@ public class DwpUploadResponseHandlerTest {
         assertFalse(handler.canHandle(CallbackType.SUBMITTED, callback));
     }
 
-
-
-
-
     @Test
     public void givenADwpUploadResponseEventChildSupportAndContainsFurtherInformationIsYesThenResponseReceived() {
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
@@ -374,26 +370,36 @@ public class DwpUploadResponseHandlerTest {
     }
 
     @Test
-    public void givenADwpUploadResponseEventChildSupportAndContainsFurtherInformationIsNoThenNotListable() {
+    public void givenADwpUploadResponseEventChildSupportAndContainsFurtherInformationIsNoThenDoNotTriggerNotListable() {
 
         final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
             SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
                 .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build())
                 .build(), RESPONSE_RECEIVED, DWP_UPLOAD_RESPONSE);
 
-        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-        when(ccdService.updateCase(any(), any(), any(), any(), any(), any())).thenReturn(SscsCaseDetails.builder().id(1L)
-            .data(callback.getCaseDetails().getCaseData()).build());
-
         handler.handle(CallbackType.SUBMITTED, callback);
 
-        verify(idamService).getIdamTokens();
-        verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
+        verify(idamService, times(0)).getIdamTokens();
+        verify(ccdService, times(0)).updateCase(eq(callback.getCaseDetails().getCaseData()),
             eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
 
+    @Test
+    @Parameters({"WITH_DWP", "READY_TO_LIST",})
+    public void givenAStateForTheCaseAndWhenDwpUploadResponseForSscs2IsRunWhileContainsFurtherInformationIsNoThenDoNotUpdateState(State state) {
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder().ccdCaseId("1").createdInGapsFrom(State.READY_TO_LIST.getId()).dwpFurtherInfo("No")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build()).build())
+                .build(), state, DWP_UPLOAD_RESPONSE);
 
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(idamService, times(0)).getIdamTokens();
+        verify(ccdService, times(0)).updateCase(eq(callback.getCaseDetails().getCaseData()),
+            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
+    }
 
     @Test
     public void givenADwpUploadResponseEventTaxCreditAndContainsFurtherInformationIsYesThenResponseReceived() {

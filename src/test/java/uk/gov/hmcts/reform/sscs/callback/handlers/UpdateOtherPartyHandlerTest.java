@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
@@ -221,6 +222,28 @@ public class UpdateOtherPartyHandlerTest {
         handler.handle(CallbackType.SUBMITTED, callback);
 
         verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
+            eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
+            eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
+    }
+
+    @Test
+    @Parameters({"APPEAL_CREATED, 1", "DORMANT_APPEAL_STATE, 0", "DRAFT, 1", "DRAFT_ARCHIVED, 1",
+        "HEARING, 1", "INCOMPLETE_APPLICATION, 1", "INCOMPLETE_APPLICATION_INFORMATION_REQUESTED, 1",
+        "INTERLOCUTORY_REVIEW_STATE, 1", "POST_HEARING, 1", "READY_TO_LIST, 1", "RESPONSE_RECEIVED, 0",
+        "VALID_APPEAL, 1", "WITH_DWP, 0"})
+    public void givenAnInitialStateThenTriggerNonListableEventType(State currentState, int wantedNumberOfInvocations) {
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder()
+                .ccdCaseId("1")
+                .isFqpmRequired(null)
+                .directionDueDate(null)
+                .otherParties(Arrays.asList(buildOtherParty("2", HearingOptions.builder().wantsToAttend("Yes").build())))
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
+                    .build()).build(), currentState, UPDATE_OTHER_PARTY_DATA);
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+
+        verify(ccdService, times(wantedNumberOfInvocations)).updateCase(eq(callback.getCaseDetails().getCaseData()),
             eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())),
             eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
     }
