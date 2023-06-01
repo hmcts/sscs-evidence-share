@@ -327,7 +327,7 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'sscs-common', version: '4.25.25'
   implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.4'
 
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.0.5'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.1.0'
 
   implementation group: 'org.pitest', name: 'pitest', version: '1.13.0'
   implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.11'
@@ -346,7 +346,7 @@ dependencies {
 
   implementation group: 'org.apache.xmlgraphics', name: 'batik-all', version: '1.16', ext: 'pom'
 
-  implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
+  implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
 
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
