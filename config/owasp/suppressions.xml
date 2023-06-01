@@ -4,4 +4,10 @@
     <cve>CVE-2022-45688</cve>
     <cve>CVE-2023-24998</cve>
   </suppress>
+  <suppress until = "2023-07-01">
+    <notes><![CDATA[
+   file name: snakeyaml-1.33.jar
+   ]]></notes>
+    <cve>CVE-2022-1471</cve>
+  </suppress>
 </suppressions>
