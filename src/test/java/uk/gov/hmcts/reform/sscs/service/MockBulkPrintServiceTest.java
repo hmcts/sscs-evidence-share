@@ -35,7 +35,7 @@ public class MockBulkPrintServiceTest {
     @Test
     public void sendToMockBulkPrint() {
         Optional<UUID> letterIdOptional = mockBulkPrintService.sendToBulkPrint(singletonList(new Pdf("myData".getBytes(), "file.pdf")),
-            SscsCaseData.builder().build());
+            SscsCaseData.builder().build(), null);
         assertEquals(Optional.of(UUID.fromString("abc123ca-c336-11e9-9cb5-123456789abc")), letterIdOptional);
     }
 

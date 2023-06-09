@@ -172,7 +172,7 @@ class IssueGenericLetterHandlerTest {
 
         UUID uuid = UUID.randomUUID();
 
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
+        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.of(uuid));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
         when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
@@ -183,7 +183,7 @@ class IssueGenericLetterHandlerTest {
 
         verify(ccdNotificationService, times(5))
             .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
-        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData));
+        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData), any());
     }
 
     @Test
@@ -208,7 +208,7 @@ class IssueGenericLetterHandlerTest {
 
         UUID uuid = UUID.randomUUID();
 
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
+        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.of(uuid));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
 
@@ -218,7 +218,7 @@ class IssueGenericLetterHandlerTest {
 
         verify(ccdNotificationService, times(5))
             .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
-        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData));
+        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData), any());
     }
 
     @Test
@@ -255,7 +255,7 @@ class IssueGenericLetterHandlerTest {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToAllParties(YesNo.YES);
 
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.empty());
+        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.empty());
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
 
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
@@ -263,7 +263,7 @@ class IssueGenericLetterHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any());
-        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), eq(caseData));
+        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), eq(caseData), any());
     }
 
     @Test
@@ -277,7 +277,7 @@ class IssueGenericLetterHandlerTest {
         UUID uuid = UUID.randomUUID();
 
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
+        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.of(uuid));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(pdfBytes);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(pdfBytes);
@@ -288,7 +288,7 @@ class IssueGenericLetterHandlerTest {
 
         verify(ccdNotificationService, times(1))
             .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
-        verify(bulkPrintService, times(1)).sendToBulkPrint(any(), eq(caseData));
+        verify(bulkPrintService, times(1)).sendToBulkPrint(any(), eq(caseData), any());
     }
 
     private static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty, Representative representative) {

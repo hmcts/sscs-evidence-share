@@ -11,5 +11,5 @@ import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 public interface PrintService {
     Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event);
 
-    Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData);
+    Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData, EventType eventType);
 }

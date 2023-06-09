@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
+import static java.util.Objects.nonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +15,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
@@ -55,13 +56,13 @@ public class BulkPrintService implements PrintService {
             log.info("Sending to bulk print service {} reasonable adjustments", sscsCaseData.getCcdCaseId());
             bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
         } else {
-            return sendToBulkPrint(pdfs, sscsCaseData);
+            return sendToBulkPrint(pdfs, sscsCaseData, event);
         }
 
         return Optional.empty();
     }
 
-    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData)
+    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, EventType eventType)
         throws BulkPrintException {
         if (sendLetterEnabled) {
             List<String> encodedData = new ArrayList<>();
@@ -69,15 +70,15 @@ public class BulkPrintService implements PrintService {
                 encodedData.add(getEncoder().encodeToString(pdf.getContent()));
             }
             final String authToken = idamService.generateServiceAuthorization();
-            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, 1);
+            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, 1, eventType);
         }
         return Optional.empty();
     }
 
     private Optional<UUID> sendLetterWithRetry(String authToken, SscsCaseData sscsCaseData, List<String> encodedData,
-                                               Integer reTryNumber) {
+                                               Integer reTryNumber, EventType eventType) {
         try {
-            return sendLetter(authToken, sscsCaseData, encodedData);
+            return sendLetter(authToken, sscsCaseData, encodedData, eventType);
         } catch (HttpClientErrorException e) {
             log.info(format("Failed to send to bulk print for case %s with error %s. Non-pdf's/broken pdf's seen in list of documents, please correct.",
                 sscsCaseData.getCcdCaseId(), e.getMessage()));
@@ -92,17 +93,17 @@ public class BulkPrintService implements PrintService {
             }
             log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
                 e.getMessage(), reTryNumber, maxRetryAttempts));
-            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, reTryNumber + 1);
+            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, reTryNumber + 1, eventType);
         }
     }
 
-    private Optional<UUID> sendLetter(String authToken, SscsCaseData sscsCaseData, List<String> encodedData) {
+    private Optional<UUID> sendLetter(String authToken, SscsCaseData sscsCaseData, List<String> encodedData, EventType eventType) {
         SendLetterResponse sendLetterResponse = sendLetterApi.sendLetter(
             authToken,
             new LetterWithPdfsRequest(
                 encodedData,
                 XEROX_TYPE_PARAMETER,
-                getAdditionalData(sscsCaseData)
+                getAdditionalData(sscsCaseData, eventType)
             )
         );
         log.info("Letter service produced the following letter Id {} for case {}",
@@ -111,11 +112,53 @@ public class BulkPrintService implements PrintService {
         return Optional.of(sendLetterResponse.letterId);
     }
 
-    private static Map<String, Object> getAdditionalData(final SscsCaseData sscsCaseData) {
+    private static Map<String, Object> getAdditionalData(final SscsCaseData sscsCaseData, EventType eventType) {
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put(LETTER_TYPE_KEY, "sscs-data-pack");
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
+
+        if (EventType.ACTION_FURTHER_EVIDENCE.equals(eventType)) {
+            additionalData.put("recipients", getPartiesOnTheCase(sscsCaseData));
+        }
         return additionalData;
+    }
+
+    private static List<String> getPartiesOnTheCase(SscsCaseData caseData) {
+        Appeal appeal = caseData.getAppeal();
+        Appellant appellant = appeal.getAppellant();
+
+        // possible parties: Appellant, Appointee, Joint Party, Representative, Other Party, Other Party Rep and Other Party Appointee
+
+        List<String> parties = new ArrayList<>();
+
+        parties.add(appellant.getName().getFullNameNoTitle());
+        if (nonNull(appellant.getAppointee()) && isYes(appellant.getIsAppointee())) {
+            parties.add(appellant.getAppointee().getName().getFullNameNoTitle());
+        }
+        if (caseData.isThereAJointParty()) {
+            parties.add(caseData.getJointParty().getName().getFullNameNoTitle());
+        }
+        if (caseData.isThereARepresentative()) {
+            parties.add(appeal.getRep().getName().getFullNameNoTitle());
+        }
+
+
+        List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
+        if (nonNull(otherParties)) {
+            for (CcdValue<OtherParty> ccdOtherParty : otherParties) {
+                OtherParty otherParty = ccdOtherParty.getValue();
+                parties.add(otherParty.getName().getFullNameNoTitle());
+
+                if (otherParty.hasRepresentative()) {
+                    parties.add(otherParty.getRep().getName().getFullNameNoTitle());
+                }
+                if (otherParty.hasAppointee()) {
+                    parties.add(otherParty.getAppointee().getName().getFullNameNoTitle());
+                }
+            }
+        }
+
+        return parties;
     }
 }

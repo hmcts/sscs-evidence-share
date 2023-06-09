@@ -194,7 +194,7 @@ public class EvidenceShareServiceIt {
         when(evidenceManagementService.upload(any(), eq("sscs"))).thenReturn(uploadResponse);
         when(ccdService.updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any())).thenReturn(expectedOptionalUuid);
 
         String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
         when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
@@ -209,7 +209,7 @@ public class EvidenceShareServiceIt {
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementService).upload(any(), eq("sscs"));
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any());
-        verify(bulkPrintService).sendToBulkPrint(any(), any());
+        verify(bulkPrintService).sendToBulkPrint(any(), any(), any());
         verify(emailService).sendEmail(anyLong(), any());
 
         verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());
@@ -234,7 +234,7 @@ public class EvidenceShareServiceIt {
         when(evidenceManagementSecureDocStoreService.upload(any(), any())).thenReturn(uploadResponse);
         when(ccdService.updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any())).thenReturn(SscsCaseDetails.builder().build());
 
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any())).thenReturn(expectedOptionalUuid);
 
         String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: dl16-12345656789.pdf, sscs1.pdf, filename1.pdf";
         when(ccdService.updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any())).thenReturn(SscsCaseDetails.builder().build());
@@ -249,7 +249,7 @@ public class EvidenceShareServiceIt {
         verify(restTemplate).postForEntity(anyString(), any(), eq(byte[].class));
         verify(evidenceManagementSecureDocStoreService).upload(any(), any());
         verify(ccdService).updateCase(any(), any(), any(), any(), eq("Uploaded dl16-12345656789.pdf into SSCS"), any());
-        verify(bulkPrintService).sendToBulkPrint(any(), any());
+        verify(bulkPrintService).sendToBulkPrint(any(), any(), any());
         verify(emailService).sendEmail(anyLong(), any());
 
         verify(ccdService).updateCase(any(), any(), eq(EventType.SENT_TO_DWP.getCcdType()), any(), eq(documentList), any());

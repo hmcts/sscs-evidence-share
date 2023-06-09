@@ -101,11 +101,11 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         docmosisTemplate = getDocmosisTemplate(caseData);
         docmosisCoverSheetTemplate = getDocmosisCoverSheet(caseData);
 
-        process(caseDetailsId, caseData);
+        process(caseDetailsId, caseData, callback.getEvent());
     }
 
-    private void sendLetter(long caseId, SscsCaseData caseData, List<Pdf> pdfs) {
-        Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData);
+    private void sendLetter(long caseId, SscsCaseData caseData, List<Pdf> pdfs, EventType eventType) {
+        Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData, eventType);
         //Optional.of(UUID.randomUUID());
 
         Pdf letter = pdfs.get(0);
@@ -129,7 +129,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
             .get("generic-letter").get("cover");
     }
 
-    private void process(long caseId, SscsCaseData caseData) {
+    private void process(long caseId, SscsCaseData caseData, EventType eventType) {
         log.info("Process the issue generic letter for the case : " + caseId);
         List<Pdf> documents = new ArrayList<>();
 
@@ -138,30 +138,30 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         }
 
         if (YesNo.isYes(caseData.getSendToAllParties())) {
-            sendToAllParties(caseId, caseData, documents);
+            sendToAllParties(caseId, caseData, documents, eventType);
             return;
         }
 
         if (YesNo.isYes(caseData.getSendToApellant())) {
-            sendToAppellant(caseId, caseData, documents);
+            sendToAppellant(caseId, caseData, documents, eventType);
         }
 
         if (YesNo.isYes(caseData.getSendToRepresentative())) {
-            sendToRepresentative(caseId, caseData, documents);
+            sendToRepresentative(caseId, caseData, documents, eventType);
         }
 
         if (YesNo.isYes(caseData.getSendToJointParty())) {
-            sendToJointParty(caseId, caseData, documents);
+            sendToJointParty(caseId, caseData, documents, eventType);
         }
 
         if (YesNo.isYes(caseData.getSendToOtherParties())) {
-            sendToOtherParties(caseId, caseData, documents);
+            sendToOtherParties(caseId, caseData, documents, eventType);
         }
 
         // TODO check if blank page on odd page ending is needed
     }
 
-    private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents, EventType eventType) {
         log.info("Sending letter to other party");
         var selectedOtherParties = caseData.getOtherPartySelection();
         var otherParties = caseData.getOtherParties();
@@ -175,7 +175,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
                     var letterType = getLetterType(otherParty, entityId);
 
                     List<Pdf> letter = getLetterPdfs(caseData, documents, letterType, entityId);
-                    sendLetter(caseId, caseData, letter);
+                    sendLetter(caseId, caseData, letter, eventType);
                 }
             }
         }
@@ -187,38 +187,38 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         return hasRepresentative ? FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER : FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
     }
 
-    private void sendToJointParty(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToJointParty(long caseId, SscsCaseData caseData, List<Pdf> documents, EventType eventType) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.JOINT_PARTY_LETTER);
-        sendLetter(caseId, caseData, letter);
+        sendLetter(caseId, caseData, letter, eventType);
     }
 
-    private void sendToRepresentative(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToRepresentative(long caseId, SscsCaseData caseData, List<Pdf> documents, EventType eventType) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
-        sendLetter(caseId, caseData, letter);
+        sendLetter(caseId, caseData, letter, eventType);
     }
 
-    private void sendToAppellant(long caseId, SscsCaseData caseData, List<Pdf> documents) {
+    private void sendToAppellant(long caseId, SscsCaseData caseData, List<Pdf> documents, EventType eventType) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.APPELLANT_LETTER);
-        sendLetter(caseId, caseData, letter);
+        sendLetter(caseId, caseData, letter, eventType);
     }
 
     private static String getLetterName(Map<String, Object> placeholders) {
         return String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
     }
 
-    private void sendToAllParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
-        sendToAppellant(caseId, caseData, documents);
+    private void sendToAllParties(long caseId, SscsCaseData caseData, List<Pdf> documents, EventType eventType) {
+        sendToAppellant(caseId, caseData, documents, eventType);
 
         if (caseData.isThereARepresentative()) {
-            sendToRepresentative(caseId, caseData, documents);
+            sendToRepresentative(caseId, caseData, documents, eventType);
         }
 
         if (caseData.isThereAJointParty()) {
-            sendToJointParty(caseId, caseData, documents);
+            sendToJointParty(caseId, caseData, documents, eventType);
         }
 
         if (isNotEmpty(caseData.getOtherParties())) {
-            sendToOtherParties(caseId, caseData, documents);
+            sendToOtherParties(caseId, caseData, documents, eventType);
         }
     }
 

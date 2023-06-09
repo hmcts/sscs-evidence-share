@@ -55,7 +55,7 @@ public class BulkPrintServiceIt {
     @Ignore("need to get send-letter-service working locally")
     public void willSendFileToBulkPrint() {
         Optional<UUID> uuidOptional = bulkPrintService.sendToBulkPrint(
-            singletonList(new Pdf("my data".getBytes(), "file.pdf")), SSCS_CASE_DATA);
+            singletonList(new Pdf("my data".getBytes(), "file.pdf")), SSCS_CASE_DATA, null);
         assertTrue("a uuid should exist", uuidOptional.isPresent());
     }
 }

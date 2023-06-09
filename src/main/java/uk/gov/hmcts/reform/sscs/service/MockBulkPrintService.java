@@ -27,7 +27,7 @@ public class MockBulkPrintService implements PrintService {
         this.bulkPrintServiceHelper = bulkPrintServiceHelper;
     }
 
-    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData) {
+    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData, EventType eventType) {
         logger.info("No bulk print operation needs to be performed as 'Bulk print url' is switched off.");
         return Optional.of(UUID.fromString("abc123ca-c336-11e9-9cb5-123456789abc"));
     }

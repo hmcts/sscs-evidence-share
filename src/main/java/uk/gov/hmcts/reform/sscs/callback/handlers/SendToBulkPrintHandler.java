@@ -205,7 +205,7 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
 
             List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
-            Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
+            Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData, sscsCaseDataCallback.getEvent());
 
             if (id.isPresent()) {
                 BulkPrintInfo info = BulkPrintInfo.builder()
