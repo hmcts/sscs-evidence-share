@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +15,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
@@ -30,6 +31,7 @@ public class BulkPrintService implements PrintService {
     private static final String CASE_IDENTIFIER = "caseIdentifier";
     private static final String LETTER_TYPE_KEY = "letterType";
     private static final String APPELLANT_NAME = "appellantName";
+    public static final String RECIPIENTS = "recipients";
 
     private final SendLetterApi sendLetterApi;
     private final IdamService idamService;
@@ -116,6 +118,62 @@ public class BulkPrintService implements PrintService {
         additionalData.put(LETTER_TYPE_KEY, "sscs-data-pack");
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
+        additionalData.put(RECIPIENTS, getPartiesOnTheCase(sscsCaseData));
         return additionalData;
+    }
+
+    private static List<String> getPartiesOnTheCase(SscsCaseData caseData) {
+        log.info("Getting recipients on the case for additional data for caseId {}", caseData.getCcdCaseId());
+        List<String> parties = new ArrayList<>();
+        Appeal appeal = caseData.getAppeal();
+        Appellant appellant = appeal.getAppellant();
+
+        parties.add(appellant.getName().getFullNameNoTitle());
+        if (hasAppointee(appellant.getAppointee(), appellant.getIsAppointee())
+            && isNameNonNull(appellant.getAppointee().getName())) {
+            parties.add(appellant.getAppointee().getName().getFullNameNoTitle());
+        }
+        if (caseData.isThereARepresentative()
+            && isNameNonNull(appeal.getRep().getName())) {
+            parties.add(appeal.getRep().getName().getFullNameNoTitle());
+        }
+        if (caseData.isThereAJointParty()
+            && isNameNonNull(caseData.getJointParty().getName())) {
+            parties.add(caseData.getJointParty().getName().getFullNameNoTitle());
+        }
+
+        List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
+        if (nonNull(otherParties)) {
+            for (CcdValue<OtherParty> ccdOtherParty : otherParties) {
+                OtherParty otherParty = ccdOtherParty.getValue();
+
+                if (hasAppointee(otherParty.getAppointee(), otherParty.getIsAppointee())
+                    && isNameNonNull(otherParty.getAppointee().getName())) {
+                    parties.add(otherParty.getAppointee().getName().getFullNameNoTitle());
+                } else if (isNameNonNull(otherParty.getName())) {
+                    parties.add(otherParty.getName().getFullNameNoTitle());
+                }
+
+                if (otherParty.hasRepresentative()
+                    && isNameNonNull(otherParty.getRep().getName())) {
+                    parties.add(otherParty.getRep().getName().getFullNameNoTitle());
+                }
+            }
+        }
+
+        log.info("{} recipients found on the case for additional data for caseId {}",
+            parties.size(),
+            caseData.getCcdCaseId());
+        return parties;
+    }
+
+    private static boolean isNameNonNull(Name name) {
+        return nonNull(name)
+            && nonNull(name.getFirstName())
+            && nonNull(name.getLastName());
+    }
+
+    private static boolean hasAppointee(Appointee appointee, String isAppointee) {
+        return !equalsIgnoreCase(isAppointee, "No") && nonNull(appointee) && isNameNonNull(appointee.getName());
     }
 }

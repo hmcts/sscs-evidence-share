@@ -6,8 +6,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,6 +84,90 @@ public class BulkPrintServiceTest {
             .thenReturn(new SendLetterResponse(LETTER_ID));
         Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
         assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
+    }
+
+    @Test
+    public void willSendToBulkPrintWithAdditionalDataThatIncludesRecipients() {
+        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture())).thenReturn(new SendLetterResponse(LETTER_ID));
+        Appointee appointee = Appointee.builder()
+            .name(Name.builder().firstName("Barry").lastName("Allen").build())
+            .address(Address.builder().line1("line1").build())
+            .build();
+        SSCS_CASE_DATA.getAppeal().getAppellant().setAppointee(appointee);
+        SSCS_CASE_DATA.getAppeal().getAppellant().setIsAppointee("Yes");
+
+        JointParty jointParty = JointParty.builder()
+            .hasJointParty(YES)
+            .name(Name.builder().firstName("Jay").lastName("Garrick").build())
+            .build();
+        SSCS_CASE_DATA.setJointParty(jointParty);
+
+        Representative representative = Representative.builder()
+            .hasRepresentative("YES")
+            .name(Name.builder().firstName("Wally").lastName("West").build())
+            .build();
+        SSCS_CASE_DATA.getAppeal().setRep(representative);
+
+        CcdValue<OtherParty> otherParty1 = CcdValue.<OtherParty>builder()
+            .value(OtherParty.builder()
+                .id("1")
+                .name(Name.builder().firstName("Hunter").lastName("Zolomon").build())
+                .isAppointee(NO.getValue())
+                .build())
+            .build();
+        CcdValue<OtherParty> otherParty2 = CcdValue.<OtherParty>builder()
+            .value(OtherParty.builder()
+                .id("2")
+                .name(Name.builder().firstName("Jessie").lastName("Quick").build())
+                .isAppointee(NO.getValue())
+                .rep(Representative.builder()
+                    .hasRepresentative("YES")
+                    .name(Name.builder().firstName("Max").lastName("Mercury").build())
+                    .build())
+                .build())
+            .build();
+        CcdValue<OtherParty> otherParty3 = CcdValue.<OtherParty>builder()
+            .value(OtherParty.builder()
+                .id("3")
+                .name(Name.builder().firstName("Caitlin").lastName("Snow").build())
+                .isAppointee(YES.getValue())
+                .appointee(Appointee.builder()
+                    .name(Name.builder().firstName("Cisco").lastName("Ramone").build())
+                    .address(Address.builder().line1("line1").build())
+                    .build())
+                .build())
+            .build();
+        CcdValue<OtherParty> otherParty4 = CcdValue.<OtherParty>builder()
+            .value(OtherParty.builder()
+                .id("4")
+                .name(Name.builder().firstName("Harrison").lastName("Wells").build())
+                .rep(Representative.builder()
+                    .hasRepresentative("YES")
+                    .name(Name.builder().firstName("Eddie").lastName("Thawne").build())
+                    .build())
+                .isAppointee(YES.getValue())
+                .appointee(Appointee.builder()
+                    .name(Name.builder().firstName("Eobard").lastName("Thawne").build())
+                    .address(Address.builder().line1("line1").build())
+                    .build())
+                .build())
+            .build();
+
+        SSCS_CASE_DATA.setOtherParties(Arrays.asList(otherParty1, otherParty2, otherParty3, otherParty4));
+        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+
+        List<String> parties = new ArrayList<>();
+        parties.add("Appellant LastName");
+        parties.add("Barry Allen");
+        parties.add("Wally West");
+        parties.add("Jay Garrick");
+        parties.add("Hunter Zolomon");
+        parties.add("Jessie Quick");
+        parties.add("Max Mercury");
+        parties.add("Cisco Ramone");
+        parties.add("Eobard Thawne");
+        parties.add("Eddie Thawne");
+        assertEquals(parties, captor.getValue().getAdditionalData().get("recipients"));
     }
 
     @Test(expected = BulkPrintException.class)
