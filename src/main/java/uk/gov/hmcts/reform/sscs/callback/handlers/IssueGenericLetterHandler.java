@@ -130,6 +130,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     }
 
     private void process(long caseId, SscsCaseData caseData, EventType eventType) {
+        
         log.info("Process the issue generic letter for the case : " + caseId);
         List<Pdf> documents = new ArrayList<>();
 
