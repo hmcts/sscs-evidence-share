@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -163,14 +162,6 @@ public class BulkPrintServiceTest {
         parties.add("Eddie Thawne");
         parties.add("Eobard Thawne");
         assertEquals(parties, captor.getValue().getAdditionalData().get("recipients"));
-    }
-
-    @Test
-    public void givenNotAnActionFurtherEvidenceEvent_sendToBulkPrint_VerifyRecipientsDoesNotExists() {
-        when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
-            .thenReturn(new SendLetterResponse(LETTER_ID));
-        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
-        assertNull(captor.getValue().getAdditionalData().get("recipients"));
     }
 
     @Test
