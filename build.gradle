@@ -3,7 +3,7 @@ plugins {
   id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.0'
-  id 'org.springframework.boot' version '2.7.11'
+  id 'org.springframework.boot' version '2.7.12'
   id 'uk.gov.hmcts.java' version '0.12.43'
   id 'com.github.ben-manes.versions' version '0.46.0'
   id 'org.owasp.dependencycheck' version '8.2.1'
@@ -376,7 +376,7 @@ dependencies {
   // Contract Tests
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.39'
-  contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.11'
+  contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.12'
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.2'
   contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.2'
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.2'
