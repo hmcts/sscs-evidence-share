@@ -118,7 +118,7 @@ public class BulkPrintService implements PrintService {
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
         List<String> parties = new ArrayList<>();
         parties.add("test name");
-        additionalData.put("key", parties);
+        additionalData.put("recipients", parties);
         return additionalData;
     }
 }
