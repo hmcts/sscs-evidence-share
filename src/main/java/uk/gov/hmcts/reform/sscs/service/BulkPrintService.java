@@ -117,7 +117,7 @@ public class BulkPrintService implements PrintService {
         additionalData.put(LETTER_TYPE_KEY, "sscs-data-pack");
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
-        additionalData.put(RECIPIENTS, "Barry Allen");
+        additionalData.put("key", "Barry Allen, Oliver Queen");
         return additionalData;
     }
 }
