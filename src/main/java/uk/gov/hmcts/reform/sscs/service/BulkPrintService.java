@@ -118,16 +118,7 @@ public class BulkPrintService implements PrintService {
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
         List<String> parties = new ArrayList<>();
-        parties.add("Appellant LastName");
-        parties.add("Barry Allen");
-        parties.add("Wally West");
-        parties.add("Jay Garrick");
-        parties.add("Hunter Zolomon");
-        parties.add("Jessie Quick");
-        parties.add("Max Mercury");
-        parties.add("Cisco Ramone");
-        parties.add("Eobard Thawne");
-        parties.add("Eddie Thawne");
+        parties.add("Appellant");
         additionalData.put(RECIPIENTS, parties.toString());
         return additionalData;
     }
