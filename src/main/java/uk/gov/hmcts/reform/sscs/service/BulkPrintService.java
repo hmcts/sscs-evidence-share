@@ -30,7 +30,6 @@ public class BulkPrintService implements PrintService {
     private static final String CASE_IDENTIFIER = "caseIdentifier";
     private static final String LETTER_TYPE_KEY = "letterType";
     private static final String APPELLANT_NAME = "appellantName";
-    private static final String RECIPIENTS = "recipients";
 
     private final SendLetterApi sendLetterApi;
     private final IdamService idamService;
