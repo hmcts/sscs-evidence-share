@@ -113,6 +113,7 @@ public class BulkPrintService implements PrintService {
 
     private static Map<String, Object> getAdditionalData(final SscsCaseData sscsCaseData) {
         Map<String, Object> additionalData = new HashMap<>();
+
         additionalData.put(LETTER_TYPE_KEY, "sscs-data-pack");
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
