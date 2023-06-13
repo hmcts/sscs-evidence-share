@@ -30,6 +30,7 @@ public class BulkPrintService implements PrintService {
     private static final String CASE_IDENTIFIER = "caseIdentifier";
     private static final String LETTER_TYPE_KEY = "letterType";
     private static final String APPELLANT_NAME = "appellantName";
+    private static final String RECIPIENTS = "recipients";
 
     private final SendLetterApi sendLetterApi;
     private final IdamService idamService;
@@ -117,8 +118,17 @@ public class BulkPrintService implements PrintService {
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
         List<String> parties = new ArrayList<>();
-        parties.add("test");
-        additionalData.put("key", parties.toString());
+        parties.add("Appellant LastName");
+        parties.add("Barry Allen");
+        parties.add("Wally West");
+        parties.add("Jay Garrick");
+        parties.add("Hunter Zolomon");
+        parties.add("Jessie Quick");
+        parties.add("Max Mercury");
+        parties.add("Cisco Ramone");
+        parties.add("Eobard Thawne");
+        parties.add("Eddie Thawne");
+        additionalData.put(RECIPIENTS, parties.toString());
         return additionalData;
     }
 }
