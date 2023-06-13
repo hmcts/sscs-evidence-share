@@ -116,7 +116,7 @@ public class BulkPrintService implements PrintService {
         additionalData.put(LETTER_TYPE_KEY, "sscs-data-pack");
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
-        additionalData.put("key", "Appellant LastName, Barry Allen, Wally West, Jay Garrick, Hunter Zolomon, Jessie Quick, Max Mercury, Cisco Ramone, Eobard Thawne, Eddie Thawne");
+        additionalData.put("recipients", "Appellant LastName, Barry Allen, Wally West, Jay Garrick, Hunter Zolomon, Jessie Quick, Max Mercury, Cisco Ramone, Eobard Thawne, Eddie Thawne");
         return additionalData;
     }
 }
