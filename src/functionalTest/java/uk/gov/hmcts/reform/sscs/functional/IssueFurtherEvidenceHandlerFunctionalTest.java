@@ -25,7 +25,6 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     @Test
     public void givenIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
-        System.out.println("running givenIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes");
         String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType());
         simulateCcdCallback(issueFurtherEvidenceCallback);
         verifyEvidenceIssued();
@@ -42,7 +41,6 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     @Test
     public void givenIssueFurtherEventIsTriggeredWithReasonableAdjustment_shouldNotBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
-        System.out.println("running givenIssueFurtherEventIsTriggeredWithReasonableAdjustment_shouldNotBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes");
         SscsCaseDetails caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
         String issueFurtherEvidenceCallback = uploadCaseDocuments(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ReasonableAdjustment", caseDetails);
 
@@ -53,7 +51,6 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     @Test
     public void givenIssueFurtherEventIsTriggeredWithExistingReasonableAdjustment_shouldNotBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
-        System.out.println("running givenIssueFurtherEventIsTriggeredWithExistingReasonableAdjustment_shouldNotBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes");
         SscsCaseDetails caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
         String issueFurtherEvidenceCallback = uploadCaseDocuments(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ExistingReasonableAdjustment", caseDetails);
 
