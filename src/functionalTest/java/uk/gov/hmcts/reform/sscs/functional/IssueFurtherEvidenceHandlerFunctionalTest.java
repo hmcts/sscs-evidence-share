@@ -27,6 +27,7 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     @Ignore("test failing due to 409 conflict error - documents generated during test are already duplicate that needs to be amended before sent to bulk print.")
     public void givenIssueFurtherEventIsTriggered_shouldBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
+        // TODO: SSCS-11780
         String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType());
         simulateCcdCallback(issueFurtherEvidenceCallback);
         verifyEvidenceIssued();
@@ -44,6 +45,7 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     @Ignore("test failing due to 409 conflict error - documents generated during test are already duplicate that needs to be amended before sent to bulk print.")
     public void givenIssueFurtherEventIsTriggeredWithReasonableAdjustment_shouldNotBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
+        // TODO: SSCS-11780
         SscsCaseDetails caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
         String issueFurtherEvidenceCallback = uploadCaseDocuments(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ReasonableAdjustment", caseDetails);
 
@@ -55,6 +57,7 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     @Ignore("test failing due to 409 conflict error - documents generated during test are already duplicate that needs to be amended before sent to bulk print.")
     public void givenIssueFurtherEventIsTriggeredWithExistingReasonableAdjustment_shouldNotBulkPrintEvidenceAndCoverLetterAndSetEvidenceIssuedToYes()
         throws IOException {
+        // TODO: SSCS-11780
         SscsCaseDetails caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
         String issueFurtherEvidenceCallback = uploadCaseDocuments(ISSUE_FURTHER_EVIDENCE.getCcdType() + "ExistingReasonableAdjustment", caseDetails);
 
