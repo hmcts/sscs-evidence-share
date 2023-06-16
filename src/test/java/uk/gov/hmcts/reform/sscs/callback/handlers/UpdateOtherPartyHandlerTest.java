@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -260,7 +261,12 @@ public class UpdateOtherPartyHandlerTest {
                 HearingOptions.builder().languageInterpreter("No").build()
             },
             new Object[]{
-                HearingOptions.builder().languages(new DynamicList("Yes")).build()
+                HearingOptions.builder().languages(
+                    new DynamicList(
+                        new DynamicListItem("eng", "English"),
+                        List.of(new DynamicListItem("arm", "Armenian"), new DynamicListItem("dut", "Dutch"))
+                    )
+                ).build()
             },
             new Object[]{
                 HearingOptions.builder().arrangements(Collections.singletonList("Arrange")).build()
