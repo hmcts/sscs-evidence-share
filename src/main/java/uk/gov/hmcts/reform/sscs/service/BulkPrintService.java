@@ -125,21 +125,31 @@ public class BulkPrintService implements PrintService {
     private static List<String> getPartiesOnTheCase(SscsCaseData caseData) {
         log.info("Getting recipients on the case for additional data for caseId {}", caseData.getCcdCaseId());
         List<String> parties = new ArrayList<>();
+
         Appeal appeal = caseData.getAppeal();
         Appellant appellant = appeal.getAppellant();
+        if (nonNull(appellant)
+            && isNameNonNull(appellant.getName())) {
+            parties.add(appellant.getName().getFullNameNoTitle());
+        }
 
-        parties.add(appellant.getName().getFullNameNoTitle());
-        if (hasAppointee(appellant.getAppointee(), appellant.getIsAppointee())
-            && isNameNonNull(appellant.getAppointee().getName())) {
-            parties.add(appellant.getAppointee().getName().getFullNameNoTitle());
+        Appointee appointee = appellant.getAppointee();
+        if (hasAppointee(appointee, appellant.getIsAppointee())
+            && isNameNonNull(appointee.getName())) {
+            parties.add(appointee.getName().getFullNameNoTitle());
         }
-        if (caseData.isThereARepresentative()
-            && isNameNonNull(appeal.getRep().getName())) {
-            parties.add(appeal.getRep().getName().getFullNameNoTitle());
+
+        Representative representative = appeal.getRep();
+        if (nonNull(representative)
+            && caseData.isThereARepresentative()
+            && isNameNonNull(representative.getName())) {
+            parties.add(representative.getName().getFullNameNoTitle());
         }
-        if (caseData.isThereAJointParty()
-            && isNameNonNull(caseData.getJointParty().getName())) {
-            parties.add(caseData.getJointParty().getName().getFullNameNoTitle());
+        JointParty jointParty = caseData.getJointParty();
+        if (nonNull(jointParty)
+            && caseData.isThereAJointParty()
+            && isNameNonNull(jointParty.getName())) {
+            parties.add(jointParty.getName().getFullNameNoTitle());
         }
 
         List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
@@ -147,16 +157,18 @@ public class BulkPrintService implements PrintService {
             for (CcdValue<OtherParty> ccdOtherParty : otherParties) {
                 OtherParty otherParty = ccdOtherParty.getValue();
 
-                if (hasAppointee(otherParty.getAppointee(), otherParty.getIsAppointee())
-                    && isNameNonNull(otherParty.getAppointee().getName())) {
-                    parties.add(otherParty.getAppointee().getName().getFullNameNoTitle());
+                Appointee otherPartyAppointee = otherParty.getAppointee();
+                if (hasAppointee(otherPartyAppointee, otherParty.getIsAppointee())
+                    && isNameNonNull(otherPartyAppointee.getName())) {
+                    parties.add(otherPartyAppointee.getName().getFullNameNoTitle());
                 } else if (isNameNonNull(otherParty.getName())) {
                     parties.add(otherParty.getName().getFullNameNoTitle());
                 }
 
+                Representative otherPartyRepresentative = otherParty.getRep();
                 if (otherParty.hasRepresentative()
-                    && isNameNonNull(otherParty.getRep().getName())) {
-                    parties.add(otherParty.getRep().getName().getFullNameNoTitle());
+                    && isNameNonNull(otherPartyRepresentative.getName())) {
+                    parties.add(otherPartyRepresentative.getName().getFullNameNoTitle());
                 }
             }
         }
