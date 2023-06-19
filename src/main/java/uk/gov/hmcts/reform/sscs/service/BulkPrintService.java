@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.ObjectUtils.allNotNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 import java.util.*;
@@ -180,9 +181,7 @@ public class BulkPrintService implements PrintService {
     }
 
     private static boolean isNameNonNull(Name name) {
-        return nonNull(name)
-            && nonNull(name.getFirstName())
-            && nonNull(name.getLastName());
+        return allNotNull(name, name.getFirstName(), name.getLastName());
     }
 
     private static boolean hasAppointee(Appointee appointee, String isAppointee) {
