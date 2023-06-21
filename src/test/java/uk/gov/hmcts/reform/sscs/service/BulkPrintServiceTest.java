@@ -89,67 +89,88 @@ public class BulkPrintServiceTest {
     @Test
     public void willSendToBulkPrintWithAdditionalDataThatIncludesRecipients() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture())).thenReturn(new SendLetterResponse(LETTER_ID));
-        Appointee appointee = Appointee.builder()
-            .name(Name.builder().firstName("Barry").lastName("Allen").build())
-            .address(Address.builder().line1("line1").build())
+        Name name1 = Name.builder().firstName("Barry").lastName("Allen").build();
+        Address address1 = Address.builder().line1("line1").build();
+        Appointee appointee1 = Appointee.builder()
+            .name(name1)
+            .address(address1)
             .build();
-        SSCS_CASE_DATA.getAppeal().getAppellant().setAppointee(appointee);
-        SSCS_CASE_DATA.getAppeal().getAppellant().setIsAppointee("Yes");
 
+        Appellant appellant = SSCS_CASE_DATA.getAppeal().getAppellant();
+        appellant.setAppointee(appointee1);
+        appellant.setIsAppointee("Yes");
+
+        Name name2 = Name.builder().firstName("Jay").lastName("Garrick").build();
         JointParty jointParty = JointParty.builder()
             .hasJointParty(YES)
-            .name(Name.builder().firstName("Jay").lastName("Garrick").build())
+            .name(name2)
             .build();
         SSCS_CASE_DATA.setJointParty(jointParty);
 
+        Name name3 = Name.builder().firstName("Wally").lastName("West").build();
         Representative representative = Representative.builder()
             .hasRepresentative("YES")
-            .name(Name.builder().firstName("Wally").lastName("West").build())
+            .name(name3)
             .build();
         SSCS_CASE_DATA.getAppeal().setRep(representative);
 
+        Name name4 = Name.builder().firstName("Hunter").lastName("Zolomon").build();
         CcdValue<OtherParty> otherParty1 = CcdValue.<OtherParty>builder()
             .value(OtherParty.builder()
                 .id("1")
-                .name(Name.builder().firstName("Hunter").lastName("Zolomon").build())
+                .name(name4)
                 .isAppointee(NO.getValue())
                 .build())
+            .build();
+
+        Name name5 = Name.builder().firstName("Jessie").lastName("Quick").build();
+        Name name6 = Name.builder().firstName("Max").lastName("Mercury").build();
+        Representative representative1 = Representative.builder()
+            .hasRepresentative("YES")
+            .name(name6)
             .build();
         CcdValue<OtherParty> otherParty2 = CcdValue.<OtherParty>builder()
             .value(OtherParty.builder()
                 .id("2")
-                .name(Name.builder().firstName("Jessie").lastName("Quick").build())
+                .name(name5)
                 .isAppointee(NO.getValue())
-                .rep(Representative.builder()
-                    .hasRepresentative("YES")
-                    .name(Name.builder().firstName("Max").lastName("Mercury").build())
-                    .build())
+                .rep(representative1)
                 .build())
+            .build();
+
+        Name name7 = Name.builder().firstName("Caitlin").lastName("Snow").build();
+        Name name8 = Name.builder().firstName("Cisco").lastName("Ramone").build();
+        Appointee appointee2 = Appointee.builder()
+            .name(name8)
+            .address(address1)
             .build();
         CcdValue<OtherParty> otherParty3 = CcdValue.<OtherParty>builder()
             .value(OtherParty.builder()
                 .id("3")
-                .name(Name.builder().firstName("Caitlin").lastName("Snow").build())
+                .name(name7)
                 .isAppointee(YES.getValue())
-                .appointee(Appointee.builder()
-                    .name(Name.builder().firstName("Cisco").lastName("Ramone").build())
-                    .address(Address.builder().line1("line1").build())
-                    .build())
+                .appointee(appointee2)
                 .build())
+            .build();
+
+        Name name9 = Name.builder().firstName("Harrison").lastName("Wells").build();
+        Name name10 = Name.builder().firstName("Eddie").lastName("Thawne").build();
+        Name name11 = Name.builder().firstName("Eobard").lastName("Thawne").build();
+        Representative representative2 = Representative.builder()
+            .hasRepresentative("YES")
+            .name(name10)
+            .build();
+        Appointee appointee3 = Appointee.builder()
+            .name(name11)
+            .address(address1)
             .build();
         CcdValue<OtherParty> otherParty4 = CcdValue.<OtherParty>builder()
             .value(OtherParty.builder()
                 .id("4")
-                .name(Name.builder().firstName("Harrison").lastName("Wells").build())
-                .rep(Representative.builder()
-                    .hasRepresentative("YES")
-                    .name(Name.builder().firstName("Eddie").lastName("Thawne").build())
-                    .build())
+                .name(name9)
+                .rep(representative2)
                 .isAppointee(YES.getValue())
-                .appointee(Appointee.builder()
-                    .name(Name.builder().firstName("Eobard").lastName("Thawne").build())
-                    .address(Address.builder().line1("line1").build())
-                    .build())
+                .appointee(appointee3)
                 .build())
             .build();
 
