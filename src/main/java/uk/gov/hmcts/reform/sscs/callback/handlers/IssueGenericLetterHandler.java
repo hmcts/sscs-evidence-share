@@ -174,10 +174,10 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
                 if (otherParty != null) {
                     FurtherEvidenceLetterType letterType = getLetterType(otherParty, entityId);
-                    String recipientName = PlaceholderUtility.getName(caseData, letterType, entityId);
+                    String recipient = PlaceholderUtility.getName(caseData, letterType, entityId);
 
                     List<Pdf> letter = getLetterPdfs(caseData, documents, letterType, entityId);
-                    sendLetter(caseId, caseData, letter, recipientName);
+                    sendLetter(caseId, caseData, letter, recipient);
                 }
             }
         }
@@ -191,20 +191,20 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private void sendToJointParty(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.JOINT_PARTY_LETTER);
-        String recipientName = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.JOINT_PARTY_LETTER, null);
-        sendLetter(caseId, caseData, letter, recipientName);
+        String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.JOINT_PARTY_LETTER, null);
+        sendLetter(caseId, caseData, letter, recipient);
     }
 
     private void sendToRepresentative(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
-        String recipientName = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER, null);
-        sendLetter(caseId, caseData, letter, recipientName);
+        String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER, null);
+        sendLetter(caseId, caseData, letter, recipient);
     }
 
     private void sendToAppellant(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.APPELLANT_LETTER);
-        String recipientName = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER, null);
-        sendLetter(caseId, caseData, letter, recipientName);
+        String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER, null);
+        sendLetter(caseId, caseData, letter, recipient);
     }
 
     private static String getLetterName(Map<String, Object> placeholders) {
