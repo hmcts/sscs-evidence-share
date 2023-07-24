@@ -35,7 +35,7 @@ public class MockBulkPrintServiceTest {
     @Test
     public void sendToMockBulkPrint() {
         Optional<UUID> letterIdOptional = mockBulkPrintService.sendToBulkPrint(singletonList(new Pdf("myData".getBytes(), "file.pdf")),
-            SscsCaseData.builder().build());
+            SscsCaseData.builder().build(), null);
         assertEquals(Optional.of(UUID.fromString("abc123ca-c336-11e9-9cb5-123456789abc")), letterIdOptional);
     }
 
@@ -43,6 +43,6 @@ public class MockBulkPrintServiceTest {
     public void sendToMockBulkPrintReasonableAdjustment() {
         Optional<UUID> letterIdOptional = mockBulkPrintService.sendToBulkPrint(
             singletonList(new Pdf("myData".getBytes(), "file.pdf")),
-            SscsCaseData.builder().ccdCaseId("12345678").build(), APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED);
+            SscsCaseData.builder().ccdCaseId("12345678").build(), APPELLANT_LETTER, EventType.VALID_APPEAL_CREATED, null);
     }
 }

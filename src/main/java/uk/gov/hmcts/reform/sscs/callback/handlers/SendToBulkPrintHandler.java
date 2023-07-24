@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.EvidenceShareConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
+import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
 import uk.gov.hmcts.reform.sscs.exception.NoDl6DocumentException;
 import uk.gov.hmcts.reform.sscs.exception.NonPdfBulkPrintException;
@@ -45,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.model.BulkPrintInfo;
 import uk.gov.hmcts.reform.sscs.service.DocumentManagementServiceWrapper;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.PrintService;
+import uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility;
 
 /*
     This code is deprecated as it is for paper cases and everything is now digital.
@@ -205,7 +207,8 @@ public class SendToBulkPrintHandler implements CallbackHandler<SscsCaseData> {
             log.info("Sending to bulk print for case id {}", sscsCaseDataCallback.getCaseDetails().getId());
 
             List<Pdf> existingCasePdfs = toPdf(sscsDocuments);
-            Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData);
+            String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.DWP_LETTER, null);
+            Optional<UUID> id = bulkPrintService.sendToBulkPrint(existingCasePdfs, caseData, recipient);
 
             if (id.isPresent()) {
                 BulkPrintInfo info = BulkPrintInfo.builder()

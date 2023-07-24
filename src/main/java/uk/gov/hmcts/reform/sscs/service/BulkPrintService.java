@@ -2,9 +2,6 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
-import static java.util.Objects.nonNull;
-import static org.apache.commons.lang3.ObjectUtils.allNotNull;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
@@ -53,18 +50,18 @@ public class BulkPrintService implements PrintService {
         this.maxRetryAttempts = maxRetryAttempts;
     }
 
-    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
+    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event, String recipient) {
         if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType)) {
             log.info("Sending to bulk print service {} reasonable adjustments", sscsCaseData.getCcdCaseId());
             bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
         } else {
-            return sendToBulkPrint(pdfs, sscsCaseData);
+            return sendToBulkPrint(pdfs, sscsCaseData, recipient);
         }
 
         return Optional.empty();
     }
 
-    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData)
+    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, String recipient)
         throws BulkPrintException {
         if (sendLetterEnabled) {
             List<String> encodedData = new ArrayList<>();
@@ -72,15 +69,15 @@ public class BulkPrintService implements PrintService {
                 encodedData.add(getEncoder().encodeToString(pdf.getContent()));
             }
             final String authToken = idamService.generateServiceAuthorization();
-            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, 1);
+            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, 1, recipient);
         }
         return Optional.empty();
     }
 
     private Optional<UUID> sendLetterWithRetry(String authToken, SscsCaseData sscsCaseData, List<String> encodedData,
-                                               Integer reTryNumber) {
+                                               Integer reTryNumber, String recipient) {
         try {
-            return sendLetter(authToken, sscsCaseData, encodedData);
+            return sendLetter(authToken, sscsCaseData, encodedData, recipient);
         } catch (HttpClientErrorException e) {
             log.info(format("Failed to send to bulk print for case %s with error %s. Non-pdf's/broken pdf's seen in list of documents, please correct.",
                 sscsCaseData.getCcdCaseId(), e.getMessage()));
@@ -95,17 +92,17 @@ public class BulkPrintService implements PrintService {
             }
             log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
                 e.getMessage(), reTryNumber, maxRetryAttempts));
-            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, reTryNumber + 1);
+            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, reTryNumber + 1, recipient);
         }
     }
 
-    private Optional<UUID> sendLetter(String authToken, SscsCaseData sscsCaseData, List<String> encodedData) {
+    private Optional<UUID> sendLetter(String authToken, SscsCaseData sscsCaseData, List<String> encodedData, String recipient) {
         SendLetterResponse sendLetterResponse = sendLetterApi.sendLetter(
             authToken,
             new LetterWithPdfsRequest(
                 encodedData,
                 XEROX_TYPE_PARAMETER,
-                getAdditionalData(sscsCaseData)
+                getAdditionalData(sscsCaseData, recipient)
             )
         );
         log.info("Letter service produced the following letter Id {} for case {}",
@@ -114,77 +111,18 @@ public class BulkPrintService implements PrintService {
         return Optional.of(sendLetterResponse.letterId);
     }
 
-    private static Map<String, Object> getAdditionalData(final SscsCaseData sscsCaseData) {
+    private static Map<String, Object> getAdditionalData(final SscsCaseData sscsCaseData, String recipient) {
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put(LETTER_TYPE_KEY, "sscs-data-pack");
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
-        additionalData.put(RECIPIENTS, getPartiesOnTheCase(sscsCaseData));
+        additionalData.put(RECIPIENTS, getRecipients(recipient));
         return additionalData;
     }
 
-    private static List<String> getPartiesOnTheCase(SscsCaseData caseData) {
-        log.info("Getting recipients on the case for additional data for caseId {}", caseData.getCcdCaseId());
+    private static List<String> getRecipients(String recipient) {
         List<String> parties = new ArrayList<>();
-
-        Appeal appeal = caseData.getAppeal();
-        Appellant appellant = appeal.getAppellant();
-        if (nonNull(appellant)
-            && isNameNonNull(appellant.getName())) {
-            parties.add(appellant.getName().getFullNameNoTitle());
-        }
-
-        Appointee appointee = appellant.getAppointee();
-        if (hasAppointee(appointee, appellant.getIsAppointee())
-            && isNameNonNull(appointee.getName())) {
-            parties.add(appointee.getName().getFullNameNoTitle());
-        }
-
-        Representative representative = appeal.getRep();
-        if (nonNull(representative)
-            && caseData.isThereARepresentative()
-            && isNameNonNull(representative.getName())) {
-            parties.add(representative.getName().getFullNameNoTitle());
-        }
-        JointParty jointParty = caseData.getJointParty();
-        if (nonNull(jointParty)
-            && caseData.isThereAJointParty()
-            && isNameNonNull(jointParty.getName())) {
-            parties.add(jointParty.getName().getFullNameNoTitle());
-        }
-
-        List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
-        if (nonNull(otherParties)) {
-            for (CcdValue<OtherParty> ccdOtherParty : otherParties) {
-                OtherParty otherParty = ccdOtherParty.getValue();
-
-                Appointee otherPartyAppointee = otherParty.getAppointee();
-                if (hasAppointee(otherPartyAppointee, otherParty.getIsAppointee())
-                    && isNameNonNull(otherPartyAppointee.getName())) {
-                    parties.add(otherPartyAppointee.getName().getFullNameNoTitle());
-                } else if (isNameNonNull(otherParty.getName())) {
-                    parties.add(otherParty.getName().getFullNameNoTitle());
-                }
-
-                Representative otherPartyRepresentative = otherParty.getRep();
-                if (otherParty.hasRepresentative()
-                    && isNameNonNull(otherPartyRepresentative.getName())) {
-                    parties.add(otherPartyRepresentative.getName().getFullNameNoTitle());
-                }
-            }
-        }
-
-        log.info("{} recipients found on the case for additional data for caseId {}",
-            parties.size(),
-            caseData.getCcdCaseId());
+        parties.add(recipient);
         return parties;
-    }
-
-    private static boolean isNameNonNull(Name name) {
-        return allNotNull(name, name.getFirstName(), name.getLastName());
-    }
-
-    private static boolean hasAppointee(Appointee appointee, String isAppointee) {
-        return !equalsIgnoreCase(isAppointee, "No") && nonNull(appointee) && isNameNonNull(appointee.getName());
     }
 }

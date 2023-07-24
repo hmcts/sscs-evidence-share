@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.service.CcdNotificationService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
 import uk.gov.hmcts.reform.sscs.service.PrintService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.GenericLetterPlaceholderService;
+import uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility;
 
 @Slf4j
 @Service
@@ -104,8 +105,8 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         process(caseDetailsId, caseData);
     }
 
-    private void sendLetter(long caseId, SscsCaseData caseData, List<Pdf> pdfs) {
-        Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData);
+    private void sendLetter(long caseId, SscsCaseData caseData, List<Pdf> pdfs, String recipient) {
+        Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData, recipient);
         //Optional.of(UUID.randomUUID());
 
         Pdf letter = pdfs.get(0);
@@ -164,7 +165,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     private void sendToOtherParties(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         log.info("Sending letter to other party");
         var selectedOtherParties = caseData.getOtherPartySelection();
-        var otherParties = caseData.getOtherParties();
+        List<CcdValue<OtherParty>> otherParties = caseData.getOtherParties();
 
         if (nonNull(selectedOtherParties)) {
             for (var party : selectedOtherParties) {
@@ -172,10 +173,11 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
                 OtherParty otherParty = getOtherPartyByEntityId(entityId, otherParties);
 
                 if (otherParty != null) {
-                    var letterType = getLetterType(otherParty, entityId);
+                    FurtherEvidenceLetterType letterType = getLetterType(otherParty, entityId);
+                    String recipientName = PlaceholderUtility.getName(caseData, letterType, entityId);
 
                     List<Pdf> letter = getLetterPdfs(caseData, documents, letterType, entityId);
-                    sendLetter(caseId, caseData, letter);
+                    sendLetter(caseId, caseData, letter, recipientName);
                 }
             }
         }
@@ -189,17 +191,20 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private void sendToJointParty(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.JOINT_PARTY_LETTER);
-        sendLetter(caseId, caseData, letter);
+        String recipientName = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.JOINT_PARTY_LETTER, null);
+        sendLetter(caseId, caseData, letter, recipientName);
     }
 
     private void sendToRepresentative(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
-        sendLetter(caseId, caseData, letter);
+        String recipientName = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER, null);
+        sendLetter(caseId, caseData, letter, recipientName);
     }
 
     private void sendToAppellant(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.APPELLANT_LETTER);
-        sendLetter(caseId, caseData, letter);
+        String recipientName = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER, null);
+        sendLetter(caseId, caseData, letter, recipientName);
     }
 
     private static String getLetterName(Map<String, Object> placeholders) {

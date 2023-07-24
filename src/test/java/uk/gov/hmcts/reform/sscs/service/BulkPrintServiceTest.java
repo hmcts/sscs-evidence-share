@@ -71,7 +71,7 @@ public class BulkPrintServiceTest {
     public void willSendToBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), captor.capture()))
             .thenReturn(new SendLetterResponse(LETTER_ID));
-        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
         assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
         assertEquals("sscs-data-pack", captor.getValue().getAdditionalData().get("letterType"));
         assertEquals("Appellant LastName", captor.getValue().getAdditionalData().get("appellantName"));
@@ -82,7 +82,7 @@ public class BulkPrintServiceTest {
     public void willSendToBulkPrintWithAdditionalData() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenReturn(new SendLetterResponse(LETTER_ID));
-        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+        Optional<UUID> letterIdOptional = bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
         assertEquals("letterIds must be equal", Optional.of(LETTER_ID), letterIdOptional);
     }
 
@@ -175,19 +175,10 @@ public class BulkPrintServiceTest {
             .build();
 
         SSCS_CASE_DATA.setOtherParties(Arrays.asList(otherParty1, otherParty2, otherParty3, otherParty4));
-        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, "Appellant LastName");
 
         List<String> parties = new ArrayList<>();
         parties.add("Appellant LastName");
-        parties.add("Barry Allen");
-        parties.add("Wally West");
-        parties.add("Jay Garrick");
-        parties.add("Hunter Zolomon");
-        parties.add("Jessie Quick");
-        parties.add("Max Mercury");
-        parties.add("Cisco Ramone");
-        parties.add("Eobard Thawne");
-        parties.add("Eddie Thawne");
         assertEquals(parties, captor.getValue().getAdditionalData().get("recipients"));
     }
 
@@ -195,20 +186,20 @@ public class BulkPrintServiceTest {
     public void willThrowAnyExceptionsToBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenThrow(new RuntimeException("error"));
-        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
     }
 
     @Test(expected = NonPdfBulkPrintException.class)
     public void shouldThrowANonPdfBulkPrintExceptionOnHttpClientErrorExceptionFromBulkPrint() {
         when(sendLetterApi.sendLetter(eq(AUTH_TOKEN), any(LetterWithPdfsRequest.class)))
             .thenThrow(new HttpClientErrorException(HttpStatus.valueOf(400)));
-        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
     }
 
     @Test
     public void sendLetterNotEnabledWillNotSendToBulkPrint() {
         BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1);
-        notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA);
+        notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
         verifyNoInteractions(idamService);
         verifyNoInteractions(sendLetterApi);
     }
@@ -223,7 +214,7 @@ public class BulkPrintServiceTest {
                 .build()).build());
 
         when(bulkPrintServiceHelper.sendForReasonableAdjustment(SSCS_CASE_DATA, APPELLANT_LETTER)).thenReturn(true);
-        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE);
+        bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE, null);
 
         verify(bulkPrintServiceHelper).saveAsReasonableAdjustment(any(), any(), any(), any());
     }
