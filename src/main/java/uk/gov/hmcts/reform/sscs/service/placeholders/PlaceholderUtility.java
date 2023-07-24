@@ -151,7 +151,7 @@ public final class PlaceholderUtility {
             .orElse(SIR_MADAM);
     }
 
-    public static String getOtherPartyName(SscsCaseData caseData, String otherPartyId) {
+    private static String getOtherPartyName(SscsCaseData caseData, String otherPartyId) {
         if (otherPartyId != null) {
             for (CcdValue<OtherParty> otherParty : caseData.getOtherParties()) {
                 OtherParty otherPartyValue = otherParty.getValue();
