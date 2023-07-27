@@ -372,6 +372,7 @@ dependencies {
   testImplementation group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
   testImplementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
   testImplementation group: 'org.glassfish', name: 'jakarta.el', version: '5.0.0-M1'
+  testImplementation group: 'com.h2database', name: 'h2', version: '2.1.214'
 
   implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
