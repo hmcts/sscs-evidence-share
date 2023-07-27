@@ -319,7 +319,7 @@ public class FurtherEvidenceServiceTest {
         then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("1"));
         then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("ApFirstname ApLastname"));
-        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("Wendy Wendy"));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("Harry Kane"));
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("Wendy Wendy"));
     }
 
@@ -336,7 +336,7 @@ public class FurtherEvidenceServiceTest {
         then(coverLetterService).should(times(1)).generateCoverLetter(eq(caseData), eq(OTHER_PARTY_LETTER), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq("2"));
         then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("ApFirstname ApLastname"));
-        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("Wendy Wendy"));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("Henry Smith"));
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("Wendy Wendy"));
     }
 
@@ -354,7 +354,7 @@ public class FurtherEvidenceServiceTest {
         then(coverLetterService).should(times(3)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(APPELLANT_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("ApFirstname ApLastname"));
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("Henry Smith"));
-        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("Henry Smith"));
+        then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), eq(OTHER_PARTY_REP_LETTER), eq(EventType.ISSUE_FURTHER_EVIDENCE), eq("Wendy Wendy"));
     }
 
     @Test

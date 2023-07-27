@@ -111,7 +111,7 @@ public class FurtherEvidenceService {
             if (allowedLetterTypes.contains(party.getKey())) {
                 byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, party.getKey(), docName, party.getValue());
                 List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs, docName);
-                String recipient = PlaceholderUtility.getName(caseData, party.getKey(), otherPartyOriginalSenderId);
+                String recipient = PlaceholderUtility.getName(caseData, party.getKey(), party.getValue());
                 bulkPrintService.sendToBulkPrint(pdfs60998, caseData, party.getKey(), EventType.ISSUE_FURTHER_EVIDENCE, recipient);
             }
         }
