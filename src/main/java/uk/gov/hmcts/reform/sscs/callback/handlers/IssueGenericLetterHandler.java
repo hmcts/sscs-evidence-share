@@ -175,7 +175,6 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
                 if (otherParty != null) {
                     FurtherEvidenceLetterType letterType = getLetterType(otherParty, entityId);
                     String recipient = PlaceholderUtility.getName(caseData, letterType, entityId);
-                    log.info("IssueGenericLetterHandler #sendToOtherParties entityId {}, otherPartyId {}, letterType {}, recipient {} for caseId {}", entityId, otherParty.getId(), letterType.getValue(), recipient, caseId);
                     List<Pdf> letter = getLetterPdfs(caseData, documents, letterType, entityId);
                     sendLetter(caseId, caseData, letter, recipient);
                 }
