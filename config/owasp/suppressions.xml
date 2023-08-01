@@ -3,6 +3,10 @@
   <suppress until="2023-09-01">
     <cve>CVE-2022-45688</cve>
     <cve>CVE-2023-24998</cve>
+    <cve>CVE-2023-3635</cve>
+    <cve>CVE-2023-34035</cve>
+    <cve>CVE-2023-3782</cve>
+    <cve>CVE-2023-34034</cve>
   </suppress>
   <suppress until = "2023-09-01">
     <notes><![CDATA[
