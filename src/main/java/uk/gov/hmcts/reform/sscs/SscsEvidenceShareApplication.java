@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -10,8 +11,7 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 
-@SpringBootApplication(
-    scanBasePackages = {"uk.gov.hmcts.reform.sscs"})
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.reform.sendletter",
     "uk.gov.hmcts.reform.sscs.idam",
