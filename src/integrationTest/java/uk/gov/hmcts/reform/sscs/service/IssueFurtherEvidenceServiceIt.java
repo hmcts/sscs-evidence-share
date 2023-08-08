@@ -155,7 +155,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -166,7 +166,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any());
+        verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
         assertEquals(1, documentCaptor.getAllValues().size());
         assertEquals(2, documentCaptor.getAllValues().get(0).size());
@@ -184,7 +184,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -195,7 +195,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any());
+        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
         assertEquals(2, documentCaptor.getAllValues().size());
         assertEquals(2, documentCaptor.getAllValues().get(0).size());
@@ -217,7 +217,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -228,7 +228,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any());
+        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
         assertEquals(2, documentCaptor.getAllValues().size());
         assertEquals(2, documentCaptor.getAllValues().get(0).size());
@@ -250,7 +250,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -261,7 +261,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        verify(bulkPrintService, times(4)).sendToBulkPrint(any(), any(), any(), any());
+        verify(bulkPrintService, times(4)).sendToBulkPrint(any(), any(), any(), any(), any());
 
         assertEquals(4, documentCaptor.getAllValues().size());
         assertEquals(2, documentCaptor.getAllValues().get(0).size());
@@ -293,7 +293,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -304,7 +304,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any());
+        verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
         assertEquals(1, documentCaptor.getAllValues().size());
         assertEquals(2, documentCaptor.getAllValues().get(0).size());
@@ -322,7 +322,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -333,7 +333,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any());
+        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
         assertEquals(2, documentCaptor.getAllValues().size());
         assertEquals(2, documentCaptor.getAllValues().get(0).size());
@@ -356,7 +356,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -367,7 +367,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any());
+        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), any(), any(), any(), any());
 
         assertEquals(2, documentCaptor.getAllValues().size());
         assertEquals(2, documentCaptor.getAllValues().get(0).size());
@@ -390,7 +390,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -401,7 +401,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        verify(bulkPrintService, times(3)).sendToBulkPrint(any(), any(), any(), any());
+        verify(bulkPrintService, times(3)).sendToBulkPrint(any(), any(), any(), any(), any());
 
         assertEquals(3, documentCaptor.getAllValues().size());
         assertEquals(2, documentCaptor.getAllValues().get(0).size());
@@ -428,7 +428,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -439,7 +439,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any());
+        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), any(), any(), any(), any());
 
         assertEquals(5, documentCaptor.getAllValues().size());
         assertEquals(3, documentCaptor.getAllValues().get(0).size());
@@ -491,7 +491,7 @@ public class IssueFurtherEvidenceServiceIt {
         doReturn(new ResponseEntity<>(fileContent, HttpStatus.OK))
             .when(restTemplate).postForEntity(anyString(), pdfDocumentRequest.capture(), eq(byte[].class));
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
-        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(documentCaptor.capture(), any(), any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
@@ -512,7 +512,7 @@ public class IssueFurtherEvidenceServiceIt {
 
         topicConsumer.onMessage(json, "1");
 
-        verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any());
+        verify(bulkPrintService).sendToBulkPrint(any(), any(), any(), any(), any());
 
         verify(ccdService, times(1)).getByCaseId(any(), any());
     }

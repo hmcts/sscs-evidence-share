@@ -22,6 +22,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ISSUE_GENERIC_LETTER
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY;
+import static uk.gov.hmcts.reform.sscs.model.PartyItemList.OTHER_PARTY_REPRESENTATIVE;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildJointParty;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildOtherParty;
 
@@ -37,18 +39,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
-import uk.gov.hmcts.reform.sscs.ccd.domain.OtherPartySelectionDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
@@ -73,6 +69,9 @@ class IssueGenericLetterHandlerTest {
 
     @Mock
     CcdNotificationService ccdNotificationService;
+
+    @Captor
+    ArgumentCaptor<String> argumentCaptor;
 
     private Map<LanguagePreference, Map<String, Map<String, String>>> template =  new HashMap<>();
 
@@ -164,7 +163,10 @@ class IssueGenericLetterHandlerTest {
         var otherParty = new CcdValue<>(buildOtherParty());
 
         var otherPartyWithRep = buildOtherParty();
-        Representative representative = caseData.getAppeal().getRep();
+        Representative representative = Representative.builder()
+            .hasRepresentative("YES")
+            .name(Name.builder().firstName("OPRepFirstName").lastName("OPRepLastName").build())
+            .build();
         otherPartyWithRep.setRep(representative);
 
         caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
@@ -172,7 +174,7 @@ class IssueGenericLetterHandlerTest {
 
         UUID uuid = UUID.randomUUID();
 
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
+        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.of(uuid));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
         when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
@@ -183,7 +185,8 @@ class IssueGenericLetterHandlerTest {
 
         verify(ccdNotificationService, times(5))
             .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
-        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData));
+        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData), argumentCaptor.capture());
+        Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
     }
 
     @Test
@@ -200,7 +203,10 @@ class IssueGenericLetterHandlerTest {
         var otherParty = new CcdValue<>(buildOtherParty());
 
         var otherPartyWithRep = buildOtherParty();
-        Representative representative = caseData.getAppeal().getRep();
+        Representative representative = Representative.builder()
+            .hasRepresentative("YES")
+            .name(Name.builder().firstName("OPRepFirstName").lastName("OPRepLastName").build())
+            .build();
         otherPartyWithRep.setRep(representative);
 
         caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
@@ -208,7 +214,7 @@ class IssueGenericLetterHandlerTest {
 
         UUID uuid = UUID.randomUUID();
 
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
+        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.of(uuid));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
 
@@ -218,7 +224,8 @@ class IssueGenericLetterHandlerTest {
 
         verify(ccdNotificationService, times(5))
             .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
-        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData));
+        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData), argumentCaptor.capture());
+        Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
     }
 
     @Test
@@ -235,7 +242,10 @@ class IssueGenericLetterHandlerTest {
         var otherParty = new CcdValue<>(buildOtherParty());
 
         var otherPartyWithRep = buildOtherParty();
-        Representative representative = caseData.getAppeal().getRep();
+        Representative representative = Representative.builder()
+            .hasRepresentative("YES")
+            .name(Name.builder().firstName("OPRepFirstName").lastName("OPRepLastName").build())
+            .build();
         otherPartyWithRep.setRep(representative);
 
         caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
@@ -255,7 +265,7 @@ class IssueGenericLetterHandlerTest {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToAllParties(YesNo.YES);
 
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.empty());
+        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.empty());
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
 
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
@@ -263,7 +273,8 @@ class IssueGenericLetterHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any());
-        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), eq(caseData));
+        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), eq(caseData), argumentCaptor.capture());
+        Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles"));
     }
 
     @Test
@@ -277,7 +288,7 @@ class IssueGenericLetterHandlerTest {
         UUID uuid = UUID.randomUUID();
 
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData))).thenReturn(Optional.of(uuid));
+        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.of(uuid));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(pdfBytes);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(pdfBytes);
@@ -288,12 +299,13 @@ class IssueGenericLetterHandlerTest {
 
         verify(ccdNotificationService, times(1))
             .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
-        verify(bulkPrintService, times(1)).sendToBulkPrint(any(), eq(caseData));
+        verify(bulkPrintService, times(1)).sendToBulkPrint(any(), eq(caseData), argumentCaptor.capture());
+        Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test"));
     }
 
     private static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty, Representative representative) {
-        var item1 = new DynamicListItem(otherParty.getValue().getId(), "test");
-        var item2 = new DynamicListItem(representative.getId(), "test");
+        var item1 = new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getValue().getId(), "test");
+        var item2 = new DynamicListItem(OTHER_PARTY_REPRESENTATIVE.getCode() + representative.getId(), "test");
 
         var list1 = new DynamicList(item1, List.of());
         CcdValue<OtherPartySelectionDetails> otherParties1 = new CcdValue<>(new OtherPartySelectionDetails(list1));

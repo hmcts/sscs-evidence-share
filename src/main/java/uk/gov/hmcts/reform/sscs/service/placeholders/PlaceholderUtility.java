@@ -19,9 +19,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 
 @Slf4j
-final class PlaceholderUtility {
+public final class PlaceholderUtility {
 
     private static final String SIR_MADAM = "Sir/Madam";
+    private static final String DWP = "DWP";
 
     private PlaceholderUtility() {
     }
@@ -108,6 +109,8 @@ final class PlaceholderUtility {
             return extractNameJointParty(caseData);
         } else if (FurtherEvidenceLetterType.OTHER_PARTY_LETTER.getValue().equals(letterType.getValue()) || FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER.getValue().equals(letterType.getValue())) {
             return getOtherPartyName(caseData, otherPartyId);
+        } else if (FurtherEvidenceLetterType.DWP_LETTER.getValue().equals(letterType.getValue())) {
+            return DWP;
         }
         return null;
     }

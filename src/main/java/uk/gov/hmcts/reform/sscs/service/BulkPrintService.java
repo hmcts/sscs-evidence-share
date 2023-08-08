@@ -13,8 +13,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.reform.sendletter.api.LetterWithPdfsRequest;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterApi;
 import uk.gov.hmcts.reform.sendletter.api.SendLetterResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
@@ -30,6 +29,7 @@ public class BulkPrintService implements PrintService {
     private static final String CASE_IDENTIFIER = "caseIdentifier";
     private static final String LETTER_TYPE_KEY = "letterType";
     private static final String APPELLANT_NAME = "appellantName";
+    public static final String RECIPIENTS = "recipients";
 
     private final SendLetterApi sendLetterApi;
     private final IdamService idamService;
@@ -50,18 +50,18 @@ public class BulkPrintService implements PrintService {
         this.maxRetryAttempts = maxRetryAttempts;
     }
 
-    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event) {
+    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event, String recipient) {
         if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType)) {
             log.info("Sending to bulk print service {} reasonable adjustments", sscsCaseData.getCcdCaseId());
             bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
         } else {
-            return sendToBulkPrint(pdfs, sscsCaseData);
+            return sendToBulkPrint(pdfs, sscsCaseData, recipient);
         }
 
         return Optional.empty();
     }
 
-    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData)
+    public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, String recipient)
         throws BulkPrintException {
         if (sendLetterEnabled) {
             List<String> encodedData = new ArrayList<>();
@@ -69,15 +69,15 @@ public class BulkPrintService implements PrintService {
                 encodedData.add(getEncoder().encodeToString(pdf.getContent()));
             }
             final String authToken = idamService.generateServiceAuthorization();
-            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, 1);
+            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, 1, recipient);
         }
         return Optional.empty();
     }
 
     private Optional<UUID> sendLetterWithRetry(String authToken, SscsCaseData sscsCaseData, List<String> encodedData,
-                                               Integer reTryNumber) {
+                                               Integer reTryNumber, String recipient) {
         try {
-            return sendLetter(authToken, sscsCaseData, encodedData);
+            return sendLetter(authToken, sscsCaseData, encodedData, recipient);
         } catch (HttpClientErrorException e) {
             log.info(format("Failed to send to bulk print for case %s with error %s. Non-pdf's/broken pdf's seen in list of documents, please correct.",
                 sscsCaseData.getCcdCaseId(), e.getMessage()));
@@ -92,17 +92,17 @@ public class BulkPrintService implements PrintService {
             }
             log.info(String.format("Caught recoverable error %s, retrying %s out of %s",
                 e.getMessage(), reTryNumber, maxRetryAttempts));
-            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, reTryNumber + 1);
+            return sendLetterWithRetry(authToken, sscsCaseData, encodedData, reTryNumber + 1, recipient);
         }
     }
 
-    private Optional<UUID> sendLetter(String authToken, SscsCaseData sscsCaseData, List<String> encodedData) {
+    private Optional<UUID> sendLetter(String authToken, SscsCaseData sscsCaseData, List<String> encodedData, String recipient) {
         SendLetterResponse sendLetterResponse = sendLetterApi.sendLetter(
             authToken,
             new LetterWithPdfsRequest(
                 encodedData,
                 XEROX_TYPE_PARAMETER,
-                getAdditionalData(sscsCaseData)
+                getAdditionalData(sscsCaseData, recipient)
             )
         );
         log.info("Letter service produced the following letter Id {} for case {}",
@@ -111,11 +111,18 @@ public class BulkPrintService implements PrintService {
         return Optional.of(sendLetterResponse.letterId);
     }
 
-    private static Map<String, Object> getAdditionalData(final SscsCaseData sscsCaseData) {
+    private static Map<String, Object> getAdditionalData(final SscsCaseData sscsCaseData, String recipient) {
         Map<String, Object> additionalData = new HashMap<>();
         additionalData.put(LETTER_TYPE_KEY, "sscs-data-pack");
         additionalData.put(CASE_IDENTIFIER, sscsCaseData.getCcdCaseId());
         additionalData.put(APPELLANT_NAME, sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
+        additionalData.put(RECIPIENTS, getRecipients(recipient));
         return additionalData;
+    }
+
+    private static List<String> getRecipients(String recipient) {
+        List<String> parties = new ArrayList<>();
+        parties.add(recipient);
+        return parties;
     }
 }

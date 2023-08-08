@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.model.PdfDocument;
+import uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility;
 
 @Service
 @Slf4j
@@ -94,8 +95,8 @@ public class FurtherEvidenceService {
 
         if (allowedLetterTypes.contains(letterType)) {
             byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, letterType, docName, otherPartyOriginalSenderId);
-            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData, letterType,
-                EventType.ISSUE_FURTHER_EVIDENCE);
+            String recipient = PlaceholderUtility.getName(caseData, letterType, otherPartyOriginalSenderId);
+            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData, letterType, EventType.ISSUE_FURTHER_EVIDENCE, recipient);
         }
     }
 
@@ -109,10 +110,9 @@ public class FurtherEvidenceService {
 
             if (allowedLetterTypes.contains(party.getKey())) {
                 byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, party.getKey(), docName, party.getValue());
-
                 List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs, docName);
-                bulkPrintService.sendToBulkPrint(pdfs60998, caseData, party.getKey(),
-                    EventType.ISSUE_FURTHER_EVIDENCE);
+                String recipient = PlaceholderUtility.getName(caseData, party.getKey(), party.getValue());
+                bulkPrintService.sendToBulkPrint(pdfs60998, caseData, party.getKey(), EventType.ISSUE_FURTHER_EVIDENCE, recipient);
             }
         }
     }
