@@ -106,6 +106,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     }
 
     private void sendLetter(long caseId, SscsCaseData caseData, List<Pdf> pdfs, String recipient) {
+        pdfs.stream().forEach(pdf -> log.info("Document: " + pdf.getName()));
         Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData, recipient);
         //Optional.of(UUID.randomUUID());
 
