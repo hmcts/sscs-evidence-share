@@ -14,9 +14,6 @@
    ]]></notes>
     <cve>CVE-2022-1471</cve>
   </suppress>
-  <suppress until = "2023-09-01">
-    <cve>CVE-2023-35116</cve>
-  </suppress>
   <suppress until = "2023-10-06">
     <notes><![CDATA[
    file name: jackson-databind-2.14.2.jar
