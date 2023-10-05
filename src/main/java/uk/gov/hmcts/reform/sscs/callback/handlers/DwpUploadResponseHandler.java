@@ -134,7 +134,7 @@ public class DwpUploadResponseHandler implements CallbackHandler<SscsCaseData> {
     }
 
     private void triggerDwpRespondEventForUc(Callback<SscsCaseData> callback, boolean dwpFurtherInfo, boolean disputedDecision, SscsCaseData caseData) {
-        log.info("updating to response received for case id: ", caseData.getCcdCaseId());
+        log.info("updating to response received for case id: {}", caseData.getCcdCaseId());
 
         String description;
         if (dwpFurtherInfo && disputedDecision) {
