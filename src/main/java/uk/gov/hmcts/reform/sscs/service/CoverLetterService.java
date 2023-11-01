@@ -149,19 +149,8 @@ public class CoverLetterService {
                 .filter(document -> fileName.equals(document.getValue().getDocumentFileName()))
                 .findAny()
                 .orElse(null);
-            DwpDocument editedDwp = null;
-            if (result == null) {
-                for (DwpDocument document: dwpDocuments) {
-                    if (document.getValue().getEditedDocumentLink() != null
-                        && fileName.equals(document.getValue().getEditedDocumentLink().getDocumentFilename())) {
-                        editedDwp = document;
-                    }
-                }
-            }
             if (result != null) {
                 return result.getValue().getDocumentLink();
-            } else if (editedDwp != null) {
-                return editedDwp.getValue().getEditedDocumentLink();
             }
         }
 

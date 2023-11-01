@@ -158,6 +158,30 @@ public class CoverLetterServiceTest {
     }
 
     @Test
+    public void givenDocumentLink_returnEditedDocuments() {
+        String documentFilename1 = "edited";
+        DynamicListItem item1 = new DynamicListItem(documentFilename1, null);
+        DynamicList list1 = new DynamicList(item1, null);
+
+        DocumentSelectionDetails documentSelectionDetails1 = new DocumentSelectionDetails(list1);
+
+        SscsDocument sscsDocument = getsScsDocument("documentFilename1");
+
+        List<CcdValue<DocumentSelectionDetails>> documentSelection = List.of(
+            new CcdValue<>(documentSelectionDetails1)
+        );
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .documentSelection(documentSelection)
+            .sscsDocument(List.of(sscsDocument))
+            .build();
+
+        List<Pdf> pdfs =  coverLetterService.getSelectedDocuments(caseData);
+
+        assertNotNull(pdfs);
+    }
+
+    @Test
     public void givenNoDocumentExist_returnEmptyList() {
         String documentFilename1 = "filename1";
 
@@ -194,6 +218,7 @@ public class CoverLetterServiceTest {
             .builder()
             .documentLink(new DocumentLink("url1", "url2", documentFilename, "hash"))
             .documentFileName(documentFilename)
+            .editedDocumentLink(new DocumentLink("123","123","edited", "hash"))
             .build();
 
         SscsDocument document = SscsDocument.builder()
