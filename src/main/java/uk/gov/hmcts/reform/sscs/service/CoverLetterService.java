@@ -125,10 +125,12 @@ public class CoverLetterService {
     public List<Pdf> getSelectedDocuments(SscsCaseData sscsCaseData) {
         List<Pdf> documents = new ArrayList<>();
         for (CcdValue<DocumentSelectionDetails> d : sscsCaseData.getDocumentSelection()) {
+            log.info("Filename: {}", d.getValue().getDocumentsList().getValue().getCode());
             var documentLink = findDocumentByFileName(d.getValue().getDocumentsList().getValue().getCode(), sscsCaseData);
             byte[] document = null;
 
-            if (documentLink != null) {
+            if (documentLink != null && documentLink.getDocumentUrl() != null) {
+                log.info("Document URL: {}", documentLink.getDocumentUrl());
                 document = pdfStoreService.download(documentLink.getDocumentUrl());
                 Pdf pdf = new Pdf(document, documentLink.getDocumentFilename());
                 documents.add(pdf);
@@ -154,24 +156,20 @@ public class CoverLetterService {
         List<SscsDocument> sscsDocuments = sscsCaseData.getSscsDocument();
 
         if (isNotEmpty(sscsDocuments)) {
-            var doc = sscsDocuments.stream()
-                .filter(d -> fileName.equals(d.getValue().getDocumentFileName()))
-                .findAny()
-                .orElse(null);
-            SscsDocument editedDoc = null;
-            if (doc == null) {
-                for (SscsDocument document: sscsDocuments) {
-                    if (document.getValue().getEditedDocumentLink() != null
-                        && fileName.equals(document.getValue().getEditedDocumentLink().getDocumentFilename())) {
-                        editedDoc = document;
+            return  sscsDocuments.stream()
+                .map(sscsDocument -> {
+                    if (fileName.equals(sscsDocument.getValue().getDocumentFileName())) {
+                        log.info("Unedited URL: {}", sscsDocument.getValue().getDocumentLink().getDocumentFilename());
+                        return sscsDocument.getValue().getDocumentLink();
+                    } else if (sscsDocument.getValue().getEditedDocumentLink() != null
+                        && fileName.equals(sscsDocument.getValue().getEditedDocumentLink().getDocumentFilename())) {
+                        log.info("Edited URL: {}", sscsDocument.getValue().getDocumentLink().toString());
+                        return sscsDocument.getValue().getEditedDocumentLink();
                     }
-                }
-            }
-            if (doc != null) {
-                return doc.getValue().getDocumentLink();
-            } else if (editedDoc != null) {
-                return editedDoc.getValue().getEditedDocumentLink();
-            }
+                    return DocumentLink.builder().build();
+                })
+                .findAny().orElse(null);
+
         }
 
         return null;
