@@ -124,8 +124,8 @@ public class CoverLetterService {
 
     public List<Pdf> getSelectedDocuments(SscsCaseData sscsCaseData) {
         List<Pdf> documents = new ArrayList<>();
-
         for (CcdValue<DocumentSelectionDetails> d : sscsCaseData.getDocumentSelection()) {
+            log.info("doc: " + d.getValue().toString());
             var documentLink = findDocumentByFileName(d.getValue().getDocumentsList().getValue().getCode(), sscsCaseData);
             byte[] document = null;
 
