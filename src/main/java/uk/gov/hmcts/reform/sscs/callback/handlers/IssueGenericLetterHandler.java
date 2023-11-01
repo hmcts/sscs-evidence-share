@@ -133,6 +133,12 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private void process(long caseId, SscsCaseData caseData) {
         log.info("Process the issue generic letter for the case : " + caseId);
+        if (caseData.getDocumentSelection() != null) {
+            caseData.getDocumentSelection().stream().forEach(d -> log.info("selection: " + d.getValue().getDocumentsList().getValue().getCode()));
+        }
+        if (caseData.getSscsDocument() != null) {
+            caseData.getSscsDocument().stream().forEach(s -> log.info("sscs document" + caseData.getSscsDocument().toString()));
+        }
         List<Pdf> documents = new ArrayList<>();
 
         if (YesNo.isYes(caseData.getAddDocuments())) {
