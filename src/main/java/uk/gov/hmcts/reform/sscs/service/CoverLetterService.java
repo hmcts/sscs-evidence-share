@@ -130,6 +130,7 @@ public class CoverLetterService {
             byte[] document = null;
 
             if (documentLink != null) {
+                log.info("Link: " + documentLink.toString());
                 document = pdfStoreService.download(documentLink.getDocumentUrl());
                 Pdf pdf = new Pdf(document, documentLink.getDocumentFilename());
                 documents.add(pdf);
@@ -140,6 +141,7 @@ public class CoverLetterService {
     }
 
     private DocumentLink findDocumentByFileName(String fileName, SscsCaseData sscsCaseData) {
+        log.info("File name: " + fileName);
         List<DwpDocument> dwpDocuments = sscsCaseData.getDwpDocuments();
 
         if (isNotEmpty(dwpDocuments)) {
@@ -147,9 +149,19 @@ public class CoverLetterService {
                 .filter(document -> fileName.equals(document.getValue().getDocumentFileName()))
                 .findAny()
                 .orElse(null);
-
+            DwpDocument editedDwp = null;
+            if (result == null) {
+                for (DwpDocument document: dwpDocuments) {
+                    if (document.getValue().getEditedDocumentLink() != null
+                        && fileName.equals(document.getValue().getEditedDocumentLink().getDocumentFilename())) {
+                        editedDwp = document;
+                    }
+                }
+            }
             if (result != null) {
                 return result.getValue().getDocumentLink();
+            } else if (editedDwp != null) {
+                return editedDwp.getValue().getEditedDocumentLink();
             }
         }
 
@@ -163,6 +175,7 @@ public class CoverLetterService {
             SscsDocument editedDoc = null;
             if (doc == null) {
                 for (SscsDocument document: sscsDocuments) {
+                    log.info("sscs doc: " + String.valueOf(document.getValue()));
                     if (document.getValue().getEditedDocumentLink() != null
                         && fileName.equals(document.getValue().getEditedDocumentLink().getDocumentFilename())) {
                         editedDoc = document;
