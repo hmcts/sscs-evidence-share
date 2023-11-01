@@ -160,9 +160,19 @@ public class CoverLetterService {
                 .filter(d -> fileName.equals(d.getValue().getDocumentFileName()))
                 .findAny()
                 .orElse(null);
-
+            SscsDocument editedDoc = null;
+            if (doc == null) {
+                for (SscsDocument document: sscsDocuments) {
+                    if (document.getValue().getEditedDocumentLink() != null
+                        && fileName.equals(document.getValue().getEditedDocumentLink().getDocumentFilename())) {
+                        editedDoc = document;
+                    }
+                }
+            }
             if (doc != null) {
                 return doc.getValue().getDocumentLink();
+            } else if (editedDoc != null) {
+                return editedDoc.getValue().getEditedDocumentLink();
             }
         }
 
