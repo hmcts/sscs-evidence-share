@@ -125,12 +125,10 @@ public class CoverLetterService {
     public List<Pdf> getSelectedDocuments(SscsCaseData sscsCaseData) {
         List<Pdf> documents = new ArrayList<>();
         for (CcdValue<DocumentSelectionDetails> d : sscsCaseData.getDocumentSelection()) {
-            log.info("doc: " + d.getValue().toString());
             var documentLink = findDocumentByFileName(d.getValue().getDocumentsList().getValue().getCode(), sscsCaseData);
             byte[] document = null;
 
             if (documentLink != null) {
-                log.info("Link: " + documentLink.toString());
                 document = pdfStoreService.download(documentLink.getDocumentUrl());
                 Pdf pdf = new Pdf(document, documentLink.getDocumentFilename());
                 documents.add(pdf);
@@ -141,7 +139,6 @@ public class CoverLetterService {
     }
 
     private DocumentLink findDocumentByFileName(String fileName, SscsCaseData sscsCaseData) {
-        log.info("File name: " + fileName);
         List<DwpDocument> dwpDocuments = sscsCaseData.getDwpDocuments();
 
         if (isNotEmpty(dwpDocuments)) {
@@ -164,7 +161,6 @@ public class CoverLetterService {
             SscsDocument editedDoc = null;
             if (doc == null) {
                 for (SscsDocument document: sscsDocuments) {
-                    log.info("sscs doc: " + String.valueOf(document.getValue()));
                     if (document.getValue().getEditedDocumentLink() != null
                         && fileName.equals(document.getValue().getEditedDocumentLink().getDocumentFilename())) {
                         editedDoc = document;
