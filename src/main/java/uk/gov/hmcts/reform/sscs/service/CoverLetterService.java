@@ -158,12 +158,13 @@ public class CoverLetterService {
         if (isNotEmpty(sscsDocuments)) {
             return  sscsDocuments.stream()
                 .map(sscsDocument -> {
+                    log.info("SSCS DOC: {}", sscsDocument.getValue().toString());
                     if (fileName.equals(sscsDocument.getValue().getDocumentFileName())) {
-                        log.info("Unedited URL: {}", sscsDocument.getValue().getDocumentLink().getDocumentFilename());
+                        log.info("Unedited DOC: {}", sscsDocument.getValue().getDocumentLink().toString());
                         return sscsDocument.getValue().getDocumentLink();
                     } else if (sscsDocument.getValue().getEditedDocumentLink() != null
                         && fileName.equals(sscsDocument.getValue().getEditedDocumentLink().getDocumentFilename())) {
-                        log.info("Edited URL: {}", sscsDocument.getValue().getDocumentLink().toString());
+                        log.info("Edited DOC: {}", sscsDocument.getValue().getEditedDocumentLink().toString());
                         return sscsDocument.getValue().getEditedDocumentLink();
                     }
                     return DocumentLink.builder().build();
