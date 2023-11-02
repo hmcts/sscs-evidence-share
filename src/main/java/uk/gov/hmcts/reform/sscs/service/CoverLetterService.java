@@ -129,7 +129,7 @@ public class CoverLetterService {
             var documentLink = findDocumentByFileName(d.getValue().getDocumentsList().getValue().getCode(), sscsCaseData);
             byte[] document = null;
 
-            if (documentLink != null && documentLink.getDocumentUrl() != null) {
+            if (documentLink != null) {
                 document = pdfStoreService.download(documentLink.getDocumentUrl());
                 Pdf pdf = new Pdf(document, documentLink.getDocumentFilename());
                 documents.add(pdf);
@@ -143,19 +143,27 @@ public class CoverLetterService {
         List<DwpDocument> dwpDocuments = sscsCaseData.getDwpDocuments();
 
         if (isNotEmpty(dwpDocuments)) {
-            var result = dwpDocuments.stream()
-                .filter(document -> fileName.equals(document.getValue().getDocumentFileName()))
-                .findAny()
-                .orElse(null);
-            if (result != null) {
-                return result.getValue().getDocumentLink();
+            DocumentLink dwpLink =  dwpDocuments.stream()
+                .map(dwpDocument -> {
+                    if (fileName.equals(dwpDocument.getValue().getDocumentFileName())) {
+                        return dwpDocument.getValue().getDocumentLink();
+                    } else if (dwpDocument.getValue().getEditedDocumentLink() != null
+                        && fileName.equals(dwpDocument.getValue().getEditedDocumentLink().getDocumentFilename())) {
+                        return dwpDocument.getValue().getEditedDocumentLink();
+                    }
+                    return DocumentLink.builder().build();
+                })
+                .filter(documentLink -> documentLink.getDocumentUrl() != null)
+                .findAny().orElse(null);
+            if (dwpLink != null) {
+                return dwpLink;
             }
         }
 
         List<SscsDocument> sscsDocuments = sscsCaseData.getSscsDocument();
 
         if (isNotEmpty(sscsDocuments)) {
-            return  sscsDocuments.stream()
+            DocumentLink sscslink =  sscsDocuments.stream()
                 .map(sscsDocument -> {
                     if (fileName.equals(sscsDocument.getValue().getDocumentFileName())) {
                         return sscsDocument.getValue().getDocumentLink();
@@ -165,7 +173,11 @@ public class CoverLetterService {
                     }
                     return DocumentLink.builder().build();
                 })
+                .filter(documentLink -> documentLink.getDocumentUrl() != null)
                 .findAny().orElse(null);
+            if (sscslink != null) {
+                return sscslink;
+            }
         }
         return null;
     }
