@@ -158,6 +158,32 @@ public class CoverLetterServiceTest {
     }
 
     @Test
+    public void givenDocumentLink_returnEditedDocuments() {
+        String uneditedDocFilename = "sscs2";
+        String editedDocFilename = "sscs2_edited";
+        DynamicListItem item1 = new DynamicListItem(editedDocFilename, null);
+        DynamicList list1 = new DynamicList(item1, null);
+
+        DocumentSelectionDetails documentSelectionDetails1 = new DocumentSelectionDetails(list1);
+
+        SscsDocument sscsDocument = getsScsDocumentEdited(uneditedDocFilename, editedDocFilename);
+
+        List<CcdValue<DocumentSelectionDetails>> documentSelection = List.of(
+            new CcdValue<>(documentSelectionDetails1)
+        );
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .documentSelection(documentSelection)
+            .sscsDocument(List.of(sscsDocument))
+            .build();
+
+        List<Pdf> pdfs =  coverLetterService.getSelectedDocuments(caseData);
+
+        assertNotNull(pdfs);
+        assertEquals(editedDocFilename, pdfs.get(0).getName());
+    }
+
+    @Test
     public void givenNoDocumentExist_returnEmptyList() {
         String documentFilename1 = "filename1";
 
@@ -201,6 +227,21 @@ public class CoverLetterServiceTest {
             .build();
         return document;
     }
+
+    private static SscsDocument getsScsDocumentEdited(String documentFilename, String editedDocumentFileName) {
+        SscsDocumentDetails details = SscsDocumentDetails
+            .builder()
+            .documentLink(new DocumentLink("url1", "url2", documentFilename, "hash"))
+            .documentFileName(documentFilename)
+            .editedDocumentLink(new DocumentLink("url2","url2",editedDocumentFileName, "hash"))
+            .build();
+
+        SscsDocument document = SscsDocument.builder()
+            .value(details)
+            .build();
+        return document;
+    }
+
 
     private void assertArgumentsForPdfGeneration() {
         ArgumentCaptor<DocumentHolder> argumentCaptor = ArgumentCaptor.forClass(DocumentHolder.class);
