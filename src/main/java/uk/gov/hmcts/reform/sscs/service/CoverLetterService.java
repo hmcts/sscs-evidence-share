@@ -13,12 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AbstractDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentSelectionDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.DocumentHolder;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Template;
@@ -140,44 +139,28 @@ public class CoverLetterService {
     }
 
     private DocumentLink findDocumentByFileName(String fileName, SscsCaseData sscsCaseData) {
-        List<DwpDocument> dwpDocuments = sscsCaseData.getDwpDocuments();
-
-        if (isNotEmpty(dwpDocuments)) {
-            DocumentLink dwpLink =  dwpDocuments.stream()
-                .map(dwpDocument -> {
-                    if (fileName.equals(dwpDocument.getValue().getDocumentFileName())) {
-                        return dwpDocument.getValue().getDocumentLink();
-                    } else if (dwpDocument.getValue().getEditedDocumentLink() != null
-                        && fileName.equals(dwpDocument.getValue().getEditedDocumentLink().getDocumentFilename())) {
-                        return dwpDocument.getValue().getEditedDocumentLink();
-                    }
-                    return DocumentLink.builder().build();
-                })
-                .filter(documentLink -> documentLink.getDocumentUrl() != null)
-                .findAny().orElse(null);
-            if (dwpLink != null) {
-                return dwpLink;
-            }
+        DocumentLink dwpLink = searchDocumentsForFile(sscsCaseData.getDwpDocuments(), fileName);
+        if (dwpLink != null) {
+            return dwpLink;
+        } else {
+            return searchDocumentsForFile(sscsCaseData.getSscsDocument(), fileName);
         }
+    }
 
-        List<SscsDocument> sscsDocuments = sscsCaseData.getSscsDocument();
-
-        if (isNotEmpty(sscsDocuments)) {
-            DocumentLink sscslink =  sscsDocuments.stream()
-                .map(sscsDocument -> {
-                    if (fileName.equals(sscsDocument.getValue().getDocumentFileName())) {
-                        return sscsDocument.getValue().getDocumentLink();
-                    } else if (sscsDocument.getValue().getEditedDocumentLink() != null
-                        && fileName.equals(sscsDocument.getValue().getEditedDocumentLink().getDocumentFilename())) {
-                        return sscsDocument.getValue().getEditedDocumentLink();
+    public DocumentLink searchDocumentsForFile(List<? extends AbstractDocument> documents, String fileName) {
+        if (isNotEmpty(documents)) {
+            return documents.stream()
+                .map(document -> {
+                    if (fileName.equals(document.getValue().getDocumentFileName())) {
+                        return document.getValue().getDocumentLink();
+                    } else if (document.getValue().getEditedDocumentLink() != null
+                        && fileName.equals(document.getValue().getEditedDocumentLink().getDocumentFilename())) {
+                        return document.getValue().getEditedDocumentLink();
                     }
                     return DocumentLink.builder().build();
                 })
                 .filter(documentLink -> documentLink.getDocumentUrl() != null)
                 .findAny().orElse(null);
-            if (sscslink != null) {
-                return sscslink;
-            }
         }
         return null;
     }

@@ -189,9 +189,11 @@ public class CoverLetterServiceTest {
 
         List<Pdf> pdfs =  coverLetterService.getSelectedDocuments(caseData);
         assertNotNull(pdfs);
-        assertNotNull(pdfs.stream().filter(pdf -> editedSscsFilename.equals(pdf.getName())).findAny().orElse(null));
-        assertNotNull(pdfs.stream().filter(pdf -> editedDwpFilename.equals(pdf.getName())).findAny().orElse(null));
+        assertNotNull(pdfs.stream().filter(pdf -> editedSscsFilename.equals(pdf.getName())).findAny().get());
+        assertNotNull(pdfs.stream().filter(pdf -> editedDwpFilename.equals(pdf.getName())).findAny().get());
     }
+
+
 
     @Test
     public void givenNoDocumentExist_returnEmptyList() {
