@@ -130,7 +130,7 @@ public class CoverLetterService {
             byte[] document = null;
 
             if (documentLink != null && documentLink.getDocumentUrl() != null) {
-                log.info("Document URL: {}", documentLink.getDocumentUrl());
+                log.info("Document URL: {}", documentLink);
                 document = pdfStoreService.download(documentLink.getDocumentUrl());
                 Pdf pdf = new Pdf(document, documentLink.getDocumentFilename());
                 documents.add(pdf);
