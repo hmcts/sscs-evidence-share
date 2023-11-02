@@ -138,7 +138,7 @@ public class CoverLetterServiceTest {
         DocumentSelectionDetails documentSelectionDetails2 = new DocumentSelectionDetails(list2);
 
         DwpDocument dwpDocument = getDwpDocument(documentFilename1);
-        SscsDocument sscsDocument = getsScsDocument(documentFilename2);
+        SscsDocument sscsDocument = getSscsDocument(documentFilename2);
 
         List<CcdValue<DocumentSelectionDetails>> documentSelection = List.of(
             new CcdValue<>(documentSelectionDetails1),
@@ -158,29 +158,39 @@ public class CoverLetterServiceTest {
     }
 
     @Test
-    public void givenDocumentLink_returnEditedDocuments() {
-        String uneditedDocFilename = "sscs2";
-        String editedDocFilename = "sscs2_edited";
-        DynamicListItem item1 = new DynamicListItem(editedDocFilename, null);
+    public void givenEditedDocs_returnEditedPdfs() {
+        String uneditedSscsFilename = "sscs";
+        String editedSscsFilename = "sscs_edited";
+        String uneditedDwpFilename = "dwp";
+        String editedDwpFilename = "dwp_edited";
+
+
+        DynamicListItem item1 = new DynamicListItem(editedSscsFilename, null);
+        DynamicListItem item2 = new DynamicListItem(editedDwpFilename, null);
         DynamicList list1 = new DynamicList(item1, null);
+        DynamicList list2 = new DynamicList(item2, null);
 
         DocumentSelectionDetails documentSelectionDetails1 = new DocumentSelectionDetails(list1);
+        DocumentSelectionDetails documentSelectionDetails2 = new DocumentSelectionDetails(list2);
 
-        SscsDocument sscsDocument = getsScsDocumentEdited(uneditedDocFilename, editedDocFilename);
+        SscsDocument sscsDocument = getSscsDocumentEdited(uneditedSscsFilename, editedSscsFilename);
+        DwpDocument dwpDocument = getDwpDocumentEdited(uneditedDwpFilename, editedDwpFilename);
 
         List<CcdValue<DocumentSelectionDetails>> documentSelection = List.of(
-            new CcdValue<>(documentSelectionDetails1)
+            new CcdValue<>(documentSelectionDetails1),
+            new CcdValue<>(documentSelectionDetails2)
         );
 
         SscsCaseData caseData = SscsCaseData.builder()
             .documentSelection(documentSelection)
             .sscsDocument(List.of(sscsDocument))
+            .dwpDocuments(List.of(dwpDocument))
             .build();
 
         List<Pdf> pdfs =  coverLetterService.getSelectedDocuments(caseData);
-
         assertNotNull(pdfs);
-        assertEquals(editedDocFilename, pdfs.get(0).getName());
+        assertNotNull(pdfs.stream().filter(pdf -> editedSscsFilename.equals(pdf.getName())).findAny().orElse(null));
+        assertNotNull(pdfs.stream().filter(pdf -> editedDwpFilename.equals(pdf.getName())).findAny().orElse(null));
     }
 
     @Test
@@ -215,7 +225,21 @@ public class CoverLetterServiceTest {
         return document;
     }
 
-    private static SscsDocument getsScsDocument(String documentFilename) {
+    private static DwpDocument getDwpDocumentEdited(String documentFilename, String editedDocumentFileName) {
+        DwpDocumentDetails details = DwpDocumentDetails
+            .builder()
+            .documentLink(new DocumentLink("url1", "url2", documentFilename, "hash"))
+            .documentFileName(documentFilename)
+            .editedDocumentLink(new DocumentLink("url2","url2",editedDocumentFileName, "hash"))
+            .build();
+
+        DwpDocument document = DwpDocument.builder()
+            .value(details)
+            .build();
+        return document;
+    }
+
+    private static SscsDocument getSscsDocument(String documentFilename) {
         SscsDocumentDetails details = SscsDocumentDetails
             .builder()
             .documentLink(new DocumentLink("url1", "url2", documentFilename, "hash"))
@@ -228,7 +252,7 @@ public class CoverLetterServiceTest {
         return document;
     }
 
-    private static SscsDocument getsScsDocumentEdited(String documentFilename, String editedDocumentFileName) {
+    private static SscsDocument getSscsDocumentEdited(String documentFilename, String editedDocumentFileName) {
         SscsDocumentDetails details = SscsDocumentDetails
             .builder()
             .documentLink(new DocumentLink("url1", "url2", documentFilename, "hash"))
