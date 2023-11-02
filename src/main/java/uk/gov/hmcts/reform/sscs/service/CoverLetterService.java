@@ -147,7 +147,7 @@ public class CoverLetterService {
         }
     }
 
-    public DocumentLink searchDocumentsForFile(List<? extends AbstractDocument> documents, String fileName) {
+    private DocumentLink searchDocumentsForFile(List<? extends AbstractDocument> documents, String fileName) {
         if (isNotEmpty(documents)) {
             return documents.stream()
                 .map(document -> {
