@@ -88,7 +88,7 @@ public class CoverLetterService {
     }
 
     public byte[] generateCoverLetterRetry(FurtherEvidenceLetterType letterType, String templateName,
-                                      String hmctsDocName, Map<String, Object> placeholders, int retries) {
+                                           String hmctsDocName, Map<String, Object> placeholders, int retries) {
         try {
             byte[] coverLetterContent = pdfGenerationService.generatePdf(DocumentHolder.builder()
                 .template(new Template(templateName, hmctsDocName))
@@ -129,7 +129,7 @@ public class CoverLetterService {
             var documentLink = findDocumentByFileName(d.getValue().getDocumentsList().getValue().getCode(), sscsCaseData);
             byte[] document = null;
 
-            if (documentLink != null) {
+            if (documentLink != null && documentLink.getDocumentUrl() != null) {
                 document = pdfStoreService.download(documentLink.getDocumentUrl());
                 Pdf pdf = new Pdf(document, documentLink.getDocumentFilename());
                 documents.add(pdf);
@@ -147,7 +147,6 @@ public class CoverLetterService {
                 .filter(document -> fileName.equals(document.getValue().getDocumentFileName()))
                 .findAny()
                 .orElse(null);
-
             if (result != null) {
                 return result.getValue().getDocumentLink();
             }
@@ -156,16 +155,18 @@ public class CoverLetterService {
         List<SscsDocument> sscsDocuments = sscsCaseData.getSscsDocument();
 
         if (isNotEmpty(sscsDocuments)) {
-            var doc = sscsDocuments.stream()
-                .filter(d -> fileName.equals(d.getValue().getDocumentFileName()))
-                .findAny()
-                .orElse(null);
-
-            if (doc != null) {
-                return doc.getValue().getDocumentLink();
-            }
+            return  sscsDocuments.stream()
+                .map(sscsDocument -> {
+                    if (fileName.equals(sscsDocument.getValue().getDocumentFileName())) {
+                        return sscsDocument.getValue().getDocumentLink();
+                    } else if (sscsDocument.getValue().getEditedDocumentLink() != null
+                        && fileName.equals(sscsDocument.getValue().getEditedDocumentLink().getDocumentFilename())) {
+                        return sscsDocument.getValue().getEditedDocumentLink();
+                    }
+                    return DocumentLink.builder().build();
+                })
+                .findAny().orElse(null);
         }
-
         return null;
     }
 }
