@@ -79,7 +79,6 @@ public class FurtherEvidencePlaceholderServiceTest {
 
     @Before
     public void setup() {
-
         sscsCaseDataWithAppointee = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder().code("PIP").build())

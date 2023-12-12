@@ -24,16 +24,11 @@ public class FurtherEvidencePlaceholderService {
     }
 
     public Map<String, Object> populatePlaceholders(SscsCaseData caseData, FurtherEvidenceLetterType letterType, String otherPartyId) {
-
-
         requireNonNull(caseData, "caseData must not be null");
 
         Map<String, Object> placeholders = new ConcurrentHashMap<>();
-
         Address address = PlaceholderUtility.getAddress(caseData, letterType, otherPartyId);
-
         placeholderService.build(caseData, placeholders, address, null);
-
         String name = PlaceholderUtility.getName(caseData, letterType, otherPartyId);
 
         if (name != null) {

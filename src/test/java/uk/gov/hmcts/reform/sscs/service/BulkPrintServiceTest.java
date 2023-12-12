@@ -58,12 +58,16 @@ public class BulkPrintServiceTest {
     @Mock
     private BulkPrintServiceHelper bulkPrintServiceHelper;
 
+    @Mock
+    private CcdNotificationService ccdNotificationService;
+
     @Captor
     ArgumentCaptor<LetterWithPdfsRequest> captor;
 
     @Before
     public void setUp() {
-        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1);
+        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper,
+            true, 1, ccdNotificationService);
         when(idamService.generateServiceAuthorization()).thenReturn(AUTH_TOKEN);
     }
 
@@ -198,7 +202,7 @@ public class BulkPrintServiceTest {
 
     @Test
     public void sendLetterNotEnabledWillNotSendToBulkPrint() {
-        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1);
+        BulkPrintService notEnabledBulkPrint = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, false, 1, ccdNotificationService);
         notEnabledBulkPrint.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, null);
         verifyNoInteractions(idamService);
         verifyNoInteractions(sendLetterApi);
@@ -206,7 +210,7 @@ public class BulkPrintServiceTest {
 
     @Test
     public void willSendToBulkPrintWithReasonableAdjustment() {
-        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1);
+        this.bulkPrintService = new BulkPrintService(sendLetterApi, idamService, bulkPrintServiceHelper, true, 1, ccdNotificationService);
 
         SSCS_CASE_DATA.setReasonableAdjustments(ReasonableAdjustments.builder()
             .appellant(ReasonableAdjustmentDetails.builder()
@@ -216,6 +220,6 @@ public class BulkPrintServiceTest {
         when(bulkPrintServiceHelper.sendForReasonableAdjustment(SSCS_CASE_DATA, APPELLANT_LETTER)).thenReturn(true);
         bulkPrintService.sendToBulkPrint(PDF_LIST, SSCS_CASE_DATA, APPELLANT_LETTER, ISSUE_FURTHER_EVIDENCE, null);
 
-        verify(bulkPrintServiceHelper).saveAsReasonableAdjustment(any(), any(), any(), any());
+        verify(bulkPrintServiceHelper).saveAsReasonableAdjustment(any(), any(), any());
     }
 }

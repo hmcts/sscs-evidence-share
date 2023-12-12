@@ -2,27 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.getBenefitByCodeOrThrowException;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.APPEAL_REF;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.APPELLANT_NAME;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.BENEFIT_NAME_ACRONYM_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.CASE_ID_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.GENERATED_DATE_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.HMCTS2;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.INFO_REQUEST_DETAIL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.IS_OTHER_PARTY;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.IS_REPRESENTATIVE;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.JOINT;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_3;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.NAME;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REGIONAL_OFFICE_PHONE_LITERAL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.REPRESENTATIVE_NAME;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.SSCS_URL;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.SSCS_URL_LITERAL;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderService.lines;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.defaultToEmptyStringIfNull;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.truncateAddressLine;
@@ -45,8 +25,6 @@ public class GenericLetterPlaceholderService {
 
     private final PlaceholderService placeholderService;
 
-    private static final String HMCTS_IMG = "[userImage:hmcts.png]";
-
     @Autowired
     public GenericLetterPlaceholderService(PlaceholderService placeholderService) {
         this.placeholderService = placeholderService;
@@ -68,9 +46,7 @@ public class GenericLetterPlaceholderService {
         String appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
         placeholders.put(APPELLANT_NAME, appellantName);
 
-        Benefit benefit = getBenefitByCodeOrThrowException(caseData.getAppeal().getBenefitType().getCode());
-        String benefitAcronym = benefit.isHasAcronym() ? benefit.getShortName() : benefit.getDescription();
-        placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, benefitAcronym);
+        placeholders.put(BENEFIT_NAME_ACRONYM_LITERAL, getBenefitAcronym(caseData));
 
         placeholders.put(SSCS_URL_LITERAL, SSCS_URL);
         placeholders.put(GENERATED_DATE_LITERAL, LocalDateTime.now().toLocalDate().toString());
@@ -101,6 +77,11 @@ public class GenericLetterPlaceholderService {
         placeholderService.buildExcelaAddress(caseData.getIsScottishCase(), placeholders);
 
         return placeholders;
+    }
+
+    private static String getBenefitAcronym(SscsCaseData caseData) {
+        Benefit benefit = getBenefitByCodeOrThrowException(caseData.getAppeal().getBenefitType().getCode());
+        return benefit.isHasAcronym() ? benefit.getShortName() : benefit.getDescription();
     }
 
     private static boolean isJointPartyLetter(FurtherEvidenceLetterType letterType) {

@@ -3,8 +3,12 @@ package uk.gov.hmcts.reform.sscs.service;
 import static java.lang.String.format;
 import static java.util.Base64.getEncoder;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,24 +40,26 @@ public class BulkPrintService implements PrintService {
     private final boolean sendLetterEnabled;
     private final Integer maxRetryAttempts;
     private final BulkPrintServiceHelper bulkPrintServiceHelper;
+    private final CcdNotificationService ccdNotificationService;
 
     @Autowired
     public BulkPrintService(SendLetterApi sendLetterApi,
                             IdamService idamService,
                             BulkPrintServiceHelper bulkPrintServiceHelper,
                             @Value("${send-letter.enabled}") boolean sendLetterEnabled,
-                            @Value("${send-letter.maxRetryAttempts}")Integer maxRetryAttempts) {
+                            @Value("${send-letter.maxRetryAttempts}")Integer maxRetryAttempts, CcdNotificationService ccdNotificationService) {
         this.idamService = idamService;
         this.bulkPrintServiceHelper = bulkPrintServiceHelper;
         this.sendLetterApi = sendLetterApi;
         this.sendLetterEnabled = sendLetterEnabled;
         this.maxRetryAttempts = maxRetryAttempts;
+        this.ccdNotificationService = ccdNotificationService;
     }
 
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, final SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event, String recipient) {
         if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType)) {
             log.info("Sending to bulk print service {} reasonable adjustments", sscsCaseData.getCcdCaseId());
-            bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
+            bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType);
         } else {
             return sendToBulkPrint(pdfs, sscsCaseData, recipient);
         }
@@ -74,6 +80,44 @@ public class BulkPrintService implements PrintService {
         return Optional.empty();
     }
 
+    public Optional<UUID> sendToBulkPrint(long caseId, SscsCaseData caseData, List<Pdf> pdfs, EventType eventType, String recipient) {
+        Optional<UUID> id = sendToBulkPrint(pdfs, caseData, recipient);
+        Pdf letter = pdfs.get(0);
+
+        if (id.isPresent()) {
+            ccdNotificationService.storeNotificationLetterIntoCcd(eventType, letter.getContent(), caseId);
+            log.info("Generic letters were sent for case {}, send-letter-service id {}", caseId, id.get());
+        } else {
+            log.error("Failed to send to bulk print for case {}. No print id returned", caseId);
+        }
+
+        return id;
+    }
+
+    public byte[] buildBundledLetter(byte[] coverSheet, byte[] letter) {
+        if (coverSheet != null) {
+            PDDocument bundledLetter;
+
+            try {
+                bundledLetter = PDDocument.load(letter);
+                PDDocument loadDoc = PDDocument.load(coverSheet);
+
+                final PDFMergerUtility merger = new PDFMergerUtility();
+                merger.appendDocument(bundledLetter, loadDoc);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                bundledLetter.save(baos);
+                bundledLetter.close();
+
+                return baos.toByteArray();
+            } catch (IOException e) {
+                log.info("Failed to merge letter and coversheet with exception {}", e.getMessage());
+            }
+        }
+
+        return letter;
+    }
+
     private Optional<UUID> sendLetterWithRetry(String authToken, SscsCaseData sscsCaseData, List<String> encodedData,
                                                Integer reTryNumber, String recipient) {
         try {
@@ -84,7 +128,6 @@ public class BulkPrintService implements PrintService {
             throw new NonPdfBulkPrintException(e);
 
         } catch (Exception e) {
-
             if (reTryNumber > maxRetryAttempts) {
                 String message = format("Failed to send to bulk print for case %s with error %s.",
                     sscsCaseData.getCcdCaseId(), e.getMessage());

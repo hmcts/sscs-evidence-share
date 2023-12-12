@@ -52,8 +52,13 @@ public final class PlaceholderConstants {
     public static final String REPRESENTATIVE_NAME = "representative_name";
     public static final String INFO_REQUEST_DETAIL = "info_request_detail";
     public static final String ADDRESS_NAME = "address_name";
-
     public static final String HMCTS2 = "hmcts2";
+    public static final String HMCTS_IMG = "[userImage:hmcts.png]";
+    public static final String LETTER_NAME = "Generic Letter to %s %s.pdf";
+    public static final String HEARING_DATE = "hearing_date";
+    public static final String ENTITY_TYPE = "entityType";
+
+    public static final String PHONE_NUMBER = "phone_number";
 
     private PlaceholderConstants() {
         //

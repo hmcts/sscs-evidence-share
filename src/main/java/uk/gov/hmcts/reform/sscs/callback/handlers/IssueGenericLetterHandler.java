@@ -4,18 +4,13 @@ import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_NAME;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,21 +26,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
-import uk.gov.hmcts.reform.sscs.service.CcdNotificationService;
+import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
-import uk.gov.hmcts.reform.sscs.service.PrintService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.GenericLetterPlaceholderService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility;
 
 @Slf4j
 @Service
 public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> {
-
-    private final PrintService bulkPrintService;
-
-    private final CcdNotificationService ccdNotificationService;
-
     private final GenericLetterPlaceholderService genericLetterPlaceholderService;
+
+    private final BulkPrintService bulkPrintService;
 
     private final CoverLetterService coverLetterService;
 
@@ -57,20 +48,16 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
     private String docmosisCoverSheetTemplate;
 
-    private static String LETTER_NAME = "Generic Letter to %s %s.pdf";
-
     @Autowired
-    public IssueGenericLetterHandler(PrintService bulkPrintService,
+    public IssueGenericLetterHandler(BulkPrintService bulkPrintService,
                                      GenericLetterPlaceholderService genericLetterPlaceholderService,
                                      CoverLetterService coverLetterService,
-                                     CcdNotificationService ccdNotificationService,
                                      DocmosisTemplateConfig docmosisTemplateConfig,
                                      @Value("${feature.issue-generic-letter.enabled}")
                                      boolean canIssueGenericLetter) {
-        this.bulkPrintService = bulkPrintService;
         this.genericLetterPlaceholderService = genericLetterPlaceholderService;
+        this.bulkPrintService = bulkPrintService;
         this.coverLetterService = coverLetterService;
-        this.ccdNotificationService = ccdNotificationService;
         this.docmosisTemplateConfig = docmosisTemplateConfig;
         this.canIssueGenericLetter = canIssueGenericLetter;
     }
@@ -78,7 +65,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
-        requireNonNull(callbackType, "callbacktype must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
 
         return canIssueGenericLetter && callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent() == EventType.ISSUE_GENERIC_LETTER;
@@ -98,26 +85,10 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         long caseDetailsId = callback.getCaseDetails().getId();
-
         docmosisTemplate = getDocmosisTemplate(caseData);
         docmosisCoverSheetTemplate = getDocmosisCoverSheet(caseData);
 
         process(caseDetailsId, caseData);
-    }
-
-    private void sendLetter(long caseId, SscsCaseData caseData, List<Pdf> pdfs, String recipient) {
-        Optional<UUID> id = bulkPrintService.sendToBulkPrint(pdfs, caseData, recipient);
-        //Optional.of(UUID.randomUUID());
-
-        Pdf letter = pdfs.get(0);
-
-        if (id.isPresent()) {
-            ccdNotificationService.storeNotificationLetterIntoCcd(EventType.ISSUE_GENERIC_LETTER, letter.getContent(),
-                caseId);
-            log.info("Generic letters were send for case {}, send-letter-service id {}", caseId, id.get());
-        } else {
-            log.error("Failed to send to bulk print for case {}. No print id returned", caseId);
-        }
     }
 
     private String getDocmosisTemplate(SscsCaseData caseData) {
@@ -176,7 +147,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
                     FurtherEvidenceLetterType letterType = getLetterType(otherParty, entityId);
                     String recipient = PlaceholderUtility.getName(caseData, letterType, entityId);
                     List<Pdf> letter = getLetterPdfs(caseData, documents, letterType, entityId);
-                    sendLetter(caseId, caseData, letter, recipient);
+                    bulkPrintService.sendToBulkPrint(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
                 }
             }
         }
@@ -191,19 +162,19 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
     private void sendToJointParty(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.JOINT_PARTY_LETTER);
         String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.JOINT_PARTY_LETTER, null);
-        sendLetter(caseId, caseData, letter, recipient);
+        bulkPrintService.sendToBulkPrint(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
     }
 
     private void sendToRepresentative(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
         String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER, null);
-        sendLetter(caseId, caseData, letter, recipient);
+        bulkPrintService.sendToBulkPrint(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
     }
 
     private void sendToAppellant(long caseId, SscsCaseData caseData, List<Pdf> documents) {
         List<Pdf> letter = getLetterPdfs(caseData, documents, FurtherEvidenceLetterType.APPELLANT_LETTER);
         String recipient = PlaceholderUtility.getName(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER, null);
-        sendLetter(caseId, caseData, letter, recipient);
+        bulkPrintService.sendToBulkPrint(caseId, caseData, letter, EventType.ISSUE_GENERIC_LETTER, recipient);
     }
 
     private static String getLetterName(Map<String, Object> placeholders) {
@@ -256,7 +227,7 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         var coverSheet = coverLetterService.generateCoverSheet(docmosisCoverSheetTemplate,
             "coversheet", placeholders);
 
-        var bundledLetter = buildBundledLetter(coverSheet, generatedPdf);
+        var bundledLetter = bulkPrintService.buildBundledLetter(coverSheet, generatedPdf);
 
         Pdf pdf = new Pdf(bundledLetter, letterName);
         List<Pdf> letter = new ArrayList<>();
@@ -265,27 +236,5 @@ public class IssueGenericLetterHandler implements CallbackHandler<SscsCaseData> 
         return letter;
     }
 
-    private byte[] buildBundledLetter(byte[] coverSheet, byte[] letter) {
-        if (coverSheet != null) {
-            PDDocument bundledLetter = null;
 
-            try {
-                bundledLetter = PDDocument.load(letter);
-                PDDocument loadDoc = PDDocument.load(coverSheet);
-
-                final PDFMergerUtility merger = new PDFMergerUtility();
-                merger.appendDocument(bundledLetter, loadDoc);
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                bundledLetter.save(baos);
-                bundledLetter.close();
-
-                return baos.toByteArray();
-            } catch (IOException e) {
-                log.info("Failed to merge letter and coversheet with exception {}", e.getMessage());
-            }
-        }
-
-        return letter;
-    }
 }
