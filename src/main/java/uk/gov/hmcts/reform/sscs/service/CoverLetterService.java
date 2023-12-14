@@ -29,8 +29,6 @@ import uk.gov.hmcts.reform.sscs.service.placeholders.FurtherEvidencePlaceholderS
 @Service
 @Slf4j
 public class CoverLetterService {
-
-
     private FurtherEvidencePlaceholderService furtherEvidencePlaceholderService;
 
     private PdfGenerationService pdfGenerationService;

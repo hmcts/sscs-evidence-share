@@ -28,8 +28,10 @@ http:
 send-grid:
   host: smtp.sendgrid.net
   port: 587
+  apiKey: AAAAAAAAAAAAAAAAAAAa
 ld:
   user-key: sscs-evidence-share
+  sdk-key: AAAAAAAAAAAAA
 
 
 service:
@@ -136,6 +138,9 @@ docmosis:
       generic-letter:
         name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
         cover: TB-SCS-LET-ENG-Cover-Sheet.docx
+      postHearingAppSorWritten:
+        name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+        cover: TB-SCS-GNO-ENG-00012.docx
     welsh:
       dl6:
         name: TB-SCS-GNO-ENG-00010.doc
@@ -148,10 +153,16 @@ docmosis:
       generic-letter:
         name: TB-SCS-LET-ENG-Issue-Generic-Letter.docx
         cover: TB-SCS-LET-ENG-Cover-Sheet.docx
+      postHearingAppSorWritten:
+        name: TB-SCS-LET-ENG-Statement-Of-Reasons-Outcome.docx
+        cover: TB-SCS-GNO-WEL-00479.docx
 
 evidence-share:
   submit-types:
     - PAPER
+
+helpline:
+  telephone: 0300 123 1142
 
 exela:
   addressLine1: HMCTS SSCS

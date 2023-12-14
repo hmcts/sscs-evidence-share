@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.t
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -133,7 +134,7 @@ public class PlaceholderService {
 
     public static String[] lines(Address address) {
         return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
-            .filter(x -> x != null)
+            .filter(Objects::nonNull)
             .toArray(String[]::new);
     }
 

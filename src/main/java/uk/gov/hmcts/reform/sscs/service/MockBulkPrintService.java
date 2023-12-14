@@ -36,7 +36,7 @@ public class MockBulkPrintService implements PrintService {
     public Optional<UUID> sendToBulkPrint(List<Pdf> pdfs, SscsCaseData sscsCaseData, FurtherEvidenceLetterType letterType, EventType event, String recipient) {
         if (bulkPrintServiceHelper.sendForReasonableAdjustment(sscsCaseData, letterType)) {
             logger.info("Sending to bulk print service {} reasonable adjustments enabled {}", sscsCaseData.getCcdCaseId());
-            bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType, event);
+            bulkPrintServiceHelper.saveAsReasonableAdjustment(sscsCaseData, pdfs, letterType);
         } else {
             logger.info("No bulk print operation needs to be performed as 'Bulk print url' is switched off.");
         }

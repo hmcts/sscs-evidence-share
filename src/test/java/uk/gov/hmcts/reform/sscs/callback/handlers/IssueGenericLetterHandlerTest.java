@@ -5,13 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -31,8 +29,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
@@ -46,15 +42,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
+import uk.gov.hmcts.reform.sscs.service.BulkPrintService;
 import uk.gov.hmcts.reform.sscs.service.CcdNotificationService;
 import uk.gov.hmcts.reform.sscs.service.CoverLetterService;
-import uk.gov.hmcts.reform.sscs.service.PrintService;
 import uk.gov.hmcts.reform.sscs.service.placeholders.GenericLetterPlaceholderService;
 
 @ExtendWith(MockitoExtension.class)
 @Slf4j
 class IssueGenericLetterHandlerTest {
-
     @Mock
     private GenericLetterPlaceholderService genericLetterPlaceholderService;
 
@@ -62,7 +57,7 @@ class IssueGenericLetterHandlerTest {
     private IssueGenericLetterHandler handler;
 
     @Mock
-    private PrintService bulkPrintService;
+    private BulkPrintService bulkPrintService;
 
     @Mock
     CoverLetterService coverLetterService;
@@ -79,10 +74,7 @@ class IssueGenericLetterHandlerTest {
 
     @BeforeEach
     public void setup() {
-        openMocks(this);
-
-        Map<String, String> nameMap;
-        nameMap = new HashMap<>();
+        Map<String, String> nameMap = new HashMap<>();
         nameMap.put("name", "TB-SCS-LET-ENG-Issue-Generic-Letter.docx");
         nameMap.put("cover", "TB-SCS-LET-ENG-Cover-Sheet.docx");
         Map<String, Map<String, String>> englishDocs = new HashMap<>();
@@ -93,7 +85,7 @@ class IssueGenericLetterHandlerTest {
         docmosisTemplateConfig.setTemplate(template);
 
         handler = new IssueGenericLetterHandler(bulkPrintService, genericLetterPlaceholderService, coverLetterService,
-            ccdNotificationService, docmosisTemplateConfig, true);
+            docmosisTemplateConfig, true);
     }
 
     @Test
@@ -124,7 +116,7 @@ class IssueGenericLetterHandlerTest {
             READY_TO_LIST,
             ISSUE_GENERIC_LETTER);
         handler = new IssueGenericLetterHandler(bulkPrintService, genericLetterPlaceholderService, coverLetterService,
-            ccdNotificationService, null, false);
+            null, false);
 
         boolean result = handler.canHandle(SUBMITTED, callback);
 
@@ -172,9 +164,6 @@ class IssueGenericLetterHandlerTest {
         caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
         caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
 
-        UUID uuid = UUID.randomUUID();
-
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.of(uuid));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
         when(coverLetterService.generateCoverSheet(anyString(), eq("coversheet"), eq(Map.of()))).thenReturn(letter);
@@ -183,9 +172,9 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(ccdNotificationService, times(5))
-            .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
-        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData), argumentCaptor.capture());
+        verify(bulkPrintService, times(5)).sendToBulkPrint(eq(callback.getCaseDetails().getId()),
+            eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
+            argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
     }
 
@@ -212,9 +201,6 @@ class IssueGenericLetterHandlerTest {
         caseData.setOtherParties(List.of(otherParty, new CcdValue<>(otherPartyWithRep)));
         caseData.setOtherPartySelection(buildOtherPartiesSelection(otherParty, representative));
 
-        UUID uuid = UUID.randomUUID();
-
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.of(uuid));
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(letter);
 
@@ -222,9 +208,9 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(ccdNotificationService, times(5))
-            .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
-        verify(bulkPrintService, times(5)).sendToBulkPrint(any(), eq(caseData), argumentCaptor.capture());
+        verify(bulkPrintService, times(5)).sendToBulkPrint(eq(callback.getCaseDetails().getId()),
+            eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
+            argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles", "Joint Party", "Other Party", "OPRepFirstName OPRepLastName"));
     }
 
@@ -265,7 +251,6 @@ class IssueGenericLetterHandlerTest {
         SscsCaseData caseData = buildCaseData();
         caseData.setSendToAllParties(YesNo.YES);
 
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.empty());
         when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
 
         Callback<SscsCaseData> callback = buildTestCallbackForGivenData(caseData, READY_TO_LIST, ISSUE_GENERIC_LETTER);
@@ -273,7 +258,9 @@ class IssueGenericLetterHandlerTest {
         handler.handle(SUBMITTED, callback);
 
         verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any());
-        verify(bulkPrintService, times(2)).sendToBulkPrint(any(), eq(caseData), argumentCaptor.capture());
+        verify(bulkPrintService, times(2)).sendToBulkPrint(eq(callback.getCaseDetails().getId()),
+            eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
+            argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test", "Wendy Giles"));
     }
 
@@ -285,11 +272,7 @@ class IssueGenericLetterHandlerTest {
         caseData.setSendToOtherParties(YesNo.NO);
         caseData.setSendToRepresentative(YesNo.NO);
 
-        UUID uuid = UUID.randomUUID();
-
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
-        when(bulkPrintService.sendToBulkPrint(any(), eq(caseData), any())).thenReturn(Optional.of(uuid));
-        when(genericLetterPlaceholderService.populatePlaceholders(eq(caseData), any(), nullable(String.class))).thenReturn(Map.of());
         when(coverLetterService.generateCoverLetterRetry(any(), anyString(), anyString(), any(), anyInt())).thenReturn(pdfBytes);
         when(coverLetterService.generateCoverSheet(anyString(), anyString(), any())).thenReturn(pdfBytes);
 
@@ -297,13 +280,13 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(ccdNotificationService, times(1))
-            .storeNotificationLetterIntoCcd(eq(ISSUE_GENERIC_LETTER), notNull(), eq(callback.getCaseDetails().getId()));
-        verify(bulkPrintService, times(1)).sendToBulkPrint(any(), eq(caseData), argumentCaptor.capture());
+        verify(bulkPrintService, times(1)).sendToBulkPrint(eq(callback.getCaseDetails().getId()),
+            eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
+            argumentCaptor.capture());
         Assertions.assertEquals(argumentCaptor.getAllValues(), List.of("User Test"));
     }
 
-    private static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty, Representative representative) {
+    static List<CcdValue<OtherPartySelectionDetails>> buildOtherPartiesSelection(CcdValue<OtherParty> otherParty, Representative representative) {
         var item1 = new DynamicListItem(OTHER_PARTY.getCode() + otherParty.getValue().getId(), "test");
         var item2 = new DynamicListItem(OTHER_PARTY_REPRESENTATIVE.getCode() + representative.getId(), "test");
 

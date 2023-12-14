@@ -46,7 +46,7 @@ public class BulkPrintServiceHelper {
         return false;
     }
 
-    public void saveAsReasonableAdjustment(SscsCaseData sscsCaseData, List<Pdf> pdfs, FurtherEvidenceLetterType letterType, EventType event) {
+    public void saveAsReasonableAdjustment(SscsCaseData sscsCaseData, List<Pdf> pdfs, FurtherEvidenceLetterType letterType) {
         String name = "";
         if (letterType.equals(APPELLANT_LETTER)) {
             log.info("Adding a reasonable adjustment letter for the appellant on case {}", sscsCaseData.getCcdCaseId());

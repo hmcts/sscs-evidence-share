@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.APPELLANT_LETTER;
 import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
@@ -54,16 +53,13 @@ class GenericLetterPlaceholderServiceTest {
 
     @BeforeEach
     public void setup() {
-        openMocks(this);
         genericLetterPlaceholderService = new GenericLetterPlaceholderService(service);
-
         caseData = buildCaseData();
         caseData.setGenericLetterText(GENERIC_LETTER_TEXT);
     }
 
     @Test
     void shouldReturnAppellantPlaceholdersGivenAppellantLetter() {
-
         Map<String, Object> placeholders = genericLetterPlaceholderService.populatePlaceholders(caseData, APPELLANT_LETTER,
             null);
 

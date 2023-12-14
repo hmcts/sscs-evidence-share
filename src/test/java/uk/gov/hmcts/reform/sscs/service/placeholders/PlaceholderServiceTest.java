@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service.placeholders;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Benefit.CHILD_SUPPORT;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildCaseData;
@@ -13,9 +13,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import org.joda.time.DateTimeUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
@@ -24,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.config.ExelaAddressConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 
 @Service
+@ExtendWith(MockitoExtension.class)
 public class PlaceholderServiceTest {
 
     PlaceholderService service;
@@ -41,9 +44,8 @@ public class PlaceholderServiceTest {
 
     Map<String, Object> placeholders;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        openMocks(this);
         DateTimeUtils.setCurrentMillisFixed(1550000000000L);
 
         now = (DateTimeFormatter.ISO_LOCAL_DATE).format(LocalDateTime.now());
@@ -52,8 +54,6 @@ public class PlaceholderServiceTest {
         service = new PlaceholderService(pdfDocumentConfig, exelaAddressConfig, false);
         placeholders = new HashMap<>();
 
-        given(pdfDocumentConfig.getHmctsWelshImgKey()).willReturn("hmctsWelshImgKey");
-        given(pdfDocumentConfig.getHmctsWelshImgVal()).willReturn("welshhmcts.png");
         given(pdfDocumentConfig.getHmctsImgKey()).willReturn("hmctsKey");
         given(exelaAddressConfig.getAddressLine1()).willReturn("Line 1");
         given(exelaAddressConfig.getAddressLine2()).willReturn("Line 2");
@@ -199,16 +199,17 @@ public class PlaceholderServiceTest {
 
     @Test
     public void givenALanguagePreferenceIsWelsh_ThenPickWelshLogo() {
+        caseData.setLanguagePreferenceWelsh("Yes");
+        given(pdfDocumentConfig.getHmctsWelshImgKey()).willReturn("hmctsWelshImgKey");
+        given(pdfDocumentConfig.getHmctsWelshImgVal()).willReturn("welshhmcts.png");
         Address address = Address.builder()
             .line1("Unit 2")
             .line2("156 The Road")
             .town("Lechworth")
             .county("Bedford")
             .postcode("L2 5UZ").build();
-        caseData.setLanguagePreferenceWelsh("Yes");
 
         service.build(caseData, placeholders, address, welshDate);
-
         assertEquals("HM Courts & Tribunals Service", placeholders.get(REGIONAL_OFFICE_ADDRESS_LINE1_LITERAL));
         assertEquals("welshhmcts.png", placeholders.get("hmctsWelshImgKey"));
         assertNotNull(placeholders.get(WELSH_CASE_CREATED_DATE_LITERAL));

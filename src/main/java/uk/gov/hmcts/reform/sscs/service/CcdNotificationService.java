@@ -17,6 +17,8 @@ public class CcdNotificationService {
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("d MMM y HH:mm");
     private static final ZoneId ZONE_ID_LONDON = ZoneId.of("Europe/London");
 
+    private static final String SENDER_TYPE = "Bulk Print";
+
     private final CcdNotificationsPdfService ccdNotificationsPdfService;
 
     public CcdNotificationService(CcdNotificationsPdfService ccdNotificationsPdfService) {
@@ -26,7 +28,7 @@ public class CcdNotificationService {
     public void storeNotificationLetterIntoCcd(EventType eventType, byte[] pdfLetter,
                                                Long ccdCaseId) {
         var correspondence = buildCorrespondence(eventType);
-        ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcd(pdfLetter, ccdCaseId, correspondence);
+        ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcd(pdfLetter, ccdCaseId, correspondence, SENDER_TYPE);
     }
 
     private Correspondence buildCorrespondence(EventType eventType) {

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -55,13 +56,13 @@ public class FurtherEvidenceServiceTest {
     private List<Pdf> pdfList;
     private List<PdfDocument> pdfDocumentList;
 
-    private String furtherEvidenceOriginalSenderTemplateName = "TB-SCS-GNO-ENG-00068.doc";
-    private String furtherEvidenceOriginalSenderWelshTemplateName = "TB-SCS-GNO-WEL-00469.docx";
-    private String furtherEvidenceOriginalSenderDocName = "609-97-template (original sender)";
-    private String furtherEvidenceOtherPartiesTemplateName = "TB-SCS-GNO-ENG-00069.doc";
-    private String furtherEvidenceOtherPartiesWelshTemplateName = "TB-SCS-GNO-WEL-00470.docx";
-    private String furtherEvidenceOtherPartiesDocName = "609-98-template (other parties)";
-    private String furtherEvidenceOtherPartiesDwpDocName = "609-98-template (DWP)";
+    private final String furtherEvidenceOriginalSenderTemplateName = "TB-SCS-GNO-ENG-00068.doc";
+    private final String furtherEvidenceOriginalSenderWelshTemplateName = "TB-SCS-GNO-WEL-00469.docx";
+    private final String furtherEvidenceOriginalSenderDocName = "609-97-template (original sender)";
+    private final String furtherEvidenceOtherPartiesTemplateName = "TB-SCS-GNO-ENG-00069.doc";
+    private final String furtherEvidenceOtherPartiesWelshTemplateName = "TB-SCS-GNO-WEL-00470.docx";
+    private final String furtherEvidenceOtherPartiesDocName = "609-98-template (other parties)";
+    private final String furtherEvidenceOtherPartiesDwpDocName = "609-98-template (DWP)";
     Map<LanguagePreference, Map<String, Map<String, String>>> template =  new HashMap<>();
 
     @Before
@@ -101,7 +102,7 @@ public class FurtherEvidenceServiceTest {
         furtherEvidenceService = new FurtherEvidenceService(coverLetterService, sscsDocumentService, bulkPrintService,
                 docmosisTemplateConfig);
 
-        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("myPdf.pdf"));
+        byte[] pdfBytes = IOUtils.toByteArray(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("myPdf.pdf")));
         pdf = new Pdf(pdfBytes, "some doc name");
         pdfList = Collections.singletonList(pdf);
         pdfDocumentList = Collections.singletonList(PdfDocument.builder().pdf(pdf).document(AbstractDocument.builder().build()).build());
@@ -503,11 +504,8 @@ public class FurtherEvidenceServiceTest {
         when(docmosisTemplateConfig.getTemplate()).thenReturn(template);
         furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, DWP_EVIDENCE, Collections.singletonList(furtherEvidenceLetterType), null);
 
-        String templateName = furtherEvidenceOtherPartiesTemplateName;
-        String docName = furtherEvidenceOtherPartiesDocName;
-
         then(coverLetterService).should(times(1))
-            .generateCoverLetter(eq(caseData), eq(furtherEvidenceLetterType), eq(templateName), eq(docName), eq(expectedOtherPartyId));
+            .generateCoverLetter(eq(caseData), eq(furtherEvidenceLetterType), eq(furtherEvidenceOtherPartiesTemplateName), eq(furtherEvidenceOtherPartiesDocName), eq(expectedOtherPartyId));
         then(coverLetterService).should(times(1)).appendCoverLetter(any(), anyList(), any());
         then(bulkPrintService).should(times(1)).sendToBulkPrint(eq(pdfList), eq(caseData), any(), any(), any());
         then(coverLetterService).shouldHaveNoMoreInteractions();
@@ -580,7 +578,7 @@ public class FurtherEvidenceServiceTest {
         }
 
         List<CcdValue<OtherParty>> otherParties = new ArrayList<>();
-        if (caseData.getOtherParties() != null && caseData.getOtherParties().size() > 0) {
+        if (caseData.getOtherParties() != null && !caseData.getOtherParties().isEmpty()) {
             otherParties = caseData.getOtherParties();
         }
 
@@ -632,7 +630,6 @@ public class FurtherEvidenceServiceTest {
 
     @Test
     public void updateSscsCaseDocumentsWhichHaveResizedDocumentsAndMatchingDocTypeAndMatchingDocIdentifier() {
-
         DocumentLink resizedDocLink = DocumentLink.builder().documentUrl("resized.com").build();
 
         SscsDocument updatedDoc = SscsDocument
@@ -713,17 +710,15 @@ public class FurtherEvidenceServiceTest {
         SscsCaseData caseData = SscsCaseData
             .builder()
             .sscsDocument(Arrays.asList(originalDoc, differentTypeDoc, differentLinkDoc))
-            .sscsWelshDocuments(Arrays.asList(originalWelshDoc))
+            .sscsWelshDocuments(Collections.singletonList(originalWelshDoc))
             .build();
 
-        DocumentType docType = APPELLANT_EVIDENCE;
-
-        furtherEvidenceService.updateCaseDocuments(Arrays.asList(updatedDoc, updatedDoc2, updatedDoc3, updatedWelshDoc), caseData, docType);
+        furtherEvidenceService.updateCaseDocuments(Arrays.asList(updatedDoc, updatedDoc2, updatedDoc3, updatedWelshDoc), caseData, APPELLANT_EVIDENCE);
 
         assertEquals(resizedDocLink, caseData.getSscsDocument().get(0).getValue().getResizedDocumentLink());
-        assertEquals(null, caseData.getSscsDocument().get(1).getValue().getResizedDocumentLink());
-        assertEquals(null, caseData.getSscsDocument().get(2).getValue().getResizedDocumentLink());
-        assertEquals(null, caseData.getSscsWelshDocuments().get(0).getValue().getResizedDocumentLink());
+        assertNull(caseData.getSscsDocument().get(1).getValue().getResizedDocumentLink());
+        assertNull(caseData.getSscsDocument().get(2).getValue().getResizedDocumentLink());
+        assertNull(caseData.getSscsWelshDocuments().get(0).getValue().getResizedDocumentLink());
     }
 
     @SuppressWarnings("unused")
