@@ -100,7 +100,11 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
 
     private boolean isDocumentSelectedInUiEqualsToStreamDocument(ReissueArtifactUi reissueArtifactUi,
                                                                  AbstractDocument<? extends AbstractDocumentDetails> document) {
-        return document.getValue().getDocumentLink().getDocumentUrl().equals(reissueArtifactUi.getReissueFurtherEvidenceDocument().getValue().getCode());
+        String expectedUrl = reissueArtifactUi.getReissueFurtherEvidenceDocument().getValue().getCode();
+
+        return (document.getValue().getDocumentLink().getDocumentUrl().equals(expectedUrl)
+            || (document.getValue().getEditedDocumentLink() != null
+            && document.getValue().getEditedDocumentLink().getDocumentUrl().equals(expectedUrl)));
     }
 
     private Stream<? extends AbstractDocument<? extends AbstractDocumentDetails>> getStreamIfNonNull(List<? extends AbstractDocument<? extends AbstractDocumentDetails>> documents) {
