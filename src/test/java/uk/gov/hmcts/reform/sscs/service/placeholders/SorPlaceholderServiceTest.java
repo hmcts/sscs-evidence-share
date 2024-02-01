@@ -46,4 +46,14 @@ public class SorPlaceholderServiceTest {
         assertEquals(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle(), placeholders.get(PlaceholderConstants.NAME));
         assertEquals(Appellant.class.getSimpleName(), placeholders.get(ENTITY_TYPE));
     }
+
+    @Test
+    void addressTest() {
+        var addressPlaceholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+            Appellant.class.getSimpleName(), null);
+
+        assertEquals(caseData.getAppeal().getAppellant().getAddress().getLine1(), addressPlaceholders.get(PlaceholderConstants.LETTER_ADDRESS_LINE_1));
+        assertEquals(caseData.getAppeal().getAppellant().getAddress().getLine2(), addressPlaceholders.get(PlaceholderConstants.LETTER_ADDRESS_LINE_2));
+        assertEquals(caseData.getAppeal().getAppellant().getAddress().getPostcode(), addressPlaceholders.get(PlaceholderConstants.LETTER_ADDRESS_POSTCODE));
+    }
 }
