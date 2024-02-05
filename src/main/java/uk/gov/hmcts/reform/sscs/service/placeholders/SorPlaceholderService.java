@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.truncateAddressLine;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,10 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 
 @Service
@@ -39,16 +35,14 @@ public class SorPlaceholderService {
         placeholderService.build(caseData, placeholders, address, null);
 
         String name = PlaceholderUtility.getName(caseData, letterType, otherPartyId);
+        placeholders.putAll(PlaceholderUtility.getAddressPlaceHolders(address));
+
         if (name != null) {
-            placeholders.put(NAME, truncateAddressLine(name));
+            placeholders.put(NAME, name);
         }
         placeholders.put(HMCTS2, HMCTS_IMG);
         placeholders.put(APPEAL_REF, caseData.getCcdCaseId());
         placeholders.put(ENTITY_TYPE, entityType);
-        placeholders.put(NAME, caseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
-        placeholders.put(LETTER_ADDRESS_LINE_1, caseData.getAppeal().getAppellant().getAddress().getLine1());
-        placeholders.put(LETTER_ADDRESS_LINE_2, caseData.getAppeal().getAppellant().getAddress().getLine2());
-        placeholders.put(LETTER_ADDRESS_POSTCODE, caseData.getAppeal().getAppellant().getAddress().getPostcode());
 
         Hearing latestHearing = caseData.getLatestHearing();
         if (!isNull(latestHearing) && !isNull(latestHearing.getValue())) {
