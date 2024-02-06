@@ -49,7 +49,7 @@ public class SorPlaceholderServiceTest {
         var appellantAddress = caseData.getAppeal().getAppellant().getAddress();
         var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
 
-        assertEquals(appellantName, placeholders.get(PlaceholderConstants.NAME));
+        assertEquals(appellantName, placeholders.get(ADDRESS_NAME));
         assertEquals(Appellant.class.getSimpleName(), placeholders.get(ENTITY_TYPE));
         assertEquals(appellantAddress.getLine1(), placeholders.get(LETTER_ADDRESS_LINE_1));
         assertEquals(appellantAddress.getLine2(), placeholders.get(LETTER_ADDRESS_LINE_2));
@@ -64,7 +64,7 @@ public class SorPlaceholderServiceTest {
         var representativeAddress = caseData.getAppeal().getRep().getAddress();
         var representativeName = caseData.getAppeal().getRep().getName().getFullNameNoTitle();
 
-        assertEquals(representativeName, placeholders.get(PlaceholderConstants.NAME));
+        assertEquals(representativeName, placeholders.get(ADDRESS_NAME));
         assertEquals(Representative.class.getSimpleName(), placeholders.get(ENTITY_TYPE));
         assertEquals(representativeAddress.getLine1(), placeholders.get(LETTER_ADDRESS_LINE_1));
         assertEquals(representativeAddress.getLine2(), placeholders.get(LETTER_ADDRESS_LINE_2));
@@ -82,7 +82,7 @@ public class SorPlaceholderServiceTest {
         var otherPartyAddress = otherParty.getAddress();
         var otherPartyName = otherParty.getName().getFullNameNoTitle();
 
-        assertEquals(otherPartyName, placeholders.get(NAME));
+        assertEquals(otherPartyName, placeholders.get(ADDRESS_NAME));
         assertEquals(OtherParty.class.getSimpleName(), placeholders.get(ENTITY_TYPE));
         assertEquals(otherPartyAddress.getLine1(), placeholders.get(LETTER_ADDRESS_LINE_1));
         assertEquals(otherPartyAddress.getLine2(), placeholders.get(LETTER_ADDRESS_LINE_2));
@@ -100,7 +100,7 @@ public class SorPlaceholderServiceTest {
         var jointPartyName = caseData.getJointParty().getName().getFullNameNoTitle();
         var jointPartyAddress = caseData.getJointParty().getAddress();
 
-        assertEquals(jointPartyName, placeholders.get(PlaceholderConstants.NAME));
+        assertEquals(jointPartyName, placeholders.get(ADDRESS_NAME));
         assertEquals(JointParty.class.getSimpleName(), placeholders.get(ENTITY_TYPE));
         assertEquals(jointPartyAddress.getLine1(), placeholders.get(LETTER_ADDRESS_LINE_1));
         assertEquals(jointPartyAddress.getLine2(), placeholders.get(LETTER_ADDRESS_LINE_2));
@@ -116,7 +116,7 @@ public class SorPlaceholderServiceTest {
         var appointeeAddress = caseData.getAppeal().getAppellant().getAppointee().getAddress();
         var appointeeName = caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle();
 
-        assertEquals(appointeeName, placeholders.get(PlaceholderConstants.NAME));
+        assertEquals(appointeeName, placeholders.get(ADDRESS_NAME));
         assertEquals(Appointee.class.getSimpleName(), placeholders.get(ENTITY_TYPE));
         assertEquals(appointeeAddress.getLine1(), placeholders.get(LETTER_ADDRESS_LINE_1));
         assertEquals(appointeeAddress.getLine2(), placeholders.get(LETTER_ADDRESS_LINE_2));
