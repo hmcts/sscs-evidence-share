@@ -11,7 +11,7 @@ public class ManualCaseCreatedFunctionalTest extends AbstractFunctionalTest {
 
         SscsCaseDetails caseDetails = createNonDigitalCaseWithEvent(VALID_APPEAL_CREATED);
 
-        Thread.sleep(5000);
+        Thread.sleep(4000);
 
         updateCaseEvent(SEND_TO_DWP_OFFLINE, caseDetails);
     }
