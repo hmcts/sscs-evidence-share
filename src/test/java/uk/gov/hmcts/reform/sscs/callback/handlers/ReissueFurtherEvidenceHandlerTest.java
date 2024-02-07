@@ -353,35 +353,29 @@ public class ReissueFurtherEvidenceHandlerTest {
 
     @Test
     @Parameters({"true", "false",})
-    public void givenIssueFurtherEvidenceCallback_shouldReissueRedactedEvidence(boolean isEditedDocChosen) {
+    public void givenIssueFurtherEvidenceCallback_shouldReissueChosenEvidence(boolean isEditedDocChosen) {
 
         SscsDocument doc1 = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentLink(DocumentLink.builder().documentUrl("First.doc").build())
                 .editedDocumentLink(DocumentLink.builder().documentUrl("FirstRedacted.doc").build())
-                .documentType(DocumentType.APPELLANT_EVIDENCE.getValue())
-                .evidenceIssued("No").originalSenderOtherPartyId("3")
                 .build())
             .build();
         SscsDocument doc2 = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentLink(DocumentLink.builder().documentUrl("Second.doc").build())
                 .editedDocumentLink(DocumentLink.builder().documentUrl("SecondRedacted.doc").build())
-                .documentType(DocumentType.APPELLANT_EVIDENCE.getValue())
-                .evidenceIssued("No").originalSenderOtherPartyId("3")
                 .build())
             .build();
         SscsDocument doc3 = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentLink(DocumentLink.builder().documentUrl("Third.doc").build())
-                .documentType(DocumentType.APPELLANT_EVIDENCE.getValue())
-                .evidenceIssued("No").originalSenderOtherPartyId("3")
                 .build())
             .build();
 
         DynamicListItem dynamicListItem1 = new DynamicListItem(
             doc1.getValue().getEditedDocumentLink().getDocumentUrl(), "First document");
-        DynamicListItem dynamicListItem2 = null;
+        DynamicListItem dynamicListItem2;
         if (isEditedDocChosen) {
             dynamicListItem2 = new DynamicListItem(
                 doc2.getValue().getEditedDocumentLink().getDocumentUrl(), "Second orginal document");
@@ -394,12 +388,8 @@ public class ReissueFurtherEvidenceHandlerTest {
         DynamicList dynamicList = new DynamicList(dynamicListItem2, List.of(dynamicListItem1, dynamicListItem2, dynamicListItem3));
         SscsCaseData caseData = SscsCaseData.builder()
             .ccdCaseId("1563382899630221")
-            .appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("YES").build()).build())
             .reissueArtifactUi(ReissueArtifactUi.builder()
                 .reissueFurtherEvidenceDocument(dynamicList)
-                .resendToAppellant(YesNo.YES)
-                .resendToRepresentative(YesNo.YES)
-                .otherPartyOptions(getOtherPartyOptions(YesNo.YES, YesNo.YES))
                 .build())
             .build();
         caseData.setSscsDocument(List.of(doc1, doc2, doc3));
