@@ -41,6 +41,7 @@ public class SorPlaceholderService {
         placeholders.putAll(PlaceholderUtility.getAddressPlaceHolders(address));
 
         if (name != null) {
+            placeholders.put(NAME, name);
             placeholders.put(ADDRESS_NAME, name);
         }
         placeholders.put(HMCTS2, HMCTS_IMG);
