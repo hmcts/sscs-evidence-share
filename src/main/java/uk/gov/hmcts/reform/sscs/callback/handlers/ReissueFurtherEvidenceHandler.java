@@ -98,7 +98,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
             .orElseThrow(() -> new IllegalStateException(getNoSelectedDocumentErrorMessage(caseData)));
     }
 
-    private boolean isDocumentSelectedInUiEqualsToStreamDocument(ReissueArtifactUi reissueArtifactUi,
+    protected boolean isDocumentSelectedInUiEqualsToStreamDocument(ReissueArtifactUi reissueArtifactUi,
                                                                  AbstractDocument<? extends AbstractDocumentDetails> document) {
         String expectedUrl = reissueArtifactUi.getReissueFurtherEvidenceDocument().getValue().getCode();
 
