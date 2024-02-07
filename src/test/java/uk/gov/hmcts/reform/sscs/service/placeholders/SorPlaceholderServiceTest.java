@@ -56,6 +56,7 @@ public class SorPlaceholderServiceTest {
         var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
         assertEquals(appellantName, placeholders.get(ADDRESS_NAME));
         assertEquals(appellantName, placeholders.get(NAME));
+        assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
     }
 
     @Test
@@ -72,6 +73,9 @@ public class SorPlaceholderServiceTest {
         var representativeName = caseData.getAppeal().getRep().getName().getFullNameNoTitle();
         assertEquals(representativeName, placeholders.get(ADDRESS_NAME));
         assertEquals(representativeName, placeholders.get(NAME));
+
+        var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
+        assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
     }
 
     @Test
@@ -91,6 +95,9 @@ public class SorPlaceholderServiceTest {
         var otherPartyName = otherParty.getName().getFullNameNoTitle();
         assertEquals(otherPartyName, placeholders.get(ADDRESS_NAME));
         assertEquals(otherPartyName, placeholders.get(NAME));
+
+        var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
+        assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
     }
 
     @Test
@@ -110,6 +117,9 @@ public class SorPlaceholderServiceTest {
         var jointPartyName = caseData.getJointParty().getName().getFullNameNoTitle();
         assertEquals(jointPartyName, placeholders.get(ADDRESS_NAME));
         assertEquals(jointPartyName, placeholders.get(NAME));
+
+        var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
+        assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
     }
 
     @Test
@@ -127,5 +137,8 @@ public class SorPlaceholderServiceTest {
         var appointeeName = caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle();
         assertEquals(appointeeName, placeholders.get(ADDRESS_NAME));
         assertEquals(appointeeName, placeholders.get(NAME));
+
+        var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
+        assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
     }
 }

@@ -47,6 +47,7 @@ public class SorPlaceholderService {
         placeholders.put(HMCTS2, HMCTS_IMG);
         placeholders.put(APPEAL_REF, caseData.getCcdCaseId());
         placeholders.put(ENTITY_TYPE, entityType);
+        placeholders.put(APPELLANT_NAME, caseData.getAppeal().getAppellant().getName().getFullNameNoTitle());
 
         Hearing latestHearing = caseData.getLatestHearing();
         if (!isNull(latestHearing) && !isNull(latestHearing.getValue())) {
