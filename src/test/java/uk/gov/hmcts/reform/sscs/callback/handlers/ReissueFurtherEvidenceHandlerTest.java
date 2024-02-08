@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.REISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 
@@ -394,9 +397,17 @@ public class ReissueFurtherEvidenceHandlerTest {
             .build();
         caseData.setSscsDocument(List.of(doc1, doc2, doc3));
 
-        assertTrue(handler.isDocumentSelectedInUiEqualsToStreamDocument(caseData.getReissueArtifactUi(), doc2));
-        assertFalse(handler.isDocumentSelectedInUiEqualsToStreamDocument(caseData.getReissueArtifactUi(), doc1));
-        assertFalse(handler.isDocumentSelectedInUiEqualsToStreamDocument(caseData.getReissueArtifactUi(), doc3));
+        when(furtherEvidenceService.canHandleAnyDocument(List.of(doc1, doc2, doc3))).thenReturn(true);
+        doNothing().when(furtherEvidenceService)
+            .issue(List.of(doc1), caseData, APPELLANT_EVIDENCE, List.of(), null);
+
+        handler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+
+        verify(furtherEvidenceService).issue(
+            argThat(argument -> argument.size() == 1 && argument.get(0) == doc2),
+            eq(caseData), eq(APPELLANT_EVIDENCE), eq(List.of()), eq(null)
+        );
     }
 
     private static List<OtherPartyOption> getOtherPartyOptions(YesNo resendToOtherParty, YesNo resendToOtherPartyRep) {
