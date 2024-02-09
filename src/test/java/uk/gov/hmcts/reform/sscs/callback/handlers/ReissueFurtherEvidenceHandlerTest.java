@@ -355,8 +355,8 @@ public class ReissueFurtherEvidenceHandlerTest {
     }
 
     @Test
-    @Parameters({"true", "false",})
-    public void givenIssueFurtherEvidenceCallback_shouldReissueChosenEvidence(boolean isEditedDocChosen) {
+    @Parameters({"Second.doc", "SecondRedacted.doc",})
+    public void givenIssueFurtherEvidenceCallback_shouldReissueChosenEvidence(String chosenDoc) {
 
         SscsDocument doc1 = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
@@ -378,14 +378,7 @@ public class ReissueFurtherEvidenceHandlerTest {
 
         DynamicListItem dynamicListItem1 = new DynamicListItem(
             doc1.getValue().getEditedDocumentLink().getDocumentUrl(), "First document");
-        DynamicListItem dynamicListItem2;
-        if (isEditedDocChosen) {
-            dynamicListItem2 = new DynamicListItem(
-                doc2.getValue().getEditedDocumentLink().getDocumentUrl(), "Second orginal document");
-        } else {
-            dynamicListItem2 = new DynamicListItem(
-                doc2.getValue().getDocumentLink().getDocumentUrl(), "Second edited document");
-        }
+        DynamicListItem dynamicListItem2 = new DynamicListItem(chosenDoc, "Second document");
         DynamicListItem dynamicListItem3 = new DynamicListItem(
             doc3.getValue().getDocumentLink().getDocumentUrl(), "Third document");
         DynamicList dynamicList = new DynamicList(dynamicListItem2, List.of(dynamicListItem1, dynamicListItem2, dynamicListItem3));
