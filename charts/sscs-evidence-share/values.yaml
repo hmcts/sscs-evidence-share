@@ -3,6 +3,7 @@ java:
   applicationPort: 8091
   readinessPath: '/health/readiness'
   aadIdentityName: sscs
+  devmemoryLimits: 2Gi
   ingressHost: sscs-evidence-share-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   keyVaults:
     sscs:
