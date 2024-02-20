@@ -105,7 +105,7 @@ public class SorWriteHandler implements CallbackHandler<SscsCaseData> {
             List<Pdf> letter = new ArrayList<>();
             letter.add(pdf);
 
-            String recipient = party.getName().getFullNameNoTitle();
+            String recipient = (String) placeholders.get(NAME);
             log.info("Party {} {}", party, party.getName());
             log.info("Sending letter to {}", recipient);
             log.info("Appellant name {} entity type {} name {}",

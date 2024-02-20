@@ -5,17 +5,30 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.NAME;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Correspondence;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
+import uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderService;
+import uk.gov.hmcts.reform.sscs.service.placeholders.SorPlaceholderService;
 
 @ExtendWith(MockitoExtension.class)
 class CcdNotificationServiceTest {
 
+    SorPlaceholderService sorPlaceholderService;
+    @Mock
+    PlaceholderService placeholderService;
     @Mock
     CcdNotificationsPdfService ccdNotificationsPdfService;
 
@@ -34,14 +47,34 @@ class CcdNotificationServiceTest {
     }
 
     @Test
-    void verifyToFieldOnCorrespondenceForSorLetter() {
+    void returnToFieldOnCorrespondenceForSorLetter() {
         CcdNotificationService ccdNotificationService = new CcdNotificationService(ccdNotificationsPdfService);
         EventType eventType = EventType.SOR_WRITE;
-        String recipient = "Test name";
+        String name = "Test name";
 
-        Correspondence correspondence = ccdNotificationService.buildCorrespondence(eventType, recipient);
+        Correspondence correspondence = ccdNotificationService.buildCorrespondence(eventType, name);
 
-        assertEquals(recipient, correspondence.getValue().getTo());
+        assertEquals(name, correspondence.getValue().getTo());
         assertEquals(eventType.getCcdType(), correspondence.getValue().getEventType());
+    }
+
+    @Test
+    void returnRepresentativeToFieldGivenOrganisationButNoNameForSorLetter() {
+        sorPlaceholderService = new SorPlaceholderService(placeholderService);
+        SscsCaseData caseData = buildCaseData();
+        caseData.getAppeal().getRep().setName(new Name(null, null, null));
+        caseData.getAppeal().getRep().setOrganisation("Test organisation");
+
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER,
+            Representative.class.getSimpleName(), null);
+
+        String name = placeholders.get(NAME).toString();
+
+        CcdNotificationService ccdNotificationService = new CcdNotificationService(ccdNotificationsPdfService);
+        EventType eventType = EventType.SOR_WRITE;
+
+        Correspondence correspondence = ccdNotificationService.buildCorrespondence(eventType, name);
+
+        Assertions.assertEquals(correspondence.getValue().getTo(), placeholders.get(ADDRESS_NAME));
     }
 }
