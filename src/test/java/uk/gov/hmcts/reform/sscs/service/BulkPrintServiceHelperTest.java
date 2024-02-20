@@ -78,6 +78,6 @@ public class BulkPrintServiceHelperTest {
                 .appeal(Appeal.builder()
                     .appellant(Appellant.builder()
                         .name(new Name("Mr", "Jimmy", "Greg")).build()).build()).build(),
-            pdfs, FurtherEvidenceLetterType.APPELLANT_LETTER, EventType.ISSUE_FURTHER_EVIDENCE);
+            pdfs, FurtherEvidenceLetterType.APPELLANT_LETTER);
     }
 }

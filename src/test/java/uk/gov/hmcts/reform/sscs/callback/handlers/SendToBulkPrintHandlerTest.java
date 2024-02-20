@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.UNREGISTERED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.APPEAL_CREATED;
 
 import feign.FeignException;
@@ -194,7 +195,7 @@ public class SendToBulkPrintHandlerTest {
 
         Optional<UUID> expectedOptionalUuid = Optional.of(UUID.fromString("0f14d0ab-9605-4a62-a9e4-5ed26688389b"));
 
-        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
+        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any(), any()))
             .thenReturn(expectedOptionalUuid);
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
@@ -202,7 +203,7 @@ public class SendToBulkPrintHandlerTest {
         handler.handle(CallbackType.SUBMITTED, callback);
 
         verify(pdfStoreService, times(2)).download(eq(docUrl));
-        verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any());
+        verify(bulkPrintService).sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any(), any());
 
         String documentList = "Case has been sent to the FTA via Bulk Print with bulk print id: 0f14d0ab-9605-4a62-a9e4-5ed26688389b and with documents: evidence1.pdf, evidence2.pdf";
         verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to FTA"), eq(documentList), any());
@@ -281,7 +282,7 @@ public class SendToBulkPrintHandlerTest {
     public void givenNoBulkPrintIdReturned_shouldThrowAnExceptionAndFlagError() {
         Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
 
-        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any()))
+        when(bulkPrintService.sendToBulkPrint(eq(Arrays.asList(docPdf, docPdf2)), any(), any()))
             .thenReturn(Optional.empty());
 
         handler.handle(CallbackType.SUBMITTED, callback);
@@ -313,7 +314,7 @@ public class SendToBulkPrintHandlerTest {
     public void givenABrokenPdfException_shouldThrowAnExceptionAndFlagAnError() {
         final Callback<SscsCaseData> callback = setupMocksForFlagErrorTests();
 
-        when(bulkPrintService.sendToBulkPrint(any(), any()))
+        when(bulkPrintService.sendToBulkPrint(any(), any(), any()))
             .thenThrow(new NonPdfBulkPrintException(new RuntimeException("error")));
 
         handler.handle(CallbackType.SUBMITTED, callback);
@@ -380,7 +381,7 @@ public class SendToBulkPrintHandlerTest {
         verify(ccdCaseService).updateCase(caseDataCaptor.capture(), eq(123L), eq(EventType.SENT_TO_DWP.getCcdType()), eq("Sent to FTA"), eq("Case state is now sent to FTA"), any());
 
         assertEquals("sentToDwp", caseDataCaptor.getValue().getHmctsDwpState());
-        assertEquals(DwpState.UNREGISTERED.getId(), caseDataCaptor.getValue().getDwpState());
+        assertEquals(UNREGISTERED, caseDataCaptor.getValue().getDwpState());
     }
 
     @Test
@@ -403,7 +404,7 @@ public class SendToBulkPrintHandlerTest {
 
         Optional<UUID> expectedOptionalUuid = Optional.empty();
 
-        when(bulkPrintService.sendToBulkPrint(any(), any())).thenReturn(expectedOptionalUuid);
+        when(bulkPrintService.sendToBulkPrint(any(), any(), any())).thenReturn(expectedOptionalUuid);
 
         Callback<SscsCaseData> callback = new Callback<>(caseDetails, Optional.empty(), EventType.VALID_APPEAL_CREATED, false);
 

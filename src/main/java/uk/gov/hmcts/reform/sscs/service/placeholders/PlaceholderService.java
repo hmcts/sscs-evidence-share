@@ -7,7 +7,9 @@ import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.t
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.docmosis.config.PdfDocumentConfig;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 
 @Service
+@Slf4j
 public class PlaceholderService {
 
     private final PdfDocumentConfig pdfDocumentConfig;
@@ -77,7 +80,7 @@ public class PlaceholderService {
         buildRecipientAddressPlaceholders(address, placeholders);
     }
 
-    private void buildExcelaAddress(String isScottish, Map<String, Object> placeholders) {
+    public void buildExcelaAddress(String isScottish, Map<String, Object> placeholders) {
         placeholders.put(EXELA_ADDRESS_LINE1_LITERAL, exelaAddressConfig.getAddressLine1());
         placeholders.put(EXELA_ADDRESS_LINE3_LITERAL, exelaAddressConfig.getAddressLine3());
 
@@ -104,7 +107,7 @@ public class PlaceholderService {
         }
     }
 
-    private boolean hasRegionalProcessingCenter(SscsCaseData ccdResponse) {
+    public boolean hasRegionalProcessingCenter(SscsCaseData ccdResponse) {
         return nonNull(ccdResponse.getRegionalProcessingCenter())
             && nonNull(ccdResponse.getRegionalProcessingCenter().getName());
     }
@@ -131,7 +134,8 @@ public class PlaceholderService {
 
     public static String[] lines(Address address) {
         return Stream.of(address.getLine1(), address.getLine2(), address.getTown(), address.getCounty(), address.getPostcode())
-            .filter(x -> x != null)
+            .filter(Objects::nonNull)
             .toArray(String[]::new);
     }
+
 }

@@ -23,23 +23,48 @@ public class PanelCompositionService {
     }
 
     public void processCaseState(Callback<SscsCaseData> callback, SscsCaseData caseData, EventType eventType) {
-        if (caseData.getIsFqpmRequired() == null
-            || hasDueDateSetAndOtherPartyWithoutHearingOption(caseData)) {
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.NOT_LISTABLE.getCcdType(),
-                "Not listable",
-                "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set",
-                idamService.getIdamTokens());
-        } else {
-            if (eventType.equals(EventType.UPDATE_OTHER_PARTY_DATA)) {
-                caseData.setDirectionDueDate(null);
-            }
-            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.READY_TO_LIST.getCcdType(),
-                "Ready to list",
-                "Update to ready to list event as there is no further information to assist the tribunal and no dispute.",
-                idamService.getIdamTokens());
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+
+        if (State.RESPONSE_RECEIVED.equals(caseDetails.getState())) {
+            caseData.setInterlocReviewState(InterlocReviewState.NONE);
+            updateCase(caseData,
+                caseDetails.getId(),
+                EventType.INTERLOC_REVIEW_STATE_AMEND,
+                "",
+                "");
+            return;
         }
+
+        if (stateNotDormant(caseDetails.getState())) {
+            if (caseData.getIsFqpmRequired() == null
+                || hasDueDateSetAndOtherPartyWithoutHearingOption(caseData)) {
+                if (stateNotWithFtaOrResponseReceived(caseDetails)) {
+                    updateCase(caseData,
+                        caseDetails.getId(),
+                        EventType.NOT_LISTABLE,
+                        "Not listable",
+                        "Update to Not Listable as the case is either awaiting hearing enquiry form or for FQPM to be set");
+                }
+            } else {
+                if (eventType.equals(EventType.UPDATE_OTHER_PARTY_DATA)) {
+                    caseData.setDirectionDueDate(null);
+                }
+                updateCase(caseData,
+                    caseDetails.getId(),
+                    EventType.READY_TO_LIST,
+                    "Ready to list",
+                    "Update to ready to list event as there is no further information to assist the tribunal and no dispute.");
+            }
+        }
+    }
+
+    private boolean stateNotWithFtaOrResponseReceived(CaseDetails<SscsCaseData> caseDetails) {
+        return !(State.WITH_DWP.equals(caseDetails.getState())
+            || State.RESPONSE_RECEIVED.equals(caseDetails.getState()));
+    }
+
+    private static boolean stateNotDormant(State caseState) {
+        return !State.DORMANT_APPEAL_STATE.equals(caseState);
     }
 
     private boolean hasDueDateSetAndOtherPartyWithoutHearingOption(SscsCaseData sscsCaseData) {
@@ -68,5 +93,9 @@ public class PanelCompositionService {
             && (hearingOptions.getExcludeDates() == null || hearingOptions.getExcludeDates().isEmpty())
             && StringUtils.isBlank(hearingOptions.getAgreeLessNotice())
             && StringUtils.isBlank(hearingOptions.getOther()));
+    }
+
+    private void updateCase(SscsCaseData caseData, Long caseId, EventType eventType, String summary, String description) {
+        ccdService.updateCase(caseData, caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens());
     }
 }

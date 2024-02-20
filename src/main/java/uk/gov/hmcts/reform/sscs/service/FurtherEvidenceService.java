@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.config.DocmosisTemplateConfig;
 import uk.gov.hmcts.reform.sscs.docmosis.domain.Pdf;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.model.PdfDocument;
+import uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility;
 
 @Service
 @Slf4j
@@ -45,14 +46,11 @@ public class FurtherEvidenceService {
     public void issue(List<? extends AbstractDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
                       List<FurtherEvidenceLetterType> allowedLetterTypes, String otherPartyOriginalSenderId) {
         List<PdfDocument> pdfDocument = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType, isYes(caseData.getIsConfidentialCase()), otherPartyOriginalSenderId);
-
         List<PdfDocument> sizeNormalisedPdfDocuments = sscsDocumentService.sizeNormalisePdfs(pdfDocument);
+        updateCaseDocuments(sizeNormalisedPdfDocuments.stream().map(PdfDocument::getDocument).collect(Collectors.toList()), caseData, documentType);
+        List<Pdf> pdfs = sizeNormalisedPdfDocuments.stream().map(PdfDocument::getPdf).collect(Collectors.toList());
 
-        updateCaseDocuments(sizeNormalisedPdfDocuments.stream().map(pdfDoc -> pdfDoc.getDocument()).collect(Collectors.toList()), caseData, documentType);
-
-        List<Pdf> pdfs = sizeNormalisedPdfDocuments.stream().map(pdfDoc -> pdfDoc.getPdf()).collect(Collectors.toList());
-
-        if (pdfs != null && pdfs.size() > 0) {
+        if (!pdfs.isEmpty()) {
             send609_97_OriginalSender(caseData, documentType, pdfs, allowedLetterTypes, otherPartyOriginalSenderId);
             send609_98_partiesOnCase(caseData, documentType, pdfs, allowedLetterTypes, otherPartyOriginalSenderId);
             log.info("Sending documents to bulk print for ccd Id: {} and document type: {}", caseData.getCcdCaseId(), documentType);
@@ -60,15 +58,12 @@ public class FurtherEvidenceService {
     }
 
     public void updateCaseDocuments(List<? extends AbstractDocument> documents, SscsCaseData caseData, DocumentType documentType) {
-
         List<SscsDocument> sscsCaseDocuments = caseData.getSscsDocument();
 
         for (AbstractDocument<AbstractDocumentDetails> doc : documents) {
-
             if (doc.getValue() != null
                 && documentType.getValue().equals(doc.getValue().getDocumentType())
                 && doc.getValue().getResizedDocumentLink() != null) {
-
                 if (doc.getValue().getClass().isAssignableFrom(SscsDocumentDetails.class)) {
                     sscsCaseDocuments
                         .stream()
@@ -88,20 +83,18 @@ public class FurtherEvidenceService {
 
     protected void send609_97_OriginalSender(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                              List<FurtherEvidenceLetterType> allowedLetterTypes, String otherPartyOriginalSenderId) {
-
         String docName = "609-97-template (original sender)";
         final FurtherEvidenceLetterType letterType = findLetterType(documentType);
 
         if (allowedLetterTypes.contains(letterType)) {
             byte[] bulkPrintList60997 = buildPdfsFor609_97(caseData, letterType, docName, otherPartyOriginalSenderId);
-            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData, letterType,
-                EventType.ISSUE_FURTHER_EVIDENCE);
+            String recipient = PlaceholderUtility.getName(caseData, letterType, otherPartyOriginalSenderId);
+            bulkPrintService.sendToBulkPrint(buildPdfs(bulkPrintList60997, pdfs, docName), caseData, letterType, EventType.ISSUE_FURTHER_EVIDENCE, recipient);
         }
     }
 
     protected void send609_98_partiesOnCase(SscsCaseData caseData, DocumentType documentType, List<Pdf> pdfs,
                                          List<FurtherEvidenceLetterType> allowedLetterTypes, String otherPartyOriginalSenderId) {
-
         Multimap<FurtherEvidenceLetterType, String> otherPartiesMap = buildMapOfPartiesFor609_98(caseData, documentType, otherPartyOriginalSenderId);
 
         for (Map.Entry<FurtherEvidenceLetterType, String> party : otherPartiesMap.entries()) {
@@ -109,10 +102,9 @@ public class FurtherEvidenceService {
 
             if (allowedLetterTypes.contains(party.getKey())) {
                 byte[] bulkPrintList60998 = buildPdfsFor609_98(caseData, party.getKey(), docName, party.getValue());
-
                 List<Pdf> pdfs60998 = buildPdfs(bulkPrintList60998, pdfs, docName);
-                bulkPrintService.sendToBulkPrint(pdfs60998, caseData, party.getKey(),
-                    EventType.ISSUE_FURTHER_EVIDENCE);
+                String recipient = PlaceholderUtility.getName(caseData, party.getKey(), party.getValue());
+                bulkPrintService.sendToBulkPrint(pdfs60998, caseData, party.getKey(), EventType.ISSUE_FURTHER_EVIDENCE, recipient);
             }
         }
     }

@@ -51,7 +51,7 @@ public class TopicConsumer {
             if (retry > maxRetryAttempts || isException(e)) {
                 log.error(format("Caught unknown unrecoverable error %s for message id %s", e.getMessage(), messageId), e);
             } else {
-
+                log.info("Statcktrace is {}", e.getStackTrace());
                 log.info(String.format("Caught recoverable error %s, retrying %s out of %s for message id %s",
                     e.getMessage(), retry, maxRetryAttempts, messageId));
 

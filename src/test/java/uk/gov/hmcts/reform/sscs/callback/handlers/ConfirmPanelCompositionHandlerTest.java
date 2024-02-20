@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.sscs.callback.handlers;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.callback.handlers.HandlerHelper.buildTestCallbackForGivenData;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CONFIRM_PANEL_COMPOSITION;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.DORMANT_APPEAL_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -168,6 +172,37 @@ public class ConfirmPanelCompositionHandlerTest {
 
         verify(ccdService).updateCase(eq(callback.getCaseDetails().getCaseData()),
             eq(Long.valueOf(callback.getCaseDetails().getCaseData().getCcdCaseId())), eq(EventType.NOT_LISTABLE.getCcdType()), anyString(), anyString(), any());
+    }
+
+    @Test
+    @Parameters(method = "generateOtherPartyOptions")
+    public void givenFqpmSetAndDueDateSetAndDormantAndNoOtherParty_thenCaseStateIsRemainDormant(List<CcdValue<OtherParty>> otherParties) {
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder()
+                .state(DORMANT_APPEAL_STATE)
+                .ccdCaseId("1")
+                .isFqpmRequired(YesNo.YES)
+                .directionDueDate(LocalDate.now().toString())
+                .otherParties(otherParties)
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
+                    .build()).build(), DORMANT_APPEAL_STATE, CONFIRM_PANEL_COMPOSITION);
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+        verify(ccdService, times(0)).updateCase(any(), anyLong(), anyString(), anyString(),anyString(), any());
+    }
+
+    @Test
+    public void givenCaseStateIsResponseReceived_thenCaseStateIsUnchangedAndReviewStateIsNone() {
+        final Callback<SscsCaseData> callback = buildTestCallbackForGivenData(
+            SscsCaseData.builder()
+                .state(RESPONSE_RECEIVED)
+                .ccdCaseId("1")
+                .appeal(Appeal.builder().benefitType(BenefitType.builder().code("childSupport").build())
+                    .build()).build(), RESPONSE_RECEIVED, CONFIRM_PANEL_COMPOSITION);
+
+        handler.handle(CallbackType.SUBMITTED, callback);
+        verify(ccdService, times(1)).updateCase(any(), anyLong(), anyString(), anyString(),anyString(), any());
+        assertEquals(callback.getCaseDetails().getCaseData().getInterlocReviewState(), InterlocReviewState.NONE);
     }
 
     private Object[] generateOtherPartyOptions() {

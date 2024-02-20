@@ -3,6 +3,7 @@ java:
   applicationPort: 8091
   readinessPath: '/health/readiness'
   aadIdentityName: sscs
+  devmemoryLimits: 2Gi
   ingressHost: sscs-evidence-share-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   keyVaults:
     sscs:
@@ -24,7 +25,8 @@ java:
         - robotics-email-from
         - robotics-email-scottish-to
         - robotics-email-pip-ae-to
-        - AppInsightsInstrumentationKey
+        - name: app-insights-connection-string
+          alias: app-insights-connection-string
         - ld-sdk-key
         - sendgrid-api-key
   environment:
