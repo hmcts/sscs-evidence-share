@@ -192,7 +192,11 @@ public class SorWriteHandlerTest {
 
         Map<String, Object> otherPartyRepPlaceholders = new HashMap<>();
         otherPartyRepPlaceholders.put(PlaceholderConstants.NAME, otherPartyWithRep.getRep().getName().getFullNameNoTitle());
-        when(sorPlaceholderService.populatePlaceholders(eq(caseData), eq(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER), anyString(), eq(null))).thenReturn(otherPartyRepPlaceholders);
+        when(sorPlaceholderService.populatePlaceholders(eq(caseData), eq(FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER), anyString(), eq(null))).thenReturn(otherPartyRepPlaceholders);
+
+        Map<String, Object> repPlaceHolders = new HashMap<>();
+        repPlaceHolders.put(PlaceholderConstants.NAME, caseData.getAppeal().getRep().getName().getFullNameNoTitle());
+        when(sorPlaceholderService.populatePlaceholders(eq(caseData), eq(FurtherEvidenceLetterType.REPRESENTATIVE_LETTER), anyString(), eq(null))).thenReturn(repPlaceHolders);
 
 
         Map<String, Object> otherPartyPlaceholders = new HashMap<>();
@@ -208,7 +212,7 @@ public class SorWriteHandlerTest {
             argumentCaptor.capture());
         Assertions.assertEquals(List.of(
                 caseData.getAppeal().getAppellant().getName().getFullNameNoTitle(),
-                otherPartyWithRep.getRep().getName().getFullNameNoTitle(),
+                caseData.getAppeal().getRep().getName().getFullNameNoTitle(),
                 otherParty.getValue().getName().getFullNameNoTitle(),
                 otherParty.getValue().getName().getFullNameNoTitle(),
                 otherPartyWithRep.getRep().getName().getFullNameNoTitle()),
