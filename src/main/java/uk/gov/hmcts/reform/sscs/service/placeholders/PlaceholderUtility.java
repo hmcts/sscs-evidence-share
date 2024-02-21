@@ -112,10 +112,11 @@ public final class PlaceholderUtility {
         if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
             return extractNameAppellant(caseData);
         } else if (FurtherEvidenceLetterType.REPRESENTATIVE_LETTER.getValue().equals(letterType.getValue())) {
-            return extractNameRep(caseData);
+            return extractNameRep(caseData.getAppeal().getRep());
         } else if (FurtherEvidenceLetterType.JOINT_PARTY_LETTER.getValue().equals(letterType.getValue())) {
             return extractNameJointParty(caseData);
-        } else if (FurtherEvidenceLetterType.OTHER_PARTY_LETTER.getValue().equals(letterType.getValue()) || FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER.getValue().equals(letterType.getValue())) {
+        } else if (FurtherEvidenceLetterType.OTHER_PARTY_LETTER.getValue().equals(letterType.getValue())
+            || FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER.getValue().equals(letterType.getValue())) {
             return getOtherPartyName(caseData, otherPartyId);
         } else if (FurtherEvidenceLetterType.DWP_LETTER.getValue().equals(letterType.getValue())) {
             return DWP;
@@ -139,14 +140,12 @@ public final class PlaceholderUtility {
                 .orElse(SIR_MADAM));
     }
 
-    private static String extractNameRep(SscsCaseData caseData) {
-        return Optional.of(caseData.getAppeal())
-            .map(Appeal::getRep)
+    private static String extractNameRep(Representative representative) {
+        return Optional.of(representative)
             .map(Representative::getName)
             .filter(PlaceholderUtility::isValidName)
             .map(Name::getFullNameNoTitle)
-            .orElseGet(() -> Optional.of(caseData.getAppeal())
-                .map(Appeal::getRep)
+            .orElseGet(() -> Optional.of(representative)
                 .map(Representative::getOrganisation)
                 .filter(StringUtils::isNoneBlank)
                 .orElse(SIR_MADAM));
@@ -174,7 +173,7 @@ public final class PlaceholderUtility {
                 } else if (otherPartyValue.getRep() != null
                     && otherPartyId.contains(otherPartyValue.getRep().getId())
                     && isValidName(otherPartyValue.getRep().getName())) {
-                    return otherPartyValue.getRep().getName().getFullNameNoTitle();
+                    return extractNameRep(otherPartyValue.getRep());
                 }
             }
         }
