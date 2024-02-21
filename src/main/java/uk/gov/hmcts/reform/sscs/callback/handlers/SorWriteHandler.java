@@ -80,20 +80,18 @@ public class SorWriteHandler implements CallbackHandler<SscsCaseData> {
         docmosisTemplate = template.get(languagePreference).get(POST_HEARING_APP_SOR_WRITTEN).get("name");
         docmosisCoverSheetTemplate = template.get(languagePreference).get(POST_HEARING_APP_SOR_WRITTEN).get("cover");
 
-        LinkedHashMap<Entity, Boolean> parties = getParties(caseData);
-        for (Map.Entry<Entity, Boolean> entry: parties.entrySet()) {
+        LinkedHashMap<Entity, FurtherEvidenceLetterType> parties = getParties(caseData);
+        for (Map.Entry<Entity, FurtherEvidenceLetterType> entry: parties.entrySet()) {
             Entity party = entry.getKey();
-            Boolean isOtherPartyRep = entry.getValue();
-            var letterType = getLetterType(party, isOtherPartyRep);
-            var partyId = party instanceof OtherParty || letterType == FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER ? party.getId() : null;
+            var partyId = party instanceof OtherParty || entry.getValue() == FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER ? party.getId() : null;
             var placeholders = sorPlaceholderService.populatePlaceholders(caseData,
-                letterType,
+                entry.getValue(),
                 party.getClass().getSimpleName(),
                 partyId);
 
             String letterName = String.format(LETTER_NAME, placeholders.get(ADDRESS_NAME), LocalDateTime.now());
 
-            var generatedPdf = coverLetterService.generateCoverLetterRetry(letterType,
+            var generatedPdf = coverLetterService.generateCoverLetterRetry(entry.getValue(),
                 docmosisTemplate, letterName, placeholders, 1);
 
             var coverSheet = coverLetterService.generateCoverSheet(docmosisCoverSheetTemplate,
@@ -120,38 +118,23 @@ public class SorWriteHandler implements CallbackHandler<SscsCaseData> {
         }
     }
 
-    private FurtherEvidenceLetterType getLetterType(Entity party, Boolean isOtherPartyRep) {
 
-        if (party instanceof Appellant) {
-            return FurtherEvidenceLetterType.APPELLANT_LETTER;
-        } else if (party instanceof Appointee) {
-            return FurtherEvidenceLetterType.APPELLANT_LETTER;
-        } else if (party instanceof Representative && isOtherPartyRep) {
-            return FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER;
-        } else if (party instanceof Representative) {
-            return FurtherEvidenceLetterType.REPRESENTATIVE_LETTER;
-        } else if (party instanceof OtherParty) {
-            return FurtherEvidenceLetterType.OTHER_PARTY_LETTER;
-        }
-        return FurtherEvidenceLetterType.JOINT_PARTY_LETTER;
-    }
-
-    private LinkedHashMap<Entity, Boolean> getParties(SscsCaseData caseData) {
-        var parties = new LinkedHashMap<Entity, Boolean>();
+    private LinkedHashMap<Entity, FurtherEvidenceLetterType> getParties(SscsCaseData caseData) {
+        var parties = new LinkedHashMap<Entity, FurtherEvidenceLetterType>();
 
         Appeal appeal = caseData.getAppeal();
         if (isYes(appeal.getAppellant().getIsAppointee())) {
-            parties.put(appeal.getAppellant().getAppointee(), false);
+            parties.put(appeal.getAppellant().getAppointee(), FurtherEvidenceLetterType.APPELLANT_LETTER);
         } else {
-            parties.put(appeal.getAppellant(), false);
+            parties.put(appeal.getAppellant(), FurtherEvidenceLetterType.APPELLANT_LETTER);
         }
 
         if (caseData.isThereAJointParty()) {
-            parties.put(caseData.getJointParty(), false);
+            parties.put(caseData.getJointParty(), FurtherEvidenceLetterType.JOINT_PARTY_LETTER);
         }
 
         if (!isNull(appeal.getRep()) && isYes(appeal.getRep().getHasRepresentative())) {
-            parties.put(appeal.getRep(), false);
+            parties.put(appeal.getRep(), FurtherEvidenceLetterType.REPRESENTATIVE_LETTER);
         }
 
         if (!isNull(caseData.getOtherParties()) && !caseData.getOtherParties().isEmpty()) {
@@ -161,13 +144,13 @@ public class SorWriteHandler implements CallbackHandler<SscsCaseData> {
                 .map(CcdValue::getValue)
                 .forEach(party -> {
                     if (party.hasAppointee()) {
-                        parties.put(party.getAppointee(), false);
+                        parties.put(party.getAppointee(), FurtherEvidenceLetterType.APPELLANT_LETTER);
                     } else {
-                        parties.put(party, false);
+                        parties.put(party, FurtherEvidenceLetterType.OTHER_PARTY_LETTER);
                     }
 
                     if (party.hasRepresentative()) {
-                        parties.put(party.getRep(), true);
+                        parties.put(party.getRep(), FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER);
                     }
                 });
         }
