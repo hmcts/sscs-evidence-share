@@ -192,7 +192,7 @@ public class SorWriteHandlerTest {
 
         Map<String, Object> otherPartyRepPlaceholders = new HashMap<>();
         otherPartyRepPlaceholders.put(PlaceholderConstants.NAME, otherPartyWithRep.getRep().getName().getFullNameNoTitle());
-        when(sorPlaceholderService.populatePlaceholders(eq(caseData), eq(FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER), anyString(), eq(null))).thenReturn(otherPartyRepPlaceholders);
+        when(sorPlaceholderService.populatePlaceholders(eq(caseData), eq(FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER), anyString(), anyString())).thenReturn(otherPartyRepPlaceholders);
 
         Map<String, Object> repPlaceHolders = new HashMap<>();
         repPlaceHolders.put(PlaceholderConstants.NAME, caseData.getAppeal().getRep().getName().getFullNameNoTitle());

@@ -85,7 +85,7 @@ public class SorWriteHandler implements CallbackHandler<SscsCaseData> {
             Entity party = entry.getKey();
             Boolean isOtherPartyRep = entry.getValue();
             var letterType = getLetterType(party, isOtherPartyRep);
-            var partyId = party instanceof OtherParty ? party.getId() : null;
+            var partyId = party instanceof OtherParty || letterType == FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER ? party.getId() : null;
             var placeholders = sorPlaceholderService.populatePlaceholders(caseData,
                 letterType,
                 party.getClass().getSimpleName(),
