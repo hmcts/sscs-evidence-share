@@ -93,7 +93,7 @@ public class ReissueFurtherEvidenceHandler implements CallbackHandler<SscsCaseDa
                                                                                                     ReissueArtifactUi reissueArtifactUi) {
         return Stream.of(caseData.getSscsDocument(), caseData.getSscsWelshDocuments())
             .flatMap(documents -> getStreamIfNonNull(documents))
-            .filter(document -> isDocumentSelectedInUiEqualsToStreamDocument(reissueArtifactUi, document))
+            .filter(document -> document.getValue().getDocumentLink() != null && isDocumentSelectedInUiEqualsToStreamDocument(reissueArtifactUi, document))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException(getNoSelectedDocumentErrorMessage(caseData)));
     }
