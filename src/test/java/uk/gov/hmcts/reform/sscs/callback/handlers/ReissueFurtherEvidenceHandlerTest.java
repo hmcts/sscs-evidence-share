@@ -403,6 +403,42 @@ public class ReissueFurtherEvidenceHandlerTest {
         );
     }
 
+    @Test
+    public void givenIssueFurtherEvidenceCallbackWithNullDocumentLink_shouldReissueWithoutError() {
+        SscsDocument doc1 = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentLink(null)
+                .build())
+            .build();
+        SscsDocument doc2 = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder().documentUrl("Second.doc").build())
+                .build())
+            .build();
+
+        DynamicListItem dynamicListItem2 = new DynamicListItem(
+            doc2.getValue().getDocumentLink().getDocumentUrl(), "Second document");
+
+        DynamicList dynamicList = new DynamicList(dynamicListItem2, List.of(dynamicListItem2));
+        SscsCaseData caseData = SscsCaseData.builder()
+            .ccdCaseId("1563382899630221")
+            .reissueArtifactUi(ReissueArtifactUi.builder()
+                .reissueFurtherEvidenceDocument(dynamicList)
+                .build())
+            .sscsDocument(List.of(doc1, doc2))
+            .build();
+        when(furtherEvidenceService.canHandleAnyDocument(List.of(doc1, doc2))).thenReturn(true);
+
+        handler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, REISSUE_FURTHER_EVIDENCE));
+
+        verify(furtherEvidenceService).issue(
+            argThat(argument -> argument.size() == 1 && argument.get(0) == doc2),
+            eq(caseData), eq(APPELLANT_EVIDENCE), eq(List.of()), eq(null)
+        );
+
+    }
+
     private static List<OtherPartyOption> getOtherPartyOptions(YesNo resendToOtherParty, YesNo resendToOtherPartyRep) {
         List<OtherPartyOption> otherPartyOptions = new ArrayList<>();
         if (resendToOtherParty != null) {
