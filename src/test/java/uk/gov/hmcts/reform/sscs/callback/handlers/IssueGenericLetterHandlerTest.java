@@ -257,7 +257,7 @@ class IssueGenericLetterHandlerTest {
 
         handler.handle(SUBMITTED, callback);
 
-        verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any());
+        verify(ccdNotificationService, times(0)).storeNotificationLetterIntoCcd(any(), any(), any(), any());
         verify(bulkPrintService, times(2)).sendToBulkPrint(eq(callback.getCaseDetails().getId()),
             eq(caseData), any(), eq(ISSUE_GENERIC_LETTER),
             argumentCaptor.capture());

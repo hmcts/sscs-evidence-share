@@ -3,7 +3,15 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderService.lines;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -104,10 +112,11 @@ public final class PlaceholderUtility {
         if (FurtherEvidenceLetterType.APPELLANT_LETTER.getValue().equals(letterType.getValue())) {
             return extractNameAppellant(caseData);
         } else if (FurtherEvidenceLetterType.REPRESENTATIVE_LETTER.getValue().equals(letterType.getValue())) {
-            return extractNameRep(caseData);
+            return extractNameRep(caseData.getAppeal().getRep());
         } else if (FurtherEvidenceLetterType.JOINT_PARTY_LETTER.getValue().equals(letterType.getValue())) {
             return extractNameJointParty(caseData);
-        } else if (FurtherEvidenceLetterType.OTHER_PARTY_LETTER.getValue().equals(letterType.getValue()) || FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER.getValue().equals(letterType.getValue())) {
+        } else if (FurtherEvidenceLetterType.OTHER_PARTY_LETTER.getValue().equals(letterType.getValue())
+            || FurtherEvidenceLetterType.OTHER_PARTY_REP_LETTER.getValue().equals(letterType.getValue())) {
             return getOtherPartyName(caseData, otherPartyId);
         } else if (FurtherEvidenceLetterType.DWP_LETTER.getValue().equals(letterType.getValue())) {
             return DWP;
@@ -131,14 +140,12 @@ public final class PlaceholderUtility {
                 .orElse(SIR_MADAM));
     }
 
-    private static String extractNameRep(SscsCaseData caseData) {
-        return Optional.of(caseData.getAppeal())
-            .map(Appeal::getRep)
+    private static String extractNameRep(Representative representative) {
+        return Optional.of(representative)
             .map(Representative::getName)
             .filter(PlaceholderUtility::isValidName)
             .map(Name::getFullNameNoTitle)
-            .orElseGet(() -> Optional.of(caseData.getAppeal())
-                .map(Appeal::getRep)
+            .orElseGet(() -> Optional.of(representative)
                 .map(Representative::getOrganisation)
                 .filter(StringUtils::isNoneBlank)
                 .orElse(SIR_MADAM));
@@ -166,7 +173,7 @@ public final class PlaceholderUtility {
                 } else if (otherPartyValue.getRep() != null
                     && otherPartyId.contains(otherPartyValue.getRep().getId())
                     && isValidName(otherPartyValue.getRep().getName())) {
-                    return otherPartyValue.getRep().getName().getFullNameNoTitle();
+                    return extractNameRep(otherPartyValue.getRep());
                 }
             }
         }
@@ -175,5 +182,18 @@ public final class PlaceholderUtility {
 
     private static boolean isValidName(Name name) {
         return isNoneBlank(name.getFirstName()) && isNoneBlank(name.getLastName());
+    }
+
+    static Map<String, Object> getAddressPlaceHolders(Address address) {
+        var addressPlaceHolders = new HashMap<String, Object>();
+        String[] lines = lines(address);
+        String[] addressConstants = {LETTER_ADDRESS_LINE_1, LETTER_ADDRESS_LINE_2, LETTER_ADDRESS_LINE_3,
+            LETTER_ADDRESS_LINE_4, LETTER_ADDRESS_POSTCODE};
+
+        for (int i = 0; i < lines.length; i++) {
+            addressPlaceHolders.put(addressConstants[i], truncateAddressLine(defaultToEmptyStringIfNull(lines[i])));
+        }
+
+        return addressPlaceHolders;
     }
 }
