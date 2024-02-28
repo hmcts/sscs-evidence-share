@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -18,10 +19,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
@@ -358,10 +365,16 @@ public class RoboticsServiceTest {
     }
 
     @Test
+    @ExtendWith(OutputCaptureExtension.class)
     @Parameters({"ESA, Balham DRT, Watford DRT", "PIP, DWP PIP (1), DWP PIP (2)", "PIP, PIP (AE), DWP PIP (AE)"})
     public void givenACaseAndDwpIssuingOfficeIsClosed_thenFindNewIssuingOfficeAndUpdateCaseInCcdAndRobotics(String benefitType, String existingOffice, String newOffice) {
         given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
             OfficeMapping.builder().code(existingOffice).mapping(Mapping.builder().ccd(newOffice).build()).build()));
+
+        Logger roboticsServiceLogger = (Logger) LoggerFactory.getLogger(RoboticsService.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        roboticsServiceLogger.addAppender(listAppender);
 
         sscsCaseData.getAppeal().getMrnDetails().setDwpIssuingOffice(existingOffice);
         sscsCaseData.getAppeal().getBenefitType().setCode(benefitType);
@@ -371,6 +384,9 @@ public class RoboticsServiceTest {
         roboticsService.sendCaseToRobotics(caseData);
 
         assertThat(caseData.getCaseData().getAppeal().getMrnDetails().getDwpIssuingOffice(), is(newOffice));
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals("Case {} automatically updating FTA office probably due to office closure", logsList.get(1)
+            .getMessage());
         verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
@@ -379,6 +395,11 @@ public class RoboticsServiceTest {
     public void givenACaseAndDwpOriginatingOfficeIsClosed_thenFindNewOriginatingOfficeAndUpdateCaseInCcdAndRobotics(String benefitType, String existingOffice, String newOffice) {
         given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
             OfficeMapping.builder().code(existingOffice).mapping(Mapping.builder().ccd(newOffice).build()).build()));
+
+        Logger roboticsServiceLogger = (Logger) LoggerFactory.getLogger(RoboticsService.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        roboticsServiceLogger.addAppender(listAppender);
 
         sscsCaseData.getAppeal().getBenefitType().setCode(benefitType);
 
@@ -390,6 +411,9 @@ public class RoboticsServiceTest {
         roboticsService.sendCaseToRobotics(caseData);
 
         assertThat(caseData.getCaseData().getDwpOriginatingOffice().getValue().getCode(), is(newOffice));
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals("Case {} automatically updating FTA office probably due to office closure", logsList.get(1)
+            .getMessage());
         verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
@@ -398,6 +422,11 @@ public class RoboticsServiceTest {
     public void givenACaseAndDwpPresentingOfficeIsClosed_thenFindNewPresentingOfficeAndUpdateCaseInCcdAndRobotics(String benefitType, String existingOffice, String newOffice) {
         given(dwpAddressLookupService.getDwpMappingByOffice(benefitType, existingOffice)).willReturn(Optional.of(
             OfficeMapping.builder().code(existingOffice).mapping(Mapping.builder().ccd(newOffice).build()).build()));
+
+        Logger roboticsServiceLogger = (Logger) LoggerFactory.getLogger(RoboticsService.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        roboticsServiceLogger.addAppender(listAppender);
 
         sscsCaseData.getAppeal().getBenefitType().setCode(benefitType);
 
@@ -409,6 +438,9 @@ public class RoboticsServiceTest {
         roboticsService.sendCaseToRobotics(caseData);
 
         assertThat(caseData.getCaseData().getDwpPresentingOffice().getValue().getCode(), is(newOffice));
+        List<ILoggingEvent> logsList = listAppender.list;
+        assertEquals("Case {} automatically updating FTA office probably due to office closure", logsList.get(1)
+            .getMessage());
         verify(ccdService, never()).updateCase(any(), any(), anyString(), anyString(), anyString(), any());
     }
 
