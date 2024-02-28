@@ -26,15 +26,16 @@ public class CcdNotificationService {
     }
 
     public void storeNotificationLetterIntoCcd(EventType eventType, byte[] pdfLetter,
-                                               Long ccdCaseId) {
-        var correspondence = buildCorrespondence(eventType);
+                                               Long ccdCaseId, String recipient) {
+        var correspondence = buildCorrespondence(eventType, recipient);
         ccdNotificationsPdfService.mergeLetterCorrespondenceIntoCcd(pdfLetter, ccdCaseId, correspondence, SENDER_TYPE);
     }
 
-    private Correspondence buildCorrespondence(EventType eventType) {
+    Correspondence buildCorrespondence(EventType eventType, String recipient) {
         var correspondenceDetails = CorrespondenceDetails.builder()
             .correspondenceType(CorrespondenceType.Letter)
             .eventType(eventType.getCcdType())
+            .to(recipient)
             .sentOn(LocalDateTime.now(ZONE_ID_LONDON).format(DATE_TIME_FORMATTER))
             .build();
 

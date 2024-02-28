@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.*;
-import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderUtility.truncateAddressLine;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +38,11 @@ public class SorPlaceholderService {
         placeholderService.build(caseData, placeholders, address, null);
 
         String name = PlaceholderUtility.getName(caseData, letterType, otherPartyId);
+        placeholders.putAll(PlaceholderUtility.getAddressPlaceHolders(address));
+
         if (name != null) {
-            placeholders.put(NAME, truncateAddressLine(name));
+            placeholders.put(NAME, name);
+            placeholders.put(ADDRESS_NAME, name);
         }
         placeholders.put(HMCTS2, HMCTS_IMG);
         placeholders.put(APPEAL_REF, caseData.getCcdCaseId());

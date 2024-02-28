@@ -2,9 +2,21 @@ package uk.gov.hmcts.reform.sscs.service.placeholders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ADDRESS_NAME;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.APPELLANT_NAME;
 import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.ENTITY_TYPE;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_LINE_4;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.LETTER_ADDRESS_POSTCODE;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderConstants.NAME;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildJointParty;
+import static uk.gov.hmcts.reform.sscs.service.placeholders.PlaceholderHelper.buildOtherParty;
 
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +24,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CcdValue;
+import uk.gov.hmcts.reform.sscs.ccd.domain.JointParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.OtherParty;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 
@@ -37,13 +54,103 @@ public class SorPlaceholderServiceTest {
             sorPlaceholderService.populatePlaceholders(null, null, null, null));
     }
 
-
     @Test
-    void appellantTest() {
+    void returnAppellantAddressAndNamePlaceholdersGivenAppellantLetter() {
         var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
             Appellant.class.getSimpleName(), null);
 
-        assertEquals(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle(), placeholders.get(PlaceholderConstants.NAME));
+        var appellantAddress = caseData.getAppeal().getAppellant().getAddress();
         assertEquals(Appellant.class.getSimpleName(), placeholders.get(ENTITY_TYPE));
+        assertEquals(appellantAddress.getLine1(), placeholders.get(LETTER_ADDRESS_LINE_1));
+        assertEquals(appellantAddress.getLine2(), placeholders.get(LETTER_ADDRESS_LINE_2));
+        assertEquals(appellantAddress.getPostcode(), placeholders.get(LETTER_ADDRESS_POSTCODE));
+
+        var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
+        assertEquals(appellantName, placeholders.get(ADDRESS_NAME));
+        assertEquals(appellantName, placeholders.get(NAME));
+        assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
+    }
+
+    @Test
+    void returnRepresentativeAddressAndNamePlaceholdersGivenRepresentativeLetter() {
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.REPRESENTATIVE_LETTER,
+            Representative.class.getSimpleName(), null);
+
+        var representativeAddress = caseData.getAppeal().getRep().getAddress();
+        assertEquals(Representative.class.getSimpleName(), placeholders.get(ENTITY_TYPE));
+        assertEquals(representativeAddress.getLine1(), placeholders.get(LETTER_ADDRESS_LINE_1));
+        assertEquals(representativeAddress.getLine2(), placeholders.get(LETTER_ADDRESS_LINE_2));
+        assertEquals(representativeAddress.getPostcode(), placeholders.get(LETTER_ADDRESS_POSTCODE));
+
+        var representativeName = caseData.getAppeal().getRep().getName().getFullNameNoTitle();
+        assertEquals(representativeName, placeholders.get(ADDRESS_NAME));
+        assertEquals(representativeName, placeholders.get(NAME));
+
+        var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
+        assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
+    }
+
+    @Test
+    void returnOtherPartyAddressAndNamePlaceholdersGivenOtherPartyLetter() {
+        OtherParty otherParty = buildOtherParty();
+        caseData.setOtherParties(List.of(new CcdValue<>(otherParty)));
+
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.OTHER_PARTY_LETTER,
+            OtherParty.class.getSimpleName(), " otherParty" + otherParty.getId());
+
+        var otherPartyAddress = otherParty.getAddress();
+        assertEquals(OtherParty.class.getSimpleName(), placeholders.get(ENTITY_TYPE));
+        assertEquals(otherPartyAddress.getLine1(), placeholders.get(LETTER_ADDRESS_LINE_1));
+        assertEquals(otherPartyAddress.getLine2(), placeholders.get(LETTER_ADDRESS_LINE_2));
+        assertEquals(otherPartyAddress.getPostcode(), placeholders.get(LETTER_ADDRESS_LINE_4));
+
+        var otherPartyName = otherParty.getName().getFullNameNoTitle();
+        assertEquals(otherPartyName, placeholders.get(ADDRESS_NAME));
+        assertEquals(otherPartyName, placeholders.get(NAME));
+
+        var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
+        assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
+    }
+
+    @Test
+    void returnJointPartyAddressAndNamePlaceholdersGivenJointPartyLetter() {
+        var jointParty = buildJointParty();
+        caseData.setJointParty(jointParty);
+
+        Map<String, Object> placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.JOINT_PARTY_LETTER,
+            JointParty.class.getSimpleName(), null);
+
+        var jointPartyAddress = caseData.getJointParty().getAddress();
+        assertEquals(JointParty.class.getSimpleName(), placeholders.get(ENTITY_TYPE));
+        assertEquals(jointPartyAddress.getLine1(), placeholders.get(LETTER_ADDRESS_LINE_1));
+        assertEquals(jointPartyAddress.getLine2(), placeholders.get(LETTER_ADDRESS_LINE_2));
+        assertEquals(jointPartyAddress.getPostcode(), placeholders.get(LETTER_ADDRESS_LINE_4));
+
+        var jointPartyName = caseData.getJointParty().getName().getFullNameNoTitle();
+        assertEquals(jointPartyName, placeholders.get(ADDRESS_NAME));
+        assertEquals(jointPartyName, placeholders.get(NAME));
+
+        var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
+        assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
+    }
+
+    @Test
+    void returnAppointeeAddressAndNamePlaceholdersGivenAppointeeLetter() {
+        caseData.getAppeal().getAppellant().setIsAppointee(YES);
+        var placeholders = sorPlaceholderService.populatePlaceholders(caseData, FurtherEvidenceLetterType.APPELLANT_LETTER,
+            Appointee.class.getSimpleName(), null);
+
+        var appointeeAddress = caseData.getAppeal().getAppellant().getAppointee().getAddress();
+        assertEquals(Appointee.class.getSimpleName(), placeholders.get(ENTITY_TYPE));
+        assertEquals(appointeeAddress.getLine1(), placeholders.get(LETTER_ADDRESS_LINE_1));
+        assertEquals(appointeeAddress.getLine2(), placeholders.get(LETTER_ADDRESS_LINE_2));
+        assertEquals(appointeeAddress.getPostcode(), placeholders.get(LETTER_ADDRESS_POSTCODE));
+
+        var appointeeName = caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle();
+        assertEquals(appointeeName, placeholders.get(ADDRESS_NAME));
+        assertEquals(appointeeName, placeholders.get(NAME));
+
+        var appellantName = caseData.getAppeal().getAppellant().getName().getFullNameNoTitle();
+        assertEquals(appellantName, placeholders.get(APPELLANT_NAME));
     }
 }

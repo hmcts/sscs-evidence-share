@@ -85,7 +85,7 @@ public class BulkPrintService implements PrintService {
         Pdf letter = pdfs.get(0);
 
         if (id.isPresent()) {
-            ccdNotificationService.storeNotificationLetterIntoCcd(eventType, letter.getContent(), caseId);
+            ccdNotificationService.storeNotificationLetterIntoCcd(eventType, letter.getContent(), caseId, recipient);
             log.info("Letter was sent for event {} and case {}, send-letter-service id {}", eventType.getCcdType(), caseId, id.get());
         } else {
             log.error("Failed to send to bulk print for case {}. No print id returned", caseId);
