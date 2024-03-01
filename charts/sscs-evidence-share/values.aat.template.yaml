@@ -1,3 +1,6 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+
+  environment:
+    ISSUE_FURTHER_EVIDENCE_HANDLER_V2: true
