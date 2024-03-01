@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.callback.CallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -19,6 +20,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DispatchPriority;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService.UpdateResult;
 import uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType;
 import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.exception.PostIssueFurtherEvidenceTasksException;
@@ -32,6 +35,11 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private final FurtherEvidenceService furtherEvidenceService;
     private final CcdService ccdService;
     private final IdamService idamService;
+    @Autowired
+    private UpdateCcdCaseService updateCcdCaseService;
+    private final String UPDATE_CASE_ONLY_SUMMARY = "Update case data";
+    @Value("${feature.issue-further-evidence-handler-v2:false}")
+    boolean issueFurtherEvidenceHandlerV2;
 
     @Autowired
     public IssueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService, CcdService ccdService,
@@ -54,10 +62,22 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        log.info("Handling with Issue Further Evidence Handler for caseId {}", caseData.getCcdCaseId());
-        issueFurtherEvidence(caseData);
-        postIssueFurtherEvidenceTasks(caseData);
+        String caseId = callback.getCaseDetails().getCaseData().getCcdCaseId();
+        log.info("Handling with Issue Further Evidence Handler for caseId {}", caseId);
+
+        if (issueFurtherEvidenceHandlerV2) {
+            updateCcdCaseService.updateCaseV2(Long.parseLong(caseId), EventType.UPDATE_CASE_ONLY.getCcdType(),
+                idamService.getIdamTokens(), caseData -> {
+                    issueFurtherEvidence(caseData);
+                    String description = postIssueFurtherEvidenceTasks(caseData);
+                    return new UpdateResult(UPDATE_CASE_ONLY_SUMMARY, description);
+                });
+
+        } else {
+            SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+            issueFurtherEvidence(caseData);
+            postIssueFurtherEvidenceTasks(caseData);
+        }
     }
 
     private void issueFurtherEvidence(SscsCaseData caseData) {
@@ -100,7 +120,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         log.info("Issued for caseId {}", caseData.getCcdCaseId());
     }
 
-    private void postIssueFurtherEvidenceTasks(SscsCaseData caseData) {
+    private String postIssueFurtherEvidenceTasks(SscsCaseData caseData) {
         log.debug("Post Issue Tasks for caseId {}", caseData.getCcdCaseId());
         try {
             if (caseData.getReasonableAdjustmentsLetters() != null) {
@@ -112,16 +132,21 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
             setEvidenceIssuedFlagToYes(caseData.getSscsDocument());
 
-            ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
-                EventType.UPDATE_CASE_ONLY.getCcdType(),
-                "Update case data",
-                description,
-                idamService.getIdamTokens());
+            if (issueFurtherEvidenceHandlerV2) {
+                return description;
+            } else {
+                ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
+                    EventType.UPDATE_CASE_ONLY.getCcdType(),
+                    UPDATE_CASE_ONLY_SUMMARY,
+                    description,
+                    idamService.getIdamTokens());
+            }
         } catch (Exception e) {
             String errorMsg = "Failed to update document evidence issued flags after issuing further evidence "
                 + "for case(%s)";
             throw new PostIssueFurtherEvidenceTasksException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
+        return null;
     }
 
     public String determineDescription(List<SscsDocument> documents) {

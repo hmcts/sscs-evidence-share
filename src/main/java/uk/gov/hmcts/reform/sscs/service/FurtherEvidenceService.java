@@ -68,13 +68,12 @@ public class FurtherEvidenceService {
                     sscsCaseDocuments
                         .stream()
                         .filter(d -> d.getValue().getDocumentLink().getDocumentBinaryUrl().equals(doc.getValue().getDocumentLink().getDocumentBinaryUrl()))
-                        .map(d -> {
+                        .peek(d -> {
                             DocumentLink resizedLink = doc.getValue().getResizedDocumentLink();
                             d.getValue().setResizedDocumentLink(resizedLink);
                             log.info("Sending resized document to bulk print link: DocumentLink(documentUrl= {} , documentFilename= {} and caseId {} )",
                                 resizedLink.getDocumentUrl(), resizedLink.getDocumentFilename(), caseData.getCcdCaseId());
-                            return d;
-                        }).findFirst();
+                        });
                 }
             }
         }
