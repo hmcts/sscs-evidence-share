@@ -206,7 +206,7 @@ dependencyCheck {
   //  otherwise we are strict in our build and fail it.
   failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'false' ? 11 : 7.0
   nvd.validForHours = 24 // on Jenkins we have 24, so if you get more vulnerabilities locally, try to normalize this value with Jenkins
-  nvd.apiKey = "280A4E31-EAD7-EE11-833F-124ABD0694B9"
+  nvd.apiKey = 'c30b5170-ecfa-434b-9f6b-6894d66c535a'
   suppressionFile = 'config/owasp/suppressions.xml'
 
   analyzers {
@@ -284,6 +284,7 @@ task runGitPreCommitTasks {
   dependsOn 'test'
   dependsOn 'pmdMain'
   dependsOn 'pmdTest'
+  dependsOn 'dependencyCheckAggregate'
   dependsOn 'checkstyleMain'
   dependsOn 'checkstyleTest'
 }

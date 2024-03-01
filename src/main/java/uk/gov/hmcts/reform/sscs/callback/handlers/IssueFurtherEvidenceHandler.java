@@ -36,7 +36,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private final CcdService ccdService;
     private final IdamService idamService;
     private UpdateCcdCaseService updateCcdCaseService;
-    private static final String updateCaseOnlySummary = "Update case data";
+    private static final String UPDATE_CASE_ONLY_SUMMARY = "Update case data";
     @Value("${feature.issue-further-evidence-handler-v2:false}")
     boolean issueFurtherEvidenceHandlerV2;
 
@@ -69,7 +69,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
                 idamService.getIdamTokens(), caseData -> {
                     issueFurtherEvidence(caseData);
                     String description = postIssueFurtherEvidenceTasks(caseData);
-                    return new UpdateResult(updateCaseOnlySummary, description);
+                    return new UpdateResult(UPDATE_CASE_ONLY_SUMMARY, description);
                 });
 
         } else {
@@ -136,7 +136,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             } else {
                 ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
                     EventType.UPDATE_CASE_ONLY.getCcdType(),
-                    updateCaseOnlySummary,
+                    UPDATE_CASE_ONLY_SUMMARY,
                     description,
                     idamService.getIdamTokens());
             }
