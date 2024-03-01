@@ -35,9 +35,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private final FurtherEvidenceService furtherEvidenceService;
     private final CcdService ccdService;
     private final IdamService idamService;
-    @Autowired
     private UpdateCcdCaseService updateCcdCaseService;
-    private final String updateCaseOnlySummary = "Update case data";
+    private static final String updateCaseOnlySummary = "Update case data";
     @Value("${feature.issue-further-evidence-handler-v2:false}")
     boolean issueFurtherEvidenceHandlerV2;
 
