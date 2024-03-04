@@ -89,7 +89,10 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException() {
+    @Parameters({"true", "false"})
+    public void givenCallbackIsNull_whenHandleIsCalled_shouldThrowException(String isV2String) {
+        Boolean isV2 = isV2String.equals("true");
+        ReflectionTestUtils.setField(issueFurtherEvidenceHandler, "issueFurtherEvidenceHandlerV2", isV2);
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, null);
     }
 
@@ -103,12 +106,27 @@ public class IssueFurtherEvidenceHandlerTest {
     @Test(expected = IllegalStateException.class)
     @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
     public void givenEventTypeIsNotIssueFurtherEvidence_willThrowAnException(EventType eventType) {
+        ReflectionTestUtils.setField(issueFurtherEvidenceHandler, "issueFurtherEvidenceHandlerV2", false);
+
+        issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
+            buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, eventType));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @Parameters({"REISSUE_FURTHER_EVIDENCE", "EVIDENCE_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
+    public void givenEventTypeIsNotIssueFurtherEvidence_willThrowAnExceptionV2(EventType eventType) {
+        ReflectionTestUtils.setField(issueFurtherEvidenceHandler, "issueFurtherEvidenceHandlerV2", true);
+
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, eventType));
     }
 
     @Test(expected = RequiredFieldMissingException.class)
-    public void givenCaseDataInCallbackIsNull_shouldThrowException() {
+    @Parameters({"true", "false"})
+    public void givenCaseDataInCallbackIsNull_shouldThrowException(String isV2String) {
+        Boolean isV2 = isV2String.equals("true");
+        ReflectionTestUtils.setField(issueFurtherEvidenceHandler, "issueFurtherEvidenceHandlerV2", isV2);
+
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(null, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
     }
@@ -125,7 +143,11 @@ public class IssueFurtherEvidenceHandlerTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void givenHandleMethodIsCalled_shouldThrowExceptionIfCanNotBeHandled() {
+    @Parameters({"true", "false"})
+    public void givenHandleMethodIsCalled_shouldThrowExceptionIfCanNotBeHandled(String isV2String) {
+        Boolean isV2 = true;
+        ReflectionTestUtils.setField(issueFurtherEvidenceHandler, "issueFurtherEvidenceHandlerV2", isV2);
+
         given(furtherEvidenceService.canHandleAnyDocument(any())).willReturn(false);
 
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
@@ -145,13 +167,21 @@ public class IssueFurtherEvidenceHandlerTest {
 
 
     @Test
-    public void givenExceptionWhenIssuingFurtherEvidence_shouldHandleItAppropriately() {
+    @Parameters({"true", "false"})
+    public void givenExceptionWhenIssuingFurtherEvidence_shouldHandleItAppropriately(String isV2String) {
+        Boolean isV2 = isV2String.equals("true");
+        ReflectionTestUtils.setField(issueFurtherEvidenceHandler, "issueFurtherEvidenceHandlerV2", isV2);
+
         doThrow(RuntimeException.class).when(furtherEvidenceService).issue(any(), any(), any(), any(), eq(null));
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         try {
             issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData,
                 INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+            if (isV2) {
+                verify(updateCcdCaseService).updateCaseV2(any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class), mutatorCaptor.capture());
+                mutatorCaptor.getValue().apply(caseData);
+            }
             fail("no exception thrown");
         } catch (IssueFurtherEvidenceException e) {
             assertEquals("Failed sending further evidence for case(1563382899630221)...", e.getMessage());
