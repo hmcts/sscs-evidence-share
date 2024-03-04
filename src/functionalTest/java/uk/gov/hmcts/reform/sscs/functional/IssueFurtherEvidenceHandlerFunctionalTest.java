@@ -6,12 +6,15 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED
 
 import java.io.IOException;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
+@Slf4j
 public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctionalTest {
 
     @Before
@@ -38,6 +41,7 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
         // we are able to cause the issue further evidence to fail by setting to null the Appellant.Name in the callback.json
         String issueFurtherEvidenceCallback = createTestData(ISSUE_FURTHER_EVIDENCE.getCcdType() + "Faulty");
         simulateCcdCallback(issueFurtherEvidenceCallback);
+        log.info("FAILING TEST");
         verifyEvidenceIsNotIssued();
     }
 
@@ -68,6 +72,8 @@ public class IssueFurtherEvidenceHandlerFunctionalTest extends AbstractFunctiona
     private void verifyEvidenceIsNotIssued() {
         SscsCaseDetails caseDetails = findCaseById(ccdCaseId);
         SscsCaseData caseData = caseDetails.getData();
+        log.info("Case ID = " + caseDetails.getId());
+        log.info("caseData.getHmctsDwpState() = " + caseData.getHmctsDwpState());
         assertEquals("failedSendingFurtherEvidence", caseData.getHmctsDwpState());
         List<SscsDocument> docs = caseData.getSscsDocument();
         Assertions.assertThat(docs)
