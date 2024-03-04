@@ -35,17 +35,18 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private final FurtherEvidenceService furtherEvidenceService;
     private final CcdService ccdService;
     private final IdamService idamService;
-    private UpdateCcdCaseService updateCcdCaseService;
+    private final UpdateCcdCaseService updateCcdCaseService;
     private static final String UPDATE_CASE_ONLY_SUMMARY = "Update case data";
     @Value("${feature.issue-further-evidence-handler-v2:false}")
     boolean issueFurtherEvidenceHandlerV2;
 
     @Autowired
     public IssueFurtherEvidenceHandler(FurtherEvidenceService furtherEvidenceService, CcdService ccdService,
-                                       IdamService idamService) {
+                                       IdamService idamService, UpdateCcdCaseService updateCcdCaseService) {
         this.furtherEvidenceService = furtherEvidenceService;
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.updateCcdCaseService = updateCcdCaseService;
     }
 
     @Override

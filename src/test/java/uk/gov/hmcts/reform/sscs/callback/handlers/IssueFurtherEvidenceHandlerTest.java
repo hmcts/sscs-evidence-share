@@ -17,6 +17,7 @@ import static uk.gov.hmcts.reform.sscs.domain.FurtherEvidenceLetterType.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -29,11 +30,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.RequiredFieldMissingException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.UpdateCcdCaseService;
 import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
 import uk.gov.hmcts.reform.sscs.exception.PostIssueFurtherEvidenceTasksException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -60,6 +63,12 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Captor
     ArgumentCaptor<SscsCaseData> captor;
+
+    @Captor
+    ArgumentCaptor<Function<SscsCaseData, UpdateCcdCaseService.UpdateResult>> mutatorCaptor;
+
+    @Mock
+    private UpdateCcdCaseService updateCcdCaseService;
 
     private final SscsDocument sscsDocumentNotIssued = SscsDocument.builder()
         .value(SscsDocumentDetails.builder()
@@ -125,12 +134,15 @@ public class IssueFurtherEvidenceHandlerTest {
 
     @Test(expected = PostIssueFurtherEvidenceTasksException.class)
     public void givenExceptionWhenPostIssueFurtherEvidenceTasks_shouldHandleIt() {
-        doThrow(RuntimeException.class).when(ccdService).updateCase(any(), any(),
-            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), any(), any());
+        ReflectionTestUtils.setField(issueFurtherEvidenceHandler, "issueFurtherEvidenceHandlerV2", true);
+        doThrow(RuntimeException.class).when(updateCcdCaseService).updateCaseV2(any(),
+            eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(), mutatorCaptor.capture());
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData,
             INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
+
+        mutatorCaptor.getValue().apply(caseData);
     }
 
 
