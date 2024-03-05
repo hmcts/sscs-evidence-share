@@ -91,8 +91,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     }
 
     private void issueFurtherEvidence(SscsCaseData caseData) {
-        Long caseId = Long.valueOf(caseData.getCcdCaseId());
-        log.info("STARTING issueFurtherEvidence for caseId {}", caseId);
+        log.info("STARTING issueFurtherEvidence");
         List<DocumentType> documentTypes = Arrays.asList(APPELLANT_EVIDENCE, REPRESENTATIVE_EVIDENCE, DWP_EVIDENCE, JOINT_PARTY_EVIDENCE, HMCTS_EVIDENCE);
         List<FurtherEvidenceLetterType> allowedLetterTypes = Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER);
 
