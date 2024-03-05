@@ -79,6 +79,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             } catch (Exception e) {
                 log.error("Caught error from updating case for caseId {}", caseIdLong);
                 log.error("Error message: {}", e.getMessage());
+                log.error("Error stack trace: ", e);
             }
 
         } else {
