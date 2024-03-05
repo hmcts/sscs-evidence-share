@@ -66,6 +66,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         log.info("Handling with Issue Further Evidence Handler for caseId {}", caseId);
 
         if (issueFurtherEvidenceHandlerV2) {
+            log.info("Handling with Issue Further Evidence Handler V2 for caseId {}", caseId);
             updateCcdCaseService.updateCaseV2(Long.parseLong(caseId), EventType.UPDATE_CASE_ONLY.getCcdType(),
                 idamService.getIdamTokens(), caseData -> {
                     issueFurtherEvidence(caseData);
@@ -113,6 +114,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             log.info("Issuing for {} for caseId {}", documentType.getValue(), caseData.getCcdCaseId());
             furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes, otherPartyOriginalSenderId);
         } catch (Exception e) {
+            log.info("Failed sending further evidence for caseId {}", caseData.getCcdCaseId());
             handleIssueFurtherEvidenceException(caseData);
             String errorMsg = "Failed sending further evidence for case(%s)...";
             throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
