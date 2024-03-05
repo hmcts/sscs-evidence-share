@@ -67,7 +67,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
 
         if (issueFurtherEvidenceHandlerV2) {
             log.info("Handling with Issue Further Evidence Handler V2 for caseId {}", caseId);
-            updateCcdCaseService.updateCaseV2(Long.parseLong(caseId), EventType.UPDATE_CASE_ONLY.getCcdType(),
+            updateCcdCaseService.updateCaseV2IssueFurtherEvidence(Long.parseLong(caseId), EventType.UPDATE_CASE_ONLY.getCcdType(),
                 idamService.getIdamTokens(), caseData -> {
                     issueFurtherEvidence(caseData);
                     String description = postIssueFurtherEvidenceTasks(caseData);
