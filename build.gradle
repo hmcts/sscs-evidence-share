@@ -330,7 +330,7 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'ccd-client', version: '4.9.2'
   implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '2.1.1'
 
-  implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'd662209'
+  implementation group: 'com.github.hmcts', name: 'sscs-common', version: 'c91f53b'
   implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '5.2.4'
 
   implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'

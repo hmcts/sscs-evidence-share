@@ -63,18 +63,27 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             throw new IllegalStateException("Cannot handle callback");
         }
         String caseId = callback.getCaseDetails().getCaseData().getCcdCaseId();
-        log.info("Handling with Issue Further Evidence Handler for caseId {}", caseId);
+
 
         if (issueFurtherEvidenceHandlerV2) {
-            log.info("Handling with Issue Further Evidence Handler V2 for caseId {}", caseId);
-            updateCcdCaseService.updateCaseV2IssueFurtherEvidence(Long.parseLong(caseId), EventType.UPDATE_CASE_ONLY.getCcdType(),
-                idamService.getIdamTokens(), caseData -> {
-                    issueFurtherEvidence(caseData);
-                    String description = postIssueFurtherEvidenceTasks(caseData);
-                    return new UpdateResult(UPDATE_CASE_ONLY_SUMMARY, description);
-                });
+            Long caseIdLong = Long.parseLong(caseId);
+            log.info("STARTING Issue Further Evidence Handler V2 for caseId {}", caseIdLong);
+            try {
+                updateCcdCaseService.updateCaseV2IssueFurtherEvidence(caseIdLong, EventType.UPDATE_CASE_ONLY.getCcdType(),
+                    idamService.getIdamTokens(), caseData -> {
+                        issueFurtherEvidence(caseData);
+                        String description = postIssueFurtherEvidenceTasks(caseData);
+                        return new UpdateResult(UPDATE_CASE_ONLY_SUMMARY, description);
+                    });
+                log.info("FINISHED Issue Further Evidence Handler V2 for caseId {}", caseIdLong);
+            } catch (Exception e) {
+                log.error("Caught error from updating case for caseId {}", caseIdLong);
+                log.error("Error message: {}", e.getMessage());
+            }
 
         } else {
+            log.info("Handling with Issue Further Evidence Handler for caseId {}", caseId);
+
             SscsCaseData caseData = callback.getCaseDetails().getCaseData();
             issueFurtherEvidence(caseData);
             postIssueFurtherEvidenceTasks(caseData);
@@ -82,6 +91,8 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     }
 
     private void issueFurtherEvidence(SscsCaseData caseData) {
+        Long caseId = Long.valueOf(caseData.getCcdCaseId());
+        log.info("STARTING issueFurtherEvidence for caseId {}", caseId);
         List<DocumentType> documentTypes = Arrays.asList(APPELLANT_EVIDENCE, REPRESENTATIVE_EVIDENCE, DWP_EVIDENCE, JOINT_PARTY_EVIDENCE, HMCTS_EVIDENCE);
         List<FurtherEvidenceLetterType> allowedLetterTypes = Arrays.asList(APPELLANT_LETTER, REPRESENTATIVE_LETTER, JOINT_PARTY_LETTER, OTHER_PARTY_LETTER, OTHER_PARTY_REP_LETTER);
 
@@ -111,15 +122,15 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     private void issueEvidencePerDocumentType(SscsCaseData caseData, List<FurtherEvidenceLetterType> allowedLetterTypes,
                                                  DocumentType documentType, String otherPartyOriginalSenderId) {
         try {
-            log.info("Issuing for {} for caseId {}", documentType.getValue(), caseData.getCcdCaseId());
+            log.info("Issuing for {} for caseId {}", documentType.getValue(), Long.parseLong(caseData.getCcdCaseId()));
             furtherEvidenceService.issue(caseData.getSscsDocument(), caseData, documentType, allowedLetterTypes, otherPartyOriginalSenderId);
         } catch (Exception e) {
-            log.info("Failed sending further evidence for caseId {}", caseData.getCcdCaseId());
+            log.info("Failed sending further evidence for caseId {}", Long.parseLong(caseData.getCcdCaseId()));
             handleIssueFurtherEvidenceException(caseData);
             String errorMsg = "Failed sending further evidence for case(%s)...";
             throw new IssueFurtherEvidenceException(String.format(errorMsg, caseData.getCcdCaseId()), e);
         }
-        log.info("Issued for caseId {}", caseData.getCcdCaseId());
+        log.info("Issued for caseId {}", Long.parseLong(caseData.getCcdCaseId()));
     }
 
     private String postIssueFurtherEvidenceTasks(SscsCaseData caseData) {
@@ -162,6 +173,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
     }
 
     private void handleIssueFurtherEvidenceException(SscsCaseData caseData) {
+        log.info("Handling IssueFurtherEvidenceException for caseId {}", Long.parseLong(caseData.getCcdCaseId()));
         caseData.setHmctsDwpState("failedSendingFurtherEvidence");
         ccdService.updateCase(caseData, Long.valueOf(caseData.getCcdCaseId()),
             EventType.SEND_FURTHER_EVIDENCE_ERROR.getCcdType(), "Failed to issue further evidence",
