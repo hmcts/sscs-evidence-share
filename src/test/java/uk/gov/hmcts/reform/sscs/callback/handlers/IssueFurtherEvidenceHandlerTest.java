@@ -179,7 +179,7 @@ public class IssueFurtherEvidenceHandlerTest {
             issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED, buildTestCallbackForGivenData(caseData,
                 INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
             if (isV2) {
-                verify(updateCcdCaseService).updateCaseV2IssueFurtherEvidence(any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class), mutatorCaptor.capture());
+                verify(updateCcdCaseService).updateCaseV2(any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class), mutatorCaptor.capture());
                 mutatorCaptor.getValue().apply(caseData);
             }
             fail("no exception thrown");
@@ -233,7 +233,7 @@ public class IssueFurtherEvidenceHandlerTest {
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
 
-        verify(updateCcdCaseService).updateCaseV2IssueFurtherEvidence(any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class), mutatorCaptor.capture());
+        verify(updateCcdCaseService).updateCaseV2(any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class), mutatorCaptor.capture());
 
         Function<SscsCaseData, UpdateCcdCaseService.UpdateResult> mutator = mutatorCaptor.getValue();
 
@@ -324,7 +324,7 @@ public class IssueFurtherEvidenceHandlerTest {
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
 
-        verify(updateCcdCaseService).updateCaseV2IssueFurtherEvidence(any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class), mutatorCaptor.capture());
+        verify(updateCcdCaseService).updateCaseV2(any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class), mutatorCaptor.capture());
 
         Function<SscsCaseData, UpdateCcdCaseService.UpdateResult> mutator = mutatorCaptor.getValue();
 
@@ -381,7 +381,7 @@ public class IssueFurtherEvidenceHandlerTest {
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
 
-        verify(updateCcdCaseService).updateCaseV2IssueFurtherEvidence(any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class), mutatorCaptor.capture());
+        verify(updateCcdCaseService).updateCaseV2(any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class), mutatorCaptor.capture());
 
         Function<SscsCaseData, UpdateCcdCaseService.UpdateResult> mutator = mutatorCaptor.getValue();
 
@@ -457,7 +457,7 @@ public class IssueFurtherEvidenceHandlerTest {
         issueFurtherEvidenceHandler.handle(CallbackType.SUBMITTED,
             buildTestCallbackForGivenData(caseData, INTERLOCUTORY_REVIEW_STATE, ISSUE_FURTHER_EVIDENCE));
 
-        verify(updateCcdCaseService).updateCaseV2IssueFurtherEvidence(any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class), mutatorCaptor.capture());
+        verify(updateCcdCaseService).updateCaseV2(any(Long.class), eq(EventType.UPDATE_CASE_ONLY.getCcdType()), any(IdamTokens.class), mutatorCaptor.capture());
 
         Function<SscsCaseData, UpdateCcdCaseService.UpdateResult> mutator = mutatorCaptor.getValue();
 

@@ -69,7 +69,7 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             Long caseIdLong = Long.parseLong(caseId);
             log.info("STARTING Issue Further Evidence Handler V2 for caseId {}", caseIdLong);
             try {
-                updateCcdCaseService.updateCaseV2IssueFurtherEvidence(caseIdLong, EventType.UPDATE_CASE_ONLY.getCcdType(),
+                updateCcdCaseService.updateCaseV2(caseIdLong, EventType.UPDATE_CASE_ONLY.getCcdType(),
                     idamService.getIdamTokens(), caseData -> {
                         issueFurtherEvidence(caseData);
                         String description = postIssueFurtherEvidenceTasks(caseData);
