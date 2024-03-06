@@ -67,30 +67,30 @@ send-letter:
   maxRetryAttempts: ${MAX_RETRY_ATTEMPTS:3}
 
 idam:
-  url: ${IDAM_API_URL:https://idam-api.aat.platform.hmcts.net}
+  url: ${IDAM_API_URL:http://localhost:5000}
   s2s-auth:
-    totp_secret: ${IDAM_S2S_AUTH_TOTP_SECRET:443EL4ICRQ53FFUY}
+    totp_secret: ${IDAM_S2S_AUTH_TOTP_SECRET:AAAAAAAAAAAAAAAC}
     microservice: ${IDAM_S2S_AUTH_MICROSERVICE:sscs}
-    url: ${IDAM_S2S_AUTH:http://rpe-service-auth-provider-aat.service.core-compute-aat.internal}
+    url: ${IDAM_S2S_AUTH:http://localhost:4502}
   oauth2:
     user:
-      email: ${IDAM_SSCS_SYSTEMUPDATE_USER:sscs-system-update@hmcts.net}
-      password: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD:BbdXxguSEeM4WDs3THy6G0rjLlQknvh8}
+      email: ${IDAM_SSCS_SYSTEMUPDATE_USER:system.update@hmcts.net}
+      password: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD:Pa55word11}
     client:
       id: ${IDAM_OAUTH2_CLIENT_ID:sscs}
-      secret: ${IDAM_OAUTH2_CLIENT_SECRET:3$^zc#4srcqONrl&}
+      secret: ${IDAM_OAUTH2_CLIENT_SECRET:QM5RQQ53LZFOSIXJ}
     redirectUrl: ${IDAM_OAUTH2_REDIRECT_URL:https://localhost:3000/authenticated}
-    jwkUrl: ${IDAM_API_JWK_URL:https://idam-api.aat.platform.hmcts.net/jwks}
+    jwkUrl: ${IDAM_API_JWK_URL:http://localhost:5000/jwks}
   api:
-    url: ${IDAM_API_URL:https://idam-api.aat.platform.hmcts.net}
+    url: ${IDAM_API_URL:http://localhost:5000}
   client:
     id: ${IDAM_OAUTH2_CLIENT_ID:sscs}
-    secret: ${IDAM_OAUTH2_CLIENT_SECRET:3$^zc#4srcqONrl&}
+    secret: ${IDAM_OAUTH2_CLIENT_SECRET:QM5RQQ53LZFOSIXJ}
     redirect_url: ${IDAM_OAUTH2_REDIRECT_URL:https://localhost:3000/authenticated}
 
 core_case_data:
   api:
-    url: ${CORE_CASE_DATA_API_URL:http://ccd-data-store-api-aat.service.core-compute-aat.internal}
+    url: ${CORE_CASE_DATA_API_URL:http://localhost:4452}
   jurisdictionId: ${CORE_CASE_DATA_JURISDICTION_ID:SSCS}
   caseTypeId: ${CORE_CASE_DATA_CASE_TYPE_ID:Benefit}
 
@@ -180,9 +180,9 @@ feature:
   gaps-switchover.enabled: ${GAPS_SWITCHOVER_FEATURE:false}
   case-access-management.enabled: ${CASE_ACCESS_MANAGEMENT_FEATURE:false}
   issue-generic-letter.enabled: ${ISSUE_GENERIC_LETTER:false}
-  issue-further-evidence-handler-v2: ${ISSUE_FURTHER_EVIDENCE_HANDLER_V2:true}
+  issue-further-evidence-handler-v2: ${ISSUE_FURTHER_EVIDENCE_HANDLER_V2:false}
 
-case_document_am.url: ${CASE_DOCUMENT_AM_URL:http://ccd-case-document-am-api-aat.service.core-compute-aat.internal}
+case_document_am.url: ${CASE_DOCUMENT_AM_URL:http://localhost:4455}
 
 pdf:
   api:
