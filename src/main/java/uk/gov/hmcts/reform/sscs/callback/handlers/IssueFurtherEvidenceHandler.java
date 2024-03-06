@@ -68,20 +68,13 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         if (issueFurtherEvidenceHandlerV2) {
             Long caseIdLong = Long.parseLong(caseId);
             log.info("STARTING Issue Further Evidence Handler V2 for caseId {}", caseIdLong);
-            try {
-                updateCcdCaseService.updateCaseV2(caseIdLong, EventType.UPDATE_CASE_ONLY.getCcdType(),
-                    idamService.getIdamTokens(), caseData -> {
-                        issueFurtherEvidence(caseData);
-                        String description = postIssueFurtherEvidenceTasks(caseData);
-                        return new UpdateResult(UPDATE_CASE_ONLY_SUMMARY, description);
-                    });
-                log.info("FINISHED Issue Further Evidence Handler V2 for caseId {}", caseIdLong);
-            } catch (Exception e) {
-                log.error("Caught error from updating case for caseId {}", caseIdLong);
-                log.error("Error message: {}", e.getMessage());
-                log.error("Error stack trace: ", e);
-            }
-
+            updateCcdCaseService.updateCaseV2(caseIdLong, EventType.UPDATE_CASE_ONLY.getCcdType(),
+                idamService.getIdamTokens(), caseData -> {
+                    issueFurtherEvidence(caseData);
+                    String description = postIssueFurtherEvidenceTasks(caseData);
+                    return new UpdateResult(UPDATE_CASE_ONLY_SUMMARY, description);
+                });
+            log.info("FINISHED Issue Further Evidence Handler V2 for caseId {}", caseIdLong);
         } else {
             log.info("Handling with Issue Further Evidence Handler for caseId {}", caseId);
 
