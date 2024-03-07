@@ -94,6 +94,14 @@ docker image rm <image-id>
 
 There is no need to remove postgres and java or similar core images.
 
+### Running Functional Tests Locally
+
+To run the functional tests copy the `application-local-through-aat.yaml` file contents into `application.yaml`. (DO NOT COMMIT THIS FILE)
+
+Then run `SscsEvidenceShareApplication` using IntelliJ. Once this has started you will see `Cause: Connection refused: localhost/127.0.0.1:5671` however this doesn't appear to cause issues.
+
+Then you can run whichever functional tests you want to run, you can debug by running the test and `SscsEvidenceShareApplication` at the same time in debug mode.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details

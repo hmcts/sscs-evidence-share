@@ -46,7 +46,11 @@ public class FurtherEvidenceService {
     public void issue(List<? extends AbstractDocument> sscsDocuments, SscsCaseData caseData, DocumentType documentType,
                       List<FurtherEvidenceLetterType> allowedLetterTypes, String otherPartyOriginalSenderId) {
         List<PdfDocument> pdfDocument = sscsDocumentService.getPdfsForGivenDocTypeNotIssued(sscsDocuments, documentType, isYes(caseData.getIsConfidentialCase()), otherPartyOriginalSenderId);
+        /*
+         * The last log that lines up is in the below function.
+         */
         List<PdfDocument> sizeNormalisedPdfDocuments = sscsDocumentService.sizeNormalisePdfs(pdfDocument);
+        log.info("Surving to here! FurtherEvidenceService.issue line 53");
         updateCaseDocuments(sizeNormalisedPdfDocuments.stream().map(PdfDocument::getDocument).collect(Collectors.toList()), caseData, documentType);
         List<Pdf> pdfs = sizeNormalisedPdfDocuments.stream().map(PdfDocument::getPdf).collect(Collectors.toList());
 
