@@ -70,8 +70,10 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             log.info("STARTING Issue Further Evidence Handler V2 for caseId {}", caseIdLong);
             updateCcdCaseService.updateCaseV2(caseIdLong, EventType.UPDATE_CASE_ONLY.getCcdType(),
                 idamService.getIdamTokens(), caseData -> {
+                    log.info("HmctsDwpState is {} at pre mutator", caseData.getHmctsDwpState());
                     issueFurtherEvidence(caseData);
                     String description = postIssueFurtherEvidenceTasks(caseData);
+                    log.info("HmctsDwpState is {} at post mutator", caseData.getHmctsDwpState());
                     return new UpdateResult(UPDATE_CASE_ONLY_SUMMARY, description);
                 });
             log.info("FINISHED Issue Further Evidence Handler V2 for caseId {}", caseIdLong);
