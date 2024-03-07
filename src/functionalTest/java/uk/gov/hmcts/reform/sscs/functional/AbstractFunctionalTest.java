@@ -87,6 +87,10 @@ public abstract class AbstractFunctionalTest {
         return createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.READY_TO_LIST.getId());
     }
 
+    SscsCaseDetails createDigitalCaseWithEvent(EventType eventType, Boolean faultyData) {
+        return createCaseWithState(eventType, "PIP", "Personal Independence Payment", State.READY_TO_LIST.getId(), faultyData);
+    }
+
 
     SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription, String createdInGapsFrom) {
         idamTokens = idamService.getIdamTokens();
@@ -105,6 +109,30 @@ public abstract class AbstractFunctionalTest {
             .build();
 
 
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
+            "Evidence share service created case",
+            "Evidence share service case created for functional test", idamTokens);
+        ccdCaseId = String.valueOf(caseDetails.getId());
+        return caseDetails;
+    }
+
+    SscsCaseDetails createCaseWithState(EventType eventType, String benefitType, String benefitDescription, String createdInGapsFrom, Boolean faultyData) {
+        idamTokens = idamService.getIdamTokens();
+
+        SscsCaseData minimalCaseData = CaseDataUtils.buildMinimalCaseData();
+
+        SscsCaseData caseData = minimalCaseData.toBuilder()
+            .createdInGapsFrom(createdInGapsFrom)
+            .appeal(minimalCaseData.getAppeal().toBuilder()
+                .benefitType(BenefitType.builder()
+                    .code(benefitType)
+                    .description(benefitDescription)
+                    .build())
+                .receivedVia("Paper")
+                .build())
+            .build();
+
+        caseData.getAppeal().getAppellant().setName(null);
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, eventType.getCcdType(),
             "Evidence share service created case",
             "Evidence share service case created for functional test", idamTokens);
@@ -154,7 +182,12 @@ public abstract class AbstractFunctionalTest {
     }
 
     protected String createTestData(String fileName) throws IOException {
-        SscsCaseDetails caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
+        SscsCaseDetails caseDetails;
+        if (fileName.contains("Faulty")) {
+            caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED, true);
+        } else {
+            caseDetails = createDigitalCaseWithEvent(VALID_APPEAL_CREATED);
+        }
 
         String json = uploadCaseDocuments(fileName, caseDetails);
 
