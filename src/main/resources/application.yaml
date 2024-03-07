@@ -180,7 +180,7 @@ feature:
   gaps-switchover.enabled: ${GAPS_SWITCHOVER_FEATURE:false}
   case-access-management.enabled: ${CASE_ACCESS_MANAGEMENT_FEATURE:false}
   issue-generic-letter.enabled: ${ISSUE_GENERIC_LETTER:false}
-  issue-further-evidence-handler-v2: ${ISSUE_FURTHER_EVIDENCE_HANDLER_V2:false}
+  issue-further-evidence-handler-v2: ${ISSUE_FURTHER_EVIDENCE_HANDLER_V2:true}
 
 case_document_am.url: ${CASE_DOCUMENT_AM_URL:http://localhost:4455}
 
