@@ -27,3 +27,5 @@ infrastructure/override.tf
 # Application insight
 lib/applicationinsights-agent-*.jar
 lib/applicationinsights.log
+
+/src/main/resources/application-local-through-aat.yaml
