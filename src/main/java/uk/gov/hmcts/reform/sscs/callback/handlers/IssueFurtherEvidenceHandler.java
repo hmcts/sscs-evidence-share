@@ -64,27 +64,12 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
         }
         String caseId = callback.getCaseDetails().getCaseData().getCcdCaseId();
 
-
         if (issueFurtherEvidenceHandlerV2) {
             Long caseIdLong = Long.parseLong(caseId);
             log.info("STARTING Issue Further Evidence Handler V2 for caseId {}", caseIdLong);
             updateCcdCaseService.updateCaseV2(caseIdLong, EventType.UPDATE_CASE_ONLY.getCcdType(),
                 idamService.getIdamTokens(), caseData -> {
                     log.info("HmctsDwpState is {} at pre mutator", caseData.getHmctsDwpState());
-                    if (caseData.getAppeal() != null) {
-                        if (caseData.getAppeal().getAppellant() != null) {
-                            if (caseData.getAppeal().getAppellant().getName() != null) {
-                                log.info("Appelant.Name is {}", caseData.getAppeal().getAppellant().getName());
-                            } else {
-                                log.info("Appelant.Name is null");
-                            }
-                        } else {
-                            log.info("Appelant is null");
-                        }
-                    } else {
-                        log.info("Appeal is null");
-                    }
-
                     issueFurtherEvidence(caseData);
                     String description = postIssueFurtherEvidenceTasks(caseData);
                     log.info("HmctsDwpState is {} at post mutator", caseData.getHmctsDwpState());
@@ -95,6 +80,21 @@ public class IssueFurtherEvidenceHandler implements CallbackHandler<SscsCaseData
             log.info("Handling with Issue Further Evidence Handler for caseId {}", caseId);
 
             SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
+            if (caseData.getAppeal() != null) {
+                if (caseData.getAppeal().getAppellant() != null) {
+                    if (caseData.getAppeal().getAppellant().getName() != null) {
+                        log.info("Appelant.Name is {}", caseData.getAppeal().getAppellant().getName());
+                    } else {
+                        log.info("Appelant.Name is null");
+                    }
+                } else {
+                    log.info("Appelant is null");
+                }
+            } else {
+                log.info("Appeal is null");
+            }
+
             issueFurtherEvidence(caseData);
             postIssueFurtherEvidenceTasks(caseData);
         }
