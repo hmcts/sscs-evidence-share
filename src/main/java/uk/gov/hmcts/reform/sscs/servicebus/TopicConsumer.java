@@ -1,11 +1,7 @@
 package uk.gov.hmcts.reform.sscs.servicebus;
 
-import static java.lang.String.format;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.support.JmsHeaders;
@@ -15,7 +11,17 @@ import uk.gov.hmcts.reform.sscs.callback.CallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.exception.*;
+import uk.gov.hmcts.reform.sscs.exception.BulkPrintException;
+import uk.gov.hmcts.reform.sscs.exception.DwpAddressLookupException;
+import uk.gov.hmcts.reform.sscs.exception.IssueFurtherEvidenceException;
+import uk.gov.hmcts.reform.sscs.exception.NoMrnDetailsException;
+import uk.gov.hmcts.reform.sscs.exception.NonPdfBulkPrintException;
+import uk.gov.hmcts.reform.sscs.exception.PdfStoreException;
+import uk.gov.hmcts.reform.sscs.exception.PostIssueFurtherEvidenceTasksException;
+import uk.gov.hmcts.reform.sscs.exception.UnableToContactThirdPartyException;
+
+import static java.lang.String.format;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 
 @Slf4j
 @Component
@@ -42,14 +48,13 @@ public class TopicConsumer {
         subscription = "${amqp.subscription}"
 
     )
-    @ConditionalOnProperty(name = "feature.bypass-evidence-share-service.enabled", havingValue = "false", matchIfMissing = true)
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         processMessageWithRetry(message, 1, messageId);
     }
 
     private void processMessageWithRetry(String message, int retry, String messageId) {
         try {
-            log.info("Message Id {} received from the service bus by evidence share service", messageId);
+
             processMessage(message, messageId);
         } catch (Exception e) {
             if (retry > maxRetryAttempts || isException(e)) {
@@ -72,13 +77,14 @@ public class TopicConsumer {
         try {
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
             dispatcher.handle(SUBMITTED, callback);
-            log.info("Sscs Case CCD callback `{}` handled for Case ID `{}` for message id {}", callback.getEvent(), callback.getCaseDetails().getId(), messageId);
+            log.info("Sscs Case CCD callback `{}` handled for Case ID `{}` for message id {}", callback.getEvent(), callback.getCaseDetails().getId(),
+                messageId);
         } catch (NonPdfBulkPrintException
-            | UnableToContactThirdPartyException
-            | PdfStoreException
-            | BulkPrintException
-            | DwpAddressLookupException
-            | NoMrnDetailsException exception) {
+                 | UnableToContactThirdPartyException
+                 | PdfStoreException
+                 | BulkPrintException
+                 | DwpAddressLookupException
+                 | NoMrnDetailsException exception) {
             // unrecoverable. Catch to remove it from the queue.
             log.error(format("Caught unrecoverable error: %s for message id %s", exception.getMessage(), messageId), exception);
         }
