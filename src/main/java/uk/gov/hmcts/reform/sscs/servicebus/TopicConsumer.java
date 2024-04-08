@@ -34,10 +34,12 @@ public class TopicConsumer {
         this.sscsDeserializer = sscsDeserializer;
     }
 
+
     @JmsListener(
         destination = "${amqp.topic}",
         containerFactory = "topicJmsListenerContainerFactory",
         subscription = "${amqp.subscription}"
+
     )
     public void onMessage(String message, @Header(JmsHeaders.MESSAGE_ID) String messageId) {
         processMessageWithRetry(message, 1, messageId);
@@ -45,7 +47,7 @@ public class TopicConsumer {
 
     private void processMessageWithRetry(String message, int retry, String messageId) {
         try {
-            log.info("Message Id {} received from the service bus by evidence share service", messageId);
+
             processMessage(message, messageId);
         } catch (Exception e) {
             if (retry > maxRetryAttempts || isException(e)) {
@@ -68,13 +70,14 @@ public class TopicConsumer {
         try {
             Callback<SscsCaseData> callback = sscsDeserializer.deserialize(message);
             dispatcher.handle(SUBMITTED, callback);
-            log.info("Sscs Case CCD callback `{}` handled for Case ID `{}` for message id {}", callback.getEvent(), callback.getCaseDetails().getId(), messageId);
+            log.info("Sscs Case CCD callback `{}` handled for Case ID `{}` for message id {}", callback.getEvent(), callback.getCaseDetails().getId(),
+                messageId);
         } catch (NonPdfBulkPrintException
-            | UnableToContactThirdPartyException
-            | PdfStoreException
-            | BulkPrintException
-            | DwpAddressLookupException
-            | NoMrnDetailsException exception) {
+                 | UnableToContactThirdPartyException
+                 | PdfStoreException
+                 | BulkPrintException
+                 | DwpAddressLookupException
+                 | NoMrnDetailsException exception) {
             // unrecoverable. Catch to remove it from the queue.
             log.error(format("Caught unrecoverable error: %s for message id %s", exception.getMessage(), messageId), exception);
         }
