@@ -10,7 +10,7 @@ plugins {
   id 'org.sonarqube' version '4.0.0.2929'
   id 'au.com.dius.pact' version '4.3.14'
   id 'io.freefair.lombok' version '8.0.1'
-  id 'nebula.lint' version '18.0.3'
+  id 'nebula.lint' version '18.1.0'
   id "info.solidsoft.pitest" version '1.9.11'
 }
 
