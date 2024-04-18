@@ -1,3 +1,7 @@
+# :warning: Archived
+
+This repository has been archived as its functionality has been moved to [sscs-tribunals-case-api](https://github.com/hmcts/sscs-tribunals-case-api/pull/3671).
+
 # sscs-evidence-share
 
 Microservice to handle sending evidence via an SFTP server to DWP from SSCS.
