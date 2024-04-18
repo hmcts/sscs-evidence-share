@@ -332,7 +332,7 @@ dependencies {
   implementation group: 'com.github.hmcts', name: 'sscs-common', version: '5.3.9'
   implementation group: 'com.github.hmcts', name: 'sscs-pdf-email-common', version: '1.8.13'
 
-  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '6.2.1'
+  implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.3.0'
 
   implementation group: 'org.pitest', name: 'pitest', version: '1.13.0'
   implementation group:'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.11'
@@ -347,11 +347,11 @@ dependencies {
   implementation group: 'org.json', name: 'json', version: '20240303'
   implementation group: 'joda-time', name: 'joda-time', version: '2.12.5'
 
-  implementation group: 'com.google.guava', name: 'guava', version: '32.0.1-jre'
+  implementation group: 'com.google.guava', name: 'guava', version: '33.1.0-jre'
 
   implementation group: 'org.apache.xmlgraphics', name: 'batik-all', version: '1.16', ext: 'pom'
 
-  implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
+  implementation group: 'org.yaml', name: 'snakeyaml', version: '2.2'
 
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.14.2'
   implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.14.2'
