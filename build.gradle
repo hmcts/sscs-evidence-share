@@ -3,7 +3,7 @@ plugins {
   id 'pmd'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.0'
-  id 'org.springframework.boot' version '2.7.12'
+  id 'org.springframework.boot' version '3.2.4'
   id 'uk.gov.hmcts.java' version '0.12.43'
   id 'com.github.ben-manes.versions' version '0.46.0'
   id 'org.owasp.dependencycheck' version '9.0.6'
@@ -297,7 +297,7 @@ dependencies {
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
 
   // https://mvnrepository.com/artifact/org.springframework.retry/spring-retry
-  implementation group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.4'
+  implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.5'
 
   implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.14'
   implementation group: 'org.projectlombok', name: 'lombok', version: '1.18.26'
@@ -308,9 +308,9 @@ dependencies {
 
   implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-netflix-hystrix', version: '2.2.10.RELEASE'
   // For the below: https://stackoverflow.com/questions/64994034/bootstrap-yml-configuration-not-processed-anymore-with-spring-cloud-2020-0
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.1.6'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '4.1.2'
 
-  implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.8.3'
+  implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.2.4'
 
   implementation group: 'org.springframework', name: 'spring-jms'
   implementation group: 'org.apache.qpid', name: 'qpid-jms-client', version: '1.8.0'
@@ -382,12 +382,12 @@ dependencies {
   // Contract Tests
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.3.15'
   contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.39'
-  contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.12'
+  contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.2.4'
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.2'
   contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.2'
   contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.2'
   contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.9.2'
-  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.6'
+  contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.1'
   contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.10.RELEASE'
 
   contractTestImplementation sourceSets.main.runtimeClasspath
@@ -397,7 +397,7 @@ dependencies {
 dependencyManagement {
   dependencies {
     imports {
-      mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.6"
+      mavenBom "org.springframework.cloud:spring-cloud-dependencies:2023.0.1"
     }
     // CVE-2022-41881, CVE-2022-41915
     dependencySet(group: 'io.netty', version: '4.1.94.Final') {
@@ -415,7 +415,7 @@ dependencyManagement {
       entry 'netty-transport-native-unix-common'
     }
     // CVE-2023-20863
-    dependencySet(group: 'org.springframework', version: '5.3.27') {
+    dependencySet(group: 'org.springframework', version: '6.1.6') {
       entry 'spring-aop'
       entry 'spring-aspects'
       entry 'spring-beans'
